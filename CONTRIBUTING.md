@@ -1,10 +1,10 @@
 ### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) documentation site with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: a [Next.js](https://nextjs.org/) create-llama demo with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- `apps/docs`: a [Next.js](https://nextjs.org/) documentation site with [Tailwind CSS](https://tailwindcss.com/)
+- `apps/web`: a [Next.js](https://nextjs.org/) create-llama demo with [Tailwind CSS](https://tailwindcss.com/)
+- `packages/chat-ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
+- `packages/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `packages/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
 ### Development Guide:
 
