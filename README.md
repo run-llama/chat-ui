@@ -38,8 +38,8 @@ pnpm add @llamaindex/chat-ui
 Here's a basic example of how to use the chat components:
 
 ```jsx
-import React from "react";
-import { ChatSection, ChatMessages, ChatInput } from "@llamaindex/chat-ui";
+import React from 'react'
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
 
 const ChatExample = () => {
   return (
@@ -47,10 +47,10 @@ const ChatExample = () => {
       <ChatMessages />
       <ChatInput />
     </ChatSection>
-  );
-};
+  )
+}
 
-export default ChatExample;
+export default ChatExample
 ```
 
 ## Documentation
