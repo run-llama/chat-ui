@@ -14,18 +14,6 @@ To install the package, run the following command in your project directory:
 npm install @llamaindex/chat-ui
 ```
 
-or if you're using yarn:
-
-```sh
-yarn add @llamaindex/chat-ui
-```
-
-or if you're using pnpm:
-
-```sh
-pnpm add @llamaindex/chat-ui
-```
-
 ## Features
 
 - Pre-built chat components (e.g., message bubbles, input fields)
@@ -37,7 +25,24 @@ pnpm add @llamaindex/chat-ui
 
 Here's a basic example of how to use the chat components:
 
-```jsx
+```tsx
+import '@llamaindex/chat-ui/styles.css' // import style in root layout
+import './globals.css' // your custom theme
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}): JSX.Element {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}
+```
+
+```tsx
 import React from 'react'
 import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
 
