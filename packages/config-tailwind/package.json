@@ -1,0 +1,12 @@
+{
+  "name": "@llamaindex/tailwind-config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./tailwind.config.ts"
+  },
+  "devDependencies": {
+    "@llamaindex/typescript-config": "workspace:*",
+    "tailwindcss": "^3.4.1"
+  }
+}
