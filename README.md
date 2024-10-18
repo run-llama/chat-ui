@@ -23,24 +23,13 @@ npm install @llamaindex/chat-ui
 
 ## Usage
 
-Here's a basic example of how to use the chat components:
+1. Import the styles in your root layout (e.g. `layout.tsx` for Next.js or `index.tsx` for React)
 
 ```tsx
-import '@llamaindex/chat-ui/styles.css' // import style in root layout
-import './globals.css' // your custom theme
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}): JSX.Element {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
-}
+import '@llamaindex/chat-ui/styles.css'
 ```
+
+2. Import the components and use them
 
 ```tsx
 import React from 'react'
@@ -57,6 +46,26 @@ const ChatExample = () => {
 
 export default ChatExample
 ```
+
+## Custom theme
+
+You can customize the theme by overriding the default styles.
+
+```tsx
+import '@llamaindex/chat-ui/styles.css'
+import './globals.css' // your custom theme
+```
+
+Inside `globals.css`, you can override the default styles by defining your own CSS variables. Eg:
+
+```css
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+}
+```
+
+For a list of all available CSS variables, please refer to the [Shadcn Theme Config](https://ui.shadcn.com/themes).
 
 ## Documentation
 
