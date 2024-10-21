@@ -47,6 +47,9 @@ module.exports = {
     '@typescript-eslint/no-confusing-void-expression': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
     'no-console': 'off',
+    'react/jsx-no-leaked-render': 'off',
+    '@typescript-eslint/no-unnecessary-condition': 'off',
+    'react/no-array-index-key': 'off',
   },
   overrides: [
     {
