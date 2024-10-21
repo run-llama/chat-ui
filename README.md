@@ -67,6 +67,68 @@ Inside `globals.css`, you can override the default styles by defining your own C
 
 For a list of all available CSS variables, please refer to the [Shadcn Theme Config](https://ui.shadcn.com/themes).
 
+## Component Composition
+
+Components are designed to be composable. You can use them as is, or extend them with your own styles and behaviors.
+
+You can use just need to use ChatSection like this:
+
+```tsx
+import '@llamaindex/chat-ui/styles.css'
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react' // or other chat context
+
+const ChatExample = () => {
+  const handler = useChat()
+  return <ChatSection handler={handler} />
+}
+```
+
+Or you can extend them with your own children components and styles:
+
+```tsx
+import '@llamaindex/chat-ui/styles.css'
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import LlamaCloudSelector from './components/LlamaCloudSelector' // your custom component
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages />
+      <ChatInput>
+        <ChatInput.Preview />
+        <ChatInput.Form className="bg-lime-500"> {/* custom styles */}
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <LlamaCloudSelector /> {/* custom component */}
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
+
+Your custom component can use provided hooks like `useChat` to access the chat context.
+
+```tsx
+import { useChatInput } from '@llamaindex/chat-ui'
+
+const LlamaCloudSelector = () => {
+  const { data, setData } = useChat()
+  return (
+    <div>
+      <select value={data?.model} onChange={(e) => setData({ model: e.target.value })}>
+        <option value="llama-3.1-70b-instruct">Pipeline 1</option>
+        <option value="llama-3.1-8b-instruct">Pipeline 2</option>
+      </select>
+    </div>
+  )
+}
+```
+
 ## Documentation
 
 For detailed documentation on all available components and their props, please visit our [documentation site](https://docs.llamaindex.ai/chat-ui).
