@@ -1,1 +1,1 @@
-export { Card } from './test/card'
+export { Card } from './widget/card'
