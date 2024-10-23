@@ -21,7 +21,7 @@ export default function ChatSection(props: ChatSectionProps) {
 
   return (
     <ChatProvider value={handler}>
-      <div className={cn('flex flex-col gap-4', className)}>{children}</div>
+      <div className={cn('llamaindex-chat-ui flex flex-col gap-4', className)}>{children}</div>
     </ChatProvider>
   )
 }
