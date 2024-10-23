@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss'
 import sharedConfig from '@llamaindex/tailwind-config'
 
 const config: Pick<Config, 'content' | 'presets' | 'theme'> = {
-  content: ['./src/app/**/*.tsx'],
+  content: ['app/**/*.{ts,tsx}'],
   presets: [sharedConfig],
   theme: {
     extend: {
