@@ -17,12 +17,13 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run build:css && pnpm run build:js",
+    "build": "pnpm run clean && pnpm run build:css && pnpm run build:js",
     "build:css": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
     "build:js": "tsc --project tsconfig.build.json --outDir dist",
     "lint": "eslint src/",
     "dev": "concurrently \"pnpm run build:css --watch\" \"pnpm run build:js --watch\"",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
   },
   "peerDependencies": {
     "react": "^18.2.0"
