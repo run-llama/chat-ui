@@ -92,7 +92,7 @@ function ChatInput(props: ChatInputProps) {
 
 function ChatInputPreview(props: ChatInputPreviewProps) {
   const { data } = useChat()
-  console.log(data)
+  if (!data) return null
   // TODO: render file preview from data
   return (
     <div className={cn(props.className, 'flex gap-2')}>ChatInputPreview</div>
