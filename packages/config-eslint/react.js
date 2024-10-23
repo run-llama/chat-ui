@@ -53,6 +53,8 @@ module.exports = {
     '@typescript-eslint/no-unsafe-assignment': 'off',
     'no-alert': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/consistent-type-imports': 'off',
+    'import/order': 'off',
   },
   overrides: [
     {
