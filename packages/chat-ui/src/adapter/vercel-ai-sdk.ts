@@ -27,6 +27,7 @@ export function useVercelAiSdk(options?: VercelAiSdkOptions): ChatHandler {
     })
 
   const chat = async (content: string, additionalData?: any) => {
+    setInput('');
     await append({ content, role: 'user' }, { data: additionalData })
   }
 
