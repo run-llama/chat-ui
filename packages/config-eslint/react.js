@@ -50,6 +50,9 @@ module.exports = {
     'react/jsx-no-leaked-render': 'off',
     '@typescript-eslint/no-unnecessary-condition': 'off',
     'react/no-array-index-key': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
+    'no-alert': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
   },
   overrides: [
     {
