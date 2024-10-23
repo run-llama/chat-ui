@@ -1,6 +1,7 @@
 export interface Message {
   content: string
   role: string
+  annotations?: any
 }
 
 export interface ChatHandler {

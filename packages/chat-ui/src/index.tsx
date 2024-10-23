@@ -6,4 +6,8 @@ export * from './chat/chat.interface'
 export { useChat } from './chat/chat.context'
 export { default as ChatSection } from './chat/chat-section'
 export { default as ChatInput, useChatInput } from './chat/chat-input'
-export { default as ChatMessages } from './chat/chat-messages'
+export { default as ChatMessages, useChatMessages } from './chat/chat-messages'
+
+// Adapters
+export * from './adapter/vercel-ai-sdk'
+export * from './adapter/vercel-ai-rsc'

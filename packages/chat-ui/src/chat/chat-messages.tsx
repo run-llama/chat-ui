@@ -4,6 +4,7 @@ import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import ChatMessage from './chat-message'
 import { useChat } from './chat.context'
+import type { Message } from './chat.interface'
 
 interface ChatMessagesProps extends React.PropsWithChildren {
   className?: string
@@ -21,6 +22,8 @@ interface ChatMessagesContext {
   isPending: boolean
   showReload?: boolean
   showStop?: boolean
+  messageLength: number
+  lastMessage: Message
 }
 
 const chatMessagesContext = createContext<ChatMessagesContext | null>(null)
@@ -39,7 +42,6 @@ export const useChatMessages = () => {
 
 function ChatMessages(props: ChatMessagesProps) {
   const { messages, reload, stop, isLoading } = useChat()
-  const scrollableChatContainerRef = useRef<HTMLDivElement>(null)
 
   const messageLength = messages.length
   const lastMessage = messages[messageLength - 1]
@@ -53,17 +55,6 @@ function ChatMessages(props: ChatMessagesProps) {
   // so we show a loading indicator to give a better UX.
   const isPending = isLoading && !isLastMessageFromAssistant
 
-  const scrollToBottom = () => {
-    if (scrollableChatContainerRef.current) {
-      scrollableChatContainerRef.current.scrollTop =
-        scrollableChatContainerRef.current.scrollHeight
-    }
-  }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messageLength, lastMessage])
-
   const children = props.children ?? (
     <>
       <ChatMessagesList />
@@ -72,9 +63,10 @@ function ChatMessages(props: ChatMessagesProps) {
   )
 
   return (
-    <ChatMessagesProvider value={{ isPending, showReload, showStop }}>
+    <ChatMessagesProvider
+      value={{ isPending, showReload, showStop, lastMessage, messageLength }}
+    >
       <div
-        ref={scrollableChatContainerRef}
         className={cn(
           'relative flex-1 overflow-y-auto rounded-xl bg-white p-4 shadow-xl',
           props.className
@@ -87,8 +79,9 @@ function ChatMessages(props: ChatMessagesProps) {
 }
 
 function ChatMessagesList(props: ChatMessagesListProps) {
+  const scrollableChatContainerRef = useRef<HTMLDivElement>(null)
   const { messages } = useChat()
-  const { isPending } = useChatMessages()
+  const { isPending, lastMessage, messageLength } = useChatMessages()
 
   const children =
     props.children ??
@@ -96,8 +89,22 @@ function ChatMessagesList(props: ChatMessagesListProps) {
       return <ChatMessage key={index} message={message} />
     })
 
+  const scrollToBottom = () => {
+    if (scrollableChatContainerRef.current) {
+      scrollableChatContainerRef.current.scrollTop =
+        scrollableChatContainerRef.current.scrollHeight
+    }
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messageLength, lastMessage])
+
   return (
-    <div className={cn('flex flex-col gap-5 divide-y', props.className)}>
+    <div
+      className={cn('flex flex-col gap-5 divide-y', props.className)}
+      ref={scrollableChatContainerRef}
+    >
       {children}
       {isPending && (
         <div className="flex items-center justify-center pt-10">
