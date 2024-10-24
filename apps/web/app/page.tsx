@@ -7,7 +7,7 @@ export default function Page(): JSX.Element {
         <h1 className="text-6xl font-bold">LlamaIndex ChatUI</h1>
         <p className="text-2xl">Build powerful AI chat interfaces with ease</p>
       </div>
-      <div className="mx-auto w-[600px] space-y-8">
+      <div className="mx-auto w-[720px] space-y-8">
         <SimpleChatSection />
         <StyledChatSection />
       </div>

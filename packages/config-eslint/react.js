@@ -55,6 +55,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-member-access': 'off',
     '@typescript-eslint/consistent-type-imports': 'off',
     'import/order': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
   },
   overrides: [
     {

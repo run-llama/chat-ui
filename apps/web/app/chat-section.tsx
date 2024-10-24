@@ -16,10 +16,22 @@ export function SimpleChatSection() {
 
 export function StyledChatSection() {
   const handler = useVercelAiSdk()
+
   return (
     <ChatSection handler={handler}>
-      <ChatMessages className="rounded-xl shadow-xl" />
+      <ChatMessages className="rounded-xl shadow-xl">
+        <ChatMessages.List />
+        <ChatMessages.Actions />
+      </ChatMessages>
       <ChatInput className="rounded-xl shadow-xl" />
     </ChatSection>
   )
 }
+
+// const CustomMessageList = () => {
+//   return (
+//     <ChatMessages.List>
+//       <ChatMessages.Loading />
+//     </ChatMessages.List>
+//   )
+// }
