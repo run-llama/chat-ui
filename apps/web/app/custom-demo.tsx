@@ -133,7 +133,7 @@ function CustomChatMessagesList() {
               <img alt="LlamaIndex" src="/llama.png" />
             )}
           </ChatMessage.Avatar>
-          <ChatMessage.Content>
+          <ChatMessage.Content className="items-start">
             <Markdown content={message.content} />
             <Annotation annotations={message.annotations} />
           </ChatMessage.Content>

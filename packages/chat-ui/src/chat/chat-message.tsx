@@ -78,7 +78,11 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 function ChatMessageContent(props: ChatMessageContentProps) {
   const { message } = useChatMessage()
   const children = props.children ?? <Markdown content={message.content} />
-  return <div className="flex flex-1 flex-col gap-4">{children}</div>
+  return (
+    <div className={cn('flex flex-1 flex-col gap-4', props.className)}>
+      {children}
+    </div>
+  )
 }
 
 function ChatMessageActions(props: ChatMessageActionsProps) {
