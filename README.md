@@ -97,7 +97,7 @@ const ChatExample = () => {
       <ChatMessages />
       <ChatInput>
         <ChatInput.Preview />
-        <ChatInput.Form className="bg-lime-500"> {/* custom styles */}
+        <ChatInput.Form className="bg-lime-500">
           <ChatInput.Field type="textarea" />
           <ChatInput.Upload />
           <LlamaCloudSelector /> {/* custom component */}
@@ -118,7 +118,10 @@ const LlamaCloudSelector = () => {
   const { requestData, setRequestData } = useChatUI()
   return (
     <div>
-      <select value={requestData?.model} onChange={(e) => setRequestData({ model: e.target.value })}>
+      <select
+        value={requestData?.model}
+        onChange={e => setRequestData({ model: e.target.value })}
+      >
         <option value="llama-3.1-70b-instruct">Pipeline 1</option>
         <option value="llama-3.1-8b-instruct">Pipeline 2</option>
       </select>
