@@ -1,4 +1,4 @@
-import { SimpleChatSection } from './chat-section'
+import { SimpleChatSection, StyledChatSection } from './chat-section'
 
 export default function Page(): JSX.Element {
   return (
@@ -7,8 +7,9 @@ export default function Page(): JSX.Element {
         <h1 className="text-6xl font-bold">LlamaIndex ChatUI</h1>
         <p className="text-2xl">Build powerful AI chat interfaces with ease</p>
       </div>
-      <div className="w-2/3 space-y-8 mx-auto">
+      <div className="w-[800px] space-y-8 mx-auto">
         <SimpleChatSection />
+        <StyledChatSection />
       </div>
     </main>
   )

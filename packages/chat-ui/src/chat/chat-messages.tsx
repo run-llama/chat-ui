@@ -14,6 +14,10 @@ interface ChatMessagesListProps extends React.PropsWithChildren {
   className?: string
 }
 
+interface ChatMessagesLoadingProps extends React.PropsWithChildren {
+  className?: string
+}
+
 interface ChatActionsProps extends React.PropsWithChildren {
   className?: string
 }
@@ -68,7 +72,7 @@ function ChatMessages(props: ChatMessagesProps) {
     >
       <div
         className={cn(
-          'relative flex-1 overflow-y-auto rounded-xl bg-white p-4 shadow-xl',
+          'relative flex-1 space-y-6 bg-white p-4',
           props.className
         )}
       >
@@ -81,13 +85,7 @@ function ChatMessages(props: ChatMessagesProps) {
 function ChatMessagesList(props: ChatMessagesListProps) {
   const scrollableChatContainerRef = useRef<HTMLDivElement>(null)
   const { messages } = useChat()
-  const { isPending, lastMessage, messageLength } = useChatMessages()
-
-  const children =
-    props.children ??
-    messages.map((message, index) => {
-      return <ChatMessage key={index} message={message} />
-    })
+  const { lastMessage, messageLength } = useChatMessages()
 
   const scrollToBottom = () => {
     if (scrollableChatContainerRef.current) {
@@ -100,17 +98,41 @@ function ChatMessagesList(props: ChatMessagesListProps) {
     scrollToBottom()
   }, [messageLength, lastMessage])
 
+  const children = props.children ?? (
+    <>
+      {messages.map((message, index) => {
+        return <ChatMessage key={index} message={message} />
+      })}
+      <ChatMessagesLoading />
+    </>
+  )
+
   return (
     <div
-      className={cn('flex flex-col gap-5 divide-y', props.className)}
+      className={cn(
+        'flex h-[400px] flex-col gap-5 divide-y overflow-auto',
+        props.className
+      )}
       ref={scrollableChatContainerRef}
     >
       {children}
-      {isPending && (
-        <div className="flex items-center justify-center pt-10">
-          <Loader2 className="h-4 w-4 animate-spin" />
-        </div>
-      )}
+    </div>
+  )
+}
+
+function ChatMessagesLoading(props: ChatMessagesLoadingProps) {
+  const { isPending } = useChatMessages()
+  if (!isPending) return null
+
+  const children = props.children ?? (
+    <Loader2 className="h-4 w-4 animate-spin" />
+  )
+
+  return (
+    <div
+      className={cn('flex items-center justify-center pt-4', props.className)}
+    >
+      {children}
     </div>
   )
 }
@@ -138,13 +160,14 @@ function ChatActions(props: ChatActionsProps) {
   )
 
   return (
-    <div className={cn('flex justify-end gap-4 py-4', props.className)}>
+    <div className={cn('flex justify-end gap-4', props.className)}>
       {children}
     </div>
   )
 }
 
 ChatMessages.List = ChatMessagesList
+ChatMessages.Loading = ChatMessagesLoading
 ChatMessages.Actions = ChatActions
 
 export default ChatMessages
