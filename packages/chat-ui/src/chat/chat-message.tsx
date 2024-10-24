@@ -59,7 +59,7 @@ function ChatMessage(props: ChatMessageProps) {
 function ChatMessageAvatar(props: ChatMessageAvatarProps) {
   const { message } = useChatMessage()
 
-  const roleIconMap: Record<Message['role'], React.ReactNode> = {
+  const roleIconMap: Record<string, React.ReactNode> = {
     user: <User2 className="h-4 w-4" />,
     assistant: <Bot className="h-4 w-4" />,
   }

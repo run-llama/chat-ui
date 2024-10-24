@@ -5,7 +5,7 @@ import { cn } from '../lib/utils'
 import { Button, buttonVariants } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
-import { useChat } from './chat.context'
+import { useChatUI } from './chat.context'
 
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
@@ -53,19 +53,19 @@ export const useChatInput = () => {
 }
 
 function ChatInput(props: ChatInputProps) {
-  const { input, chat, isLoading, data } = useChat()
+  const { input, chat, isLoading, requestData } = useChatUI()
   const isDisabled = isLoading || !input.trim()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    await chat(input, data)
+    await chat(input, requestData)
   }
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isDisabled) return
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      await chat(input, data)
+      await chat(input, requestData)
     }
   }
 
@@ -91,8 +91,8 @@ function ChatInput(props: ChatInputProps) {
 }
 
 function ChatInputPreview(props: ChatInputPreviewProps) {
-  const { data } = useChat()
-  if (!data) return null
+  const { requestData } = useChatUI()
+  if (!requestData) return null
   // TODO: render file preview from data
   return (
     <div className={cn(props.className, 'flex gap-2')}>ChatInputPreview</div>
@@ -117,7 +117,7 @@ function ChatInputForm(props: ChatInputFormProps) {
 }
 
 function ChatInputField(props: ChatInputFieldProps) {
-  const { input, setInput } = useChat()
+  const { input, setInput } = useChatUI()
   const { handleKeyDown } = useChatInput()
   const type = props.type ?? 'textarea'
 
@@ -146,7 +146,7 @@ function ChatInputField(props: ChatInputFieldProps) {
 }
 
 function ChatInputUpload(props: ChatInputUploadProps) {
-  const { data, setData, isLoading } = useChat()
+  const { requestData, setRequestData, isLoading } = useChatUI()
   const [uploading, setUploading] = useState(false)
   const inputId = props.inputId || 'fileInput'
 
@@ -163,7 +163,7 @@ function ChatInputUpload(props: ChatInputUploadProps) {
     if (props.onUpload) {
       await props.onUpload(file)
     } else {
-      setData({ ...(data || {}), file })
+      setRequestData({ ...(requestData || {}), file })
     }
     resetInput()
     setUploading(false)

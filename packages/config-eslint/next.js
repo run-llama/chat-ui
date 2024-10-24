@@ -50,5 +50,7 @@ module.exports = {
     'import/order': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'no-alert': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
   },
 }

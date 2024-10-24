@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useRef } from 'react'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import ChatMessage from './chat-message'
-import { useChat } from './chat.context'
+import { useChatUI } from './chat.context'
 import type { Message } from './chat.interface'
 
 interface ChatMessagesProps extends React.PropsWithChildren {
@@ -45,7 +45,7 @@ export const useChatMessages = () => {
 }
 
 function ChatMessages(props: ChatMessagesProps) {
-  const { messages, reload, stop, isLoading } = useChat()
+  const { messages, reload, stop, isLoading } = useChatUI()
 
   const messageLength = messages.length
   const lastMessage = messages[messageLength - 1]
@@ -84,7 +84,7 @@ function ChatMessages(props: ChatMessagesProps) {
 
 function ChatMessagesList(props: ChatMessagesListProps) {
   const scrollableChatContainerRef = useRef<HTMLDivElement>(null)
-  const { messages } = useChat()
+  const { messages } = useChatUI()
   const { lastMessage, messageLength } = useChatMessages()
 
   const scrollToBottom = () => {
@@ -138,7 +138,7 @@ function ChatMessagesLoading(props: ChatMessagesLoadingProps) {
 }
 
 function ChatActions(props: ChatActionsProps) {
-  const { reload, stop } = useChat()
+  const { reload, stop } = useChatUI()
   const { showReload, showStop } = useChatMessages()
   if (!showStop && !showReload) return null
 

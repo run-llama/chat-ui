@@ -148,9 +148,6 @@ importers:
       '@radix-ui/react-tabs':
         specifier: ^1.1.0
         version: 1.1.1(@types/react-dom@18.2.19)(@types/react@18.2.61)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      ai:
-        specifier: 3.3.42
-        version: 3.3.42(openai@4.68.2(zod@3.23.8))(react@18.2.0)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.12(typescript@5.4.5))(zod@3.23.8)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -5243,16 +5240,6 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/vue@0.0.50(vue@3.5.12(typescript@5.4.5))(zod@3.23.8)':
-    dependencies:
-      '@ai-sdk/provider-utils': 1.0.19(zod@3.23.8)
-      '@ai-sdk/ui-utils': 0.0.44(zod@3.23.8)
-      swrv: 1.0.4(vue@3.5.12(typescript@5.4.5))
-    optionalDependencies:
-      vue: 3.5.12(typescript@5.4.5)
-    transitivePeerDependencies:
-      - zod
-
   '@alloc/quick-lru@5.2.0': {}
 
   '@ampproject/remapping@2.2.1':
@@ -7378,12 +7365,6 @@ snapshots:
       '@vue/shared': 3.5.12
       vue: 3.5.12(typescript@5.3.3)
 
-  '@vue/server-renderer@3.5.12(vue@3.5.12(typescript@5.4.5))':
-    dependencies:
-      '@vue/compiler-ssr': 3.5.12
-      '@vue/shared': 3.5.12
-      vue: 3.5.12(typescript@5.4.5)
-
   '@vue/shared@3.5.12': {}
 
   '@wojtekmaj/react-hooks@1.17.2(react@18.2.0)':
@@ -7445,32 +7426,6 @@ snapshots:
       '@ai-sdk/svelte': 0.0.49(svelte@4.2.19)(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.44(zod@3.23.8)
       '@ai-sdk/vue': 0.0.50(vue@3.5.12(typescript@5.3.3))(zod@3.23.8)
-      '@opentelemetry/api': 1.9.0
-      eventsource-parser: 1.1.2
-      json-schema: 0.4.0
-      jsondiffpatch: 0.6.0
-      nanoid: 3.3.6
-      secure-json-parse: 2.7.0
-      zod-to-json-schema: 3.23.2(zod@3.23.8)
-    optionalDependencies:
-      openai: 4.68.2(encoding@0.1.13)(zod@3.23.8)
-      react: 18.2.0
-      sswr: 2.1.0(svelte@4.2.19)
-      svelte: 4.2.19
-      zod: 3.23.8
-    transitivePeerDependencies:
-      - solid-js
-      - vue
-
-  ai@3.3.42(openai@4.68.2(zod@3.23.8))(react@18.2.0)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.12(typescript@5.4.5))(zod@3.23.8):
-    dependencies:
-      '@ai-sdk/provider': 0.0.23
-      '@ai-sdk/provider-utils': 1.0.19(zod@3.23.8)
-      '@ai-sdk/react': 0.0.59(react@18.2.0)(zod@3.23.8)
-      '@ai-sdk/solid': 0.0.47(zod@3.23.8)
-      '@ai-sdk/svelte': 0.0.49(svelte@4.2.19)(zod@3.23.8)
-      '@ai-sdk/ui-utils': 0.0.44(zod@3.23.8)
-      '@ai-sdk/vue': 0.0.50(vue@3.5.12(typescript@5.4.5))(zod@3.23.8)
       '@opentelemetry/api': 1.9.0
       eventsource-parser: 1.1.2
       json-schema: 0.4.0
@@ -10810,10 +10765,6 @@ snapshots:
     dependencies:
       vue: 3.5.12(typescript@5.3.3)
 
-  swrv@1.0.4(vue@3.5.12(typescript@5.4.5)):
-    dependencies:
-      vue: 3.5.12(typescript@5.4.5)
-
   synckit@0.8.5:
     dependencies:
       '@pkgr/utils': 2.4.2
@@ -11234,16 +11185,6 @@ snapshots:
       '@vue/shared': 3.5.12
     optionalDependencies:
       typescript: 5.3.3
-
-  vue@3.5.12(typescript@5.4.5):
-    dependencies:
-      '@vue/compiler-dom': 3.5.12
-      '@vue/compiler-sfc': 3.5.12
-      '@vue/runtime-dom': 3.5.12
-      '@vue/server-renderer': 3.5.12(vue@3.5.12(typescript@5.4.5))
-      '@vue/shared': 3.5.12
-    optionalDependencies:
-      typescript: 5.4.5
 
   warning@4.0.3:
     dependencies:

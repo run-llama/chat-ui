@@ -10,11 +10,7 @@ export { Markdown } from './widget/markdown'
 export { CodeBlock } from './widget/codeblock'
 
 // Context Provider Hooks
-export { useChat } from './chat/chat.context'
+export { useChatUI } from './chat/chat.context'
 export { useChatInput } from './chat/chat-input'
 export { useChatMessages } from './chat/chat-messages'
 export { useChatMessage } from './chat/chat-message'
-
-// Adapters
-export * from './adapter/vercel-ai-sdk'
-export * from './adapter/vercel-ai-rsc'

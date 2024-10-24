@@ -20,6 +20,7 @@ Settings.embedModel = new OpenAIEmbedding({
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as { messages: Message[] }
+    console.log(body)
     const messages = body.messages
     const lastMessage = messages[messages.length - 1]
 

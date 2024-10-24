@@ -7,7 +7,7 @@ export const chatContext = createContext<ChatContext | null>(null)
 
 export const ChatProvider = chatContext.Provider
 
-export const useChat = () => {
+export const useChatUI = () => {
   const context = useContext(chatContext)
   if (!context) {
     throw new Error('useChat must be used within a ChatProvider')
