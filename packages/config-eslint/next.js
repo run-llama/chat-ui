@@ -52,5 +52,8 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'no-alert': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',
+    'react/no-array-index-key': 'off',
+    '@next/next/no-img-element': 'off',
+    'react/jsx-sort-props': 'off',
   },
 }
