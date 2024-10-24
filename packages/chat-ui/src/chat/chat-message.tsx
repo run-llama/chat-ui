@@ -1,11 +1,10 @@
 import { createContext, useContext } from 'react'
 import { cn } from '../lib/utils'
-import type { Message } from './chat.interface'
+import { Message } from './chat.interface'
 import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
 import { Button } from '../ui/button'
-import { useCopyToClipboard } from './use-copy-to-clipboard'
-import { Markdown } from './markdown'
-import { Attachment } from "./attachment"
+import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
+import { Markdown } from '../widget/markdown'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -78,13 +77,7 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 
 function ChatMessageContent(props: ChatMessageContentProps) {
   const { message } = useChatMessage()
-  const children = props.children ?? (
-    <>
-      <Attachment />
-      <Markdown content={message.content} />
-      {/* TODO: More Chat content goes here */}
-    </>
-  )
+  const children = props.children ?? <Markdown content={message.content} />
   return <div className="flex flex-1 flex-col gap-4">{children}</div>
 }
 

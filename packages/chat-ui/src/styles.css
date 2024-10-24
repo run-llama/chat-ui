@@ -3,36 +3,116 @@
 @tailwind utilities;
 
 @layer base {
-	.llamaindex-chat-ui {
-		--background: 0 0% 100%;
-		--foreground: 222.2 47.4% 11.2%;
+  .llamaindex-chat-ui {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
 
-		--muted: 210 40% 96.1%;
-		--muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-		--popover: 0 0% 100%;
-		--popover-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
 
-		--border: 214.3 31.8% 91.4%;
-		--input: 214.3 31.8% 91.4%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
 
-		--card: 0 0% 100%;
-		--card-foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
 
-		--primary: 222.2 47.4% 11.2%;
-		--primary-foreground: 210 40% 98%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
-		--secondary: 210 40% 96.1%;
-		--secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-		--accent: 210 40% 96.1%;
-		--accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-		--destructive: 0 100% 50%;
-		--destructive-foreground: 210 40% 98%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
 
-		--ring: 215 20.2% 65.1%;
+    --ring: 215 20.2% 65.1%;
 
-		--radius: 0.5rem;
-	}
+    --radius: 0.5rem;
+  }
+
+  /* Custom CSS for chat message markdown */
+  .llamaindex-chat-ui .custom-markdown ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown ol {
+    list-style-type: decimal;
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown li {
+    margin-bottom: 5px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown ol ol {
+    list-style: lower-alpha;
+  }
+
+  .llamaindex-chat-ui .custom-markdown ul ul,
+  .llamaindex-chat-ui .custom-markdown ol ol {
+    margin-left: 20px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown img {
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+  }
+
+  .llamaindex-chat-ui .custom-markdown a {
+    text-decoration: underline;
+    color: #007bff;
+  }
+
+  .llamaindex-chat-ui .custom-markdown h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown h6 {
+    font-size: 16px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown h5 {
+    font-size: 18px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown h4 {
+    font-size: 20px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown h3 {
+    font-size: 22px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown h2 {
+    font-size: 24px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown h1 {
+    font-size: 26px;
+  }
+
+  .llamaindex-chat-ui .custom-markdown hr {
+    border: 0;
+    border-top: 1px solid #e1e4e8;
+    margin: 20px 0;
+  }
 }

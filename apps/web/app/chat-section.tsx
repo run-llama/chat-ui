@@ -23,15 +23,14 @@ export function StyledChatSection() {
         <ChatMessages.List />
         <ChatMessages.Actions />
       </ChatMessages>
-      <ChatInput className="rounded-xl shadow-xl" />
+      <ChatInput className="rounded-xl shadow-xl">
+        <ChatInput.Preview />
+        <ChatInput.Form>
+          <ChatInput.Field />
+          <ChatInput.Upload />
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
     </ChatSection>
   )
 }
-
-// const CustomMessageList = () => {
-//   return (
-//     <ChatMessages.List>
-//       <ChatMessages.Loading />
-//     </ChatMessages.List>
-//   )
-// }

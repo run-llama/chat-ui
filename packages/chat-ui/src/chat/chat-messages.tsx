@@ -110,7 +110,7 @@ function ChatMessagesList(props: ChatMessagesListProps) {
   return (
     <div
       className={cn(
-        'flex h-[300px] flex-col gap-5 divide-y overflow-auto',
+        'flex h-[400px] flex-col gap-5 divide-y overflow-auto',
         props.className
       )}
       ref={scrollableChatContainerRef}
