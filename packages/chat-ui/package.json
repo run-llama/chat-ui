@@ -53,5 +53,8 @@
     "lucide-react": "^0.453.0",
     "tailwind-merge": "^2.1.0",
     "vaul": "^0.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
