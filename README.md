@@ -71,12 +71,11 @@ For a list of all available CSS variables, please refer to the [Shadcn Theme Con
 
 Components are designed to be composable. You can use them as is, or extend them with your own styles and behaviors.
 
-You can use just need to use ChatSection like this:
+So the easiest way to get started is to connect the whole `ChatSection` component with [vercel/ai](https://github.com/vercel/ai) like this:
 
 ```tsx
-import '@llamaindex/chat-ui/styles.css'
-import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react' // or other chat context
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
 
 const ChatExample = () => {
   const handler = useChat()
@@ -87,7 +86,6 @@ const ChatExample = () => {
 Or you can extend them with your own children components and styles:
 
 ```tsx
-import '@llamaindex/chat-ui/styles.css'
 import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
 import LlamaCloudSelector from './components/LlamaCloudSelector' // your custom component
 import { useChat } from 'ai/react'
@@ -111,16 +109,16 @@ const ChatExample = () => {
 }
 ```
 
-Your custom component can use provided hooks like `useChat` to access the chat context.
+Your custom component can use provided hooks like `useChatUI` to access the chat context.
 
 ```tsx
 import { useChatInput } from '@llamaindex/chat-ui'
 
 const LlamaCloudSelector = () => {
-  const { data, setData } = useChat()
+  const { requestData, setRequestData } = useChatUI()
   return (
     <div>
-      <select value={data?.model} onChange={(e) => setData({ model: e.target.value })}>
+      <select value={requestData?.model} onChange={(e) => setRequestData({ model: e.target.value })}>
         <option value="llama-3.1-70b-instruct">Pipeline 1</option>
         <option value="llama-3.1-8b-instruct">Pipeline 2</option>
       </select>
