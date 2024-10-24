@@ -1,4 +1,4 @@
-import { SimpleChatSection, StyledChatSection } from './chat-section'
+import { SimpleChatSection, StyledChatSection } from './demo'
 
 export default function Page(): JSX.Element {
   return (

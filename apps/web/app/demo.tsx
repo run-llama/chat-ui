@@ -6,12 +6,12 @@ import { ChatInput, ChatMessages, ChatSection } from '@llamaindex/chat-ui'
 import { useChat } from 'ai/react'
 
 export function SimpleChatSection() {
-  const handler = useChat({ api: '/api/chat' })
+  const handler = useChat()
   return <ChatSection handler={handler} />
 }
 
 export function StyledChatSection() {
-  const handler = useChat({ api: '/api/chat' })
+  const handler = useChat()
   return (
     <ChatSection handler={handler}>
       <ChatMessages className="rounded-xl shadow-xl">
