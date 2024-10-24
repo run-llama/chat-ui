@@ -23,39 +23,39 @@ npm install @llamaindex/chat-ui
 
 ## Usage
 
-1. Import the styles in your root layout (e.g. `layout.tsx` for Next.js or `index.tsx` for React)
+1. Install the package
 
-```tsx
-import '@llamaindex/chat-ui/styles.css'
+```sh
+npm install @llamaindex/chat-ui
 ```
 
-2. Import the components and use them
+2. Configure your `tailwind.config.ts` to include the chat-ui components
+
+```ts
+module.exports = {
+  content: [
+    'app/**/*.{ts,tsx}',
+    'node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}',
+  ],
+  // ...
+}
+```
+
+3. Import the components and use them
 
 ```tsx
-import React from 'react'
-import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
 
 const ChatExample = () => {
-  return (
-    <ChatSection>
-      <ChatMessages />
-      <ChatInput />
-    </ChatSection>
-  )
+  const handler = useChat()
+  return <ChatSection handler={handler} />
 }
-
-export default ChatExample
 ```
 
 ## Custom theme
 
 You can customize the theme by overriding the default styles.
-
-```tsx
-import '@llamaindex/chat-ui/styles.css'
-import './globals.css' // your custom theme
-```
-
 Inside `globals.css`, you can override the default styles by defining your own CSS variables. Eg:
 
 ```css
