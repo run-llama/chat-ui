@@ -11,7 +11,6 @@
     "src"
   ],
   "exports": {
-    "./styles.css": "./dist/index.css",
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -19,11 +18,10 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run clean && pnpm run build:css && pnpm run build:js",
-    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
+    "build": "pnpm run clean && pnpm run build:js",
     "build:js": "tsc --project tsconfig.build.json --outDir dist",
     "lint": "eslint src/",
-    "dev": "concurrently \"pnpm run build:css --watch\" \"pnpm run build:js --watch\"",
+    "dev": "pnpm run build:js --watch",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
@@ -38,8 +36,7 @@
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3",
-		"concurrently": "^8.2.0"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@llamaindex/pdf-viewer": "^1.1.3",
