@@ -10,7 +10,7 @@ on:
 
 jobs:
   format:
-    name: Run Prettier
+    name: Check Formatting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,3 +31,9 @@ jobs:
 
       - name: Check formatting
         run: pnpm format --check
+        
+      - name: Fail if formatting issues found
+        if: failure()
+        run: |
+          echo "Formatting issues found. Please run 'pnpm format' locally and commit the changes."
+          exit 1
