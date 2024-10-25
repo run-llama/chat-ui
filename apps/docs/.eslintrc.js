@@ -1,3 +1,3 @@
 module.exports = {
-  extends: ["@llamaindex/eslint-config/next.js"],
-};
+  extends: ['@llamaindex/eslint-config/next.js'],
+}

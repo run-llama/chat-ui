@@ -1,3 +1,3 @@
 module.exports = {
-  extends: ["@llamaindex/eslint-config/react.js"],
-};
+  extends: ['@llamaindex/eslint-config/react.js'],
+}

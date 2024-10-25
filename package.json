@@ -6,8 +6,8 @@
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
-    "format": "prettier --ignore-unknown --cache --check .",
-    "format:write": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --ignore-unknown --cache --check \"**/*.{js,ts,tsx,md}\"",
+    "format:write": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo build --filter=docs^... && changeset publish"
