@@ -17,7 +17,7 @@ npm install @llamaindex/chat-ui
 ## Features
 
 - Pre-built chat components (e.g., message bubbles, input fields)
-- Customizable styles using Tailwind CSS
+- Minimal styling, fully customizable with Tailwind CSS
 - TypeScript support for type safety
 - Easy integration with LLM backends
 
@@ -43,6 +43,8 @@ module.exports = {
 
 3. Import the components and use them
 
+The easiest way to get started is to connect the whole `ChatSection` component with `useChat` hook from [vercel/ai](https://github.com/vercel/ai):
+
 ```tsx
 import { ChatSection } from '@llamaindex/chat-ui'
 import { useChat } from 'ai/react'
@@ -52,25 +54,10 @@ const ChatExample = () => {
   return <ChatSection handler={handler} />
 }
 ```
-
-## Custom theme
-
-Inside `globals.css`, you can override the default styles by defining your own CSS variables. Eg:
-
-```css
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-}
-```
-
-For a list of all available CSS variables, please refer to the [Shadcn Theme Config](https://ui.shadcn.com/themes).
 
 ## Component Composition
 
-Components are designed to be composable. You can use them as is, or extend them with your own styles and behaviors.
-
-So the easiest way to get started is to connect the whole `ChatSection` component with [vercel/ai](https://github.com/vercel/ai) like this:
+Components are designed to be composable. You can use them as is:
 
 ```tsx
 import { ChatSection } from '@llamaindex/chat-ui'
@@ -82,7 +69,7 @@ const ChatExample = () => {
 }
 ```
 
-Or you can extend them with your own children components and styles:
+Or you can extend them with your own children components:
 
 ```tsx
 import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
@@ -129,9 +116,44 @@ const LlamaCloudSelector = () => {
 }
 ```
 
-## Documentation
+## Styling
 
-For detailed documentation on all available components and their props, please visit our [documentation site](https://docs.llamaindex.ai/chat-ui).
+`chat-ui` components are based on [shadcn](https://ui.shadcn.com/) components using Tailwind CSS.
+
+You can override the default styles by changing CSS variables in the `globals.css` file of your Tailwind CSS configuration. For example, to change the background and foreground colors:
+
+```css
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+}
+```
+
+For a list of all available CSS variables, please refer to the [Shadcn Theme Config](https://ui.shadcn.com/themes).
+
+Additionally, you can also override each component's styles by setting custom classes in the `className` prop. For example, setting the background color of the `ChatInput.Form` component:
+
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages />
+      <ChatInput>
+        <ChatInput.Preview />
+        <ChatInput.Form className="bg-lime-500">
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
 
 ## License
 
