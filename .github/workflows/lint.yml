@@ -10,7 +10,7 @@ on:
 
 jobs:
   lint:
-    name: Run ESLint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,6 +28,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Build
+        run: pnpm build
 
       - name: Run ESLint
         run: pnpm lint
