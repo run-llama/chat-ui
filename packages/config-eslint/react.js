@@ -56,6 +56,11 @@ module.exports = {
     '@typescript-eslint/consistent-type-imports': 'off',
     'import/order': 'off',
     '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/naming-convention': 'off',
+    'prefer-named-capture-group': 'off',
+    '@typescript-eslint/consistent-indexed-object-style': 'off',
+    'react/no-unstable-nested-components': 'off',
+    '@typescript-eslint/prefer-optional-chain': 'off',
   },
   overrides: [
     {

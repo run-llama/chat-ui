@@ -139,9 +139,9 @@ export function Markdown({
           p({ children }) {
             return <div className="mb-2 last:mb-0">{children}</div>
           },
-          code({ node, inline, className, children, ...props }) {
+          code({ inline, className, children, ...props }) {
             if (children.length) {
-              if (children[0] == '▍') {
+              if (children[0] === '▍') {
                 return (
                   <span className="mt-1 animate-pulse cursor-default">▍</span>
                 )
