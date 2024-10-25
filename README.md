@@ -17,46 +17,110 @@ npm install @llamaindex/chat-ui
 ## Features
 
 - Pre-built chat components (e.g., message bubbles, input fields)
-- Customizable styles using Tailwind CSS
+- Minimal styling, fully customizable with Tailwind CSS
 - TypeScript support for type safety
 - Easy integration with LLM backends
 
 ## Usage
 
-1. Import the styles in your root layout (e.g. `layout.tsx` for Next.js or `index.tsx` for React)
+1. Install the package
 
-```tsx
-import '@llamaindex/chat-ui/styles.css'
+```sh
+npm install @llamaindex/chat-ui
 ```
 
-2. Import the components and use them
+2. Configure your `tailwind.config.ts` to include the chat-ui components
+
+```ts
+module.exports = {
+  content: [
+    'app/**/*.{ts,tsx}',
+    'node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}',
+  ],
+  // ...
+}
+```
+
+3. Import the components and use them
+
+The easiest way to get started is to connect the whole `ChatSection` component with `useChat` hook from [vercel/ai](https://github.com/vercel/ai):
 
 ```tsx
-import React from 'react'
-import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
 
 const ChatExample = () => {
+  const handler = useChat()
+  return <ChatSection handler={handler} />
+}
+```
+
+## Component Composition
+
+Components are designed to be composable. You can use them as is:
+
+```tsx
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return <ChatSection handler={handler} />
+}
+```
+
+Or you can extend them with your own children components:
+
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import LlamaCloudSelector from './components/LlamaCloudSelector' // your custom component
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
   return (
-    <ChatSection>
+    <ChatSection handler={handler}>
       <ChatMessages />
-      <ChatInput />
+      <ChatInput>
+        <ChatInput.Preview />
+        <ChatInput.Form className="bg-lime-500">
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <LlamaCloudSelector /> {/* custom component */}
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
     </ChatSection>
   )
 }
-
-export default ChatExample
 ```
 
-## Custom theme
-
-You can customize the theme by overriding the default styles.
+Your custom component can use the `useChatUI` hook to send additional data to the chat API endpoint:
 
 ```tsx
-import '@llamaindex/chat-ui/styles.css'
-import './globals.css' // your custom theme
+import { useChatInput } from '@llamaindex/chat-ui'
+
+const LlamaCloudSelector = () => {
+  const { requestData, setRequestData } = useChatUI()
+  return (
+    <div>
+      <select
+        value={requestData?.model}
+        onChange={e => setRequestData({ model: e.target.value })}
+      >
+        <option value="llama-3.1-70b-instruct">Pipeline 1</option>
+        <option value="llama-3.1-8b-instruct">Pipeline 2</option>
+      </select>
+    </div>
+  )
+}
 ```
 
-Inside `globals.css`, you can override the default styles by defining your own CSS variables. Eg:
+## Styling
+
+`chat-ui` components are based on [shadcn](https://ui.shadcn.com/) components using Tailwind CSS.
+
+You can override the default styles by changing CSS variables in the `globals.css` file of your Tailwind CSS configuration. For example, to change the background and foreground colors:
 
 ```css
 :root {
@@ -67,9 +131,29 @@ Inside `globals.css`, you can override the default styles by defining your own C
 
 For a list of all available CSS variables, please refer to the [Shadcn Theme Config](https://ui.shadcn.com/themes).
 
-## Documentation
+Additionally, you can also override each component's styles by setting custom classes in the `className` prop. For example, setting the background color of the `ChatInput.Form` component:
 
-For detailed documentation on all available components and their props, please visit our [documentation site](https://docs.llamaindex.ai/chat-ui).
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages />
+      <ChatInput>
+        <ChatInput.Preview />
+        <ChatInput.Form className="bg-lime-500">
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
 
 ## License
 

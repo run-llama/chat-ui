@@ -1,0 +1,5 @@
+# Run lint-staged
+pnpm run format:write
+
+# Run lint for the entire project
+pnpm run lint
