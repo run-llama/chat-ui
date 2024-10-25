@@ -8,8 +8,6 @@ import { FC, memo, useEffect, useRef } from 'react'
 import { Button } from '../ui/button'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 
-
-
 interface Props {
   language: string
   value: string
