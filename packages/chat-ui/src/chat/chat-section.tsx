@@ -10,6 +10,9 @@ export interface ChatSectionProps extends React.PropsWithChildren {
   className?: string
 }
 
+
+
+
 export default function ChatSection(props: ChatSectionProps) {
   const { handler, className } = props
   const [requestData, setRequestData] = useState<any>()
