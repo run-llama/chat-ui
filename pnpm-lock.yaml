@@ -27,55 +27,6 @@ importers:
         specifier: ^2.1.3
         version: 2.1.3
 
-  apps/docs:
-    dependencies:
-      '@llamaindex/chat-ui':
-        specifier: workspace:*
-        version: link:../../packages/chat-ui
-      next:
-        specifier: ^14.2.3
-        version: 14.2.3(@opentelemetry/api@1.9.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-    devDependencies:
-      '@llamaindex/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/config-eslint
-      '@llamaindex/tailwind-config':
-        specifier: workspace:*
-        version: link:../../packages/config-tailwind
-      '@llamaindex/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/config-typescript
-      '@next/eslint-plugin-next':
-        specifier: ^14.2.3
-        version: 14.2.3
-      '@types/node':
-        specifier: ^20.11.24
-        version: 20.11.24
-      '@types/react':
-        specifier: ^18.2.61
-        version: 18.2.61
-      '@types/react-dom':
-        specifier: ^18.2.19
-        version: 18.2.19
-      autoprefixer:
-        specifier: ^10.4.18
-        version: 10.4.18(postcss@8.4.35)
-      postcss:
-        specifier: ^8.4.35
-        version: 8.4.35
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.1
-      typescript:
-        specifier: ^5.3.3
-        version: 5.3.3
-
   apps/web:
     dependencies:
       '@llamaindex/chat-ui':
@@ -6513,7 +6464,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.4
+      debug: 4.3.7
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.1
@@ -6583,7 +6534,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.2
-      debug: 4.3.4
+      debug: 4.3.7
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -8834,7 +8785,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.4
+      debug: 4.3.7
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
