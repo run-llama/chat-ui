@@ -23,7 +23,9 @@
     "lint": "eslint src/",
     "dev": "pnpm run build:js --watch",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "copy": "cp -r ../../README.md ../../LICENSE .",
+    "postbuild": "pnpm run copy"
   },
   "peerDependencies": {
     "react": "^18.2.0"
