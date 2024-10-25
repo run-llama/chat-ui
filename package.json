@@ -10,7 +10,7 @@
     "format:write": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo build --filter=docs^... && changeset publish",
+    "release": "turbo build && changeset publish",
     "prepare": "husky install"
   },
   "devDependencies": {
