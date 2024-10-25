@@ -6,9 +6,7 @@ import { ChatProvider } from './chat.context'
 import { type ChatHandler } from './chat.interface'
 
 export interface ChatSectionProps extends React.PropsWithChildren {
-  handler: Omit<ChatHandler, 'chat' | 'requestData' | 'setRequestData'> & {
-    chat?: ChatHandler['chat']
-  }
+  handler: ChatHandler
   className?: string
 }
 
@@ -16,18 +14,19 @@ export default function ChatSection(props: ChatSectionProps) {
   const { handler, className } = props
   const [requestData, setRequestData] = useState<any>()
 
-  if (!handler.chat && !handler.append) {
+  if (!('chat' in handler) && !('append' in handler)) {
     throw new Error(
       'Please provide chat or append function to handle submit messages'
     )
   }
 
   const chat =
-    props.handler.chat ??
-    (async (input: string, data?: any) => {
-      props.handler.setInput('')
-      await handler.append?.({ content: input, role: 'user' }, { data })
-    })
+    'chat' in handler
+      ? handler.chat
+      : async (input: string, data?: any) => {
+          props.handler.setInput('')
+          await handler.append({ content: input, role: 'user' }, { data })
+        }
 
   const children = props.children ?? (
     <>

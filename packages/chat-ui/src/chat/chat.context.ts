@@ -1,7 +1,5 @@
 import { createContext, useContext } from 'react'
-import { type ChatHandler } from './chat.interface'
-
-export interface ChatContext extends ChatHandler {}
+import { type ChatContext } from './chat.interface'
 
 export const chatContext = createContext<ChatContext | null>(null)
 
