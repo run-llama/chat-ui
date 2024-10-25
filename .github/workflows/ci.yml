@@ -1,4 +1,4 @@
-name: Format
+name: CI
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  format:
-    name: Check Formatting
+  ci:
+    name: Format, Lint, Build, and Type Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,3 +31,12 @@ jobs:
 
       - name: Check formatting
         run: pnpm format
+
+      - name: Run ESLint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Type Check
+        run: pnpm type-check
