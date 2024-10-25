@@ -32,11 +32,8 @@ jobs:
       - name: Check formatting
         run: pnpm format
 
-      - name: Run ESLint
+      - name: Run Build and Lint
         run: pnpm lint
-
-      - name: Build
-        run: pnpm build
 
       - name: Type Check
         run: pnpm type-check
