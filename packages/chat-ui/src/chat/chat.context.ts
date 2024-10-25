@@ -10,7 +10,7 @@ export const ChatProvider = chatContext.Provider
 export const useChatUI = () => {
   const context = useContext(chatContext)
   if (!context) {
-    throw new Error('useChat must be used within a ChatProvider')
+    throw new Error('useChatUI must be used within a ChatProvider')
   }
   return context
 }

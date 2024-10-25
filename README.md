@@ -55,7 +55,6 @@ const ChatExample = () => {
 
 ## Custom theme
 
-You can customize the theme by overriding the default styles.
 Inside `globals.css`, you can override the default styles by defining your own CSS variables. Eg:
 
 ```css
@@ -109,7 +108,7 @@ const ChatExample = () => {
 }
 ```
 
-Your custom component can use provided hooks like `useChatUI` to access the chat context.
+Your custom component can use the `useChatUI` hook to send additional data to the chat API endpoint:
 
 ```tsx
 import { useChatInput } from '@llamaindex/chat-ui'
