@@ -1,8 +1,5 @@
 ---
-'@llamaindex/eslint-config': major
-'@llamaindex/chat-ui': major
-'docs': major
-'web': major
+'@llamaindex/chat-ui': patch
 ---
 
 release first version

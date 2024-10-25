@@ -155,6 +155,10 @@ const ChatExample = () => {
 }
 ```
 
+## Example
+
+See the [example app](./apps/web/README.md) for a complete example.
+
 ## License
 
 @llamaindex/chat-ui is released under the [MIT License](LICENSE).
