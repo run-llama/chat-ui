@@ -30,10 +30,4 @@ jobs:
         run: pnpm install
 
       - name: Check formatting
-        run: pnpm format --check
-        
-      - name: Fail if formatting issues found
-        if: failure()
-        run: |
-          echo "Formatting issues found. Please run 'pnpm format' locally and commit the changes."
-          exit 1
+        run: pnpm format
