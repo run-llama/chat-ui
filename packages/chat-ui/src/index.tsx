@@ -8,7 +8,6 @@ export { default as ChatMessage } from './chat/chat-message'
 // Other useful components
 export { Markdown } from './widget/markdown'
 export { CodeBlock } from './widget/codeblock'
-export * from './widget/file'
 
 // Context Provider Hooks
 export { useChatUI } from './chat/chat.context'

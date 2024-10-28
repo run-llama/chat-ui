@@ -14,10 +14,6 @@ interface ChatInputProps extends React.PropsWithChildren {
   annotations?: any
 }
 
-interface ChatInputPreviewProps extends React.PropsWithChildren {
-  className?: string
-}
-
 interface ChatInputFormProps extends React.PropsWithChildren {
   className?: string
 }
@@ -85,12 +81,7 @@ function ChatInput(props: ChatInputProps) {
     }
   }
 
-  const children = props.children ?? (
-    <>
-      <ChatInputPreview />
-      <ChatInputForm />
-    </>
-  )
+  const children = props.children ?? <ChatInputForm />
 
   return (
     <ChatInputProvider value={{ isDisabled, handleKeyDown, handleSubmit }}>
@@ -106,21 +97,11 @@ function ChatInput(props: ChatInputProps) {
   )
 }
 
-function ChatInputPreview(props: ChatInputPreviewProps) {
-  const { requestData } = useChatUI()
-  if (!requestData) return null
-  // TODO: render file preview from data
-  return (
-    <div className={cn(props.className, 'flex gap-2')}>ChatInputPreview</div>
-  )
-}
-
 function ChatInputForm(props: ChatInputFormProps) {
   const { handleSubmit } = useChatInput()
   const children = props.children ?? (
     <>
       <ChatInputField />
-      <ChatInputUpload />
       <ChatInputSubmit />
     </>
   )
@@ -222,7 +203,6 @@ function ChatInputSubmit(props: ChatInputSubmitProps) {
   )
 }
 
-ChatInput.Preview = ChatInputPreview
 ChatInput.Form = ChatInputForm
 ChatInput.Field = ChatInputField
 ChatInput.Upload = ChatInputUpload
