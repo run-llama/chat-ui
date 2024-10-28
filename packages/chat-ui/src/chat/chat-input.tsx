@@ -6,9 +6,12 @@ import { Button, buttonVariants } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { useChatUI } from './chat.context'
+import { Message } from './chat.interface'
 
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
+  resetUploadedFiles?: () => void
+  annotations?: any
 }
 
 interface ChatInputPreviewProps extends React.PropsWithChildren {
@@ -53,19 +56,32 @@ export const useChatInput = () => {
 }
 
 function ChatInput(props: ChatInputProps) {
-  const { input, append, isLoading, requestData } = useChatUI()
+  const { input, setInput, append, isLoading, requestData } = useChatUI()
   const isDisabled = isLoading || !input.trim()
+
+  const submit = async () => {
+    const newMessage: Omit<Message, 'id'> = {
+      role: 'user',
+      content: input,
+      annotations: props.annotations,
+    }
+
+    setInput('') // Clear the input
+    props.resetUploadedFiles?.() // Reset the uploaded files
+
+    await append(newMessage, { data: requestData })
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    await append({ role: 'user', content: input }, { data: requestData })
+    await submit()
   }
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isDisabled) return
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      await append({ role: 'user', content: input }, { data: requestData })
+      await submit()
     }
   }
 
