@@ -7,6 +7,7 @@ import {
   ChatSection,
   Markdown,
   useChatUI,
+  useFile,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
 import { User2 } from 'lucide-react'
@@ -146,13 +147,39 @@ function CustomChatMessagesList() {
 
 export function CustomChat() {
   const handler = useChat({ initialMessages })
+  const { imageUrl, getAnnotations, uploadFile } = useFile({
+    uploadAPI: '/chat/upload',
+  })
+  const annotations = getAnnotations()
+  const handleUpload = async (file: File) => {
+    try {
+      await uploadFile(file)
+    } catch (error) {
+      console.error(error)
+    }
+  }
   return (
     <ChatSection handler={handler}>
       <ChatMessages className="rounded-xl shadow-xl">
         <CustomChatMessagesList />
         <ChatMessages.Actions />
       </ChatMessages>
-      <ChatInput className="rounded-xl shadow-xl" />
+      <ChatInput className="rounded-xl shadow-xl" annotations={annotations}>
+        <div>
+          {imageUrl ? (
+            <img
+              className="max-h-[100px] object-contain"
+              src={imageUrl}
+              alt="uploaded"
+            />
+          ) : null}
+        </div>
+        <ChatInput.Form>
+          <ChatInput.Field />
+          <ChatInput.Upload onUpload={handleUpload} />
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
     </ChatSection>
   )
 }
