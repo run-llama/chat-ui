@@ -53,19 +53,19 @@ export const useChatInput = () => {
 }
 
 function ChatInput(props: ChatInputProps) {
-  const { input, chat, isLoading, requestData } = useChatUI()
+  const { input, append, isLoading, requestData } = useChatUI()
   const isDisabled = isLoading || !input.trim()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    await chat(input, requestData)
+    await append({ role: 'user', content: input }, { data: requestData })
   }
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isDisabled) return
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      await chat(input, requestData)
+      await append({ role: 'user', content: input }, { data: requestData })
     }
   }
 
