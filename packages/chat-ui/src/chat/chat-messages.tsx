@@ -101,7 +101,13 @@ function ChatMessagesList(props: ChatMessagesListProps) {
   const children = props.children ?? (
     <>
       {messages.map((message, index) => {
-        return <ChatMessage key={index} message={message} />
+        return (
+          <ChatMessage
+            key={index}
+            message={message}
+            isLast={index === messageLength - 1}
+          />
+        )
       })}
       <ChatMessagesLoading />
     </>

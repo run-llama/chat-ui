@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, memo, useContext } from 'react'
 import { cn } from '../lib/utils'
 import { Message } from './chat.interface'
 import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
@@ -8,6 +8,7 @@ import { Markdown } from '../widget/markdown'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
+  isLast: boolean
   className?: string
 }
 
@@ -25,6 +26,7 @@ interface ChatMessageActionsProps extends React.PropsWithChildren {
 
 interface ChatMessageContext {
   message: Message
+  isLast: boolean
 }
 
 const chatMessageContext = createContext<ChatMessageContext | null>(null)
@@ -48,7 +50,9 @@ function ChatMessage(props: ChatMessageProps) {
   )
 
   return (
-    <ChatMessageProvider value={{ message: props.message }}>
+    <ChatMessageProvider
+      value={{ message: props.message, isLast: props.isLast }}
+    >
       <div className={cn('group flex gap-4 pr-2 pt-4', props.className)}>
         {children}
       </div>
@@ -111,8 +115,22 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
   )
 }
 
-ChatMessage.Avatar = ChatMessageAvatar
-ChatMessage.Content = ChatMessageContent
-ChatMessage.Actions = ChatMessageActions
+type ComposibleChatMessage = typeof ChatMessage & {
+  Avatar: typeof ChatMessageAvatar
+  Content: typeof ChatMessageContent
+  Actions: typeof ChatMessageActions
+}
 
-export default ChatMessage
+const PrimiviteChatMessage = memo(ChatMessage, (prevProps, nextProps) => {
+  return (
+    !nextProps.isLast &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.message === nextProps.message
+  )
+}) as unknown as ComposibleChatMessage
+
+PrimiviteChatMessage.Avatar = ChatMessageAvatar
+PrimiviteChatMessage.Content = ChatMessageContent
+PrimiviteChatMessage.Actions = ChatMessageActions
+
+export default PrimiviteChatMessage
