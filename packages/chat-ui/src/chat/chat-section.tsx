@@ -14,20 +14,6 @@ export default function ChatSection(props: ChatSectionProps) {
   const { handler, className } = props
   const [requestData, setRequestData] = useState<any>()
 
-  if (!('chat' in handler) && !('append' in handler)) {
-    throw new Error(
-      'Please provide chat or append function to handle submit messages'
-    )
-  }
-
-  const chat =
-    'chat' in handler
-      ? handler.chat
-      : async (input: string, data?: any) => {
-          props.handler.setInput('')
-          await handler.append({ content: input, role: 'user' }, { data })
-        }
-
   const children = props.children ?? (
     <>
       <ChatMessages />
@@ -36,7 +22,7 @@ export default function ChatSection(props: ChatSectionProps) {
   )
 
   return (
-    <ChatProvider value={{ ...handler, chat, requestData, setRequestData }}>
+    <ChatProvider value={{ ...handler, requestData, setRequestData }}>
       <div className={cn('flex flex-col gap-4', className)}>{children}</div>
     </ChatProvider>
   )

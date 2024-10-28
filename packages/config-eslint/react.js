@@ -61,6 +61,7 @@ module.exports = {
     '@typescript-eslint/consistent-indexed-object-style': 'off',
     'react/no-unstable-nested-components': 'off',
     '@typescript-eslint/prefer-optional-chain': 'off',
+    '@typescript-eslint/prefer-promise-reject-errors': 'off',
   },
   overrides: [
     {

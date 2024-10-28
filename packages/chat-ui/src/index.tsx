@@ -14,3 +14,6 @@ export { useChatUI } from './chat/chat.context'
 export { useChatInput } from './chat/chat-input'
 export { useChatMessages } from './chat/chat-messages'
 export { useChatMessage } from './chat/chat-message'
+
+// Custom Hooks
+export { useFile } from './hook/use-file'

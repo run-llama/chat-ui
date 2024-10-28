@@ -6,13 +6,12 @@ import { Button, buttonVariants } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { useChatUI } from './chat.context'
+import { Message } from './chat.interface'
 
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
-}
-
-interface ChatInputPreviewProps extends React.PropsWithChildren {
-  className?: string
+  resetUploadedFiles?: () => void
+  annotations?: any
 }
 
 interface ChatInputFormProps extends React.PropsWithChildren {
@@ -53,28 +52,36 @@ export const useChatInput = () => {
 }
 
 function ChatInput(props: ChatInputProps) {
-  const { input, chat, isLoading, requestData } = useChatUI()
+  const { input, setInput, append, isLoading, requestData } = useChatUI()
   const isDisabled = isLoading || !input.trim()
+
+  const submit = async () => {
+    const newMessage: Omit<Message, 'id'> = {
+      role: 'user',
+      content: input,
+      annotations: props.annotations,
+    }
+
+    setInput('') // Clear the input
+    props.resetUploadedFiles?.() // Reset the uploaded files
+
+    await append(newMessage, { data: requestData })
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    await chat(input, requestData)
+    await submit()
   }
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isDisabled) return
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      await chat(input, requestData)
+      await submit()
     }
   }
 
-  const children = props.children ?? (
-    <>
-      <ChatInputPreview />
-      <ChatInputForm />
-    </>
-  )
+  const children = props.children ?? <ChatInputForm />
 
   return (
     <ChatInputProvider value={{ isDisabled, handleKeyDown, handleSubmit }}>
@@ -90,21 +97,11 @@ function ChatInput(props: ChatInputProps) {
   )
 }
 
-function ChatInputPreview(props: ChatInputPreviewProps) {
-  const { requestData } = useChatUI()
-  if (!requestData) return null
-  // TODO: render file preview from data
-  return (
-    <div className={cn(props.className, 'flex gap-2')}>ChatInputPreview</div>
-  )
-}
-
 function ChatInputForm(props: ChatInputFormProps) {
   const { handleSubmit } = useChatInput()
   const children = props.children ?? (
     <>
       <ChatInputField />
-      <ChatInputUpload />
       <ChatInputSubmit />
     </>
   )
@@ -206,7 +203,6 @@ function ChatInputSubmit(props: ChatInputSubmitProps) {
   )
 }
 
-ChatInput.Preview = ChatInputPreview
 ChatInput.Form = ChatInputForm
 ChatInput.Field = ChatInputField
 ChatInput.Upload = ChatInputUpload
