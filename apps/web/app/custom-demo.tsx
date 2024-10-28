@@ -124,8 +124,8 @@ function CustomChatMessagesList() {
   const { messages } = useChatUI()
   return (
     <ChatMessages.List>
-      {messages.map((message, index) => (
-        <ChatMessage key={index} message={message} className="items-start">
+      {messages.map(message => (
+        <ChatMessage key={message.id} message={message} className="items-start">
           <ChatMessage.Avatar>
             {message.role === 'user' ? (
               <User2 className="h-4 w-4" />

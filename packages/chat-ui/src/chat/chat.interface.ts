@@ -7,6 +7,7 @@ export type MessageRole =
   | 'tool'
 
 export interface Message {
+  id: string
   content: string
   role: MessageRole
   annotations?: any
