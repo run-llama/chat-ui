@@ -147,7 +147,7 @@ function CustomChatMessagesList() {
 
 export function CustomChat() {
   const handler = useChat({ initialMessages })
-  const { imageUrl, getAnnotations, uploadFile } = useFile({
+  const { imageUrl, getAnnotations, uploadFile, reset } = useFile({
     uploadAPI: '/chat/upload',
   })
   const annotations = getAnnotations()
@@ -164,7 +164,11 @@ export function CustomChat() {
         <CustomChatMessagesList />
         <ChatMessages.Actions />
       </ChatMessages>
-      <ChatInput className="rounded-xl shadow-xl" annotations={annotations}>
+      <ChatInput
+        className="rounded-xl shadow-xl"
+        annotations={annotations}
+        resetUploadedFiles={reset}
+      >
         <div>
           {imageUrl ? (
             <img
