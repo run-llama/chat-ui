@@ -1,8 +1,8 @@
 'use client'
 
-import hljs from 'highlight.js'
+// import hljs from 'highlight.js'
 // instead of atom-one-dark theme, there are a lot of others: https://highlightjs.org/demo
-import 'highlight.js/styles/atom-one-dark-reasonable.css'
+// import 'highlight.js/styles/atom-one-dark-reasonable.css'
 import { Check, Copy, Download } from 'lucide-react'
 import { FC, memo, useEffect, useRef } from 'react'
 import { Button } from '../ui/button'
@@ -60,7 +60,7 @@ const CodeBlock: FC<Props> = memo(({ language, value, className }) => {
 
   useEffect(() => {
     if (codeRef.current && codeRef.current.dataset.highlighted !== 'yes') {
-      hljs.highlightElement(codeRef.current)
+      // hljs.highlightElement(codeRef.current)
     }
   }, [language, value])
 
