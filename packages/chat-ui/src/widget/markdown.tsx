@@ -12,7 +12,8 @@ import {
   DocumentFileType,
   SourceData,
 } from '../chat/annotation'
-import { DocumentInfo, SourceNumberButton } from './chat-sources'
+import { DocumentInfo } from './document-info'
+import { SourceNumberButton } from './source-number-button'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
