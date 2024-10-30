@@ -1,5 +1,6 @@
 'use client'
 
+import { lazy } from 'react'
 import { Button } from '../ui/button'
 import {
   Drawer,
@@ -10,7 +11,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '../ui/drawer'
-import { PDFViewer, PdfFocusProvider } from '@llamaindex/pdf-viewer'
+
+const PDFViewer = lazy(() =>
+  import('@llamaindex/pdf-viewer').then(m => ({ default: m.PDFViewer }))
+)
+const PdfFocusProvider = lazy(() =>
+  import('@llamaindex/pdf-viewer').then(m => ({ default: m.PdfFocusProvider }))
+)
 
 export interface PdfDialogProps {
   documentId: string
