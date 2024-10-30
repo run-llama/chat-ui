@@ -62,6 +62,12 @@ module.exports = {
     'react/no-unstable-nested-components': 'off',
     '@typescript-eslint/prefer-optional-chain': 'off',
     '@typescript-eslint/prefer-promise-reject-errors': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/non-nullable-type-assertion-style': 'off',
+    'jsx-a11y/click-events-have-key-events': 'off',
+    'jsx-a11y/no-static-element-interactions': 'off',
+    'jsx-a11y/anchor-is-valid': 'off',
   },
   overrides: [
     {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { DocumentFileType, DocumentFile } from '../chat/annotation'
 
 const docMineTypeMap: Record<string, DocumentFileType> = {
   'text/csv': 'csv',
@@ -8,17 +9,6 @@ const docMineTypeMap: Record<string, DocumentFileType> = {
   'text/plain': 'txt',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
     'docx',
-}
-
-export type DocumentFileType = 'csv' | 'pdf' | 'txt' | 'docx'
-
-export type DocumentFile = {
-  id: string
-  name: string // The uploaded file name in the backend
-  size: number // The file size in bytes
-  type: DocumentFileType
-  url: string // The URL of the uploaded file in the backend
-  refs?: string[] // DocumentIDs of the uploaded file in the vector index
 }
 
 export function useFile({ uploadAPI }: { uploadAPI: string }) {
