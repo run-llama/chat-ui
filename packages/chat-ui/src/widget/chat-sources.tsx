@@ -12,7 +12,7 @@ import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { PdfDialog } from './pdf-dialog'
 import { Button } from '../ui/button'
-import { PreviewCard } from './document-preview'
+import { DocumentPreviewCard } from './document-preview'
 
 type Document = {
   url: string
@@ -112,7 +112,7 @@ export function DocumentInfo({
 
   const DocumentDetail = (
     <div className={`relative ${className}`}>
-      <PreviewCard className="cursor-pointer" file={previewFile} />
+      <DocumentPreviewCard className="cursor-pointer" file={previewFile} />
       <div className="absolute bottom-2 right-2 flex space-x-2">
         {sources.map((node: SourceNode, index: number) => (
           <div key={node.id}>
