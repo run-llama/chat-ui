@@ -4,7 +4,11 @@ import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Markdown } from '../widget/markdown'
-import { getSourceAnnotationData, MessageAnnotation } from './annotation'
+import {
+  getSourceAnnotationData,
+  MessageAnnotation,
+  SourceData,
+} from './annotation'
 import {
   AgentEventAnnotations,
   DocumentFileAnnotations,
@@ -53,6 +57,7 @@ type ContentDisplayConfig = {
 interface ChatMessageContentProps extends React.PropsWithChildren {
   className?: string
   content?: ContentDisplayConfig[]
+  markdownComponent?: React.FC<{ content: string; sources?: SourceData }>
 }
 
 interface ChatMessageActionsProps extends React.PropsWithChildren {
@@ -119,11 +124,13 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
   const contents = useMemo(() => {
+    const MarkdownComponent = props.markdownComponent ?? Markdown
+
     if (!annotations?.length) {
       return [
         {
           position: ContentPosition.MARKDOWN,
-          component: <Markdown content={message.content} />,
+          component: <MarkdownComponent content={message.content} />,
         },
         ...(props.content ?? []),
       ]
@@ -145,7 +152,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       {
         position: ContentPosition.MARKDOWN,
         component: (
-          <Markdown
+          <MarkdownComponent
             content={message.content}
             sources={getSourceAnnotationData(annotations)?.[0]}
           />
@@ -167,7 +174,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       },
       ...(props.content ?? []),
     ] as ContentDisplayConfig[]
-  }, [annotations, isLast, message, props.content])
+  }, [annotations, isLast, message, props.content, props.markdownComponent])
 
   const children = props.children ?? (
     <>
