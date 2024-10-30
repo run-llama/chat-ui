@@ -17,6 +17,8 @@ export { CodeBlock } from './widget/codeblock'
 export { PdfDialog } from './widget/pdf-dialog'
 export { SuggestedQuestions } from './widget/suggested-questions'
 export { StarterQuestions } from './widget/starter-questions'
+export { DocumentPreview } from './widget/document-preview'
+export { ImagePreview } from './widget/image-preview'
 
 // Context Provider Hooks
 export { useChatUI } from './chat/chat.context'
