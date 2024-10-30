@@ -29,7 +29,7 @@ export function DocumentPreview(props: DocumentPreviewProps) {
   if (refs?.length) {
     return (
       <div title={`Document IDs: ${refs.join(', ')}`}>
-        <PreviewCard {...props} />
+        <DocumentPreviewCard {...props} />
       </div>
     )
   }
@@ -38,7 +38,7 @@ export function DocumentPreview(props: DocumentPreviewProps) {
     <Drawer direction="left">
       <DrawerTrigger asChild>
         <div>
-          <PreviewCard className="cursor-pointer" {...props} />
+          <DocumentPreviewCard className="cursor-pointer" {...props} />
         </div>
       </DrawerTrigger>
       <DrawerContent className="mt-24 h-full max-h-[96%] w-3/5 ">
@@ -72,7 +72,7 @@ export const FileIconMap: Record<DocumentFileType, React.ReactNode> = {
   txt: <TxtIcon />,
 }
 
-export function PreviewCard(props: {
+export function DocumentPreviewCard(props: {
   file: {
     name: string
     size?: number
