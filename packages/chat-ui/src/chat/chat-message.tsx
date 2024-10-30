@@ -4,7 +4,7 @@ import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Markdown } from '../widget/markdown'
-import { MessageAnnotation } from './annotation'
+import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
   DocumentFileAnnotations,
@@ -144,7 +144,12 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       },
       {
         position: ContentPosition.MARKDOWN,
-        component: <Markdown content={message.content} />,
+        component: (
+          <Markdown
+            content={message.content}
+            sources={getSourceAnnotationData(annotations)?.[0]}
+          />
+        ),
       },
       {
         position: ContentPosition.CHAT_DOCUMENT_FILES,
@@ -162,7 +167,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       },
       ...(props.content ?? []),
     ] as ContentDisplayConfig[]
-  }, [annotations?.length, isLast, message, props.content])
+  }, [annotations, isLast, message, props.content])
 
   const children = props.children ?? (
     <>
