@@ -1,28 +1,19 @@
-import { createContext, Fragment, memo, useContext, useMemo } from 'react'
-import { cn } from '../lib/utils'
-import { Message } from './chat.interface'
 import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
-import { Button } from '../ui/button'
+import { createContext, Fragment, memo, useContext, useMemo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
+import { cn } from '../lib/utils'
+import { Button } from '../ui/button'
 import { Markdown } from '../widget/markdown'
+import { MessageAnnotation } from './annotation'
 import {
-  getSourceAnnotationData,
-  ImageData,
-  SuggestedQuestionsData,
-  AgentEventData,
-  DocumentFileData,
-  EventData,
-  getAnnotationData,
-  MessageAnnotation,
-  MessageAnnotationType,
-} from './annotation'
-import { useChatUI } from './chat.context'
-import { ChatAgentEvents } from '../widget/chat-agent-events'
-import { ChatEvents } from '../widget/chat-events'
-import { ChatImage } from '../widget/chat-image'
-import { ChatFiles } from '../widget/chat-files'
-import { ChatSources } from '../widget/chat-sources'
-import { SuggestedQuestions } from '../widget/suggested-questions'
+  AgentEventAnnotations,
+  DocumentFileAnnotations,
+  EventAnnotations,
+  ImageAnnotations,
+  SourceAnnotations,
+  SuggestedQuestionsAnnotations,
+} from './chat-annotations'
+import { Message } from './chat.interface'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -42,12 +33,15 @@ export enum ContentPosition {
   AFTER_AGENT_EVENTS = 3,
   CHAT_IMAGE = 4,
   AFTER_IMAGE = 5,
-  MARKDOWN = 6,
-  AFTER_MARKDOWN = 7,
-  CHAT_SOURCES = 8,
-  AFTER_SOURCES = 9,
-  SUGGESTED_QUESTIONS = 10,
-  AFTER_SUGGESTED_QUESTIONS = 11,
+  BEFORE_MARKDOWN = 6,
+  MARKDOWN = 7,
+  AFTER_MARKDOWN = 8,
+  CHAT_DOCUMENT_FILES = 9,
+  AFTER_DOCUMENT_FILES = 10,
+  CHAT_SOURCES = 11,
+  AFTER_SOURCES = 12,
+  SUGGESTED_QUESTIONS = 13,
+  AFTER_SUGGESTED_QUESTIONS = 14,
   BOTTOM = 9999,
 }
 
@@ -121,7 +115,6 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 }
 
 function ChatMessageContent(props: ChatMessageContentProps) {
-  const { append, isLoading } = useChatUI()
   const { message, isLast } = useChatMessage()
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
@@ -136,80 +129,40 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       ]
     }
 
-    const imageData = getAnnotationData<ImageData>(annotations, 'image')
-    const contentFileData = getAnnotationData<DocumentFileData>(
-      annotations,
-      MessageAnnotationType.DOCUMENT_FILE
-    )
-    const eventData = getAnnotationData<EventData>(
-      annotations,
-      MessageAnnotationType.EVENTS
-    )
-    const agentEventData = getAnnotationData<AgentEventData>(
-      annotations,
-      MessageAnnotationType.AGENT_EVENTS
-    )
-    const sourceData = getSourceAnnotationData(annotations)
-    const suggestedQuestionsData = getAnnotationData<SuggestedQuestionsData>(
-      annotations,
-      MessageAnnotationType.SUGGESTED_QUESTIONS
-    )
-
     return [
       {
         position: ContentPosition.CHAT_EVENTS,
-        component:
-          eventData.length > 0 ? (
-            <ChatEvents
-              data={eventData}
-              isLast={isLast}
-              isLoading={isLoading}
-            />
-          ) : null,
+        component: <EventAnnotations message={message} isLast={isLast} />,
       },
       {
         position: ContentPosition.CHAT_AGENT_EVENTS,
-        component:
-          agentEventData.length > 0 ? (
-            <ChatAgentEvents
-              data={agentEventData}
-              isFinished={Boolean(message.content)}
-            />
-          ) : null,
+        component: <AgentEventAnnotations message={message} />,
       },
       {
         position: ContentPosition.CHAT_IMAGE,
-        component: imageData[0] ? <ChatImage data={imageData[0]} /> : null,
-      },
-      {
-        position: ContentPosition.AFTER_IMAGE,
-        component: contentFileData[0] ? (
-          <ChatFiles data={contentFileData[0]} />
-        ) : null,
+        component: <ImageAnnotations message={message} />,
       },
       {
         position: ContentPosition.MARKDOWN,
-        component: (
-          <Markdown content={message.content} sources={sourceData[0]} />
-        ),
+        component: <Markdown content={message.content} />,
+      },
+      {
+        position: ContentPosition.CHAT_DOCUMENT_FILES,
+        component: <DocumentFileAnnotations message={message} />,
       },
       {
         position: ContentPosition.CHAT_SOURCES,
-        component: sourceData[0] ? <ChatSources data={sourceData[0]} /> : null,
+        component: <SourceAnnotations message={message} />,
       },
       {
         position: ContentPosition.SUGGESTED_QUESTIONS,
-        component: suggestedQuestionsData[0] ? (
-          <SuggestedQuestions
-            questions={suggestedQuestionsData[0]}
-            append={append}
-            isLastMessage={isLast}
-          />
-        ) : null,
+        component: (
+          <SuggestedQuestionsAnnotations message={message} isLast={isLast} />
+        ),
       },
       ...(props.content ?? []),
     ] as ContentDisplayConfig[]
-  }, [annotations, append, isLast, isLoading, message.content, props.content])
+  }, [annotations?.length, isLast, message, props.content])
 
   const children = props.children ?? (
     <>

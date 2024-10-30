@@ -4,7 +4,7 @@ export * from './chat/annotation'
 export { default as ChatSection } from './chat/chat-section'
 export { default as ChatInput } from './chat/chat-input'
 export { default as ChatMessages } from './chat/chat-messages'
-export { default as ChatMessage } from './chat/chat-message'
+export { default as ChatMessage, ContentPosition } from './chat/chat-message'
 
 // Other useful components
 export { ChatAgentEvents } from './widget/chat-agent-events'

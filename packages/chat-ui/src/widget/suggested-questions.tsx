@@ -9,7 +9,7 @@ export function SuggestedQuestions({
   isLastMessage,
 }: {
   questions: SuggestedQuestionsData
-  append: Pick<ChatHandler, 'append'>['append']
+  append?: Pick<ChatHandler, 'append'>['append']
   isLastMessage: boolean
 }) {
   const showQuestions = isLastMessage && questions.length > 0
