@@ -1,6 +1,5 @@
 ---
-'@llamaindex/eslint-config': minor
-'@llamaindex/chat-ui': minor
+'@llamaindex/chat-ui': patch
 ---
 
 feat: chat annotations
