@@ -9,12 +9,16 @@ import {
   CollapsibleTrigger,
 } from '../ui/collapsible'
 import { EventData } from '../chat/annotation'
-import { useChatUI } from '../chat/chat.context'
-import { useChatMessage } from '../chat/chat-message'
 
-export function ChatEvents({ data }: { data: EventData[] }) {
-  const { isLoading } = useChatUI()
-  const { isLast } = useChatMessage()
+export function ChatEvents({
+  data,
+  isLast,
+  isLoading,
+}: {
+  data: EventData[]
+  isLast: boolean
+  isLoading: boolean
+}) {
   const [isOpen, setIsOpen] = useState(false)
 
   const showLoading = isLast && isLoading

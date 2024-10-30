@@ -3,7 +3,6 @@ export enum MessageAnnotationType {
   DOCUMENT_FILE = 'document_file',
   SOURCES = 'sources',
   EVENTS = 'events',
-  TOOLS = 'tools',
   SUGGESTED_QUESTIONS = 'suggested_questions',
   AGENT_EVENTS = 'agent',
 }
@@ -54,20 +53,6 @@ export type AgentEventData = {
   text: string
 }
 
-export type ToolData = {
-  toolCall: {
-    id: string
-    name: string
-    input: {
-      [key: string]: any
-    }
-  }
-  toolOutput: {
-    output: any
-    isError: boolean
-  }
-}
-
 export type SuggestedQuestionsData = string[]
 
 export type AnnotationData =
@@ -76,7 +61,6 @@ export type AnnotationData =
   | SourceData
   | EventData
   | AgentEventData
-  | ToolData
   | SuggestedQuestionsData
 
 export type MessageAnnotation = {
@@ -88,9 +72,11 @@ const NODE_SCORE_THRESHOLD = 0.25
 
 export function getAnnotationData<T extends AnnotationData>(
   annotations: MessageAnnotation[],
-  type: MessageAnnotationType
+  type: string
 ): T[] {
-  return annotations.filter(a => a.type === type).map(a => a.data as T)
+  return annotations
+    .filter(a => a.type.toString() === type)
+    .map(a => a.data as T)
 }
 
 export function getSourceAnnotationData(
