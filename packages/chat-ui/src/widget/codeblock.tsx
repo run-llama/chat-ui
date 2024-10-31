@@ -1,8 +1,6 @@
 'use client'
 
 import hljs from 'highlight.js'
-// instead of atom-one-dark theme, there are a lot of others: https://highlightjs.org/demo
-import 'highlight.js/styles/atom-one-dark-reasonable.css'
 import { Check, Copy, Download } from 'lucide-react'
 import { FC, memo, useEffect, useRef } from 'react'
 import { Button } from '../ui/button'
@@ -98,31 +96,133 @@ const CodeBlock: FC<Props> = memo(({ language, value, className }) => {
   }
 
   return (
-    <div
-      className={`codeblock relative w-full bg-zinc-950 font-sans ${className}`}
-    >
-      <div className="flex w-full items-center justify-between bg-zinc-800 px-6 py-2 pr-4 text-zinc-100">
-        <span className="text-xs lowercase">{language}</span>
-        <div className="flex items-center space-x-1">
-          <Button variant="ghost" onClick={downloadAsFile} size="icon">
-            <Download />
-            <span className="sr-only">Download</span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onCopy}>
-            {isCopied ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-            <span className="sr-only">Copy code</span>
-          </Button>
+    <div>
+      <style>{`
+        pre code.hljs {
+          display: block;
+          overflow-x: auto;
+          padding: 1em
+        }
+        code.hljs {
+          padding: 3px 5px
+        }
+        .hljs {
+          color: #abb2bf;
+          background: #282c34
+        }
+        .hljs-keyword,
+        .hljs-operator {
+          color: #F92672
+        }
+        .hljs-pattern-match {
+          color: #F92672
+        }
+        .hljs-pattern-match .hljs-constructor {
+          color: #61aeee
+        }
+        .hljs-function {
+          color: #61aeee
+        }
+        .hljs-function .hljs-params {
+          color: #A6E22E
+        }
+        .hljs-function .hljs-params .hljs-typing {
+          color: #FD971F
+        }
+        .hljs-module-access .hljs-module {
+          color: #7e57c2
+        }
+        .hljs-constructor {
+          color: #e2b93d
+        }
+        .hljs-constructor .hljs-string {
+          color: #9CCC65
+        }
+        .hljs-comment,
+        .hljs-quote {
+          color: #b18eb1;
+          font-style: italic
+        }
+        .hljs-doctag,
+        .hljs-formula {
+          color: #c678dd
+        }
+        .hljs-section,
+        .hljs-name,
+        .hljs-selector-tag,
+        .hljs-deletion,
+        .hljs-subst {
+          color: #e06c75
+        }
+        .hljs-literal {
+          color: #56b6c2
+        }
+        .hljs-string,
+        .hljs-regexp,
+        .hljs-addition,
+        .hljs-attribute,
+        .hljs-meta .hljs-string {
+          color: #98c379
+        }
+        .hljs-built_in,
+        .hljs-title.class_,
+        .hljs-class .hljs-title {
+          color: #e6c07b
+        }
+        .hljs-attr,
+        .hljs-variable,
+        .hljs-template-variable,
+        .hljs-type,
+        .hljs-selector-class,
+        .hljs-selector-attr,
+        .hljs-selector-pseudo,
+        .hljs-number {
+          color: #d19a66
+        }
+        .hljs-symbol,
+        .hljs-bullet,
+        .hljs-link,
+        .hljs-meta,
+        .hljs-selector-id,
+        .hljs-title {
+          color: #61aeee
+        }
+        .hljs-emphasis {
+          font-style: italic
+        }
+        .hljs-strong {
+          font-weight: bold
+        }
+        .hljs-link {
+          text-decoration: underline
+        }
+      `}</style>
+      <div
+        className={`codeblock relative w-full bg-zinc-950 font-sans ${className}`}
+      >
+        <div className="flex w-full items-center justify-between bg-zinc-800 px-6 py-2 pr-4 text-zinc-100">
+          <span className="text-xs lowercase">{language}</span>
+          <div className="flex items-center space-x-1">
+            <Button variant="ghost" onClick={downloadAsFile} size="icon">
+              <Download />
+              <span className="sr-only">Download</span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onCopy}>
+              {isCopied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+              <span className="sr-only">Copy code</span>
+            </Button>
+          </div>
         </div>
+        <pre className="border border-zinc-700">
+          <code ref={codeRef} className={`language-${language} font-mono`}>
+            {value}
+          </code>
+        </pre>
       </div>
-      <pre className="border border-zinc-700">
-        <code ref={codeRef} className={`language-${language} font-mono`}>
-          {value}
-        </code>
-      </pre>
     </div>
   )
 })
