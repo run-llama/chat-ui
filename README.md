@@ -155,6 +155,13 @@ const ChatExample = () => {
 }
 ```
 
+For code and katex styling, you can import the CSS files:
+
+```tsx
+import '@llamaindex/chat-ui/styles/code.css'
+import '@llamaindex/chat-ui/styles/katex.css'
+```
+
 ## Example
 
 See the [example app](./apps/web/README.md) for a complete example.
