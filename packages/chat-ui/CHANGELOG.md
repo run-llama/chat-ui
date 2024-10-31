@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.4
+
+### Patch Changes
+
+- 07a0d27: Add progress bar for agent events
+
 ## 0.0.3
 
 ### Patch Changes
