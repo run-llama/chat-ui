@@ -18,8 +18,10 @@ npm install @llamaindex/chat-ui
 
 - Pre-built chat components (e.g., message bubbles, input fields)
 - Minimal styling, fully customizable with Tailwind CSS
+- Custom widgets to extend components (e.g., for rendering generated or retrieved documents)
 - TypeScript support for type safety
 - Easy integration with LLM backends
+- Code and Latex styling with highlight.js and katex
 
 ## Usage
 
