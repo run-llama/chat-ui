@@ -118,6 +118,8 @@ const LlamaCloudSelector = () => {
 
 ## Styling
 
+### Components
+
 `chat-ui` components are based on [shadcn](https://ui.shadcn.com/) components using Tailwind CSS.
 
 You can override the default styles by changing CSS variables in the `globals.css` file of your Tailwind CSS configuration. For example, to change the background and foreground colors:
@@ -155,15 +157,18 @@ const ChatExample = () => {
 }
 ```
 
-For code and katex styling, you can import the CSS files:
+### Code and Latex styling
+
+Inside the markdown component, we use [highlight.js](https://highlightjs.org/) for code blocks and [katex](https://katex.org/) for latex.
+If your app is using code or latex blocks, you'll need to import their CSS files:
 
 ```tsx
 import '@llamaindex/chat-ui/styles/code.css'
 import '@llamaindex/chat-ui/styles/katex.css'
 ```
 
-Instead of atom-one-dark theme, there are a lot of others: https://highlightjs.org/demo
-You can use any of them by copying CSS to your project and importing it.
+The `code.css` file uses the `atom-one-dark` theme from highlight.js by default. There are a lot of others to choose from: https://highlightjs.org/demo
+You can use any of them by copying [their CSS](https://github.com/highlightjs/highlight.js/tree/main/src/styles/) to your project and importing it.
 
 ## Example
 
