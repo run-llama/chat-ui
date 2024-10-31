@@ -73,7 +73,7 @@ function SourceInfo({ node, index }: { node?: SourceNode; index: number }) {
           className="hover:bg-primary hover:text-white"
         />
       </HoverCardTrigger>
-      <HoverCardContent className="w-[400px]">
+      <HoverCardContent className="w-[400px] bg-white p-4">
         <NodeInfo nodeInfo={node} />
       </HoverCardContent>
     </HoverCard>
