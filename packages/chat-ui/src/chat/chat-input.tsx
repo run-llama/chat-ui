@@ -33,6 +33,7 @@ interface ChatInputUploadProps {
 
 interface ChatInputSubmitProps extends React.PropsWithChildren {
   className?: string
+  disabled?: boolean
 }
 
 interface ChatInputContext {
@@ -170,7 +171,11 @@ function ChatInputUpload(props: ChatInputUploadProps) {
 function ChatInputSubmit(props: ChatInputSubmitProps) {
   const { isDisabled } = useChatInput()
   return (
-    <Button type="submit" disabled={isDisabled} className={cn(props.className)}>
+    <Button
+      type="submit"
+      disabled={props.disabled ?? isDisabled}
+      className={cn(props.className)}
+    >
       {props.children ?? 'Send message'}
     </Button>
   )
