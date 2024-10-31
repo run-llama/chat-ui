@@ -4,11 +4,7 @@ import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Markdown } from '../widget/markdown'
-import {
-  getSourceAnnotationData,
-  MessageAnnotation,
-  SourceData,
-} from './annotation'
+import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
   DocumentFileAnnotations,
@@ -57,7 +53,6 @@ type ContentDisplayConfig = {
 interface ChatMessageContentProps extends React.PropsWithChildren {
   className?: string
   content?: ContentDisplayConfig[]
-  markdownComponent?: React.FC<{ content: string; sources?: SourceData }>
 }
 
 interface ChatMessageActionsProps extends React.PropsWithChildren {
@@ -123,58 +118,44 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   const { message, isLast } = useChatMessage()
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
-  const contents = useMemo(() => {
-    const MarkdownComponent = props.markdownComponent ?? Markdown
-
-    if (!annotations?.length) {
-      return [
-        {
-          position: ContentPosition.MARKDOWN,
-          component: <MarkdownComponent content={message.content} />,
-        },
-        ...(props.content ?? []),
-      ]
+  const contents = useMemo<ContentDisplayConfig[]>(() => {
+    const displayMap: {
+      [key in ContentPosition]?: React.ReactNode | null
+    } = {
+      [ContentPosition.CHAT_EVENTS]: (
+        <EventAnnotations message={message} isLast={isLast} />
+      ),
+      [ContentPosition.CHAT_AGENT_EVENTS]: (
+        <AgentEventAnnotations message={message} />
+      ),
+      [ContentPosition.CHAT_IMAGE]: <ImageAnnotations message={message} />,
+      [ContentPosition.MARKDOWN]: (
+        <Markdown
+          content={message.content}
+          sources={
+            annotations ? getSourceAnnotationData(annotations)[0] : undefined
+          }
+        />
+      ),
+      [ContentPosition.CHAT_DOCUMENT_FILES]: (
+        <DocumentFileAnnotations message={message} />
+      ),
+      [ContentPosition.CHAT_SOURCES]: <SourceAnnotations message={message} />,
+      [ContentPosition.SUGGESTED_QUESTIONS]: (
+        <SuggestedQuestionsAnnotations message={message} isLast={isLast} />
+      ),
     }
 
-    return [
-      {
-        position: ContentPosition.CHAT_EVENTS,
-        component: <EventAnnotations message={message} isLast={isLast} />,
-      },
-      {
-        position: ContentPosition.CHAT_AGENT_EVENTS,
-        component: <AgentEventAnnotations message={message} />,
-      },
-      {
-        position: ContentPosition.CHAT_IMAGE,
-        component: <ImageAnnotations message={message} />,
-      },
-      {
-        position: ContentPosition.MARKDOWN,
-        component: (
-          <MarkdownComponent
-            content={message.content}
-            sources={getSourceAnnotationData(annotations)?.[0]}
-          />
-        ),
-      },
-      {
-        position: ContentPosition.CHAT_DOCUMENT_FILES,
-        component: <DocumentFileAnnotations message={message} />,
-      },
-      {
-        position: ContentPosition.CHAT_SOURCES,
-        component: <SourceAnnotations message={message} />,
-      },
-      {
-        position: ContentPosition.SUGGESTED_QUESTIONS,
-        component: (
-          <SuggestedQuestionsAnnotations message={message} isLast={isLast} />
-        ),
-      },
-      ...(props.content ?? []),
-    ] as ContentDisplayConfig[]
-  }, [annotations, isLast, message, props.content, props.markdownComponent])
+    // Override the default display map with the custom content
+    props.content?.forEach(content => {
+      displayMap[content.position] = content.component
+    })
+
+    return Object.entries(displayMap).map(([position, component]) => ({
+      position: parseInt(position),
+      component,
+    }))
+  }, [annotations, isLast, message, props.content])
 
   const children = props.children ?? (
     <>
