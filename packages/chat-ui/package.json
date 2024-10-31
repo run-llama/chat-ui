@@ -11,6 +11,8 @@
     "src"
   ],
   "exports": {
+    "./styles/katex.css": "./dist/styles/katex.css",
+    "./styles/code.css": "./dist/styles/code.css",
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -22,10 +24,11 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run clean && pnpm run build:js",
+    "build": "pnpm run clean && pnpm run copy:css && pnpm run build:js",
+    "copy:css": "mkdir dist\\styles 2>nul & xcopy /E /I src\\styles dist\\styles",
     "build:js": "tsc --project tsconfig.build.json --outDir dist",
     "lint": "eslint src/",
-    "dev": "pnpm run build:js --watch",
+    "dev": "pnpm run copy:css && pnpm run build:js --watch",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "copy": "cp -r ../../README.md ../../LICENSE .",

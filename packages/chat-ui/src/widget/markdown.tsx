@@ -1,6 +1,5 @@
 'use client'
 
-import 'katex/dist/katex.min.css'
 import { FC, memo } from 'react'
 import ReactMarkdown, { Options } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'

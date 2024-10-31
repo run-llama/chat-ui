@@ -74,6 +74,7 @@ export function getAnnotationData<T extends AnnotationData>(
   annotations: MessageAnnotation[],
   type: string
 ): T[] {
+  if(!annotations?.length) return [];
   return annotations
     .filter(a => a.type.toString() === type)
     .map(a => a.data as T)
