@@ -5,10 +5,10 @@ import {
   ChatMessage,
   ChatMessages,
   ChatSection,
-  Markdown,
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
+import { Markdown } from '@llamaindex/chat-ui/widgets'
 import { Message, useChat } from 'ai/react'
 import { User2 } from 'lucide-react'
 import { Code } from './ui/code'
