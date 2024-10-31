@@ -116,7 +116,7 @@ const CodeBlock: FC<Props> = memo(({ language, value, className }) => {
           </Button>
         </div>
       </div>
-      <pre className="border border-zinc-700">
+      <pre className="border border-zinc-700 text-white">
         <code ref={codeRef} className={`language-${language} font-mono`}>
           {value}
         </code>
