@@ -1,10 +1,9 @@
-import { Loader2, Paperclip } from 'lucide-react'
-import type { ChangeEvent } from 'react'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext } from 'react'
 import { cn } from '../lib/utils'
-import { Button, buttonVariants } from '../ui/button'
+import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
+import { FileUploader } from '../widget/file-uploader'
 import { useChatUI } from './chat.context'
 import { Message } from './chat.interface'
 
@@ -25,8 +24,8 @@ interface ChatInputFieldProps {
 
 interface ChatInputUploadProps {
   className?: string
-  inputId?: string
-  onUpload?: (file: File) => Promise<void>
+  onUpload?: (file: File) => Promise<void> | undefined
+  allowedExtensions?: string[]
 }
 
 interface ChatInputSubmitProps extends React.PropsWithChildren {
@@ -144,53 +143,23 @@ function ChatInputField(props: ChatInputFieldProps) {
 
 function ChatInputUpload(props: ChatInputUploadProps) {
   const { requestData, setRequestData, isLoading } = useChatUI()
-  const [uploading, setUploading] = useState(false)
-  const inputId = props.inputId || 'fileInput'
 
-  const resetInput = () => {
-    const fileInput = document.getElementById(inputId) as HTMLInputElement
-    fileInput.value = ''
-  }
-
-  const onFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploading(true)
+  const onFileUpload = async (file: File) => {
     if (props.onUpload) {
       await props.onUpload(file)
     } else {
       setRequestData({ ...(requestData || {}), file })
     }
-    resetInput()
-    setUploading(false)
   }
 
   return (
-    <div className="self-stretch">
-      <input
-        id={inputId}
-        type="file"
-        className="hidden"
-        onChange={onFileChange}
-        disabled={isLoading}
-      />
-      <label
-        htmlFor={inputId}
-        className={cn(
-          buttonVariants({ variant: 'secondary', size: 'icon' }),
-          'cursor-pointer',
-          uploading && 'opacity-50',
-          props.className
-        )}
-      >
-        {uploading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Paperclip className="h-4 w-4 -rotate-45" />
-        )}
-      </label>
-    </div>
+    <FileUploader
+      onFileUpload={onFileUpload}
+      config={{
+        disabled: isLoading,
+        allowedExtensions: props.allowedExtensions,
+      }}
+    />
   )
 }
 
