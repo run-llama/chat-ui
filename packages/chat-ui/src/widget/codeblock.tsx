@@ -1,8 +1,6 @@
 'use client'
 
 import hljs from 'highlight.js'
-// instead of atom-one-dark theme, there are a lot of others: https://highlightjs.org/demo
-import 'highlight.js/styles/atom-one-dark-reasonable.css'
 import { Check, Copy, Download } from 'lucide-react'
 import { FC, memo, useEffect, useRef } from 'react'
 import { Button } from '../ui/button'
@@ -118,7 +116,7 @@ const CodeBlock: FC<Props> = memo(({ language, value, className }) => {
           </Button>
         </div>
       </div>
-      <pre className="border border-zinc-700">
+      <pre className="border border-zinc-700 text-white">
         <code ref={codeRef} className={`language-${language} font-mono`}>
           {value}
         </code>

@@ -1,10 +1,18 @@
-import 'katex/dist/katex.min.css'
+'use client'
+
 import { FC, memo } from 'react'
 import ReactMarkdown, { Options } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { CodeBlock } from './codeblock'
+import {
+  DOCUMENT_FILE_TYPES,
+  DocumentFileType,
+  SourceData,
+} from '../chat/annotation'
+import { DocumentInfo } from './document-info'
+import { SourceNumberButton } from './source-number-button'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -27,27 +35,48 @@ const preprocessLaTeX = (content: string) => {
   return inlineProcessedContent
 }
 
-const preprocessContent = (
-  content: string,
-  transformers?: ((content: string) => string)[]
-) => {
-  let processedContent = preprocessLaTeX(content)
-  for (const transformer of transformers || []) {
-    processedContent = transformer(processedContent)
+/**
+ * Update the citation flag [citation:id]() to the new format [citation:index](url)
+ */
+const preprocessCitations = (input: string, sources?: SourceData) => {
+  let content = input
+  if (sources) {
+    const citationRegex = /\[citation:(.+?)\]\(\)/g
+    let match
+    // Find all the citation references in the content
+    while ((match = citationRegex.exec(content)) !== null) {
+      const citationId = match[1]
+      // Find the source node with the id equal to the citation-id, also get the index of the source node
+      const sourceNode = sources.nodes.find(node => node.id === citationId)
+      // If the source node is found, replace the citation reference with the new format
+      if (sourceNode !== undefined) {
+        content = content.replace(
+          match[0],
+          `[citation:${sources.nodes.indexOf(sourceNode)}]()`
+        )
+      } else {
+        // If the source node is not found, remove the citation reference
+        content = content.replace(match[0], '')
+      }
+    }
   }
-  return processedContent
+  return content
+}
+
+const preprocessContent = (content: string, sources?: SourceData) => {
+  return preprocessCitations(preprocessLaTeX(content), sources)
 }
 
 export function Markdown({
   content,
-  transformers = [],
-  components = {},
+  sources,
+  backend,
 }: {
   content: string
-  transformers?: ((content: string) => string)[]
-  components?: Options['components']
+  sources?: SourceData
+  backend?: string
 }) {
-  const processedContent = preprocessContent(content, transformers)
+  const processedContent = preprocessContent(content, sources)
 
   return (
     <div>
@@ -170,7 +199,48 @@ export function Markdown({
               />
             )
           },
-          ...components,
+          a({ href, children }) {
+            // If href starts with `{backend}/api/files`, then it's a local document and we use DocumenInfo for rendering
+            if (href?.startsWith(`${backend}/api/files`)) {
+              // Check if the file is document file type
+              const fileExtension = href.split('.').pop()?.toLowerCase()
+
+              if (
+                fileExtension &&
+                DOCUMENT_FILE_TYPES.includes(fileExtension as DocumentFileType)
+              ) {
+                return (
+                  <DocumentInfo
+                    document={{
+                      url: backend
+                        ? new URL(decodeURIComponent(href)).href
+                        : href,
+                      sources: [],
+                    }}
+                    className="mb-2 mt-2"
+                  />
+                )
+              }
+            }
+            // If a text link starts with 'citation:', then render it as a citation reference
+            if (
+              Array.isArray(children) &&
+              typeof children[0] === 'string' &&
+              children[0].startsWith('citation:')
+            ) {
+              const index = Number(children[0].replace('citation:', ''))
+              if (!isNaN(index)) {
+                return <SourceNumberButton index={index} />
+              }
+              // citation is not looked up yet, don't render anything
+              return null
+            }
+            return (
+              <a href={href} target="_blank" rel="noopener">
+                {children}
+              </a>
+            )
+          },
         }}
       >
         {processedContent}
