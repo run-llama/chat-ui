@@ -162,6 +162,9 @@ import '@llamaindex/chat-ui/styles/code.css'
 import '@llamaindex/chat-ui/styles/katex.css'
 ```
 
+Instead of atom-one-dark theme, there are a lot of others: https://highlightjs.org/demo
+You can use any of them by copying CSS to your project and importing it.
+
 ## Example
 
 See the [example app](./apps/web/README.md) for a complete example.
