@@ -161,12 +161,13 @@ const ChatExample = () => {
 
 ### Code and Latex styling
 
-Inside the markdown component, we use [highlight.js](https://highlightjs.org/) for code blocks and [katex](https://katex.org/) for latex.
-If your app is using code or latex blocks, you'll need to import their CSS files:
+Inside the markdown component, we use [highlight.js](https://highlightjs.org/) for code blocks, [katex](https://katex.org/) for latex, and [pdf-viewer](https://github.com/run-llama/pdf-viewer) for pdf files.
+If your app is using code or latex or pdf files, you'll need to import their CSS files:
 
 ```tsx
 import '@llamaindex/chat-ui/styles/code.css'
 import '@llamaindex/chat-ui/styles/katex.css'
+import '@llamaindex/chat-ui/styles/pdf.css'
 ```
 
 The `code.css` file uses the `atom-one-dark` theme from highlight.js by default. There are a lot of others to choose from: https://highlightjs.org/demo
