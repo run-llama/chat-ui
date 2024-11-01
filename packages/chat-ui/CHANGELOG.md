@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.5
+
+### Patch Changes
+
+- 6934a2b: feat: export pdf css
+
 ## 0.0.4
 
 ### Patch Changes
