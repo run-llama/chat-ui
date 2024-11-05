@@ -11,16 +11,16 @@
     "src"
   ],
   "exports": {
-    "./styles/katex.css": "./dist/styles/katex.css",
-    "./styles/code.css": "./dist/styles/code.css",
-    "./styles/pdf.css": "./dist/styles/pdf.css",
+    "./styles/*.css": "./dist/styles/*.css",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./widgets": {
-      "types": "./dist/widgets.d.ts",
-      "default": "./dist/widgets.js"
     }
   },
   "license": "MIT",
