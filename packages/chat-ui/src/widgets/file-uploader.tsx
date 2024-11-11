@@ -1,5 +1,3 @@
-'use client'
-
 import { Loader2, Paperclip } from 'lucide-react'
 import { ChangeEvent, useState } from 'react'
 import { buttonVariants } from '../ui/button'

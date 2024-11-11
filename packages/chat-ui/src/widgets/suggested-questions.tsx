@@ -1,5 +1,3 @@
-'use client'
-
 import { SuggestedQuestionsData } from '../chat/annotation'
 import { ChatHandler } from '../chat/chat.interface'
 
