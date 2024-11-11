@@ -127,7 +127,7 @@ function CustomChatMessagesList() {
     <ChatMessages.List>
       {messages.map((message, index) => (
         <ChatMessage
-          key={message.id}
+          key={index}
           message={message}
           isLast={index === messages.length - 1}
           className="items-start"

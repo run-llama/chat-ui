@@ -7,7 +7,6 @@ export type MessageRole =
   | 'tool'
 
 export interface Message {
-  id: string
   content: string
   role: MessageRole
   annotations?: any
@@ -21,7 +20,7 @@ export type ChatHandler = {
   reload?: () => void
   stop?: () => void
   append: (
-    message: Message | Omit<Message, 'id'>,
+    message: Message,
     chatRequestOptions?: { data?: any }
   ) => Promise<string | null | undefined>
 }
