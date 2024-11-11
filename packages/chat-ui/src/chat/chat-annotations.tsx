@@ -34,7 +34,13 @@ export function EventAnnotations({
       ? getAnnotationData<EventData>(annotations, MessageAnnotationType.EVENTS)
       : null
   if (!eventData?.length) return null
-  return <ChatEvents data={eventData} isLast={isLast} isLoading={isLoading ?? false} />
+  return (
+    <ChatEvents
+      data={eventData}
+      isLast={isLast}
+      isLoading={isLoading ?? false}
+    />
+  )
 }
 
 export function AgentEventAnnotations({ message }: { message: Message }) {

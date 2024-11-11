@@ -1,6 +1,6 @@
 ---
-"web": patch
-"@llamaindex/chat-ui": patch
+'web': patch
+'@llamaindex/chat-ui': patch
 ---
 
 remove calls
