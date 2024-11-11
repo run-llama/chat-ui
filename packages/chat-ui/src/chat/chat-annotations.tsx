@@ -1,9 +1,11 @@
-import { ChatAgentEvents } from '../widget/chat-agent-events'
-import { ChatEvents } from '../widget/chat-events'
-import { ChatFiles } from '../widget/chat-files'
-import { ChatImage } from '../widget/chat-image'
-import { ChatSources } from '../widget/chat-sources'
-import { SuggestedQuestions } from '../widget/suggested-questions'
+import {
+  ChatAgentEvents,
+  ChatEvents,
+  ChatFiles,
+  ChatImage,
+  ChatSources,
+  SuggestedQuestions,
+} from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import {
   AgentEventData,
   DocumentFileData,
