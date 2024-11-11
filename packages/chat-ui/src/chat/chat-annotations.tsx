@@ -17,7 +17,6 @@ import {
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
-import { useChatUI } from './chat.context'
 import { Message } from './chat.interface'
 
 export function EventAnnotations({
@@ -27,7 +26,6 @@ export function EventAnnotations({
   message: Message
   isLast: boolean
 }) {
-  const { isLoading } = useChatUI()
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const eventData =
     annotations && annotations.length > 0
@@ -95,7 +93,6 @@ export function SuggestedQuestionsAnnotations({
   message: Message
   isLast: boolean
 }) {
-  const { append } = useChatUI()
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const suggestedQuestionsData =
     annotations && annotations.length > 0
