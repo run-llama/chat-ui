@@ -3,8 +3,9 @@ import { defineConfig } from 'tsup'
 export default defineConfig([
   {
     entry: ['src/index.tsx'],
+    outDir: 'dist/chat',
     format: ['cjs', 'esm'],
-    external: ['react'],
+    external: ['react', /\/widgets\/index\.js/],
     dts: true,
     sourcemap: true,
   },

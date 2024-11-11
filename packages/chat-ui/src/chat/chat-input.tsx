@@ -3,7 +3,7 @@ import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
-import { FileUploader } from '../widgets/file-uploader'
+import { FileUploader } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { useChatUI } from './chat.context'
 import { Message } from './chat.interface'
 

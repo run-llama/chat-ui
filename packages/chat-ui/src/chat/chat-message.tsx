@@ -3,7 +3,7 @@ import { createContext, Fragment, memo, useContext, useMemo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
-import { Markdown } from '../widgets/markdown'
+import { Markdown } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,

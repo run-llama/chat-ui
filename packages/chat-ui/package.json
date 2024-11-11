@@ -13,9 +13,9 @@
   "exports": {
     "./styles/*.css": "./dist/styles/*.css",
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "types": "./dist/chat/index.d.ts",
+      "import": "./dist/chat/index.js",
+      "require": "./dist/chat/index.cjs"
     },
     "./widgets": {
       "types": "./dist/widgets/index.d.ts",
