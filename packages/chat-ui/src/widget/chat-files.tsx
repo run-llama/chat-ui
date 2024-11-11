@@ -1,14 +1,18 @@
 'use client'
 
 import { DocumentFileData } from '../chat/annotation'
-import { DocumentPreview } from './document-preview'
+import { DocumentInfo } from './document-info'
 
 export function ChatFiles({ data }: { data: DocumentFileData }) {
   if (!data.files.length) return null
   return (
     <div className="flex items-center gap-2">
       {data.files.map(file => (
-        <DocumentPreview key={file.id} file={file} />
+        <DocumentInfo
+          key={file.id}
+          document={{ url: file.url, sources: [] }}
+          className="mb-2 mt-2"
+        />
       ))}
     </div>
   )

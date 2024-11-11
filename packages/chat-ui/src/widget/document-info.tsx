@@ -21,14 +21,14 @@ type Document = {
 export function DocumentInfo({
   document,
   className,
+  onRemove,
 }: {
   document: Document
   className?: string
+  onRemove?: () => void
 }) {
   const { url, sources } = document
-  // Extract filename from URL
-  const urlParts = url.split('/')
-  const fileName = urlParts.length > 0 ? urlParts[urlParts.length - 1] : url
+  const fileName = urlToFileName(url)
   const fileExt = fileName?.split('.').pop() as DocumentFileType | undefined
 
   const previewFile = {
@@ -38,7 +38,11 @@ export function DocumentInfo({
 
   const DocumentDetail = (
     <div className={`relative ${className}`}>
-      <DocumentPreviewCard className="cursor-pointer" file={previewFile} />
+      <DocumentPreviewCard
+        className="cursor-pointer"
+        file={previewFile}
+        onRemove={onRemove}
+      />
       <div className="absolute bottom-2 right-2 flex space-x-2">
         {sources.map((node: SourceNode, index: number) => (
           <div key={node.id}>
@@ -121,4 +125,11 @@ function NodeInfo({ nodeInfo }: { nodeInfo: SourceNode }) {
       )}
     </div>
   )
+}
+
+function urlToFileName(url: string) {
+  const urlObj = new URL(url)
+  const urlParts = urlObj.pathname.split('/')
+  const fileName = urlParts.length > 0 ? urlParts[urlParts.length - 1] : url
+  return fileName
 }

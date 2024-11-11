@@ -112,7 +112,10 @@ export function DocumentPreviewCard(props: {
         >
           <XCircleIcon
             className="h-6 w-6 rounded-full bg-gray-500 text-white"
-            onClick={onRemove}
+            onClick={e => {
+              e.stopPropagation();
+              onRemove()
+            }}
           />
         </div>
       )}
