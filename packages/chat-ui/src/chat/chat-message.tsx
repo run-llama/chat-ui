@@ -88,7 +88,7 @@ function ChatMessage(props: ChatMessageProps) {
     <ChatMessageProvider
       value={{ message: props.message, isLast: props.isLast }}
     >
-      <div className={cn('group flex gap-4 pr-2 pt-4', props.className)}>
+      <div className={cn('group flex gap-4 p-3', props.className)}>
         {children}
       </div>
     </ChatMessageProvider>
