@@ -1,5 +1,5 @@
 ---
-"@llamaindex/chat-ui": patch
+'@llamaindex/chat-ui': patch
 ---
 
 chore: remove use-client decorator
