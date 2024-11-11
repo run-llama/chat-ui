@@ -1,69 +1,12 @@
 'use client'
 
 import { FileIcon, XCircleIcon } from 'lucide-react'
-import { Button } from '../ui/button'
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '../ui/drawer'
+import { DocumentFileType } from '../chat/annotation'
 import { cn } from '../lib/utils'
-import { DocumentFile, DocumentFileType } from '../chat/annotation'
 import { DocxIcon } from '../ui/icons/docx'
-import { TxtIcon } from '../ui/icons/txt'
 import { PDFIcon } from '../ui/icons/pdf'
 import { SheetIcon } from '../ui/icons/sheet'
-
-export interface DocumentPreviewProps {
-  file: DocumentFile
-  onRemove?: () => void
-}
-
-export function DocumentPreview(props: DocumentPreviewProps) {
-  const { name, size, type, refs } = props.file
-
-  if (refs?.length) {
-    return (
-      <div title={`Document IDs: ${refs.join(', ')}`}>
-        <DocumentPreviewCard {...props} />
-      </div>
-    )
-  }
-
-  return (
-    <Drawer direction="left">
-      <DrawerTrigger asChild>
-        <div>
-          <DocumentPreviewCard className="cursor-pointer" {...props} />
-        </div>
-      </DrawerTrigger>
-      <DrawerContent className="mt-24 h-full max-h-[96%] w-3/5 ">
-        <DrawerHeader className="flex justify-between">
-          <div className="space-y-2">
-            <DrawerTitle>{type.toUpperCase()} Raw Content</DrawerTitle>
-            <DrawerDescription>
-              {name} ({inKB(size)} KB)
-            </DrawerDescription>
-          </div>
-          <DrawerClose asChild>
-            <Button variant="outline">Close</Button>
-          </DrawerClose>
-        </DrawerHeader>
-        <div className="m-4 max-h-[80%] overflow-auto">
-          {refs?.length && (
-            <pre className="bg-secondary block rounded-md p-4 text-sm">
-              {refs.join(', ')}
-            </pre>
-          )}
-        </div>
-      </DrawerContent>
-    </Drawer>
-  )
-}
+import { TxtIcon } from '../ui/icons/txt'
 
 export const FileIconMap: Record<DocumentFileType, React.ReactNode> = {
   csv: <SheetIcon />,
