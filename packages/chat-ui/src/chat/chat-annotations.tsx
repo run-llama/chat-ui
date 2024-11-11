@@ -1,9 +1,9 @@
-import { ChatAgentEvents } from '../widget/chat-agent-events'
-import { ChatEvents } from '../widget/chat-events'
-import { ChatFiles } from '../widget/chat-files'
-import { ChatImage } from '../widget/chat-image'
-import { ChatSources } from '../widget/chat-sources'
-import { SuggestedQuestions } from '../widget/suggested-questions'
+import { ChatAgentEvents } from '../widgets/chat-agent-events'
+import { ChatEvents } from '../widgets/chat-events'
+import { ChatFiles } from '../widgets/chat-files'
+import { ChatImage } from '../widgets/chat-image'
+import { ChatSources } from '../widgets/chat-sources'
+import { SuggestedQuestions } from '../widgets/suggested-questions'
 import {
   AgentEventData,
   DocumentFileData,

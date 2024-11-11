@@ -3,7 +3,7 @@ import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
-import { FileUploader } from '../widget/file-uploader'
+import { FileUploader } from '../widgets/file-uploader'
 import { useChatUI } from './chat.context'
 import { Message } from './chat.interface'
 
