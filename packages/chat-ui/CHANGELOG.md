@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.6
+
+### Patch Changes
+
+- dbdaed0: Allow import of sub-dirs, remove unused ID
+
 ## 0.0.5
 
 ### Patch Changes
