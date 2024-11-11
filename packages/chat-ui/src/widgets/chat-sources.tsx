@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { SourceData, SourceNode } from '../chat/annotation'
 import { DocumentInfo } from './document-info'

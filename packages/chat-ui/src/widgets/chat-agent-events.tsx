@@ -1,5 +1,3 @@
-'use client'
-
 import { icons, LucideIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { Button } from '../ui/button'

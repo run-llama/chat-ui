@@ -1,5 +1,3 @@
-'use client'
-
 import hljs from 'highlight.js'
 import { Check, Copy, Download } from 'lucide-react'
 import { FC, memo, useEffect, useRef } from 'react'

@@ -1,5 +1,3 @@
-'use client'
-
 import { ChatHandler } from '../chat/chat.interface'
 import { Button } from '../ui/button'
 

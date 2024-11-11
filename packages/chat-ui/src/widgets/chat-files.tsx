@@ -1,5 +1,3 @@
-'use client'
-
 import { DocumentFileData } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
 

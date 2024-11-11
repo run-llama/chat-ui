@@ -1,5 +1,3 @@
-'use client'
-
 import { type ImageData } from '../index'
 
 export function ChatImage({ data }: { data: ImageData }) {
