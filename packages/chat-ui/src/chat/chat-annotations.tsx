@@ -17,14 +17,16 @@ import {
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
-import { Message } from './chat.interface'
+import { ChatHandler, Message } from './chat.interface'
 
 export function EventAnnotations({
   message,
   isLast,
+  isLoading,
 }: {
   message: Message
   isLast: boolean
+  isLoading?: boolean
 }) {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const eventData =
@@ -32,7 +34,7 @@ export function EventAnnotations({
       ? getAnnotationData<EventData>(annotations, MessageAnnotationType.EVENTS)
       : null
   if (!eventData?.length) return null
-  return <ChatEvents data={eventData} isLast={isLast} isLoading={isLoading} />
+  return <ChatEvents data={eventData} isLast={isLast} isLoading={isLoading ?? false} />
 }
 
 export function AgentEventAnnotations({ message }: { message: Message }) {
@@ -89,9 +91,11 @@ export function SourceAnnotations({ message }: { message: Message }) {
 export function SuggestedQuestionsAnnotations({
   message,
   isLast,
+  append,
 }: {
   message: Message
   isLast: boolean
+  append?: ChatHandler['append']
 }) {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const suggestedQuestionsData =
