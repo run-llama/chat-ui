@@ -17,24 +17,22 @@ import {
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
-import { useChatUI } from './chat.context'
-import { Message } from './chat.interface'
+import { ChatHandler, Message } from './chat.interface'
 
 export function EventAnnotations({
   message,
-  isLast,
+  showLoading,
 }: {
   message: Message
-  isLast: boolean
+  showLoading: boolean
 }) {
-  const { isLoading } = useChatUI()
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const eventData =
     annotations && annotations.length > 0
       ? getAnnotationData<EventData>(annotations, MessageAnnotationType.EVENTS)
       : null
   if (!eventData?.length) return null
-  return <ChatEvents data={eventData} isLast={isLast} isLoading={isLoading} />
+  return <ChatEvents data={eventData} showLoading={showLoading} />
 }
 
 export function AgentEventAnnotations({ message }: { message: Message }) {
@@ -90,12 +88,11 @@ export function SourceAnnotations({ message }: { message: Message }) {
 
 export function SuggestedQuestionsAnnotations({
   message,
-  isLast,
+  append,
 }: {
   message: Message
-  isLast: boolean
+  append: ChatHandler['append']
 }) {
-  const { append } = useChatUI()
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const suggestedQuestionsData =
     annotations && annotations.length > 0
@@ -104,12 +101,8 @@ export function SuggestedQuestionsAnnotations({
           MessageAnnotationType.SUGGESTED_QUESTIONS
         )
       : null
-  if (!suggestedQuestionsData) return null
-  return suggestedQuestionsData[0] ? (
-    <SuggestedQuestions
-      questions={suggestedQuestionsData[0]}
-      append={append}
-      isLastMessage={isLast}
-    />
-  ) : null
+  if (!suggestedQuestionsData?.[0]) return null
+  return (
+    <SuggestedQuestions questions={suggestedQuestionsData[0]} append={append} />
+  )
 }

@@ -122,7 +122,7 @@ function Annotation({ annotations }: { annotations: any }) {
 }
 
 function CustomChatMessagesList() {
-  const { messages } = useChatUI()
+  const { messages, isLoading, append } = useChatUI()
   return (
     <ChatMessages.List>
       {messages.map((message, index) => (
@@ -139,7 +139,11 @@ function CustomChatMessagesList() {
               <img alt="LlamaIndex" src="/llama.png" />
             )}
           </ChatMessage.Avatar>
-          <ChatMessage.Content className="items-start">
+          <ChatMessage.Content
+            className="items-start"
+            isLoading={isLoading}
+            append={append}
+          >
             <Markdown content={message.content} />
             <Annotation annotations={message.annotations} />
           </ChatMessage.Content>

@@ -13,12 +13,14 @@ import {
   SourceAnnotations,
   SuggestedQuestionsAnnotations,
 } from './chat-annotations'
-import { Message } from './chat.interface'
+import { ChatHandler, Message } from './chat.interface'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
   isLast: boolean
   className?: string
+  isLoading?: boolean
+  append?: ChatHandler['append']
 }
 
 interface ChatMessageAvatarProps extends React.PropsWithChildren {
@@ -53,6 +55,8 @@ type ContentDisplayConfig = {
 interface ChatMessageContentProps extends React.PropsWithChildren {
   className?: string
   content?: ContentDisplayConfig[]
+  isLoading?: boolean
+  append?: ChatHandler['append']
 }
 
 interface ChatMessageActionsProps extends React.PropsWithChildren {
@@ -79,7 +83,7 @@ function ChatMessage(props: ChatMessageProps) {
   const children = props.children ?? (
     <>
       <ChatMessageAvatar />
-      <ChatMessageContent />
+      <ChatMessageContent isLoading={props.isLoading} append={props.append} />
       <ChatMessageActions />
     </>
   )
@@ -123,7 +127,10 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       [key in ContentPosition]?: React.ReactNode | null
     } = {
       [ContentPosition.CHAT_EVENTS]: (
-        <EventAnnotations message={message} isLast={isLast} />
+        <EventAnnotations
+          message={message}
+          showLoading={(isLast && props.isLoading) ?? false}
+        />
       ),
       [ContentPosition.CHAT_AGENT_EVENTS]: (
         <AgentEventAnnotations message={message} />
@@ -141,9 +148,16 @@ function ChatMessageContent(props: ChatMessageContentProps) {
         <DocumentFileAnnotations message={message} />
       ),
       [ContentPosition.CHAT_SOURCES]: <SourceAnnotations message={message} />,
-      [ContentPosition.SUGGESTED_QUESTIONS]: (
-        <SuggestedQuestionsAnnotations message={message} isLast={isLast} />
-      ),
+      ...(isLast &&
+        props.append && {
+          // show suggested questions only on the last message
+          [ContentPosition.SUGGESTED_QUESTIONS]: (
+            <SuggestedQuestionsAnnotations
+              message={message}
+              append={props.append}
+            />
+          ),
+        }),
     }
 
     // Override the default display map with the custom content
@@ -155,7 +169,14 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       position: parseInt(position),
       component,
     }))
-  }, [annotations, isLast, message, props.content])
+  }, [
+    annotations,
+    isLast,
+    message,
+    props.append,
+    props.content,
+    props.isLoading,
+  ])
 
   const children = props.children ?? (
     <>

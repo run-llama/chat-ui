@@ -4,16 +4,13 @@ import { ChatHandler } from '../chat/chat.interface'
 export function SuggestedQuestions({
   questions,
   append,
-  isLastMessage,
 }: {
   questions: SuggestedQuestionsData
-  append?: Pick<ChatHandler, 'append'>['append']
-  isLastMessage: boolean
+  append: ChatHandler['append']
 }) {
-  const showQuestions = isLastMessage && questions.length > 0
+  const showQuestions = questions.length > 0
   return (
-    showQuestions &&
-    append !== undefined && (
+    showQuestions && (
       <div className="flex flex-col space-y-2">
         {questions.map((question, index) => (
           <a

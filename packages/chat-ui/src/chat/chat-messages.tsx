@@ -84,7 +84,7 @@ function ChatMessages(props: ChatMessagesProps) {
 
 function ChatMessagesList(props: ChatMessagesListProps) {
   const scrollableChatContainerRef = useRef<HTMLDivElement>(null)
-  const { messages } = useChatUI()
+  const { messages, isLoading, append } = useChatUI()
   const { lastMessage, messageLength } = useChatMessages()
 
   const scrollToBottom = () => {
@@ -106,6 +106,8 @@ function ChatMessagesList(props: ChatMessagesListProps) {
             key={index}
             message={message}
             isLast={index === messageLength - 1}
+            isLoading={isLoading}
+            append={append}
           />
         )
       })}
