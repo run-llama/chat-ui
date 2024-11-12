@@ -10,16 +10,13 @@ import { EventData } from '../chat/annotation'
 
 export function ChatEvents({
   data,
-  isLast,
-  isLoading,
+  showLoading,
 }: {
   data: EventData[]
-  isLast: boolean
-  isLoading: boolean
+  showLoading: boolean
 }) {
   const [isOpen, setIsOpen] = useState(false)
 
-  const showLoading = isLast && isLoading
   const buttonLabel = isOpen ? 'Hide events' : 'Show events'
 
   const EventIcon = isOpen ? (

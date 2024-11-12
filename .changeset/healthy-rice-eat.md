@@ -3,4 +3,4 @@
 '@llamaindex/chat-ui': patch
 ---
 
-remove calls
+make chat message component stand alone without provider

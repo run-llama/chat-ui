@@ -129,8 +129,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       [ContentPosition.CHAT_EVENTS]: (
         <EventAnnotations
           message={message}
-          isLast={isLast}
-          isLoading={props.isLoading}
+          showLoading={(isLast && props.isLoading) ?? false}
         />
       ),
       [ContentPosition.CHAT_AGENT_EVENTS]: (
@@ -149,13 +148,16 @@ function ChatMessageContent(props: ChatMessageContentProps) {
         <DocumentFileAnnotations message={message} />
       ),
       [ContentPosition.CHAT_SOURCES]: <SourceAnnotations message={message} />,
-      [ContentPosition.SUGGESTED_QUESTIONS]: (
-        <SuggestedQuestionsAnnotations
-          message={message}
-          isLast={isLast}
-          append={props.append}
-        />
-      ),
+      ...(isLast &&
+        props.append && {
+          // show suggested questions only on the last message
+          [ContentPosition.SUGGESTED_QUESTIONS]: (
+            <SuggestedQuestionsAnnotations
+              message={message}
+              append={props.append}
+            />
+          ),
+        }),
     }
 
     // Override the default display map with the custom content
