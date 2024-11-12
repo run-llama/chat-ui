@@ -1,5 +1,15 @@
 # web
 
+## 1.0.6
+
+### Patch Changes
+
+- fa3537b: make chat message component stand alone without provider
+- Updated dependencies [fa3537b]
+- Updated dependencies [ace0c06]
+- Updated dependencies [7988fbe]
+  - @llamaindex/chat-ui@0.0.7
+
 ## 1.0.5
 
 ### Patch Changes
