@@ -72,7 +72,7 @@ function ChatMessages(props: ChatMessagesProps) {
     >
       <div
         className={cn(
-          'relative flex-1 space-y-6 bg-white p-4',
+          'relative flex-1 space-y-6 bg-background p-4',
           props.className
         )}
       >
