@@ -90,7 +90,7 @@ function ChatInput(props: ChatInputProps) {
     <ChatInputProvider value={{ isDisabled, handleKeyDown, handleSubmit }}>
       <div
         className={cn(
-          'flex shrink-0 flex-col gap-4 bg-white p-4',
+          'bg-background flex shrink-0 flex-col gap-4 p-4',
           props.className
         )}
       >
