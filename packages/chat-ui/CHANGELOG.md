@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.8
+
+### Patch Changes
+
+- 1d89841: fix: support dark theme
+
 ## 0.0.7
 
 ### Patch Changes
