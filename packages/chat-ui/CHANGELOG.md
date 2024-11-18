@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.9
+
+### Patch Changes
+
+- bb63a54: bump: react19 rc
+
 ## 0.0.8
 
 ### Patch Changes
