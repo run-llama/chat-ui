@@ -2,7 +2,8 @@
 
 import { ChatSection } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
-import { Code } from './ui/code'
+import { Code } from '@/components/code'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const code = `
 import { ChatSection } from '@llamaindex/chat-ui'
@@ -36,15 +37,19 @@ function SimpleChat() {
 export function SimpleChatSection() {
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-semibold">Primitive Chat Section</h2>
-      <div className="flex gap-4">
-        <div>
-          <Code content={code} language="jsx" />
-        </div>
-        <div className="flex-1">
+      <h2 className="text-2xl font-semibold">Simple Chat Demo</h2>
+      <Tabs defaultValue="preview" className="w-[800px]">
+        <TabsList>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="code">Code</TabsTrigger>
+        </TabsList>
+        <TabsContent value="preview">
           <SimpleChat />
-        </div>
-      </div>
+        </TabsContent>
+        <TabsContent value="code">
+          <Code content={code} language="jsx" />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
