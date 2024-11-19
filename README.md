@@ -57,6 +57,10 @@ const ChatExample = () => {
 }
 ```
 
+This simple example looks like this:
+
+![output](https://github.com/user-attachments/assets/fdf008a3-52b4-49ef-8db5-c9388d4fb8fa)
+
 ## Component Composition
 
 Components are designed to be composable. You can use them as is:
