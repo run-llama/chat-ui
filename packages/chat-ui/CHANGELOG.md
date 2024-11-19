@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.10
+
+### Patch Changes
+
+- 4f27d57: Add support for Vercel ai 4.0.0
+
 ## 0.0.9
 
 ### Patch Changes
