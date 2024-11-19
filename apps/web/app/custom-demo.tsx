@@ -11,8 +11,8 @@ import {
 import { Markdown } from '@llamaindex/chat-ui/widgets'
 import { Message, useChat } from 'ai/react'
 import { User2 } from 'lucide-react'
-import { Code } from './ui/code'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+import { Code } from '@/components/code'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const code = `
 import {
@@ -200,7 +200,7 @@ export function CustomChat() {
 export function CustomChatSection() {
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-semibold">Custom Chat Section</h2>
+      <h2 className="text-2xl font-semibold">Custom Chat Demo</h2>
       <Tabs defaultValue="preview" className="w-[800px]">
         <TabsList>
           <TabsTrigger value="preview">Preview</TabsTrigger>
