@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.11
+
+### Patch Changes
+
+- 22e25b0: fix: support releative URLs in document viewer
+
 ## 0.0.10
 
 ### Patch Changes
