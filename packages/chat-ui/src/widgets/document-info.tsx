@@ -31,7 +31,8 @@ export function DocumentInfo({
   onRemove?: () => void
 }) {
   const { url, sources } = document
-  const fileName = urlToFileName(url)
+  const urlParts = url.split('/')
+  const fileName = urlParts.length > 0 ? urlParts[urlParts.length - 1] : url
   const fileExt = fileName?.split('.').pop() as DocumentFileType | undefined
 
   const previewFile = {
@@ -190,11 +191,4 @@ function DocumentPreviewCard(props: {
 
 function inKB(size: number) {
   return Math.round((size / 1024) * 10) / 10
-}
-
-function urlToFileName(url: string) {
-  const urlObj = new URL(url)
-  const urlParts = urlObj.pathname.split('/')
-  const fileName = urlParts.length > 0 ? urlParts[urlParts.length - 1] : url
-  return fileName
 }
