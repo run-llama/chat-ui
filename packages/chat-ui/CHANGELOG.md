@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.0.12
+
+### Patch Changes
+
+- 944bdbd: Add feature to customize markdown style, optionally can pass message as parameter to message content
+
 ## 0.0.11
 
 ### Patch Changes
