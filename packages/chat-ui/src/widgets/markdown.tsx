@@ -77,90 +77,92 @@ export function Markdown({
   const processedContent = preprocessContent(content, sources)
 
   return (
-    <MemoizedReactMarkdown
-      className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 custom-markdown break-words"
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex as any]}
-      components={{
-        p({ children }) {
-          return <div className="mb-2 last:mb-0">{children}</div>
-        },
-        code({ inline, className, children, ...props }) {
-          if (children.length) {
-            if (children[0] === '▍') {
+    <div>
+      <MemoizedReactMarkdown
+        className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 custom-markdown break-words"
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex as any]}
+        components={{
+          p({ children }) {
+            return <div className="mb-2 last:mb-0">{children}</div>
+          },
+          code({ inline, className, children, ...props }) {
+            if (children.length) {
+              if (children[0] === '▍') {
+                return (
+                  <span className="mt-1 animate-pulse cursor-default">▍</span>
+                )
+              }
+
+              children[0] = (children[0] as string).replace('`▍`', '▍')
+            }
+
+            const match = /language-(\w+)/.exec(className || '')
+
+            if (inline) {
               return (
-                <span className="mt-1 animate-pulse cursor-default">▍</span>
+                <code className={className} {...props}>
+                  {children}
+                </code>
               )
             }
 
-            children[0] = (children[0] as string).replace('`▍`', '▍')
-          }
-
-          const match = /language-(\w+)/.exec(className || '')
-
-          if (inline) {
             return (
-              <code className={className} {...props}>
-                {children}
-              </code>
+              <CodeBlock
+                key={Math.random()}
+                language={(match && match[1]) || ''}
+                value={String(children).replace(/\n$/, '')}
+                className="mb-2"
+                {...props}
+              />
             )
-          }
+          },
+          a({ href, children }) {
+            // If href starts with `{backend}/api/files`, then it's a local document and we use DocumenInfo for rendering
+            if (href?.startsWith(`${backend}/api/files`)) {
+              // Check if the file is document file type
+              const fileExtension = href.split('.').pop()?.toLowerCase()
 
-          return (
-            <CodeBlock
-              key={Math.random()}
-              language={(match && match[1]) || ''}
-              value={String(children).replace(/\n$/, '')}
-              className="mb-2"
-              {...props}
-            />
-          )
-        },
-        a({ href, children }) {
-          // If href starts with `{backend}/api/files`, then it's a local document and we use DocumenInfo for rendering
-          if (href?.startsWith(`${backend}/api/files`)) {
-            // Check if the file is document file type
-            const fileExtension = href.split('.').pop()?.toLowerCase()
-
+              if (
+                fileExtension &&
+                DOCUMENT_FILE_TYPES.includes(fileExtension as DocumentFileType)
+              ) {
+                return (
+                  <DocumentInfo
+                    document={{
+                      url: backend
+                        ? new URL(decodeURIComponent(href)).href
+                        : href,
+                      sources: [],
+                    }}
+                    className="mb-2 mt-2"
+                  />
+                )
+              }
+            }
+            // If a text link starts with 'citation:', then render it as a citation reference
             if (
-              fileExtension &&
-              DOCUMENT_FILE_TYPES.includes(fileExtension as DocumentFileType)
+              Array.isArray(children) &&
+              typeof children[0] === 'string' &&
+              children[0].startsWith('citation:')
             ) {
-              return (
-                <DocumentInfo
-                  document={{
-                    url: backend
-                      ? new URL(decodeURIComponent(href)).href
-                      : href,
-                    sources: [],
-                  }}
-                  className="mb-2 mt-2"
-                />
-              )
+              const index = Number(children[0].replace('citation:', ''))
+              if (!isNaN(index)) {
+                return <SourceNumberButton index={index} />
+              }
+              // citation is not looked up yet, don't render anything
+              return null
             }
-          }
-          // If a text link starts with 'citation:', then render it as a citation reference
-          if (
-            Array.isArray(children) &&
-            typeof children[0] === 'string' &&
-            children[0].startsWith('citation:')
-          ) {
-            const index = Number(children[0].replace('citation:', ''))
-            if (!isNaN(index)) {
-              return <SourceNumberButton index={index} />
-            }
-            // citation is not looked up yet, don't render anything
-            return null
-          }
-          return (
-            <a href={href} target="_blank" rel="noopener">
-              {children}
-            </a>
-          )
-        },
-      }}
-    >
-      {processedContent}
-    </MemoizedReactMarkdown>
+            return (
+              <a href={href} target="_blank" rel="noopener">
+                {children}
+              </a>
+            )
+          },
+        }}
+      >
+        {processedContent}
+      </MemoizedReactMarkdown>
+    </div>
   )
 }
