@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     return LlamaIndexAdapter.toDataStreamResponse(response, {
       data: vercelStreamData,
       callbacks: {
-        onFinal: async () => {
+        onCompletion: async () => {
           await vercelStreamData.close()
         },
       },

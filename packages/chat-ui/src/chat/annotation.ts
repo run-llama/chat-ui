@@ -96,10 +96,12 @@ export function getSourceAnnotationData(
     MessageAnnotationType.SOURCES
   )
   if (data.length > 0) {
-    const sourceData = data[0]
-    if (sourceData.nodes) {
-      sourceData.nodes = preprocessSourceNodes(sourceData.nodes)
-    }
+    return [
+      {
+        ...data[0],
+        nodes: data[0].nodes ? preprocessSourceNodes(data[0].nodes) : [],
+      },
+    ]
   }
   return data
 }

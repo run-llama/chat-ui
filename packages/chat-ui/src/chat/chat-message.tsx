@@ -57,6 +57,7 @@ interface ChatMessageContentProps extends React.PropsWithChildren {
   content?: ContentDisplayConfig[]
   isLoading?: boolean
   append?: ChatHandler['append']
+  message?: Message // in case you want to customize the message
 }
 
 interface ChatMessageActionsProps extends React.PropsWithChildren {
@@ -119,7 +120,8 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 }
 
 function ChatMessageContent(props: ChatMessageContentProps) {
-  const { message, isLast } = useChatMessage()
+  const { message: defaultMessage, isLast } = useChatMessage()
+  const message = props.message ?? defaultMessage
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
   const contents = useMemo<ContentDisplayConfig[]>(() => {
@@ -189,7 +191,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   )
 
   return (
-    <div className={cn('flex flex-1 flex-col gap-4', props.className)}>
+    <div className={cn('flex min-w-0 flex-1 flex-col gap-4', props.className)}>
       {children}
     </div>
   )
