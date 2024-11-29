@@ -146,7 +146,7 @@ function ChatMessagesLoading(props: ChatMessagesLoadingProps) {
 }
 
 function ChatActions(props: ChatActionsProps) {
-  const { reload, stop } = useChatUI()
+  const { reload, stop, requestData } = useChatUI()
   const { showReload, showStop } = useChatMessages()
   if (!showStop && !showReload) return null
 
@@ -159,7 +159,11 @@ function ChatActions(props: ChatActionsProps) {
         </Button>
       )}
       {showReload && (
-        <Button variant="outline" size="sm" onClick={reload}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => reload?.({ data: requestData })}
+        >
           <RefreshCw className="mr-2 h-4 w-4" />
           Regenerate
         </Button>
