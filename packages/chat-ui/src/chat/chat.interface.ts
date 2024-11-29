@@ -11,7 +11,7 @@ export type ChatHandler = {
   setInput: (input: string) => void
   isLoading: boolean
   messages: Message[]
-  reload?: () => void
+  reload?: (chatRequestOptions?: { data?: any }) => void
   stop?: () => void
   append: (
     message: Message,
