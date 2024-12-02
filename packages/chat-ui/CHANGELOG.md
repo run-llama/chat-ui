@@ -1,5 +1,12 @@
 # @llamaindex/chat-ui
 
+## 0.0.13
+
+### Patch Changes
+
+- 8214bcd: fix: send request data when reload
+- 0445125: fix: private markdown css style
+
 ## 0.0.12
 
 ### Patch Changes
