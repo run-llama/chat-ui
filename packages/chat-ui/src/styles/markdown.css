@@ -40,11 +40,11 @@
 }
 
 .custom-markdown h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+.custom-markdown h2,
+.custom-markdown h3,
+.custom-markdown h4,
+.custom-markdown h5,
+.custom-markdown h6 {
   font-weight: bold;
   margin-bottom: 20px;
   margin-top: 20px;
