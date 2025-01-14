@@ -22,6 +22,7 @@ interface ChatInputFormProps extends React.PropsWithChildren {
 interface ChatInputFieldProps {
   className?: string
   type?: 'input' | 'textarea'
+  placeholder?: string
 }
 
 interface ChatInputUploadProps {
@@ -125,7 +126,7 @@ function ChatInputField(props: ChatInputFieldProps) {
     return (
       <Input
         name="input"
-        placeholder="Type a message"
+        placeholder={props.placeholder ?? 'Type a message'}
         className={cn(props.className, 'min-h-0')}
         value={input}
         onChange={e => setInput(e.target.value)}
@@ -136,7 +137,7 @@ function ChatInputField(props: ChatInputFieldProps) {
   return (
     <Textarea
       name="input"
-      placeholder="Type a message"
+      placeholder={props.placeholder ?? 'Type a message'}
       className={cn(props.className, 'h-[40px] min-h-0 flex-1')}
       value={input}
       onChange={e => setInput(e.target.value)}
