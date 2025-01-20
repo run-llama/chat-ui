@@ -72,7 +72,7 @@ function ChatMessages(props: ChatMessagesProps) {
     >
       <div
         className={cn(
-          'bg-background relative flex-1 min-h-0 space-y-6 p-4 flex flex-col',
+          'bg-background relative flex min-h-0 flex-1 flex-col space-y-6 p-4',
           props.className
         )}
       >
@@ -118,7 +118,7 @@ function ChatMessagesList(props: ChatMessagesListProps) {
   return (
     <div
       className={cn(
-        'flex flex-1 min-h-0 flex-col gap-5 overflow-auto',
+        'flex min-h-0 flex-1 flex-col gap-5 overflow-auto',
         props.className
       )}
       ref={scrollableChatContainerRef}
