@@ -30,8 +30,15 @@ export function ChatSources({ data }: { data: SourceData }) {
     <div className="space-y-2 text-sm">
       <div className="text-lg font-semibold">Sources:</div>
       <div className="flex flex-wrap gap-3">
-        {documents.map(document => {
-          return <DocumentInfo key={document.url} document={document} />
+        {documents.map((document, index) => {
+          const startIndex = documents[index - 1]?.sources.length ?? 0
+          return (
+            <DocumentInfo
+              key={document.url}
+              document={document}
+              startIndex={startIndex}
+            />
+          )
         })}
       </div>
     </div>

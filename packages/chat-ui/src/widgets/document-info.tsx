@@ -25,10 +25,12 @@ export function DocumentInfo({
   document,
   className,
   onRemove,
+  startIndex = 0,
 }: {
   document: Document
   className?: string
   onRemove?: () => void
+  startIndex?: number
 }) {
   const { url, sources } = document
   const urlParts = url.split('/')
@@ -50,7 +52,7 @@ export function DocumentInfo({
       <div className="absolute bottom-2 right-2 flex space-x-2">
         {sources.map((node: SourceNode, index: number) => (
           <div key={node.id}>
-            <SourceInfo node={node} index={index} />
+            <SourceInfo node={node} index={startIndex + index} />
           </div>
         ))}
       </div>
