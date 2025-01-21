@@ -1,5 +1,12 @@
 # @llamaindex/chat-ui
 
+## 0.0.14
+
+### Patch Changes
+
+- f2e7014: feat(chat-input): add support for custom placeholder in ChatInput.Field
+- c11143d: fix: chat height and citation
+
 ## 0.0.13
 
 ### Patch Changes
