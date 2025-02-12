@@ -1,6 +1,7 @@
 // Chat components
 export * from './chat/chat.interface'
 export * from './chat/annotation'
+export * from './chat/chat-annotations'
 export { default as ChatSection } from './chat/chat-section'
 export { default as ChatInput } from './chat/chat-input'
 export { default as ChatMessages } from './chat/chat-messages'

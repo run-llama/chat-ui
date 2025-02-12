@@ -1,5 +1,5 @@
 import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
-import { createContext, Fragment, memo, useContext, useMemo } from 'react'
+import { createContext, Fragment, memo, useContext } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
@@ -47,14 +47,8 @@ export enum ContentPosition {
   BOTTOM = 9999,
 }
 
-type ContentDisplayConfig = {
-  position: ContentPosition
-  component: React.ReactNode | null
-}
-
 interface ChatMessageContentProps extends React.PropsWithChildren {
   className?: string
-  content?: ContentDisplayConfig[]
   isLoading?: boolean
   append?: ChatHandler['append']
   message?: Message // in case you want to customize the message
@@ -124,69 +118,28 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   const message = props.message ?? defaultMessage
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
-  const contents = useMemo<ContentDisplayConfig[]>(() => {
-    const displayMap: {
-      [key in ContentPosition]?: React.ReactNode | null
-    } = {
-      [ContentPosition.CHAT_EVENTS]: (
-        <EventAnnotations
-          message={message}
-          showLoading={(isLast && props.isLoading) ?? false}
-        />
-      ),
-      [ContentPosition.CHAT_AGENT_EVENTS]: (
-        <AgentEventAnnotations message={message} />
-      ),
-      [ContentPosition.CHAT_IMAGE]: <ImageAnnotations message={message} />,
-      [ContentPosition.MARKDOWN]: (
-        <Markdown
-          content={message.content}
-          sources={
-            annotations ? getSourceAnnotationData(annotations)[0] : undefined
-          }
-        />
-      ),
-      [ContentPosition.CHAT_DOCUMENT_FILES]: (
-        <DocumentFileAnnotations message={message} />
-      ),
-      [ContentPosition.CHAT_SOURCES]: <SourceAnnotations message={message} />,
-      ...(isLast &&
-        props.append && {
-          // show suggested questions only on the last message
-          [ContentPosition.SUGGESTED_QUESTIONS]: (
-            <SuggestedQuestionsAnnotations
-              message={message}
-              append={props.append}
-            />
-          ),
-        }),
-    }
-
-    // Override the default display map with the custom content
-    props.content?.forEach(content => {
-      displayMap[content.position] = content.component
-    })
-
-    return Object.entries(displayMap).map(([position, component]) => ({
-      position: parseInt(position),
-      component,
-    }))
-  }, [
-    annotations,
-    isLast,
-    message,
-    props.append,
-    props.content,
-    props.isLoading,
-  ])
-
   const children = props.children ?? (
     <>
-      {contents
-        .sort((a, b) => a.position - b.position)
-        .map((content, index) => (
-          <Fragment key={index}>{content.component}</Fragment>
-        ))}
+      <EventAnnotations
+        message={message}
+        showLoading={(isLast && props.isLoading) ?? false}
+      />
+      <AgentEventAnnotations message={message} />
+      <ImageAnnotations message={message} />
+      <Markdown
+        content={message.content}
+        sources={
+          annotations ? getSourceAnnotationData(annotations)[0] : undefined
+        }
+      />
+      <DocumentFileAnnotations message={message} />
+      <SourceAnnotations message={message} />
+      {isLast && props.append && (
+        <SuggestedQuestionsAnnotations
+          message={message}
+          append={props.append}
+        />
+      )}
     </>
   )
 
