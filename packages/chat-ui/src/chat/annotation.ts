@@ -78,13 +78,32 @@ export type MessageAnnotation = {
 
 const NODE_SCORE_THRESHOLD = 0.25
 
+/**
+ * Gets custom message annotations that don't follow the standard type/data structure
+ * @param annotations - Array of message annotations to filter
+ * @param filter - Optional custom filter function to apply instead of the default
+ * @returns Filtered array of custom message annotations
+ *
+ * The default filter will return annotations that don't have 'type' or 'data' properties.
+ * A custom filter function can be provided to override this default behavior.
+ */
+export function getCustomAnnotationData(
+  annotations: MessageAnnotation[],
+  filter?: (a: MessageAnnotation) => boolean
+) {
+  if (!Array.isArray(annotations)) return []
+  const defaultFilter = (a: MessageAnnotation) =>
+    !('type' in a) && !('data' in a)
+  return annotations.filter(filter ?? defaultFilter)
+}
+
 export function getAnnotationData<T extends AnnotationData>(
   annotations: MessageAnnotation[],
   type: string
 ): T[] {
   if (!annotations?.length) return []
   return annotations
-    .filter(a => a.type.toString() === type)
+    .filter(a => a && 'type' in a && a.type.toString() === type)
     .map(a => a.data as T)
 }
 
