@@ -87,14 +87,16 @@ const NODE_SCORE_THRESHOLD = 0.25
  * The default filter will return annotations that don't have 'type' or 'data' properties.
  * A custom filter function can be provided to override this default behavior.
  */
-export function getCustomAnnotationData(
-  annotations: MessageAnnotation[],
-  filter?: (a: MessageAnnotation) => boolean
-) {
-  if (!Array.isArray(annotations)) return []
+export function getCustomAnnotationData<T = MessageAnnotation>(
+  annotations: T[],
+  filterFn?: (a: T) => boolean
+): T[] {
+  if (!Array.isArray(annotations) || !annotations.length) return [] as T[]
   const defaultFilter = (a: MessageAnnotation) =>
     !('type' in a) && !('data' in a)
-  return annotations.filter(filter ?? defaultFilter)
+  return annotations.filter(
+    a => filterFn?.(a as T) ?? defaultFilter(a as MessageAnnotation)
+  ) as T[]
 }
 
 export function getAnnotationData<T extends AnnotationData>(
