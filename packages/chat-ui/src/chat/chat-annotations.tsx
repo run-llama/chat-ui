@@ -17,15 +17,12 @@ import {
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
-import { ChatHandler, Message } from './chat.interface'
+import { useChatMessage } from './chat.context.js'
 
-export function EventAnnotations({
-  message,
-  showLoading,
-}: {
-  message: Message
-  showLoading: boolean
-}) {
+export function EventAnnotations() {
+  const { message, isLast, isLoading } = useChatMessage()
+  const showLoading = (isLast && isLoading) ?? false
+
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const eventData =
     annotations && annotations.length > 0
@@ -35,7 +32,9 @@ export function EventAnnotations({
   return <ChatEvents data={eventData} showLoading={showLoading} />
 }
 
-export function AgentEventAnnotations({ message }: { message: Message }) {
+export function AgentEventAnnotations() {
+  const { message } = useChatMessage()
+
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const agentEventData =
     annotations && annotations.length > 0
@@ -53,7 +52,9 @@ export function AgentEventAnnotations({ message }: { message: Message }) {
   )
 }
 
-export function ImageAnnotations({ message }: { message: Message }) {
+export function ImageAnnotations() {
+  const { message } = useChatMessage()
+
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const imageData =
     annotations && annotations.length > 0
@@ -63,7 +64,9 @@ export function ImageAnnotations({ message }: { message: Message }) {
   return imageData[0] ? <ChatImage data={imageData[0]} /> : null
 }
 
-export function DocumentFileAnnotations({ message }: { message: Message }) {
+export function DocumentFileAnnotations() {
+  const { message } = useChatMessage()
+
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const contentFileData =
     annotations && annotations.length > 0
@@ -76,7 +79,9 @@ export function DocumentFileAnnotations({ message }: { message: Message }) {
   return contentFileData[0] ? <ChatFiles data={contentFileData[0]} /> : null
 }
 
-export function SourceAnnotations({ message }: { message: Message }) {
+export function SourceAnnotations() {
+  const { message } = useChatMessage()
+
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const sourceData =
     annotations && annotations.length > 0
@@ -86,13 +91,10 @@ export function SourceAnnotations({ message }: { message: Message }) {
   return sourceData[0] ? <ChatSources data={sourceData[0]} /> : null
 }
 
-export function SuggestedQuestionsAnnotations({
-  message,
-  append,
-}: {
-  message: Message
-  append: ChatHandler['append']
-}) {
+export function SuggestedQuestionsAnnotations() {
+  const { message, append, isLast } = useChatMessage()
+  if (!isLast || !append) return null
+
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const suggestedQuestionsData =
     annotations && annotations.length > 0

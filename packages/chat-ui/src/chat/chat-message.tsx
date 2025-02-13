@@ -1,5 +1,5 @@
 import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
-import { createContext, Fragment, memo, useContext } from 'react'
+import { memo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
@@ -13,6 +13,7 @@ import {
   SourceAnnotations,
   SuggestedQuestionsAnnotations,
 } from './chat-annotations'
+import { ChatMessageProvider, useChatMessage } from './chat.context.js'
 import { ChatHandler, Message } from './chat.interface'
 
 interface ChatMessageProps extends React.PropsWithChildren {
@@ -58,22 +59,6 @@ interface ChatMessageActionsProps extends React.PropsWithChildren {
   className?: string
 }
 
-interface ChatMessageContext {
-  message: Message
-  isLast: boolean
-}
-
-const chatMessageContext = createContext<ChatMessageContext | null>(null)
-
-const ChatMessageProvider = chatMessageContext.Provider
-
-export const useChatMessage = () => {
-  const context = useContext(chatMessageContext)
-  if (!context)
-    throw new Error('useChatMessage must be used within a ChatMessageProvider')
-  return context
-}
-
 function ChatMessage(props: ChatMessageProps) {
   const children = props.children ?? (
     <>
@@ -85,7 +70,12 @@ function ChatMessage(props: ChatMessageProps) {
 
   return (
     <ChatMessageProvider
-      value={{ message: props.message, isLast: props.isLast }}
+      value={{
+        message: props.message,
+        isLast: props.isLast,
+        isLoading: props.isLoading,
+        append: props.append,
+      }}
     >
       <div className={cn('group flex gap-4 p-3', props.className)}>
         {children}
@@ -114,32 +104,15 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 }
 
 function ChatMessageContent(props: ChatMessageContentProps) {
-  const { message: defaultMessage, isLast } = useChatMessage()
-  const message = props.message ?? defaultMessage
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-
   const children = props.children ?? (
     <>
-      <EventAnnotations
-        message={message}
-        showLoading={(isLast && props.isLoading) ?? false}
-      />
-      <AgentEventAnnotations message={message} />
-      <ImageAnnotations message={message} />
-      <Markdown
-        content={message.content}
-        sources={
-          annotations ? getSourceAnnotationData(annotations)[0] : undefined
-        }
-      />
-      <DocumentFileAnnotations message={message} />
-      <SourceAnnotations message={message} />
-      {isLast && props.append && (
-        <SuggestedQuestionsAnnotations
-          message={message}
-          append={props.append}
-        />
-      )}
+      <EventAnnotations />
+      <AgentEventAnnotations />
+      <ImageAnnotations />
+      <ChatMarkdown />
+      <DocumentFileAnnotations />
+      <SourceAnnotations />
+      <SuggestedQuestionsAnnotations />
     </>
   )
 
@@ -147,6 +120,20 @@ function ChatMessageContent(props: ChatMessageContentProps) {
     <div className={cn('flex min-w-0 flex-1 flex-col gap-4', props.className)}>
       {children}
     </div>
+  )
+}
+
+function ChatMarkdown() {
+  const { message } = useChatMessage()
+  const annotations = message.annotations as MessageAnnotation[] | undefined
+
+  return (
+    <Markdown
+      content={message.content}
+      sources={
+        annotations ? getSourceAnnotationData(annotations)[0] : undefined
+      }
+    />
   )
 }
 
@@ -176,9 +163,19 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
   )
 }
 
+type ComposibleChatMessageContent = typeof ChatMessageContent & {
+  Event: typeof EventAnnotations
+  AgentEvent: typeof AgentEventAnnotations
+  Image: typeof ImageAnnotations
+  Markdown: typeof ChatMarkdown
+  DocumentFile: typeof DocumentFileAnnotations
+  Source: typeof SourceAnnotations
+  SuggestedQuestions: typeof SuggestedQuestionsAnnotations
+}
+
 type ComposibleChatMessage = typeof ChatMessage & {
   Avatar: typeof ChatMessageAvatar
-  Content: typeof ChatMessageContent
+  Content: ComposibleChatMessageContent
   Actions: typeof ChatMessageActions
 }
 
@@ -190,8 +187,18 @@ const PrimiviteChatMessage = memo(ChatMessage, (prevProps, nextProps) => {
   )
 }) as unknown as ComposibleChatMessage
 
+PrimiviteChatMessage.Content =
+  ChatMessageContent as ComposibleChatMessageContent
+
+PrimiviteChatMessage.Content.Event = EventAnnotations
+PrimiviteChatMessage.Content.AgentEvent = AgentEventAnnotations
+PrimiviteChatMessage.Content.Image = ImageAnnotations
+PrimiviteChatMessage.Content.Markdown = ChatMarkdown
+PrimiviteChatMessage.Content.DocumentFile = DocumentFileAnnotations
+PrimiviteChatMessage.Content.Source = SourceAnnotations
+PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsAnnotations
+
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
-PrimiviteChatMessage.Content = ChatMessageContent
 PrimiviteChatMessage.Actions = ChatMessageActions
 
 export default PrimiviteChatMessage
