@@ -7,7 +7,8 @@ export { default as ChatMessages } from './chat/chat-messages'
 export { default as ChatMessage, ContentPosition } from './chat/chat-message'
 
 // Context Provider Hooks
-export { useChatUI, useChatMessage } from './chat/chat.context'
+export { useChatUI } from './chat/chat.context'
+export { useChatMessage } from './chat/chat-message.context'
 export { useChatInput } from './chat/chat-input'
 export { useChatMessages } from './chat/chat-messages'
 

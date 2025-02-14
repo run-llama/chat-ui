@@ -10,14 +10,14 @@ import {
   AgentEventData,
   DocumentFileData,
   EventData,
-  getAnnotationData,
+  getChatUIAnnotation,
   getSourceAnnotationData,
   ImageData,
   MessageAnnotation,
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
-import { useChatMessage } from './chat.context.js'
+import { useChatMessage } from './chat-message.context.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -26,7 +26,7 @@ export function EventAnnotations() {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const eventData =
     annotations && annotations.length > 0
-      ? getAnnotationData<EventData>(annotations, MessageAnnotationType.EVENTS)
+      ? getChatUIAnnotation<EventData>(annotations, MessageAnnotationType.EVENTS)
       : null
   if (!eventData?.length) return null
   return <ChatEvents data={eventData} showLoading={showLoading} />
@@ -38,7 +38,7 @@ export function AgentEventAnnotations() {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const agentEventData =
     annotations && annotations.length > 0
-      ? getAnnotationData<AgentEventData>(
+      ? getChatUIAnnotation<AgentEventData>(
           annotations,
           MessageAnnotationType.AGENT_EVENTS
         )
@@ -58,7 +58,7 @@ export function ImageAnnotations() {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const imageData =
     annotations && annotations.length > 0
-      ? getAnnotationData<ImageData>(annotations, 'image')
+      ? getChatUIAnnotation<ImageData>(annotations, 'image')
       : null
   if (!imageData) return null
   return imageData[0] ? <ChatImage data={imageData[0]} /> : null
@@ -70,7 +70,7 @@ export function DocumentFileAnnotations() {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const contentFileData =
     annotations && annotations.length > 0
-      ? getAnnotationData<DocumentFileData>(
+      ? getChatUIAnnotation<DocumentFileData>(
           annotations,
           MessageAnnotationType.DOCUMENT_FILE
         )
@@ -98,7 +98,7 @@ export function SuggestedQuestionsAnnotations() {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const suggestedQuestionsData =
     annotations && annotations.length > 0
-      ? getAnnotationData<SuggestedQuestionsData>(
+      ? getChatUIAnnotation<SuggestedQuestionsData>(
           annotations,
           MessageAnnotationType.SUGGESTED_QUESTIONS
         )

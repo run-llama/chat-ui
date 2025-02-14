@@ -13,7 +13,7 @@ import {
   SourceAnnotations,
   SuggestedQuestionsAnnotations,
 } from './chat-annotations'
-import { ChatMessageProvider, useChatMessage } from './chat.context.js'
+import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { ChatHandler, Message } from './chat.interface'
 
 interface ChatMessageProps extends React.PropsWithChildren {
