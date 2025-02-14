@@ -11,7 +11,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo build && changeset publish",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "new-version": "changeset version && pnpm run build"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
