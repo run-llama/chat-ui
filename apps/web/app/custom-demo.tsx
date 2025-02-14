@@ -1,19 +1,20 @@
 'use client'
 
+import { Code } from '@/components/code'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   ChatInput,
   ChatMessage,
   ChatMessages,
   ChatSection,
   getCustomAnnotation,
+  JSONValue,
   useChatMessage,
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
 import { User2 } from 'lucide-react'
-import { Code } from '@/components/code'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const code = `
 import {
@@ -106,7 +107,7 @@ const initialMessages: Message[] = [
 function Annotation() {
   const { message } = useChatMessage()
   const annotations = getCustomAnnotation<{ type: string; url: string }>(
-    message.annotations,
+    message.annotations as JSONValue[],
     a => a.type === 'image'
   )
 
