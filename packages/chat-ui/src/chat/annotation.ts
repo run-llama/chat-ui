@@ -113,19 +113,6 @@ function isSupportedAnnotation(a: JSONValue): boolean {
   )
 }
 
-/**
- * @deprecated Use getChatUIAnnotation instead
- */
-export function getAnnotationData<T extends AnnotationData>(
-  annotations: MessageAnnotation[],
-  type: string
-): T[] {
-  if (!annotations?.length) return []
-  return annotations
-    .filter(a => a && 'type' in a && a.type.toString() === type)
-    .map(a => a.data as T)
-}
-
 export function getChatUIAnnotation<T extends AnnotationData>(
   annotations: MessageAnnotation[],
   type: string
