@@ -1,3 +1,5 @@
+import { JSONValue } from './chat.interface'
+
 export enum MessageAnnotationType {
   IMAGE = 'image',
   DOCUMENT_FILE = 'document_file',
@@ -77,16 +79,6 @@ export type MessageAnnotation = {
 }
 
 const NODE_SCORE_THRESHOLD = 0.25
-
-export type JSONValue =
-  | null
-  | string
-  | number
-  | boolean
-  | {
-      [value: string]: JSONValue
-    }
-  | JSONValue[]
 
 /**
  * Gets custom message annotations that don't match any standard MessageAnnotationType

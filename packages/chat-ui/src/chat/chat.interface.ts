@@ -1,9 +1,19 @@
 type MessageRole = 'system' | 'user' | 'assistant' | 'data'
 
+export type JSONValue =
+  | null
+  | string
+  | number
+  | boolean
+  | {
+      [value: string]: JSONValue
+    }
+  | JSONValue[]
+
 export interface Message {
   content: string
   role: MessageRole
-  annotations?: any
+  annotations?: JSONValue[] | undefined
 }
 
 export type ChatHandler = {

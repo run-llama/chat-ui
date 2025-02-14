@@ -5,10 +5,11 @@ import {
   ChatMessage,
   ChatMessages,
   ChatSection,
+  getCustomAnnotation,
+  useChatMessage,
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
-import { Markdown } from '@llamaindex/chat-ui/widgets'
 import { Message, useChat } from 'ai/react'
 import { User2 } from 'lucide-react'
 import { Code } from '@/components/code'
@@ -102,23 +103,22 @@ const initialMessages: Message[] = [
   },
 ]
 
-function Annotation({ annotations }: { annotations: any }) {
-  if (annotations && Array.isArray(annotations)) {
-    return annotations.map((annotation: any) => {
-      if (annotation.type === 'image' && annotation.url) {
-        return (
-          <img
-            alt="annotation"
-            className="h-[200px] object-contain"
-            key={annotation.url}
-            src={annotation.url}
-          />
-        )
-      }
-      return null
-    })
-  }
-  return null
+function Annotation() {
+  const { message } = useChatMessage()
+  const annotations = getCustomAnnotation<{ type: string; url: string }>(
+    message.annotations,
+    a => a.type === 'image'
+  )
+
+  if (!annotations.length) return null
+  return annotations.map(annotation => (
+    <img
+      alt="annotation"
+      className="h-[200px] object-contain"
+      key={annotation.url}
+      src={annotation.url}
+    />
+  ))
 }
 
 function CustomChatMessagesList() {
@@ -144,8 +144,8 @@ function CustomChatMessagesList() {
             isLoading={isLoading}
             append={append}
           >
-            <Markdown content={message.content} />
-            <Annotation annotations={message.annotations} />
+            <Annotation />
+            <ChatMessage.Content.Markdown />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>
