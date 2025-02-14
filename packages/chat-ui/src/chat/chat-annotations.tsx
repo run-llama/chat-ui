@@ -26,7 +26,10 @@ export function EventAnnotations() {
   const annotations = message.annotations as MessageAnnotation[] | undefined
   const eventData =
     annotations && annotations.length > 0
-      ? getChatUIAnnotation<EventData>(annotations, MessageAnnotationType.EVENTS)
+      ? getChatUIAnnotation<EventData>(
+          annotations,
+          MessageAnnotationType.EVENTS
+        )
       : null
   if (!eventData?.length) return null
   return <ChatEvents data={eventData} showLoading={showLoading} />
