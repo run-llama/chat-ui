@@ -1,3 +1,5 @@
+import { JSONValue } from './chat.interface'
+
 export enum MessageAnnotationType {
   IMAGE = 'image',
   DOCUMENT_FILE = 'document_file',
@@ -78,20 +80,53 @@ export type MessageAnnotation = {
 
 const NODE_SCORE_THRESHOLD = 0.25
 
-export function getAnnotationData<T extends AnnotationData>(
+/**
+ * Gets custom message annotations that don't match any standard MessageAnnotationType
+ * @param annotations - Array of message annotations to filter
+ * @param filter - Optional custom filter function to apply after filtering out standard annotations
+ * @returns Filtered array of custom message annotations
+ *
+ * First filters out any annotations that match MessageAnnotationType values,
+ * then applies the optional custom filter if provided.
+ */
+export function getCustomAnnotation<T = JSONValue>(
+  annotations: JSONValue[] | undefined,
+  filterFn?: (a: T) => boolean
+): T[] {
+  if (!Array.isArray(annotations) || !annotations.length) return [] as T[]
+  const customAnnotations = annotations.filter(
+    a => !isSupportedAnnotation(a)
+  ) as T[]
+  return filterFn ? customAnnotations.filter(filterFn) : customAnnotations
+}
+
+function isSupportedAnnotation(a: JSONValue): boolean {
+  return (
+    typeof a === 'object' &&
+    a !== null &&
+    a !== undefined &&
+    'type' in a &&
+    'data' in a &&
+    Object.values(MessageAnnotationType).includes(
+      a.type as MessageAnnotationType
+    )
+  )
+}
+
+export function getChatUIAnnotation<T extends AnnotationData>(
   annotations: MessageAnnotation[],
   type: string
 ): T[] {
   if (!annotations?.length) return []
   return annotations
-    .filter(a => a.type.toString() === type)
+    .filter(a => a && 'type' in a && a.type.toString() === type)
     .map(a => a.data as T)
 }
 
 export function getSourceAnnotationData(
   annotations: MessageAnnotation[]
 ): SourceData[] {
-  const data = getAnnotationData<SourceData>(
+  const data = getChatUIAnnotation<SourceData>(
     annotations,
     MessageAnnotationType.SOURCES
   )
