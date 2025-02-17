@@ -36,10 +36,10 @@ const preprocessLaTeX = (content: string) => {
 /**
  * Update the citation flag [citation:id]() to the new format [citation:index](url)
  */
-const preprocessCitations = (input: string, sources?: SourceData) => {
+export const preprocessCitations = (input: string, sources?: SourceData) => {
   let content = input
   if (sources) {
-    const citationRegex = /\[citation:(.+?)\]\(\)/g
+    const citationRegex = /\[citation:(.+?)\]/g
     let match
     // Find all the citation references in the content
     while ((match = citationRegex.exec(content)) !== null) {
