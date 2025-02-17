@@ -39,7 +39,7 @@ export type SourceNode = {
   metadata: Record<string, unknown>
   score?: number
   text: string
-  url: string
+  url?: string
 }
 
 export type SourceData = {
@@ -145,11 +145,12 @@ function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
   // Filter source nodes has lower score
   const processedNodes = nodes
     .filter(node => (node.score ?? 1) > NODE_SCORE_THRESHOLD)
-    .filter(node => node.url && node.url.trim() !== '')
     .sort((a, b) => (b.score ?? 1) - (a.score ?? 1))
     .map(node => {
       // remove trailing slash for node url if exists
-      node.url = node.url.replace(/\/$/, '')
+      if (node.url) {
+        node.url = node.url.replace(/\/$/, '')
+      }
       return node
     })
   return processedNodes
