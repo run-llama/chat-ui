@@ -36,7 +36,7 @@ const preprocessLaTeX = (content: string) => {
 /**
  * Update the citation flag [citation:id]() to the new format [citation:index](url)
  */
-export const preprocessCitations = (input: string, sources?: SourceData) => {
+const preprocessCitations = (input: string, sources?: SourceData) => {
   let content = input
   if (sources) {
     const citationRegex = /\[citation:(.+?)\]/g
