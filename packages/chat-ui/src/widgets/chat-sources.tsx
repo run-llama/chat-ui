@@ -11,11 +11,13 @@ export function ChatSources({ data }: { data: SourceData }) {
   const documents: Document[] = useMemo(() => {
     // group nodes by document (a document must have a URL)
     const nodesByUrl: Record<string, SourceNode[]> = {}
-    data.nodes.forEach(node => {
-      const key = node.url
-      nodesByUrl[key] ??= []
-      nodesByUrl[key].push(node)
-    })
+    data.nodes
+      .filter(node => node.url)
+      .forEach(node => {
+        const key = node.url ?? ''
+        nodesByUrl[key] ??= []
+        nodesByUrl[key].push(node)
+      })
 
     // convert to array of documents
     return Object.entries(nodesByUrl).map(([url, sources]) => ({
