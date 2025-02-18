@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.1.0
+
+### Minor Changes
+
+- d7e63e7: Update citation processor format
+
 ## 0.0.15
 
 ### Patch Changes
