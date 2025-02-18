@@ -33,6 +33,12 @@ const preprocessLaTeX = (content: string) => {
   return inlineProcessedContent
 }
 
+const preprocessMedia = (content: string) => {
+  // Remove `sandbox:` from the beginning of the URL
+  // to fix OpenAI's models issue appending `sandbox:` to the relative URL
+  return content.replace(/(sandbox|attachment|snt):/g, "");
+};
+
 /**
  * Update the citation flag [citation:id]() to the new format [citation:index](url)
  */
@@ -62,7 +68,7 @@ const preprocessCitations = (input: string, sources?: SourceData) => {
 }
 
 const preprocessContent = (content: string, sources?: SourceData) => {
-  return preprocessCitations(preprocessLaTeX(content), sources)
+  return preprocessCitations(preprocessLaTeX(preprocessMedia(content)), sources)
 }
 
 export function Markdown({
