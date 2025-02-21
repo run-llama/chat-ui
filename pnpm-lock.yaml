@@ -66,9 +66,6 @@ importers:
       '@llamaindex/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
-      '@llamaindex/tailwind-config':
-        specifier: workspace:*
-        version: link:../../packages/config-tailwind
       '@llamaindex/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
@@ -175,9 +172,6 @@ importers:
       '@llamaindex/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@llamaindex/tailwind-config':
-        specifier: workspace:*
-        version: link:../config-tailwind
       '@llamaindex/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
@@ -208,15 +202,6 @@ importers:
       eslint-config-turbo:
         specifier: ^2.0.0
         version: 2.4.2(eslint@8.57.1)(turbo@2.4.2)
-
-  packages/config-tailwind:
-    devDependencies:
-      '@llamaindex/typescript-config':
-        specifier: workspace:*
-        version: link:../config-typescript
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.17
 
   packages/config-typescript: {}
 
