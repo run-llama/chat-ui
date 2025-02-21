@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@llamaindex/eslint-config": "workspace:*",
-    "@llamaindex/tailwind-config": "workspace:*",
     "@llamaindex/typescript-config": "workspace:*",
     "@next/eslint-plugin-next": "^14.2.3",
     "@types/node": "^20.11.24",
