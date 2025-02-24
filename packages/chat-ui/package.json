@@ -25,8 +25,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run clean && pnpm run build:js && pnpm run copy:css",
-    "copy:css": "cp -r src/styles dist/styles",
+    "build": "pnpm run clean && pnpm run build:js && pnpm run build:css",
+    "build:css": "postcss \"src/styles/*.css\" --base src/styles --dir dist/styles",
     "build:js": "tsup",
     "lint": "eslint src/",
     "dev": "pnpm run build:js --watch",
@@ -41,10 +41,11 @@
   "devDependencies": {
     "@llamaindex/eslint-config": "workspace:*",
     "@llamaindex/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.0.7",
     "@types/react": "^18.2.61",
     "postcss": "^8.4.35",
+    "postcss-cli": "^11.0.0",
     "tailwindcss": "^4.0.7",
-    "@tailwindcss/postcss": "^4.0.7",
     "tsup": "^8.3.5",
     "typescript": "^5.3.3"
   },
@@ -60,6 +61,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "highlight.js": "^11.10.0",
+    "katex": "^0.16.21",
     "lucide-react": "^0.453.0",
     "react-markdown": "^8.0.7",
     "rehype-katex": "^7.0.0",

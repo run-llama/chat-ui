@@ -1,5 +1,5 @@
-@import '~highlight.js/styles/atom-one-dark-reasonable.css';
-@import '~katex/dist/katex.min.css';
+@import 'highlight.js/styles/atom-one-dark-reasonable.css';
+@import 'katex/dist/katex.min.css';
 
 .custom-markdown ul {
   list-style-type: disc;
