@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.2.0
+
+### Minor Changes
+
+- cb705ce: chore: bump tailwind v4
+
 ## 0.1.0
 
 ### Minor Changes
