@@ -31,7 +31,15 @@ npm install @llamaindex/chat-ui
 npm install @llamaindex/chat-ui
 ```
 
-2. Configure your `tailwind.config.ts` to include the chat-ui components
+2. Configure Tailwind CSS to include the chat-ui components
+
+For Tailwind CSS version 4.x, update `globals.css` to include the chat-ui components (update the relative path to node_modules if necessary):
+
+```css
+@source '../node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}';
+```
+
+For Tailwind CSS version 3.x, you need to add the following to your `tailwind.config.ts` file:
 
 ```ts
 module.exports = {
