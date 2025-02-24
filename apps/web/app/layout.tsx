@@ -1,5 +1,6 @@
 import './globals.css'
 import '@llamaindex/chat-ui/styles/markdown.css'
+import '@llamaindex/chat-ui/styles/pdf.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 

@@ -102,6 +102,30 @@ const initialMessages: Message[] = [
       },
     ],
   },
+  {
+    id: '3',
+    role: 'user',
+    content: 'Show me a pdf file',
+  },
+  {
+    id: '4',
+    role: 'assistant',
+    content: 'Got it! Here is the pdf file',
+    annotations: [
+      {
+        type: 'document_file',
+        data: {
+          files: [
+            {
+              id: '1',
+              name: 'sample.pdf',
+              url: 'https://pdfobject.com/pdf/sample.pdf',
+            },
+          ],
+        },
+      },
+    ],
+  },
 ]
 
 function Annotation() {
@@ -146,6 +170,7 @@ function CustomChatMessagesList() {
             append={append}
           >
             <Annotation />
+            <ChatMessage.Content.DocumentFile />
             <ChatMessage.Content.Markdown />
           </ChatMessage.Content>
           <ChatMessage.Actions />
