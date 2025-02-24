@@ -51,7 +51,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@llamaindex/pdf-viewer": "1.2.0",
+    "@llamaindex/pdf-viewer": "1.3.0",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-hover-card": "^1.0.7",
     "@radix-ui/react-icons": "^1.3.0",
