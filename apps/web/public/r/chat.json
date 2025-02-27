@@ -1,16 +1,16 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-  "name": "chat-section",
+  "name": "chat",
   "type": "registry:block",
-  "title": "Chat Section",
-  "description": "A chat section component for AI applications",
+  "title": "Chatbot",
+  "description": "A chatbot component for AI applications",
   "dependencies": [
     "@llamaindex/chat-ui"
   ],
   "registryDependencies": [],
   "files": [
     {
-      "path": "registry/chat-section/chat-section.tsx",
+      "path": "registry/chat/chat.tsx",
       "content": "'use client'\r\n\r\nimport {\r\n  ChatHandler,\r\n  ChatSection as ChatSectionUI,\r\n  Message,\r\n} from '@llamaindex/chat-ui'\r\n\r\nimport '@llamaindex/chat-ui/styles/markdown.css'\r\nimport { useState } from 'react'\r\n\r\nconst initialMessages: Message[] = [\r\n  {\r\n    content: 'Write simple Javascript hello world code',\r\n    role: 'user',\r\n  },\r\n  {\r\n    role: 'assistant',\r\n    content:\r\n      'Got it! Here\\'s the simplest JavaScript code to print \"Hello, World!\" to the console:\\n\\n```javascript\\nconsole.log(\"Hello, World!\");\\n```\\n\\nYou can run this code in any JavaScript environment, such as a web browser\\'s console or a Node.js environment. Just paste the code and execute it to see the output.',\r\n  },\r\n  {\r\n    content: 'Write a simple math equation',\r\n    role: 'user',\r\n  },\r\n  {\r\n    role: 'assistant',\r\n    content:\r\n      \"Let's explore a simple mathematical equation using LaTeX:\\n\\n The quadratic formula is: $$x = \\\\frac{-b \\\\pm \\\\sqrt{b^2 - 4ac}}{2a}$$\\n\\nThis formula helps us solve quadratic equations in the form $ax^2 + bx + c = 0$. The solution gives us the x-values where the parabola intersects the x-axis.\",\r\n  },\r\n]\r\n\r\nexport function ChatSection() {\r\n  // You can replace the handler with a useChat hook from Vercel AI SDK\r\n  const handler = useMockChat(initialMessages)\r\n  return (\r\n    <div className=\"flex max-h-[80vh] flex-col gap-6 overflow-y-auto\">\r\n      <ChatSectionUI handler={handler} />\r\n    </div>\r\n  )\r\n}\r\n\r\nfunction useMockChat(initMessages: Message[]): ChatHandler {\r\n  const [messages, setMessages] = useState<Message[]>(initMessages)\r\n  const [input, setInput] = useState('')\r\n  const [isLoading, setIsLoading] = useState(false)\r\n\r\n  const append = async (message: Message) => {\r\n    setIsLoading(true)\r\n\r\n    const mockResponse: Message = {\r\n      role: 'assistant',\r\n      content: '',\r\n    }\r\n    setMessages(prev => [...prev, message, mockResponse])\r\n\r\n    const mockContent =\r\n      'This is a mock response. In a real implementation, this would be replaced with an actual AI response.'\r\n\r\n    let streamedContent = ''\r\n    const words = mockContent.split(' ')\r\n\r\n    for (const word of words) {\r\n      await new Promise(resolve => setTimeout(resolve, 100))\r\n      streamedContent += (streamedContent ? ' ' : '') + word\r\n      setMessages(prev => {\r\n        return [\r\n          ...prev.slice(0, -1),\r\n          {\r\n            role: 'assistant',\r\n            content: streamedContent,\r\n          },\r\n        ]\r\n      })\r\n    }\r\n\r\n    setIsLoading(false)\r\n    return mockContent\r\n  }\r\n\r\n  return {\r\n    messages,\r\n    input,\r\n    setInput,\r\n    isLoading,\r\n    append,\r\n  }\r\n}\r\n",
       "type": "registry:block"
     }

@@ -8,9 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "registry:build": "npx shadcn@latest build"
+    "registry:build": "rm -rf public/r && npx shadcn@latest build"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.4.0",
     "@llamaindex/chat-ui": "workspace:*",
     "@radix-ui/react-tabs": "^1.1.1",
     "class-variance-authority": "^0.7.0",
