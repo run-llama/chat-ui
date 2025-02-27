@@ -9,7 +9,7 @@ import {
 import { NextResponse, type NextRequest } from 'next/server'
 import { fakeStreamText } from '@/app/utils'
 
-export const runtime = 'node'
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 Settings.llm = new OpenAI({ model: 'gpt-4o-mini' })
