@@ -7,6 +7,7 @@ import {
   SimpleChatEngine,
 } from 'llamaindex'
 import { NextResponse, type NextRequest } from 'next/server'
+import { fakeStreamText } from '@/app/utils'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -24,6 +25,17 @@ export async function POST(request: NextRequest) {
     const lastMessage = messages[messages.length - 1]
 
     const vercelStreamData = new StreamData()
+
+    if (!process.env.OPENAI_API_KEY) {
+      // Return fake stream if API key is not set
+      return new Response(fakeStreamText(), {
+        headers: {
+          'Content-Type': 'text/plain',
+          Connection: 'keep-alive',
+        },
+      })
+    }
+
     const chatEngine = new SimpleChatEngine()
 
     const response = await chatEngine.chat({

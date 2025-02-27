@@ -29,6 +29,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@faker-js/faker':
+        specifier: ^9.4.0
+        version: 9.5.0
       '@llamaindex/chat-ui':
         specifier: workspace:*
         version: link:../../packages/chat-ui
@@ -1622,6 +1625,11 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@faker-js/faker@9.5.0:
+    resolution: {integrity: sha512-3qbjLv+fzuuCg3umxc9/7YjrEXNaKwHgmig949nfyaTx8eL4FAsvFbu+1JcFUj1YAXofhaDn6JdEUBTYuk0Ssw==}
+    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
+    dev: false
 
   /@fastify/busboy@2.1.1:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}

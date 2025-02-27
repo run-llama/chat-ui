@@ -5,5 +5,6 @@ module.exports = {
     'no-await-in-loop': 'off',
     'no-promise-executor-return': 'off',
     '@typescript-eslint/no-loop-func': 'off',
+    'turbo/no-undeclared-env-vars': 'off',
   },
 }
