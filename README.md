@@ -11,7 +11,7 @@ Chat UI components for LLM apps
 You can quickly add a chatbot to your project by using Shadcn CLI command:
 
 ```sh
-npx shadcn@latest add https://raw.githubusercontent.com/run-llama/chat-ui/refs/heads/tp/build-registry/apps/web/public/r/chat-section.json
+npx shadcn@latest add https://ui.llamaindex.ai/r/chat.json
 ```
 
 ## Manual Installation
