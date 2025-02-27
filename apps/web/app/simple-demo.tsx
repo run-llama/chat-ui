@@ -42,15 +42,24 @@ const initialMessages: Message[] = [
 
 function SimpleChat() {
   const handler = useChat({ initialMessages })
-  return <ChatSection className="max-h-[72vh]" handler={handler} />
+  return (
+    <div className="overflow-hidden rounded-xl shadow-xl">
+      <ChatSection className="max-h-[72vh]" handler={handler} />
+    </div>
+  )
 }
 
 export function SimpleChatSection() {
   return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-semibold">Simple Chat Demo</h2>
-      <Tabs defaultValue="preview" className="w-[800px]">
-        <TabsList>
+    <div className="flex flex-col gap-6">
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold text-white">Simple Chat Demo</h2>
+        <p className="text-zinc-400">
+          A minimal implementation using just a few lines of code
+        </p>
+      </div>
+      <Tabs defaultValue="preview">
+        <TabsList className="mb-4">
           <TabsTrigger value="preview">Preview</TabsTrigger>
           <TabsTrigger value="code">Code</TabsTrigger>
         </TabsList>
