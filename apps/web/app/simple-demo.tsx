@@ -42,7 +42,7 @@ const initialMessages: Message[] = [
 
 function SimpleChat() {
   const handler = useChat({ initialMessages })
-  return <ChatSection handler={handler} />
+  return <ChatSection className="max-h-[72vh]" handler={handler} />
 }
 
 export function SimpleChatSection() {

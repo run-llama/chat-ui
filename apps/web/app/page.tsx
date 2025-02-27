@@ -10,7 +10,7 @@ export default function Page(): JSX.Element {
         <p className="text-2xl">Build powerful AI chat interfaces with ease</p>
       </div>
 
-      <div className="mx-auto w-[72%] space-y-16 divide-y-4">
+      <div className="mx-auto w-[72%] space-y-16">
         <div className="mx-auto w-fit rounded-lg bg-zinc-800 p-3">
           <Guide />
         </div>

@@ -194,7 +194,7 @@ export function CustomChat() {
     }
   }
   return (
-    <ChatSection handler={handler}>
+    <ChatSection handler={handler} className="max-h-[72vh]">
       <ChatMessages className="rounded-xl shadow-xl">
         <CustomChatMessagesList />
         <ChatMessages.Actions />

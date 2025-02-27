@@ -18,8 +18,11 @@ export function Code({
   }, [language, content])
 
   return (
-    <pre className="border border-zinc-700">
-      <code className={`language-${language} font-mono`} ref={codeRef}>
+    <pre className="rounded-lg border border-zinc-700 shadow-lg overflow-hidden">
+      <code
+        className={`language-${language} block p-4 font-mono`}
+        ref={codeRef}
+      >
         {content}
       </code>
     </pre>
