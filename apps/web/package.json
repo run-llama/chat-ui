@@ -18,11 +18,13 @@
     "clsx": "^2.1.1",
     "highlight.js": "^11.10.0",
     "lucide-react": "^0.453.0",
-    "next": "^14.2.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "next": "15.1.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "ai": "4.0.0",
+    "llamaindex": "0.9.3"
   },
   "devDependencies": {
     "@llamaindex/eslint-config": "workspace:*",
@@ -32,11 +34,8 @@
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
-    "ai": "4.0.0",
-    "llamaindex": "0.6.22",
     "postcss": "^8.4.35",
     "tailwindcss": "^4.0.7",
-    "tiktoken": "^1.0.15",
     "typescript": "^5.3.3"
   }
 }
