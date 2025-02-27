@@ -6,7 +6,15 @@ Chat UI components for LLM apps
 
 @llamaindex/chat-ui is a React component library that provides ready-to-use UI elements for building chat interfaces in LLM (Large Language Model) applications. This package is designed to streamline the development of chat-based user interfaces for AI-powered applications.
 
-## Installation
+## Quick Start
+
+You can quickly add a chatbot to your project by using Shadcn CLI command:
+
+```sh
+npx shadcn@latest add https://raw.githubusercontent.com/run-llama/chat-ui/refs/heads/tp/build-registry/apps/web/public/r/chat-section.json
+```
+
+## Manual Installation
 
 To install the package, run the following command in your project directory:
 
