@@ -49,13 +49,13 @@ export default function Page(): JSX.Element {
               Add a chatbot to your project with Shadcn CLI:
             </p>
             <div className="overflow-x-auto rounded-lg bg-zinc-900 p-4">
-              <code className="text-purple-400 font-medium text-sm">
+              <code className="text-sm font-medium text-purple-400">
                 npx shadcn@latest add https://ui.llamaindex.ai/r/chat.json
               </code>
             </div>
             <p className="text-zinc-300">Or install manually:</p>
             <div className="overflow-x-auto rounded-lg bg-zinc-900 p-4">
-              <code className="text-purple-400 font-medium text-sm">
+              <code className="text-sm font-medium text-purple-400">
                 npm install @llamaindex/chat-ui
               </code>
             </div>
