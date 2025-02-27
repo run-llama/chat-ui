@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "chat-section",
+  "homepage": "https://llamaindex.ai",
+  "items": [
+    {
+      "name": "chat-section",
+      "type": "registry:block",
+      "title": "Chat Section",
+      "description": "A chat section component for AI applications",
+      "registryDependencies": [],
+      "dependencies": ["@llamaindex/chat-ui"],
+      "files": [
+        {
+          "path": "registry/chat-section/chat-section.tsx",
+          "type": "registry:block"
+        }
+      ]
+    }
+  ]
+}
