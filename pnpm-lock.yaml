@@ -51,8 +51,8 @@ importers:
         specifier: ^11.10.0
         version: 11.11.1
       llamaindex:
-        specifier: 0.9.3
-        version: 0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.24.3)
+        specifier: 0.10.5
+        version: 0.10.5(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.24.3)
       lucide-react:
         specifier: ^0.453.0
         version: 0.453.0(react@18.3.1)
@@ -331,6 +331,31 @@ packages:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
     dev: true
+
+  /@aws-crypto/sha256-js@5.2.0:
+    resolution: {integrity: sha512-FFQQyu7edu4ufvIZ+OadFpHHOt+eSTBaYaki44c+akjg7qZg9oOQeLlk77F6tSYqjDAFClrHJk9tMf0HdVyOvA==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@aws-crypto/util': 5.2.0
+      '@aws-sdk/types': 3.804.0
+      tslib: 2.8.1
+    dev: false
+
+  /@aws-crypto/util@5.2.0:
+    resolution: {integrity: sha512-4RkU9EsI6ZpBve5fseQlGNUWKMa1RLPQ1dnjnQoe07ldfIzcsGb5hC5W0Dm7u423KWzawlrpbjXBrXCEv9zazQ==}
+    dependencies:
+      '@aws-sdk/types': 3.804.0
+      '@smithy/util-utf8': 2.3.0
+      tslib: 2.8.1
+    dev: false
+
+  /@aws-sdk/types@3.804.0:
+    resolution: {integrity: sha512-A9qnsy9zQ8G89vrPPlNG9d1d8QcKRGqJKqwyGgS0dclJpwy6d1EWgQLIolKPl6vcFpLoe6avLOLxr+h8ur5wpg==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      '@smithy/types': 4.2.0
+      tslib: 2.8.1
+    dev: false
 
   /@babel/code-frame@7.27.1:
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -1400,86 +1425,71 @@ packages:
       '@lezer/lr': 1.4.2
     dev: false
 
-  /@llamaindex/cloud@3.0.3(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28):
-    resolution: {integrity: sha512-DVTIMiurAUe2WKvkQ8oEZacPpzgxF8L45LzxdjZCZmUYes19dQYQsFkkU/Qfxmt7Bbbui77HNDFRvLxVj4SdVg==}
+  /@llamaindex/cloud@4.0.6(@llamaindex/core@0.6.4)(@llamaindex/env@0.1.30):
+    resolution: {integrity: sha512-rotXPn7MjSysDqTZn3MN9yNgvmiTuT6lgZYQt1LnMECUKbx4PYZbDRzINl+8DmyG/prPqTqN2rcDbF4//OMSiQ==}
     peerDependencies:
-      '@llamaindex/core': 0.5.2
-      '@llamaindex/env': 0.1.28
+      '@llamaindex/core': 0.6.4
+      '@llamaindex/env': 0.1.30
     dependencies:
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
+      '@llamaindex/core': 0.6.4
+      '@llamaindex/env': 0.1.30
+      p-retry: 6.2.1
     dev: false
 
-  /@llamaindex/core@0.5.2(gpt-tokenizer@2.9.0):
-    resolution: {integrity: sha512-YCkRNJHc8xHgaDj9qP8sLcughhBumh/qrmwJfY03fuBrCszrVP9tRt3migRvswzb17JqqR9ASsg8biBKwM3E9g==}
+  /@llamaindex/core@0.6.4:
+    resolution: {integrity: sha512-M6Lwnp3CwqlPyJnn2xPPz8cGg2AFUt44BycOsY7Y/bNXm/tokTSFUhGSfL/etaubWOURvOeUYUm2Fs1lGI6YWw==}
     dependencies:
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
-      '@types/node': 22.15.3
+      '@llamaindex/env': 0.1.30
+      '@types/node': 22.15.17
       magic-bytes.js: 1.12.1
       zod: 3.24.3
       zod-to-json-schema: 3.24.5(zod@3.24.3)
     transitivePeerDependencies:
-      - '@aws-crypto/sha256-js'
       - '@huggingface/transformers'
       - gpt-tokenizer
-      - js-tiktoken
-      - pathe
-      - tiktoken
     dev: false
 
-  /@llamaindex/env@0.1.28(gpt-tokenizer@2.9.0):
-    resolution: {integrity: sha512-ktAS9I2bJprUilBKpNLLGc2uHGyhFTVWaslSCord0PH4pTTs6OenJdtvG+ZaVkJZg6CLUZDF2e7Hcjwn/NzU+A==}
+  /@llamaindex/env@0.1.30:
+    resolution: {integrity: sha512-y6kutMcCevzbmexUgz+HXf7KiZemzAoFEYSjAILfR+cG6FmYSF8XvLbGOB34Kx8mlRi7EI8rZXpezJ5qCqOyZg==}
     peerDependencies:
-      '@aws-crypto/sha256-js': ^5.2.0
-      '@huggingface/transformers': ^3.0.2
+      '@huggingface/transformers': ^3.5.0
       gpt-tokenizer: ^2.5.0
-      js-tiktoken: ^1.0.12
-      pathe: ^1.1.2
-      tiktoken: '*'
     peerDependenciesMeta:
-      '@aws-crypto/sha256-js':
-        optional: true
       '@huggingface/transformers':
         optional: true
-      js-tiktoken:
-        optional: true
-      pathe:
-        optional: true
-      tiktoken:
+      gpt-tokenizer:
         optional: true
     dependencies:
-      gpt-tokenizer: 2.9.0
+      '@aws-crypto/sha256-js': 5.2.0
+      js-tiktoken: 1.0.20
+      pathe: 1.1.2
     dev: false
 
-  /@llamaindex/node-parser@1.0.2(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7):
-    resolution: {integrity: sha512-iOT4IK84NH1Gla+w5ZC3Q9cT8RsjWVEQ+ravFL0oMsaEAnJV3BUXthYKeM9NgRDfj8EqRVIMmSffPtD/jFQahA==}
+  /@llamaindex/node-parser@2.0.4(@llamaindex/core@0.6.4)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7):
+    resolution: {integrity: sha512-fwWE6c4T/ZcZOmXjEI0bHNZ+sEZjv5C3QqYdNsTNy8MglEitIP6hrMVe6L36sZqfhFAW4BJMBc4iwg7KHFFEBg==}
     peerDependencies:
-      '@llamaindex/core': 0.5.2
-      '@llamaindex/env': 0.1.28
+      '@llamaindex/core': 0.6.4
+      '@llamaindex/env': 0.1.30
       tree-sitter: ^0.22.0
       web-tree-sitter: ^0.24.3
     dependencies:
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
+      '@llamaindex/core': 0.6.4
+      '@llamaindex/env': 0.1.30
       html-to-text: 9.0.5
       tree-sitter: 0.22.4
       web-tree-sitter: 0.24.7
     dev: false
 
-  /@llamaindex/openai@0.1.54(gpt-tokenizer@2.9.0)(zod@3.24.3):
-    resolution: {integrity: sha512-C1r5PleKcIihiDQ9mCCVVBwmub/hT4o8Yi97U9KNR2u0oSOVXfuYWuxx9ViYiiYG4GnnwO5DqmEGzlC32TR5oA==}
+  /@llamaindex/openai@0.3.6(zod@3.24.3):
+    resolution: {integrity: sha512-Od7OdYswIDV8BPPS/L3QkzxSnaWuUp6rX0BB3ypdMD7aHn6gy7cJHrB0otw/bDKDLnHknagouS6psOZxs5QfeQ==}
     dependencies:
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
-      openai: 4.96.2(zod@3.24.3)
+      '@llamaindex/core': 0.6.4
+      '@llamaindex/env': 0.1.30
+      openai: 4.98.0(zod@3.24.3)
     transitivePeerDependencies:
-      - '@aws-crypto/sha256-js'
       - '@huggingface/transformers'
       - encoding
       - gpt-tokenizer
-      - js-tiktoken
-      - pathe
-      - tiktoken
       - ws
       - zod
     dev: false
@@ -1505,6 +1515,18 @@ packages:
       react-intersection-observer: 9.5.1(react@18.3.1)
       react-pdf: 9.2.1(@types/react@18.3.20)(react-dom@18.3.1)(react@18.3.1)
       react-window: 1.8.9(react-dom@18.3.1)(react@18.3.1)
+    dev: false
+
+  /@llamaindex/workflow@1.0.3(@llamaindex/core@0.6.4)(@llamaindex/env@0.1.30)(zod@3.24.3):
+    resolution: {integrity: sha512-GzYzLfn12BTQiLVwFr9tGl1Sa7PPVErLLQAJMgvfjUK8cv764SpJGqln8iKTxnKF05HcRrmJeE7ZD9Lzpf7UrA==}
+    peerDependencies:
+      '@llamaindex/core': 0.6.2
+      '@llamaindex/env': 0.1.29
+      zod: ^3.23.8
+    dependencies:
+      '@llamaindex/core': 0.6.4
+      '@llamaindex/env': 0.1.30
+      zod: 3.24.3
     dev: false
 
   /@manypkg/find-root@1.1.0:
@@ -2528,6 +2550,36 @@ packages:
     engines: {node: '>=18'}
     dev: true
 
+  /@smithy/is-array-buffer@2.2.0:
+    resolution: {integrity: sha512-GGP3O9QFD24uGeAXYUjwSTXARoqpZykHadOmA8G5vfJPK0/DC67qa//0qvqrJzL1xc8WQWX7/yc7fwudjPHPhA==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
+
+  /@smithy/types@4.2.0:
+    resolution: {integrity: sha512-7eMk09zQKCO+E/ivsjQv+fDlOupcFUCSC/L2YUPgwhvowVGWbPQHjEFcmjt7QQ4ra5lyowS92SV53Zc6XD4+fg==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
+
+  /@smithy/util-buffer-from@2.2.0:
+    resolution: {integrity: sha512-IJdWBbTcMQ6DA0gdNhh/BwrLkDR+ADW5Kr1aZmd4k3DIF6ezMV4R2NIAmT08wQJ3yUK82thHWmC/TnK/wpMMIA==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@smithy/is-array-buffer': 2.2.0
+      tslib: 2.8.1
+    dev: false
+
+  /@smithy/util-utf8@2.3.0:
+    resolution: {integrity: sha512-R8Rdn8Hy72KKcebgLiv8jQcQkXoLMOGGv5uI1/k0l+snqkOzQ1R0ChUBCxWMlBsFMekWjq0wRudIweFs7sKT5A==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@smithy/util-buffer-from': 2.2.0
+      tslib: 2.8.1
+    dev: false
+
   /@swc/counter@0.1.3:
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
     dev: false
@@ -2910,8 +2962,8 @@ packages:
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
     dev: true
 
-  /@types/node@18.19.87:
-    resolution: {integrity: sha512-OIAAu6ypnVZHmsHCeJ+7CCSub38QNBS9uceMQeg7K5Ur0Jr+wG9wEOEvvMbhp09pxD5czIUy/jND7s7Tb6Nw7A==}
+  /@types/node@18.19.100:
+    resolution: {integrity: sha512-ojmMP8SZBKprc3qGrGk8Ujpo80AXkrP7G2tOT4VWr5jlr5DHjsJF+emXJz+Wm0glmy4Js62oKMdZZ6B9Y+tEcA==}
     dependencies:
       undici-types: 5.26.5
     dev: false
@@ -2921,8 +2973,8 @@ packages:
     dependencies:
       undici-types: 6.19.8
 
-  /@types/node@22.15.3:
-    resolution: {integrity: sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw==}
+  /@types/node@22.15.17:
+    resolution: {integrity: sha512-wIX2aSZL5FE+MR0JlvF87BNVrtFWf6AE6rxSE9X7OwnVvoyCQjpzSRJ+M87se/4QCkCiebQAqrJ0y6fwIyi7nw==}
     dependencies:
       undici-types: 6.21.0
     dev: false
@@ -2946,6 +2998,10 @@ packages:
     dependencies:
       '@types/prop-types': 15.7.14
       csstype: 3.1.3
+
+  /@types/retry@0.12.2:
+    resolution: {integrity: sha512-XISRgDJ2Tc5q4TRqvgJtzsRkFYNJzZrhTdtMoGVBttwzzQJkPnS3WWTFc7kuDRoPtPakl+T+OfdEUjYJj7Jbow==}
+    dev: false
 
   /@types/semver@7.7.0:
     resolution: {integrity: sha512-k107IF4+Xr7UHjwDc7Cfd6PRQfbdkiRabXGRjo07b4WyPahFBZCZ1sE+BNxYIJPPg73UkfOsVOLwqVc/6ETrIA==}
@@ -3692,7 +3748,6 @@ packages:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
     requiresBuild: true
     dev: false
-    optional: true
 
   /better-path-resolve@1.0.0:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
@@ -5311,10 +5366,6 @@ packages:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
 
-  /gpt-tokenizer@2.9.0:
-    resolution: {integrity: sha512-YSpexBL/k4bfliAzMrRqn3M6+it02LutVyhVpDeMKrC/O9+pCe/5s8U2hYKa2vFLD5/vHhsKc8sOn/qGqII8Kg==}
-    dev: false
-
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
     dev: true
@@ -5710,6 +5761,11 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
+  /is-network-error@1.1.0:
+    resolution: {integrity: sha512-tUdRRAnhT+OtCZR/LxZelH/C7QtjtFrTu5tXCA8pl55eTUElUHT+GPYV8MBMBvea/j+NxQqVt3LbWMRir7Gx9g==}
+    engines: {node: '>=16'}
+    dev: false
+
   /is-number-object@1.1.1:
     resolution: {integrity: sha512-lZhclumE1G6VYD8VHe35wFaIif+CTy5SJIi5+3y4psDgWu4wPDoBhF8NxUOinEc7pHgiTsT6MaBb92rKhhD+Xw==}
     engines: {node: '>= 0.4'}
@@ -5865,6 +5921,12 @@ packages:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
     dev: true
+
+  /js-tiktoken@1.0.20:
+    resolution: {integrity: sha512-Xlaqhhs8VfCd6Sh7a1cFkZHQbYTLCwVJJWiHVxBYzLPxW0XsoxBy1hitmjkdIjD3Aon5BXLHFwU5O8WUx6HH+A==}
+    dependencies:
+      base64-js: 1.5.1
+    dev: false
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -6161,28 +6223,25 @@ packages:
       wrap-ansi: 9.0.0
     dev: true
 
-  /llamaindex@0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.24.3):
-    resolution: {integrity: sha512-NgMD2eddBxwvrhGsHsma7XxfEda015u4IMzWzUCq94ZnlVfXaRNMe/hWUOkief+huvUV3EkTTSWpSrXhZyiriQ==}
+  /llamaindex@0.10.5(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.24.3):
+    resolution: {integrity: sha512-ZxaP5B+n9hab6ELnG8fglvocfjDykC+VredoKexXN+KGB12Byw03vVJkQ3kwFsqN2oLMoO/vWh9WMYrkbg0WLg==}
     engines: {node: '>=18.0.0'}
     dependencies:
-      '@llamaindex/cloud': 3.0.3(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28)
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
-      '@llamaindex/node-parser': 1.0.2(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
-      '@llamaindex/openai': 0.1.54(gpt-tokenizer@2.9.0)(zod@3.24.3)
+      '@llamaindex/cloud': 4.0.6(@llamaindex/core@0.6.4)(@llamaindex/env@0.1.30)
+      '@llamaindex/core': 0.6.4
+      '@llamaindex/env': 0.1.30
+      '@llamaindex/node-parser': 2.0.4(@llamaindex/core@0.6.4)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
+      '@llamaindex/openai': 0.3.6(zod@3.24.3)
+      '@llamaindex/workflow': 1.0.3(@llamaindex/core@0.6.4)(@llamaindex/env@0.1.30)(zod@3.24.3)
       '@types/lodash': 4.17.16
-      '@types/node': 22.15.3
+      '@types/node': 22.15.17
       ajv: 8.17.1
-      gpt-tokenizer: 2.9.0
       lodash: 4.17.21
       magic-bytes.js: 1.12.1
     transitivePeerDependencies:
-      - '@aws-crypto/sha256-js'
       - '@huggingface/transformers'
       - encoding
-      - js-tiktoken
-      - pathe
-      - tiktoken
+      - gpt-tokenizer
       - tree-sitter
       - web-tree-sitter
       - ws
@@ -6909,7 +6968,6 @@ packages:
   /node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
-    deprecated: Use your platform's native DOMException instead
     dev: false
 
   /node-fetch@2.7.0:
@@ -7038,8 +7096,8 @@ packages:
       mimic-function: 5.0.1
     dev: true
 
-  /openai@4.96.2(zod@3.24.3):
-    resolution: {integrity: sha512-R2XnxvMsizkROr7BV3uNp1q/3skwPZ7fmPjO1bXLnfB4Tu5xKxrT1EVwzjhxn0MZKBKAvOaGWS63jTMN6KrIXA==}
+  /openai@4.98.0(zod@3.24.3):
+    resolution: {integrity: sha512-TmDKur1WjxxMPQAtLG5sgBSCJmX7ynTsGmewKzoDwl1fRxtbLOsiR0FA/AOAAtYUmP6azal+MYQuOENfdU+7yg==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
@@ -7050,7 +7108,7 @@ packages:
       zod:
         optional: true
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 18.19.100
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
@@ -7135,6 +7193,15 @@ packages:
     resolution: {integrity: sha512-y3b8Kpd8OAN444hxfBbFfj1FY/RjtTd8tzYwhUqNYXx0fXx2iX4maP4Qr6qhIKbQXI02wTLAda4fYUbDagTUFw==}
     engines: {node: '>=6'}
     dev: true
+
+  /p-retry@6.2.1:
+    resolution: {integrity: sha512-hEt02O4hUct5wtwg4H4KcWgDdm+l1bOaEy/hWzd8xtXB9BqxTWBBhb+2ImAtH4Cv4rPjV76xN3Zumqk3k3AhhQ==}
+    engines: {node: '>=16.17'}
+    dependencies:
+      '@types/retry': 0.12.2
+      is-network-error: 1.1.0
+      retry: 0.13.1
+    dev: false
 
   /p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
@@ -7229,6 +7296,10 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
+
+  /pathe@1.1.2:
+    resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
+    dev: false
 
   /pdfjs-dist@4.8.69:
     resolution: {integrity: sha512-IHZsA4T7YElCKNNXtiLgqScw4zPd3pG9do8UrznC757gMd7UPeHSL2qwNNMJo4r79fl8oj1Xx+1nh2YkzdMpLQ==}
@@ -8000,6 +8071,11 @@ packages:
       onetime: 7.0.0
       signal-exit: 4.1.0
     dev: true
+
+  /retry@0.13.1:
+    resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
+    engines: {node: '>= 4'}
+    dev: false
 
   /reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
