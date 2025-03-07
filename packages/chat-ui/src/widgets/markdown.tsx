@@ -10,7 +10,7 @@ import {
   SourceData,
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
-import { SourceNumberButton } from './source-number-button'
+import { Citation } from './citation'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -40,20 +40,25 @@ const preprocessMedia = (content: string) => {
 }
 
 /**
- * Update the citation flag [citation:id]() to the new format [citation:index](url)
+ * Convert citation flags [citation:id] to markdown links [citation:id]()
  */
 const preprocessCitations = (input: string, sources?: SourceData) => {
   let content = input
 
   if (sources) {
+    // Match citation format [citation:node_id]
+    // Handle complete citations
     const idToIndexRegex = /\[citation:([^\]]+)\]/g
     content = content.replace(idToIndexRegex, (match, citationId) => {
-      const sourceNode = sources.nodes.find(node => node.id === citationId)
-      if (sourceNode !== undefined) {
-        return `[citation:${sources.nodes.indexOf(sourceNode)}]() `
-      }
-      return ''
+      const trimmedId = citationId.trim()
+      // Use a special format that doesn't get styled as a link by markdown-it
+      return `[citation:${trimmedId}](javascript:void(0))`
     })
+
+    // For incomplete citations - any [citation: pattern that isn't closed with ]
+    // Look for open bracket, citation text, then end of string or any char except closing bracket
+    const incompleteRegex = /\[citation:[^\]]*$/g
+    content = content.replace(incompleteRegex, '')
   }
 
   return content
@@ -67,10 +72,12 @@ export function Markdown({
   content,
   sources,
   backend,
+  citationNode,
 }: {
   content: string
   sources?: SourceData
   backend?: string
+  citationNode?: (nodeId: string, sources?: SourceData) => React.ReactNode
 }) {
   const processedContent = preprocessContent(content, sources)
 
@@ -138,18 +145,26 @@ export function Markdown({
                 )
               }
             }
-            // If a text link starts with 'citation:', then render it as a citation reference
+
+            // Handle citation links
             if (
               Array.isArray(children) &&
               typeof children[0] === 'string' &&
-              children[0].startsWith('citation:')
+              (children[0].startsWith('citation:') ||
+                href?.startsWith('citation:'))
             ) {
-              const index = Number(children[0].replace('citation:', ''))
-              if (!isNaN(index)) {
-                return <SourceNumberButton index={index} />
+              // Extract the nodeId from the citation link
+              const nodeId = children[0].includes('citation:')
+                ? children[0].split('citation:')[1].trim()
+                : href?.replace('citation:', '').trim() || ''
+
+              if (nodeId && nodeId !== '' && nodeId !== ' ') {
+                return citationNode ? (
+                  citationNode(nodeId, sources)
+                ) : (
+                  <Citation nodeId={nodeId} sources={sources} />
+                )
               }
-              // citation is not looked up yet, don't render anything
-              return null
             }
             return (
               <a href={href} target="_blank" rel="noopener">
