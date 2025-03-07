@@ -44,26 +44,18 @@ const preprocessMedia = (content: string) => {
  */
 const preprocessCitations = (input: string, sources?: SourceData) => {
   let content = input
+
   if (sources) {
-    const citationRegex = /\[citation:(.+?)\]/g
-    let match
-    // Find all the citation references in the content
-    while ((match = citationRegex.exec(content)) !== null) {
-      const citationId = match[1]
-      // Find the source node with the id equal to the citation-id, also get the index of the source node
+    const idToIndexRegex = /\[citation:([^\]]+)\]/g
+    content = content.replace(idToIndexRegex, (match, citationId) => {
       const sourceNode = sources.nodes.find(node => node.id === citationId)
-      // If the source node is found, replace the citation reference with the new format
       if (sourceNode !== undefined) {
-        content = content.replace(
-          match[0],
-          `[citation:${sources.nodes.indexOf(sourceNode)}]()`
-        )
-      } else {
-        // If the source node is not found, remove the citation reference
-        content = content.replace(match[0], '')
+        return `[citation:${sources.nodes.indexOf(sourceNode)}]() `
       }
-    }
+      return ''
+    })
   }
+
   return content
 }
 
