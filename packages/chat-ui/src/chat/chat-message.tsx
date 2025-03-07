@@ -4,7 +4,11 @@ import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Markdown } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
-import { getSourceAnnotationData, MessageAnnotation } from './annotation'
+import {
+  getSourceAnnotationData,
+  MessageAnnotation,
+  SourceData,
+} from './annotation'
 import {
   AgentEventAnnotations,
   DocumentFileAnnotations,
@@ -57,6 +61,11 @@ interface ChatMessageContentProps extends React.PropsWithChildren {
 
 interface ChatMessageActionsProps extends React.PropsWithChildren {
   className?: string
+}
+
+interface ChatMarkdownProps extends React.PropsWithChildren {
+  className?: string
+  citationNode?: (nodeId: string, sources?: SourceData) => React.ReactNode
 }
 
 function ChatMessage(props: ChatMessageProps) {
@@ -123,7 +132,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   )
 }
 
-function ChatMarkdown() {
+function ChatMarkdown(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
@@ -133,6 +142,7 @@ function ChatMarkdown() {
       sources={
         annotations ? getSourceAnnotationData(annotations)[0] : undefined
       }
+      citationNode={props.citationNode}
     />
   )
 }
