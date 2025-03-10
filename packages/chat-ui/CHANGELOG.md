@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.3.0
+
+### Minor Changes
+
+- 4129574: Fix not showing citation issue
+
 ## 0.2.0
 
 ### Minor Changes
