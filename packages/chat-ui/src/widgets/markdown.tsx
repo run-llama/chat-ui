@@ -1,4 +1,4 @@
-import { FC, memo } from 'react'
+import { FC, memo, ComponentType } from 'react'
 import ReactMarkdown, { Options } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -10,7 +10,7 @@ import {
   SourceData,
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
-import { Citation } from './citation'
+import { Citation, CitationComponentProps } from './citation'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -72,12 +72,12 @@ export function Markdown({
   content,
   sources,
   backend,
-  citationNode,
+  citationComponent: CitationComponent,
 }: {
   content: string
   sources?: SourceData
   backend?: string
-  citationNode?: (nodeId: string, sources?: SourceData) => React.ReactNode
+  citationComponent?: ComponentType<CitationComponentProps>
 }) {
   const processedContent = preprocessContent(content, sources)
 
@@ -158,12 +158,19 @@ export function Markdown({
                 ? children[0].split('citation:')[1].trim()
                 : href?.replace('citation:', '').trim() || ''
 
-              if (nodeId && nodeId !== '' && nodeId !== ' ') {
-                return citationNode ? (
-                  citationNode(nodeId, sources)
+              const nodeIndex = sources?.nodes.findIndex(
+                node => node.id === nodeId
+              )
+              const sourceNode = sources?.nodes.find(node => node.id === nodeId)
+
+              if (nodeIndex !== undefined && nodeIndex > -1 && sourceNode) {
+                return CitationComponent ? (
+                  <CitationComponent index={nodeIndex} node={sourceNode} />
                 ) : (
-                  <Citation nodeId={nodeId} sources={sources} />
+                  <Citation index={nodeIndex} node={sourceNode} />
                 )
+              } else {
+                return null
               }
             }
             return (
