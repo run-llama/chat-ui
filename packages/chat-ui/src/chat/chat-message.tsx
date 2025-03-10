@@ -60,7 +60,6 @@ interface ChatMessageActionsProps extends React.PropsWithChildren {
 }
 
 interface ChatMarkdownProps extends React.PropsWithChildren {
-  className?: string
   citationComponent?: ComponentType<CitationComponentProps>
 }
 
