@@ -1,9 +1,9 @@
 import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
-import { memo } from 'react'
+import { memo, ComponentType } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
-import { Markdown } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
+import { Markdown, CitationComponentProps } from '../widgets/index.js'
 import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
@@ -57,6 +57,10 @@ interface ChatMessageContentProps extends React.PropsWithChildren {
 
 interface ChatMessageActionsProps extends React.PropsWithChildren {
   className?: string
+}
+
+interface ChatMarkdownProps extends React.PropsWithChildren {
+  citationComponent?: ComponentType<CitationComponentProps>
 }
 
 function ChatMessage(props: ChatMessageProps) {
@@ -123,7 +127,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   )
 }
 
-function ChatMarkdown() {
+function ChatMarkdown(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
@@ -133,6 +137,7 @@ function ChatMarkdown() {
       sources={
         annotations ? getSourceAnnotationData(annotations)[0] : undefined
       }
+      citationComponent={props.citationComponent}
     />
   )
 }

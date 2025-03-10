@@ -1,4 +1,4 @@
-import { FC, memo } from 'react'
+import { FC, memo, ComponentType } from 'react'
 import ReactMarkdown, { Options } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -10,7 +10,7 @@ import {
   SourceData,
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
-import { SourceNumberButton } from './source-number-button'
+import { Citation, CitationComponentProps } from './citation'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -40,30 +40,27 @@ const preprocessMedia = (content: string) => {
 }
 
 /**
- * Update the citation flag [citation:id]() to the new format [citation:index](url)
+ * Convert citation flags [citation:id] to markdown links [citation:id]()
  */
 const preprocessCitations = (input: string, sources?: SourceData) => {
   let content = input
+
   if (sources) {
-    const citationRegex = /\[citation:(.+?)\]/g
-    let match
-    // Find all the citation references in the content
-    while ((match = citationRegex.exec(content)) !== null) {
-      const citationId = match[1]
-      // Find the source node with the id equal to the citation-id, also get the index of the source node
-      const sourceNode = sources.nodes.find(node => node.id === citationId)
-      // If the source node is found, replace the citation reference with the new format
-      if (sourceNode !== undefined) {
-        content = content.replace(
-          match[0],
-          `[citation:${sources.nodes.indexOf(sourceNode)}]()`
-        )
-      } else {
-        // If the source node is not found, remove the citation reference
-        content = content.replace(match[0], '')
-      }
-    }
+    // Match citation format [citation:node_id]
+    // Handle complete citations
+    const idToIndexRegex = /\[citation:([^\]]+)\]/g
+    content = content.replace(idToIndexRegex, (match, citationId) => {
+      const trimmedId = citationId.trim()
+      // Use a special format that doesn't get styled as a link by markdown-it
+      return `[citation:${trimmedId}](javascript:void(0))`
+    })
+
+    // For incomplete citations - any [citation: pattern that isn't closed with ]
+    // Look for open bracket, citation text, then end of string or any char except closing bracket
+    const incompleteRegex = /\[citation:[^\]]*$/g
+    content = content.replace(incompleteRegex, '')
   }
+
   return content
 }
 
@@ -75,10 +72,12 @@ export function Markdown({
   content,
   sources,
   backend,
+  citationComponent: CitationComponent,
 }: {
   content: string
   sources?: SourceData
   backend?: string
+  citationComponent?: ComponentType<CitationComponentProps>
 }) {
   const processedContent = preprocessContent(content, sources)
 
@@ -146,18 +145,33 @@ export function Markdown({
                 )
               }
             }
-            // If a text link starts with 'citation:', then render it as a citation reference
+
+            // Handle citation links
             if (
               Array.isArray(children) &&
               typeof children[0] === 'string' &&
-              children[0].startsWith('citation:')
+              (children[0].startsWith('citation:') ||
+                href?.startsWith('citation:'))
             ) {
-              const index = Number(children[0].replace('citation:', ''))
-              if (!isNaN(index)) {
-                return <SourceNumberButton index={index} />
+              // Extract the nodeId from the citation link
+              const nodeId = children[0].includes('citation:')
+                ? children[0].split('citation:')[1].trim()
+                : href?.replace('citation:', '').trim() || ''
+
+              const nodeIndex = sources?.nodes.findIndex(
+                node => node.id === nodeId
+              )
+              const sourceNode = sources?.nodes.find(node => node.id === nodeId)
+
+              if (nodeIndex !== undefined && nodeIndex > -1 && sourceNode) {
+                return CitationComponent ? (
+                  <CitationComponent index={nodeIndex} node={sourceNode} />
+                ) : (
+                  <Citation index={nodeIndex} node={sourceNode} />
+                )
+              } else {
+                return null
               }
-              // citation is not looked up yet, don't render anything
-              return null
             }
             return (
               <a href={href} target="_blank" rel="noopener">
