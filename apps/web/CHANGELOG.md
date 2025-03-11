@@ -1,5 +1,12 @@
 # web
 
+## 1.0.18
+
+### Patch Changes
+
+- Updated dependencies [bd353f2]
+  - @llamaindex/chat-ui@0.3.1
+
 ## 1.0.17
 
 ### Patch Changes
