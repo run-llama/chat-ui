@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.3.1
+
+### Patch Changes
+
+- bd353f2: Remove citation text if there is no sources in chat message data
+
 ## 0.3.0
 
 ### Minor Changes
