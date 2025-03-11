@@ -42,30 +42,28 @@ const preprocessMedia = (content: string) => {
 /**
  * Convert citation flags [citation:id] to markdown links [citation:id]()
  */
-const preprocessCitations = (input: string, sources?: SourceData) => {
+const preprocessCitations = (input: string) => {
   let content = input
 
-  if (sources) {
-    // Match citation format [citation:node_id]
-    // Handle complete citations
-    const idToIndexRegex = /\[citation:([^\]]+)\]/g
-    content = content.replace(idToIndexRegex, (match, citationId) => {
-      const trimmedId = citationId.trim()
-      // Use a special format that doesn't get styled as a link by markdown-it
-      return `[citation:${trimmedId}](javascript:void(0))`
-    })
+  // Match citation format [citation:node_id]
+  // Handle complete citations
+  const idToIndexRegex = /\[citation:([^\]]+)\]/g
+  content = content.replace(idToIndexRegex, (match, citationId) => {
+    const trimmedId = citationId.trim()
+    // Use a special format that doesn't get styled as a link by markdown-it
+    return `[citation:${trimmedId}](javascript:void(0))`
+  })
 
-    // For incomplete citations - any [citation: pattern that isn't closed with ]
-    // Look for open bracket, citation text, then end of string or any char except closing bracket
-    const incompleteRegex = /\[citation:[^\]]*$/g
-    content = content.replace(incompleteRegex, '')
-  }
+  // For incomplete citations - any [citation: pattern that isn't closed with ]
+  // Look for open bracket, citation text, then end of string or any char except closing bracket
+  const incompleteRegex = /\[citation:[^\]]*$/g
+  content = content.replace(incompleteRegex, '')
 
   return content
 }
 
-const preprocessContent = (content: string, sources?: SourceData) => {
-  return preprocessCitations(preprocessLaTeX(preprocessMedia(content)), sources)
+const preprocessContent = (content: string) => {
+  return preprocessCitations(preprocessLaTeX(preprocessMedia(content)))
 }
 
 export function Markdown({
@@ -79,7 +77,7 @@ export function Markdown({
   backend?: string
   citationComponent?: ComponentType<CitationComponentProps>
 }) {
-  const processedContent = preprocessContent(content, sources)
+  const processedContent = preprocessContent(content)
 
   return (
     <div>
