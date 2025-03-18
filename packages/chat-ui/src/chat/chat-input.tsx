@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -41,6 +41,8 @@ interface ChatInputContext {
   isDisabled: boolean
   handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  isComposing: boolean
+  setIsComposing: (value: boolean) => void
 }
 
 const chatInputContext = createContext<ChatInputContext | null>(null)
@@ -58,6 +60,7 @@ export const useChatInput = () => {
 function ChatInput(props: ChatInputProps) {
   const { input, setInput, append, isLoading, requestData } = useChatUI()
   const isDisabled = isLoading || !input.trim()
+  const [isComposing, setIsComposing] = useState(false)
 
   const submit = async () => {
     const newMessage: Omit<Message, 'id'> = {
@@ -79,7 +82,7 @@ function ChatInput(props: ChatInputProps) {
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (isDisabled) return
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
       await submit()
     }
@@ -88,7 +91,15 @@ function ChatInput(props: ChatInputProps) {
   const children = props.children ?? <ChatInputForm />
 
   return (
-    <ChatInputProvider value={{ isDisabled, handleKeyDown, handleSubmit }}>
+    <ChatInputProvider
+      value={{
+        isDisabled,
+        handleKeyDown,
+        handleSubmit,
+        isComposing,
+        setIsComposing,
+      }}
+    >
       <div
         className={cn(
           'bg-background flex shrink-0 flex-col gap-4 p-4',
@@ -119,7 +130,7 @@ function ChatInputForm(props: ChatInputFormProps) {
 
 function ChatInputField(props: ChatInputFieldProps) {
   const { input, setInput } = useChatUI()
-  const { handleKeyDown } = useChatInput()
+  const { handleKeyDown, setIsComposing } = useChatInput()
   const type = props.type ?? 'textarea'
 
   if (type === 'input') {
@@ -142,6 +153,8 @@ function ChatInputField(props: ChatInputFieldProps) {
       value={input}
       onChange={e => setInput(e.target.value)}
       onKeyDown={handleKeyDown}
+      onCompositionStart={() => setIsComposing(true)}
+      onCompositionEnd={() => setIsComposing(false)}
     />
   )
 }
