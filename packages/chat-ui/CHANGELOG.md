@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.3.2
+
+### Patch Changes
+
+- bf21327: fix: prevent message send during text composition
+
 ## 0.3.1
 
 ### Patch Changes
