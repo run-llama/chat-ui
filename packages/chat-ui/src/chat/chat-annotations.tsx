@@ -18,6 +18,7 @@ import {
   SuggestedQuestionsData,
 } from './annotation'
 import { useChatMessage } from './chat-message.context.js'
+import { useChatUI } from './chat.context.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -85,17 +86,17 @@ export function DocumentFileAnnotations() {
 export function SourceAnnotations() {
   const { message } = useChatMessage()
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  const sourceData =
-    annotations && annotations.length > 0
-      ? getSourceAnnotationData(annotations)
-      : null
-  if (!sourceData) return null
-  return sourceData[0] ? <ChatSources data={sourceData[0]} /> : null
+  const annotations = (message.annotations ?? []) as MessageAnnotation[]
+  const sourceData = getSourceAnnotationData(annotations)
+
+  if (!sourceData?.length) return null
+  const allNodes = sourceData.flatMap(item => item.nodes)
+  return <ChatSources data={{ nodes: allNodes }} />
 }
 
 export function SuggestedQuestionsAnnotations() {
-  const { message, append, isLast } = useChatMessage()
+  const { append } = useChatUI()
+  const { message, isLast } = useChatMessage()
   if (!isLast || !append) return null
 
   const annotations = message.annotations as MessageAnnotation[] | undefined

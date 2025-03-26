@@ -130,15 +130,11 @@ export function getSourceAnnotationData(
     annotations,
     MessageAnnotationType.SOURCES
   )
-  if (data.length > 0) {
-    return [
-      {
-        ...data[0],
-        nodes: data[0].nodes ? preprocessSourceNodes(data[0].nodes) : [],
-      },
-    ]
-  }
-  return data
+  if (!data.length) return []
+  return data.map(item => ({
+    ...item,
+    nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
+  }))
 }
 
 function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
