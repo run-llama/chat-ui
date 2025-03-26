@@ -107,7 +107,6 @@ export function SuggestedQuestionsAnnotations() {
           MessageAnnotationType.SUGGESTED_QUESTIONS
         )
       : null
-  console.log({ suggestedQuestionsData, annotations })
   if (!suggestedQuestionsData?.[0]) return null
   return (
     <SuggestedQuestions questions={suggestedQuestionsData[0]} append={append} />
