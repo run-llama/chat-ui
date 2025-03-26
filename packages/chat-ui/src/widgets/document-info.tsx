@@ -49,7 +49,7 @@ export function DocumentInfo({
         file={previewFile}
         onRemove={onRemove}
       />
-      <div className="flex space-x-2 max-w-60 flex-wrap px-2">
+      <div className="flex max-w-60 flex-wrap space-x-2 px-2">
         {sources.map((node: SourceNode, index: number) => (
           <div key={node.id}>
             <SourceInfo node={node} index={startIndex + index} />
