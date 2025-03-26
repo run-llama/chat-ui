@@ -18,6 +18,7 @@ import {
   SuggestedQuestionsData,
 } from './annotation'
 import { useChatMessage } from './chat-message.context.js'
+import { useChatUI } from './chat.context.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -94,7 +95,8 @@ export function SourceAnnotations() {
 }
 
 export function SuggestedQuestionsAnnotations() {
-  const { message, append, isLast } = useChatMessage()
+  const { append } = useChatUI()
+  const { message, isLast } = useChatMessage()
   if (!isLast || !append) return null
 
   const annotations = message.annotations as MessageAnnotation[] | undefined
@@ -105,6 +107,7 @@ export function SuggestedQuestionsAnnotations() {
           MessageAnnotationType.SUGGESTED_QUESTIONS
         )
       : null
+  console.log({ suggestedQuestionsData, annotations })
   if (!suggestedQuestionsData?.[0]) return null
   return (
     <SuggestedQuestions questions={suggestedQuestionsData[0]} append={append} />
