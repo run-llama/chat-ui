@@ -1,5 +1,12 @@
 # @llamaindex/chat-ui
 
+## 0.3.2
+
+### Patch Changes
+
+- bf21327: fix: prevent message send during text composition
+- 2ddf223: fix: display all sources from annotations
+
 ## 0.3.1
 
 ### Patch Changes
