@@ -43,13 +43,13 @@ export function DocumentInfo({
   }
 
   const DocumentDetail = (
-    <div className={`relative ${className}`}>
+    <div className={`bg-secondary rounded-lg p-2 ${className}`}>
       <DocumentPreviewCard
         className="cursor-pointer"
         file={previewFile}
         onRemove={onRemove}
       />
-      <div className="absolute bottom-2 right-2 flex space-x-2">
+      <div className="flex space-x-2 max-w-60 flex-wrap px-2">
         {sources.map((node: SourceNode, index: number) => (
           <div key={node.id}>
             <SourceInfo node={node} index={startIndex + index} />
