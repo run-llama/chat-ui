@@ -85,13 +85,12 @@ export function DocumentFileAnnotations() {
 export function SourceAnnotations() {
   const { message } = useChatMessage()
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  const sourceData =
-    annotations && annotations.length > 0
-      ? getSourceAnnotationData(annotations)
-      : null
-  if (!sourceData) return null
-  return sourceData[0] ? <ChatSources data={sourceData[0]} /> : null
+  const annotations = (message.annotations ?? []) as MessageAnnotation[]
+  const sourceData = getSourceAnnotationData(annotations)
+
+  if (!sourceData?.length) return null
+  const allNodes = sourceData.flatMap(item => item.nodes)
+  return <ChatSources data={{ nodes: allNodes }} />
 }
 
 export function SuggestedQuestionsAnnotations() {
