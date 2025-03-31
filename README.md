@@ -104,7 +104,6 @@ const ChatExample = () => {
     <ChatSection handler={handler}>
       <ChatMessages />
       <ChatInput>
-        <ChatInput.Preview />
         <ChatInput.Form className="bg-lime-500">
           <ChatInput.Field type="textarea" />
           <ChatInput.Upload />
