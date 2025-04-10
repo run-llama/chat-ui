@@ -19,7 +19,6 @@ import {
   ChatMessage,
   ChatMessages,
   ChatSection,
-  Markdown,
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
@@ -27,7 +26,7 @@ import { useChat } from 'ai/react'
 import { User2 } from 'lucide-react'
 
 export function CustomChat() {
-  const handler = useChat({ initialMessages })
+  const handler = useChat()
   const { imageUrl, getAnnotations, uploadFile, reset } = useFile({
     uploadAPI: '/chat/upload',
   })
@@ -70,7 +69,6 @@ export function CustomChat() {
     </div>
   )
 }
-
 
 function CustomChatMessagesList() {
   const { messages, isLoading, append } = useChatUI()
