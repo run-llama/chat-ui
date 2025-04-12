@@ -12,6 +12,7 @@ import {
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
 
+
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
   (prevProps, nextProps) =>
@@ -20,17 +21,23 @@ const MemoizedReactMarkdown: FC<Options> = memo(
 )
 
 const preprocessLaTeX = (content: string) => {
+  // Escape dollar signs to prevent them from being treated as LaTeX math delimiters
+  // For example, in "$10 million and $20 million", the content between the dollar signs might be incorrectly parsed as a math block
+  // Replacing $ with \$ avoids this issue
+  const dollarSignProcessedContent = content.replace(/\$/g, '\\$');
+  
   // Replace block-level LaTeX delimiters \[ \] with $$ $$
-  const blockProcessedContent = content.replace(
+  const blockProcessedContent = dollarSignProcessedContent.replace(
     /\\\[([\s\S]*?)\\\]/g,
     (_, equation) => `$$${equation}$$`
-  )
+  );
   // Replace inline LaTeX delimiters \( \) with $ $
   const inlineProcessedContent = blockProcessedContent.replace(
-    /\\\[([\s\S]*?)\\\]/g,
-    (_, equation) => `$${equation}$`
-  )
-  return inlineProcessedContent
+      /\\\(([\s\S]*?)\\\)/g,
+      (_, equation) => `$${equation}$`
+  );
+
+  return inlineProcessedContent;
 }
 
 const preprocessMedia = (content: string) => {
