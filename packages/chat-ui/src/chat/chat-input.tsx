@@ -1,7 +1,7 @@
-import { createContext, useContext, useState } from 'react'
+import { Send } from 'lucide-react'
+import { createContext, useContext, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
-import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
 import { FileUploader } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { useChatUI } from './chat.context'
@@ -21,7 +21,6 @@ interface ChatInputFormProps extends React.PropsWithChildren {
 
 interface ChatInputFieldProps {
   className?: string
-  type?: 'input' | 'textarea'
   placeholder?: string
 }
 
@@ -117,12 +116,16 @@ function ChatInputForm(props: ChatInputFormProps) {
   const children = props.children ?? (
     <>
       <ChatInputField />
+      <ChatInputUpload />
       <ChatInputSubmit />
     </>
   )
 
   return (
-    <form onSubmit={handleSubmit} className={cn(props.className, 'flex gap-2')}>
+    <form
+      onSubmit={handleSubmit}
+      className={cn(props.className, 'relative flex gap-2')}
+    >
       {children}
     </form>
   )
@@ -131,30 +134,35 @@ function ChatInputForm(props: ChatInputFormProps) {
 function ChatInputField(props: ChatInputFieldProps) {
   const { input, setInput } = useChatUI()
   const { handleKeyDown, setIsComposing } = useChatInput()
-  const type = props.type ?? 'textarea'
+  const textareaRef = useRef<HTMLTextAreaElement>(null) // Add a ref for the textarea
 
-  if (type === 'input') {
-    return (
-      <Input
-        name="input"
-        placeholder={props.placeholder ?? 'Type a message'}
-        className={cn(props.className, 'min-h-0')}
-        value={input}
-        onChange={e => setInput(e.target.value)}
-      />
-    )
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      let newHeight = Math.max(textareaRef.current.scrollHeight, 100)
+      if (textareaRef.current.scrollHeight > 80) {
+        newHeight += 40 // offset for the textarea padding
+      }
+      textareaRef.current.style.height = `${newHeight}px`
+    }
   }
 
   return (
     <Textarea
+      ref={textareaRef}
       name="input"
-      placeholder={props.placeholder ?? 'Type a message'}
-      className={cn(props.className, 'h-[40px] min-h-0 flex-1')}
+      placeholder={props.placeholder ?? 'Type a message...'}
+      className={cn(
+        props.className,
+        'bg-secondary h-[100px] max-h-[400px] min-h-0 flex-1 resize-none overflow-y-auto rounded-2xl p-4'
+      )}
       value={input}
-      onChange={e => setInput(e.target.value)}
+      onChange={handleInputChange}
       onKeyDown={handleKeyDown}
       onCompositionStart={() => setIsComposing(true)}
       onCompositionEnd={() => setIsComposing(false)}
+      spellCheck={false}
     />
   )
 }
@@ -178,6 +186,10 @@ function ChatInputUpload(props: ChatInputUploadProps) {
         allowedExtensions: props.allowedExtensions ?? ALLOWED_EXTENSIONS,
         multiple: props.multiple ?? true,
       }}
+      className={cn(
+        'hover:bg-primary absolute bottom-2 left-2 rounded-full',
+        props.className
+      )}
     />
   )
 }
@@ -187,10 +199,11 @@ function ChatInputSubmit(props: ChatInputSubmitProps) {
   return (
     <Button
       type="submit"
+      size="icon"
       disabled={props.disabled ?? isDisabled}
-      className={cn(props.className)}
+      className={cn('absolute bottom-2 right-2 rounded-full', props.className)}
     >
-      {props.children ?? 'Send message'}
+      {props.children ?? <Send className="size-4" />}
     </Button>
   )
 }

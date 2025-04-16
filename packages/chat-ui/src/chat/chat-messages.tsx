@@ -18,6 +18,10 @@ interface ChatMessagesLoadingProps extends React.PropsWithChildren {
   className?: string
 }
 
+interface ChatMessagesEmptyProps {
+  className?: string
+}
+
 interface ChatActionsProps extends React.PropsWithChildren {
   className?: string
 }
@@ -111,6 +115,7 @@ function ChatMessagesList(props: ChatMessagesListProps) {
           />
         )
       })}
+      <ChatMessagesEmpty />
       <ChatMessagesLoading />
     </>
   )
@@ -124,6 +129,42 @@ function ChatMessagesList(props: ChatMessagesListProps) {
       ref={scrollableChatContainerRef}
     >
       {children}
+    </div>
+  )
+}
+
+function ChatMessagesEmpty(props: ChatMessagesEmptyProps) {
+  const { messages } = useChatUI()
+  if (messages.length > 0) return null
+
+  return (
+    <div
+      className={cn(
+        'flex h-full flex-col justify-center pt-4',
+        props.className
+      )}
+    >
+      <p className="mb-2 animate-[slide-up_0.5s_ease-out] text-3xl font-bold opacity-0 [animation-delay:100ms] [animation-fill-mode:forwards]">
+        Hello there!
+      </p>
+      <p className="text-muted-foreground animate-[slide-up_0.5s_ease-out] text-xl opacity-0 [animation-delay:300ms] [animation-fill-mode:forwards]">
+        I&apos;m here to help you with your questions.
+      </p>
+      <style>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.5s ease-out;
+        }
+      `}</style>
     </div>
   )
 }
@@ -180,6 +221,7 @@ function ChatActions(props: ChatActionsProps) {
 
 ChatMessages.List = ChatMessagesList
 ChatMessages.Loading = ChatMessagesLoading
+ChatMessages.Empty = ChatMessagesEmpty
 ChatMessages.Actions = ChatActions
 
 export default ChatMessages

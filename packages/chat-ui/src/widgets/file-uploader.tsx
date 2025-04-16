@@ -14,6 +14,7 @@ export interface FileUploaderProps {
   }
   onFileUpload: (file: File) => Promise<void>
   onFileError?: (errMsg: string) => void
+  className?: string
 }
 
 const DEFAULT_INPUT_ID = 'fileInput'
@@ -23,6 +24,7 @@ export function FileUploader({
   config,
   onFileUpload,
   onFileError,
+  className,
 }: FileUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const [remainingFiles, setRemainingFiles] = useState<number>(0)
@@ -98,7 +100,7 @@ export function FileUploader({
   }
 
   return (
-    <div className="self-stretch">
+    <div className={cn('self-stretch', className)}>
       <input
         type="file"
         id={inputId}
