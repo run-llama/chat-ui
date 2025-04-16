@@ -63,12 +63,7 @@ function ChatMessages(props: ChatMessagesProps) {
   // so we show a loading indicator to give a better UX.
   const isPending = isLoading && !isLastMessageFromAssistant
 
-  const children = props.children ?? (
-    <>
-      <ChatMessagesList />
-      <ChatActions />
-    </>
-  )
+  const children = props.children ?? <ChatMessagesList />
 
   return (
     <ChatMessagesProvider

@@ -29,6 +29,6 @@ const initialMessages: Message[] = [
 ]
 
 export default function Page(): JSX.Element {
-  const handler = useChat({ initialMessages: [] })
+  const handler = useChat({ initialMessages })
   return <ChatSection handler={handler} />
 }

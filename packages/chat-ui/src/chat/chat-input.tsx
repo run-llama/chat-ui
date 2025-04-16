@@ -1,4 +1,4 @@
-import { Send } from 'lucide-react'
+import { Send, Square } from 'lucide-react'
 import { createContext, useContext, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
@@ -195,7 +195,21 @@ function ChatInputUpload(props: ChatInputUploadProps) {
 }
 
 function ChatInputSubmit(props: ChatInputSubmitProps) {
+  const { stop, isLoading } = useChatUI()
   const { isDisabled } = useChatInput()
+
+  if (stop && isLoading) {
+    return (
+      <Button
+        size="icon"
+        onClick={stop}
+        className="absolute bottom-2 right-2 rounded-full"
+      >
+        <Square className="size-3" fill="white" stroke="white" />
+      </Button>
+    )
+  }
+
   return (
     <Button
       type="submit"
