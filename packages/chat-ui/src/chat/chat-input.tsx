@@ -116,7 +116,6 @@ function ChatInputForm(props: ChatInputFormProps) {
   const children = props.children ?? (
     <>
       <ChatInputField />
-      <ChatInputUpload />
       <ChatInputSubmit />
     </>
   )
@@ -136,6 +135,7 @@ function ChatInputField(props: ChatInputFieldProps) {
   const { handleKeyDown, setIsComposing } = useChatInput()
   const textareaRef = useRef<HTMLTextAreaElement>(null) // Add a ref for the textarea
 
+  // auto resize the textarea based on the content
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value)
     if (textareaRef.current) {
