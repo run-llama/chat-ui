@@ -133,7 +133,7 @@ function ChatInputForm(props: ChatInputFormProps) {
 function ChatInputField(props: ChatInputFieldProps) {
   const { input, setInput } = useChatUI()
   const { handleKeyDown, setIsComposing } = useChatInput()
-  const textareaRef = useRef<HTMLTextAreaElement>(null) // Add a ref for the textarea
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // auto resize the textarea based on the content
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

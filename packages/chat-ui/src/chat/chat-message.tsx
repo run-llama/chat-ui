@@ -1,9 +1,9 @@
-import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
-import { memo, ComponentType } from 'react'
+import { Check, Copy, Sparkles } from 'lucide-react'
+import { ComponentType, memo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
-import { Markdown, CitationComponentProps } from '../widgets/index.js'
+import { CitationComponentProps, Markdown } from '../widgets/index.js'
 import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
@@ -91,17 +91,17 @@ function ChatMessage(props: ChatMessageProps) {
 function ChatMessageAvatar(props: ChatMessageAvatarProps) {
   const { message } = useChatMessage()
 
-  const roleIconMap: Record<string, React.ReactNode> = {
-    user: <User2 className="h-4 w-4" />,
-    assistant: <Bot className="h-4 w-4" />,
-  }
+  if (message.role !== 'assistant') return null // by default we only show the assistant avatar
 
-  const children = props.children ?? roleIconMap[message.role] ?? (
-    <MessageCircle className="h-4 w-4" />
-  )
+  const children = props.children ?? <Sparkles className="h-4 w-4" />
 
   return (
-    <div className="bg-background flex h-8 w-8 shrink-0 select-none items-center justify-center border">
+    <div
+      className={cn(
+        'bg-background flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full border',
+        props.className
+      )}
+    >
       {children}
     </div>
   )
