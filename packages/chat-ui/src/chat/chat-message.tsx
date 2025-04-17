@@ -1,4 +1,4 @@
-import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
+import { Bot, Check, Copy, MessageCircle, RefreshCw, User2 } from 'lucide-react'
 import { ComponentType, memo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
@@ -15,6 +15,7 @@ import {
 } from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { ChatHandler, Message } from './chat.interface'
+import { useChatUI } from './chat.context.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -158,7 +159,7 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       citationComponent={props.citationComponent}
       className={cn(
         {
-          'bg-primary text-primary-foreground w-fit rounded-xl p-2 px-3':
+          'bg-primary text-primary-foreground w-fit rounded-xl py-2 px-3':
             message.role === 'user',
         },
         props.className
@@ -168,26 +169,43 @@ function ChatMarkdown(props: ChatMarkdownProps) {
 }
 
 function ChatMessageActions(props: ChatMessageActionsProps) {
+  const { reload, requestData, isLoading } = useChatUI()
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
-  const { message } = useChatMessage()
+  const { message, isLast } = useChatMessage()
+
+  const isLastMessageFromAssistant = message.role === 'assistant' && isLast
+  const showReload = reload && !isLoading && isLastMessageFromAssistant
 
   const children = props.children ?? (
-    <Button
-      onClick={() => copyToClipboard(message.content)}
-      size="icon"
-      variant="ghost"
-      className="h-8 w-8"
-    >
-      {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-    </Button>
+    <>
+      <Button
+        title="Copy"
+        onClick={() => copyToClipboard(message.content)}
+        size="icon"
+        variant="outline"
+        className="h-8 w-8"
+      >
+        {isCopied ? (
+          <Check className="h-4 w-4" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
+      </Button>
+      {showReload && (
+        <Button
+          title="Regenerate"
+          variant="outline"
+          size="icon"
+          onClick={() => reload?.({ data: requestData })}
+          className="h-8 w-8"
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+      )}
+    </>
   )
   return (
-    <div
-      className={cn(
-        'flex shrink-0 flex-col gap-2 opacity-0 group-hover:opacity-100',
-        props.className
-      )}
-    >
+    <div className={cn('flex shrink-0 flex-col gap-2', props.className)}>
       {children}
     </div>
   )
