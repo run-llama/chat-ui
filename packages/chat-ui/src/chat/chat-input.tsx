@@ -123,7 +123,7 @@ function ChatInputForm(props: ChatInputFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className={cn(props.className, 'relative flex gap-2')}
+      className={cn('relative flex gap-2', props.className)}
     >
       {children}
     </form>
