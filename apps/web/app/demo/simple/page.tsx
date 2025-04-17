@@ -1,9 +1,8 @@
 'use client'
 
-import { ChatSection } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
+import { ChatSection } from '@llamaindex/chat-ui'
 import { Code } from '@/components/code'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const code = `
 import { ChatSection } from '@llamaindex/chat-ui'
@@ -29,7 +28,8 @@ const initialMessages: Message[] = [
   },
   {
     id: '3',
-    content: 'Write a simple math equation',
+    content:
+      'Write a simple math equation that solves for x. It should be a quadratic equation. Please use LaTeX to write the equation.',
     role: 'user',
   },
   {
@@ -40,36 +40,23 @@ const initialMessages: Message[] = [
   },
 ]
 
-function SimpleChat() {
+export default function Page(): JSX.Element {
   const handler = useChat({ initialMessages })
   return (
-    <div className="overflow-hidden rounded-xl shadow-xl">
-      <ChatSection className="max-h-[72vh]" handler={handler} />
-    </div>
-  )
-}
-
-export function SimpleChatSection() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-white">Simple Chat Demo</h2>
-        <p className="text-zinc-400">
-          A minimal implementation using just a few lines of code
-        </p>
+    <div className="flex gap-10">
+      <div className="w-1/3 justify-center space-y-10 self-center p-10">
+        <h1 className="bg-gradient-to-r from-[#e711dd] to-[#b5f2fd] bg-clip-text text-6xl font-bold text-transparent">
+          LlamaIndex ChatUI
+        </h1>
+        <h1 className="mb-4 text-2xl font-bold">Simple Chat Demo</h1>
+        <Code content={code} language="jsx" />
       </div>
-      <Tabs defaultValue="preview">
-        <TabsList className="mb-4">
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="code">Code</TabsTrigger>
-        </TabsList>
-        <TabsContent value="preview">
-          <SimpleChat />
-        </TabsContent>
-        <TabsContent value="code">
-          <Code content={code} language="jsx" />
-        </TabsContent>
-      </Tabs>
+      <div className="w-2/3 border-l">
+        <ChatSection
+          handler={handler}
+          className="mx-auto h-screen max-w-3xl overflow-hidden"
+        />
+      </div>
     </div>
   )
 }
