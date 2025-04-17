@@ -101,7 +101,7 @@ function ChatInput(props: ChatInputProps) {
     >
       <div
         className={cn(
-          'bg-background flex shrink-0 flex-col gap-4 p-4',
+          'bg-background flex shrink-0 flex-col gap-4 p-4 pt-0',
           props.className
         )}
       >
