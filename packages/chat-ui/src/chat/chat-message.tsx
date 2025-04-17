@@ -159,7 +159,7 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       citationComponent={props.citationComponent}
       className={cn(
         {
-          'bg-primary text-primary-foreground w-fit rounded-xl py-2 px-3':
+          'bg-primary text-primary-foreground w-fit rounded-xl px-3 py-2':
             message.role === 'user',
         },
         props.className
