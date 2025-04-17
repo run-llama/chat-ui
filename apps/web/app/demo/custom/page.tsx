@@ -175,7 +175,10 @@ function CustomChat() {
     }
   }
   return (
-    <ChatSection handler={handler} className="h-screen overflow-hidden p-0 md:p-5">
+    <ChatSection
+      handler={handler}
+      className="h-screen overflow-hidden p-0 md:p-5"
+    >
       <CustomChatMessages />
       <ChatInput annotations={annotations} resetUploadedFiles={reset}>
         <div>
