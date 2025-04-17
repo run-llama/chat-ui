@@ -18,8 +18,10 @@ interface ChatMessagesLoadingProps extends React.PropsWithChildren {
   className?: string
 }
 
-interface ChatMessagesEmptyProps {
+interface ChatMessagesEmptyProps extends React.PropsWithChildren {
   className?: string
+  heading?: string
+  subheading?: string
 }
 
 interface ChatActionsProps extends React.PropsWithChildren {
@@ -132,6 +134,19 @@ function ChatMessagesEmpty(props: ChatMessagesEmptyProps) {
   const { messages } = useChatUI()
   if (messages.length > 0) return null
 
+  if (props.children) {
+    return (
+      <div
+        className={cn(
+          'flex h-full flex-col justify-center pt-4',
+          props.className
+        )}
+      >
+        {props.children}
+      </div>
+    )
+  }
+
   return (
     <div
       className={cn(
@@ -140,10 +155,10 @@ function ChatMessagesEmpty(props: ChatMessagesEmptyProps) {
       )}
     >
       <p className="mb-2 animate-[slide-up_0.5s_ease-out] text-3xl font-bold opacity-0 [animation-delay:100ms] [animation-fill-mode:forwards]">
-        Hello there!
+        {props.heading ?? 'Hello there!'}
       </p>
       <p className="text-muted-foreground animate-[slide-up_0.5s_ease-out] text-xl opacity-0 [animation-delay:300ms] [animation-fill-mode:forwards]">
-        I&apos;m here to help you with your questions.
+        {props.subheading ?? "I'm here to help you with your questions."}
       </p>
       <style>{`
         @keyframes slide-up {

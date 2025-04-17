@@ -154,8 +154,8 @@ function ChatInputField(props: ChatInputFieldProps) {
       name="input"
       placeholder={props.placeholder ?? 'Type a message...'}
       className={cn(
-        props.className,
-        'bg-secondary h-[100px] max-h-[400px] min-h-0 flex-1 resize-none overflow-y-auto rounded-2xl p-4'
+        'bg-secondary h-[100px] max-h-[400px] min-h-0 flex-1 resize-none overflow-y-auto rounded-2xl p-4',
+        props.className
       )}
       value={input}
       onChange={handleInputChange}
