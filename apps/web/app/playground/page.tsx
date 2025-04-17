@@ -17,7 +17,8 @@ const initialMessages: Message[] = [
   },
   {
     id: '3',
-    content: 'Write a simple math equation',
+    content:
+      'Write a simple math equation that solves for x. It should be a quadratic equation. Please use LaTeX to write the equation.',
     role: 'user',
   },
   {
@@ -30,5 +31,10 @@ const initialMessages: Message[] = [
 
 export default function Page(): JSX.Element {
   const handler = useChat({ initialMessages })
-  return <ChatSection handler={handler} />
+  return (
+    <ChatSection
+      handler={handler}
+      className="mx-auto h-screen max-w-3xl overflow-hidden"
+    />
+  )
 }

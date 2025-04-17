@@ -1,4 +1,4 @@
-import { Bot, Check, Copy, MessageCircle, RefreshCw, User2 } from 'lucide-react'
+import { Bot, Check, Copy, RefreshCw } from 'lucide-react'
 import { ComponentType, memo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
@@ -14,8 +14,8 @@ import {
   SuggestedQuestionsAnnotations,
 } from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
-import { ChatHandler, Message } from './chat.interface'
 import { useChatUI } from './chat.context.js'
+import { ChatHandler, Message } from './chat.interface'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -66,13 +66,11 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
 }
 
 function ChatMessage(props: ChatMessageProps) {
-  const isAssistantMessage = props.message.role === 'assistant'
-
   const children = props.children ?? (
     <>
       <ChatMessageAvatar />
       <ChatMessageContent isLoading={props.isLoading} append={props.append} />
-      {isAssistantMessage && <ChatMessageActions />}
+      <ChatMessageActions />
     </>
   )
 
@@ -95,14 +93,9 @@ function ChatMessage(props: ChatMessageProps) {
 function ChatMessageAvatar(props: ChatMessageAvatarProps) {
   const { message } = useChatMessage()
 
-  const roleIconMap: Record<string, React.ReactNode> = {
-    user: <User2 className="h-4 w-4" />,
-    assistant: <Bot className="h-4 w-4" />,
-  }
+  if (message.role !== 'assistant') return null
 
-  const children = props.children ?? roleIconMap[message.role] ?? (
-    <MessageCircle className="h-4 w-4" />
-  )
+  const children = props.children ?? <Bot className="h-4 w-4" />
 
   return (
     <div
@@ -117,8 +110,6 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 }
 
 function ChatMessageContent(props: ChatMessageContentProps) {
-  const { message } = useChatMessage()
-
   const children = props.children ?? (
     <>
       <EventAnnotations />
@@ -132,15 +123,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   )
 
   return (
-    <div
-      className={cn(
-        'flex min-w-0 flex-1 flex-col gap-4',
-        {
-          'w-fit max-w-[80%]': message.role === 'user',
-        },
-        props.className
-      )}
-    >
+    <div className={cn('flex min-w-0 flex-1 flex-col gap-4', props.className)}>
       {children}
     </div>
   )
@@ -159,7 +142,7 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       citationComponent={props.citationComponent}
       className={cn(
         {
-          'bg-primary text-primary-foreground w-fit rounded-xl px-3 py-2':
+          'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
             message.role === 'user',
         },
         props.className
@@ -172,6 +155,8 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
   const { reload, requestData, isLoading } = useChatUI()
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   const { message, isLast } = useChatMessage()
+
+  if (message.role !== 'assistant') return null
 
   const isLastMessageFromAssistant = message.role === 'assistant' && isLast
   const showReload = reload && !isLoading && isLastMessageFromAssistant
