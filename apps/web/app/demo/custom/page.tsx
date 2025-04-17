@@ -147,14 +147,14 @@ const initialMessages: Message[] = [
 export default function Page(): JSX.Element {
   return (
     <div className="flex gap-10">
-      <div className="max-h-screen w-1/2 justify-center space-y-10 self-center overflow-y-auto p-10">
+      <div className="hidden max-h-screen w-1/2 justify-center space-y-10 self-center overflow-y-auto p-10 md:block">
         <h1 className="bg-gradient-to-r from-[#e711dd] to-[#b5f2fd] bg-clip-text text-6xl font-bold text-transparent">
           LlamaIndex ChatUI
         </h1>
         <h1 className="mb-4 text-2xl font-bold">Custom Chat Demo</h1>
         <Code content={code} language="jsx" />
       </div>
-      <div className="w-1/2 border-l">
+      <div className="w-full md:w-1/2 md:border-l">
         <CustomChat />
       </div>
     </div>
@@ -175,7 +175,7 @@ function CustomChat() {
     }
   }
   return (
-    <ChatSection handler={handler} className="h-screen overflow-hidden">
+    <ChatSection handler={handler} className="h-screen overflow-hidden p-0 md:p-5">
       <CustomChatMessages />
       <ChatInput annotations={annotations} resetUploadedFiles={reset}>
         <div>
@@ -204,7 +204,7 @@ function CustomChatMessages() {
   const { messages, isLoading, append } = useChatUI()
   return (
     <ChatMessages>
-      <ChatMessages.List className="px-16">
+      <ChatMessages.List className="px-0 md:px-16">
         {messages.map((message, index) => (
           <ChatMessage
             key={index}

@@ -10,18 +10,18 @@ export default function Page(): JSX.Element {
               <img
                 src="/llama.png"
                 alt="LlamaIndex Logo"
-                className="h-16 w-16 rounded-full"
+                className="h-12 w-12 rounded-full sm:h-16 sm:w-16"
               />
             </div>
           </div>
-          <h1 className="bg-gradient-to-r from-[#fad6f8] to-[#b5f2fd] bg-clip-text text-6xl font-bold text-transparent">
+          <h1 className="bg-gradient-to-r from-[#fad6f8] to-[#b5f2fd] bg-clip-text text-4xl font-bold text-transparent sm:text-6xl">
             LlamaIndex ChatUI
           </h1>
-          <p className="max-w-2xl text-xl text-zinc-300">
+          <p className="max-w-2xl text-lg text-zinc-300 sm:text-xl">
             A powerful React component library for building chat interfaces in
             LLM applications
           </p>
-          <div className="flex flex-wrap gap-4 pt-4">
+          <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center">
             <a
               href="https://github.com/run-llama/chat-ui"
               target="_blank"
@@ -39,7 +39,7 @@ export default function Page(): JSX.Element {
               npm install @llamaindex/chat-ui
             </a>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex gap-4">
             <Link
               href="/demo/simple"
               className="rounded-full bg-gradient-to-r from-[#ff6b6b] to-[#4ecdc4] px-6 py-2 font-medium text-white transition hover:opacity-90"
@@ -55,8 +55,10 @@ export default function Page(): JSX.Element {
           </div>
         </div>
 
-        <div className="mx-auto mb-16 max-w-4xl rounded-xl bg-zinc-800/50 p-6 backdrop-blur">
-          <h2 className="mb-4 text-2xl font-bold text-white">Quick Start</h2>
+        <div className="mx-auto mb-16 max-w-full rounded-xl bg-zinc-800/50 p-6 backdrop-blur sm:max-w-4xl">
+          <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">
+            Quick Start
+          </h2>
           <div className="space-y-4">
             <p className="text-zinc-300">
               Add a chatbot to your project with Shadcn CLI:
