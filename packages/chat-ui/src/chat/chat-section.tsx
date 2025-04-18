@@ -23,7 +23,9 @@ export default function ChatSection(props: ChatSectionProps) {
 
   return (
     <ChatProvider value={{ ...handler, requestData, setRequestData }}>
-      <div className={cn('flex flex-col gap-4', className)}>{children}</div>
+      <div className={cn('flex h-full w-full flex-col gap-4 p-5', className)}>
+        {children}
+      </div>
     </ChatProvider>
   )
 }

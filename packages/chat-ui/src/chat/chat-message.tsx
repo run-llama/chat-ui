@@ -1,9 +1,9 @@
-import { Bot, Check, Copy, MessageCircle, User2 } from 'lucide-react'
-import { memo, ComponentType } from 'react'
+import { Bot, Check, Copy, RefreshCw } from 'lucide-react'
+import { ComponentType, memo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
-import { Markdown, CitationComponentProps } from '../widgets/index.js'
+import { CitationComponentProps, Markdown } from '../widgets/index.js'
 import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
@@ -14,6 +14,7 @@ import {
   SuggestedQuestionsAnnotations,
 } from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
+import { useChatUI } from './chat.context.js'
 import { ChatHandler, Message } from './chat.interface'
 
 interface ChatMessageProps extends React.PropsWithChildren {
@@ -61,6 +62,7 @@ interface ChatMessageActionsProps extends React.PropsWithChildren {
 
 interface ChatMarkdownProps extends React.PropsWithChildren {
   citationComponent?: ComponentType<CitationComponentProps>
+  className?: string
 }
 
 function ChatMessage(props: ChatMessageProps) {
@@ -91,17 +93,17 @@ function ChatMessage(props: ChatMessageProps) {
 function ChatMessageAvatar(props: ChatMessageAvatarProps) {
   const { message } = useChatMessage()
 
-  const roleIconMap: Record<string, React.ReactNode> = {
-    user: <User2 className="h-4 w-4" />,
-    assistant: <Bot className="h-4 w-4" />,
-  }
+  if (message.role !== 'assistant') return null
 
-  const children = props.children ?? roleIconMap[message.role] ?? (
-    <MessageCircle className="h-4 w-4" />
-  )
+  const children = props.children ?? <Bot className="h-4 w-4" />
 
   return (
-    <div className="bg-background flex h-8 w-8 shrink-0 select-none items-center justify-center border">
+    <div
+      className={cn(
+        'bg-background flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full border',
+        props.className
+      )}
+    >
       {children}
     </div>
   )
@@ -138,31 +140,57 @@ function ChatMarkdown(props: ChatMarkdownProps) {
         annotations ? getSourceAnnotationData(annotations)[0] : undefined
       }
       citationComponent={props.citationComponent}
+      className={cn(
+        {
+          'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
+            message.role === 'user',
+        },
+        props.className
+      )}
     />
   )
 }
 
 function ChatMessageActions(props: ChatMessageActionsProps) {
+  const { reload, requestData, isLoading } = useChatUI()
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
-  const { message } = useChatMessage()
+  const { message, isLast } = useChatMessage()
+
+  if (message.role !== 'assistant') return null
+
+  const isLastMessageFromAssistant = message.role === 'assistant' && isLast
+  const showReload = reload && !isLoading && isLastMessageFromAssistant
 
   const children = props.children ?? (
-    <Button
-      onClick={() => copyToClipboard(message.content)}
-      size="icon"
-      variant="ghost"
-      className="h-8 w-8"
-    >
-      {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-    </Button>
+    <>
+      <Button
+        title="Copy"
+        onClick={() => copyToClipboard(message.content)}
+        size="icon"
+        variant="outline"
+        className="h-8 w-8"
+      >
+        {isCopied ? (
+          <Check className="h-4 w-4" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
+      </Button>
+      {showReload && (
+        <Button
+          title="Regenerate"
+          variant="outline"
+          size="icon"
+          onClick={() => reload?.({ data: requestData })}
+          className="h-8 w-8"
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+      )}
+    </>
   )
   return (
-    <div
-      className={cn(
-        'flex shrink-0 flex-col gap-2 opacity-0 group-hover:opacity-100',
-        props.className
-      )}
-    >
+    <div className={cn('flex shrink-0 flex-col gap-2', props.className)}>
       {children}
     </div>
   )

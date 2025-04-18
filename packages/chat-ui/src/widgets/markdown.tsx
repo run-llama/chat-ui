@@ -11,6 +11,7 @@ import {
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
+import { cn } from '../lib/utils'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -77,18 +78,23 @@ export function Markdown({
   sources,
   backend,
   citationComponent: CitationComponent,
+  className: customClassName,
 }: {
   content: string
   sources?: SourceData
   backend?: string
   citationComponent?: ComponentType<CitationComponentProps>
+  className?: string
 }) {
   const processedContent = preprocessContent(content)
 
   return (
     <div>
       <MemoizedReactMarkdown
-        className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 custom-markdown break-words"
+        className={cn(
+          'prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 custom-markdown break-words',
+          customClassName
+        )}
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex as any]}
         components={{
@@ -173,9 +179,8 @@ export function Markdown({
                 ) : (
                   <Citation index={nodeIndex} node={sourceNode} />
                 )
-              } else {
-                return null
               }
+              return null
             }
             return (
               <a href={href} target="_blank" rel="noopener">

@@ -1,1 +1,12 @@
 @import '@llamaindex/pdf-viewer/index.css';
+
+@media (max-width: 640px) {
+  .pdf-viewer-container .optionBar {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .pdf-viewer-container .optionBar .title {
+    border-right: none !important;
+  }
+}
