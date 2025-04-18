@@ -20,16 +20,22 @@ const MemoizedReactMarkdown: FC<Options> = memo(
 )
 
 const preprocessLaTeX = (content: string) => {
+  // Escape dollar signs to prevent them from being treated as LaTeX math delimiters
+  // For example, in "$10 million and $20 million", the content between the dollar signs might be incorrectly parsed as a math block
+  // Replacing $ with \$ avoids this issue
+  const escapedDollarSigns = content.replace(/\$/g, '\\$')
+
   // Replace block-level LaTeX delimiters \[ \] with $$ $$
-  const blockProcessedContent = content.replace(
+  const blockProcessedContent = escapedDollarSigns.replace(
     /\\\[([\s\S]*?)\\\]/g,
     (_, equation) => `$$${equation}$$`
   )
   // Replace inline LaTeX delimiters \( \) with $ $
   const inlineProcessedContent = blockProcessedContent.replace(
-    /\\\[([\s\S]*?)\\\]/g,
+    /\\\(([\s\S]*?)\\\)/g,
     (_, equation) => `$${equation}$`
   )
+
   return inlineProcessedContent
 }
 

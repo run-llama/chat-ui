@@ -36,7 +36,7 @@ const initialMessages: Message[] = [
     id: '4',
     role: 'assistant',
     content:
-      "Let's explore a simple mathematical equation using LaTeX:\n\n The quadratic formula is: $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$\n\nThis formula helps us solve quadratic equations in the form $ax^2 + bx + c = 0$. The solution gives us the x-values where the parabola intersects the x-axis.",
+      "Let's explore a simple mathematical equation using LaTeX:\n\n The quadratic formula is: \\[x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}\\]\n\nThis formula helps us solve quadratic equations in the form \\(ax^2 + bx + c = 0\\). The solution gives us the x-values where the parabola intersects the x-axis.",
   },
 ]
 
