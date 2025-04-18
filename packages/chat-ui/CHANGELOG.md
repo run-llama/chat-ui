@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.4.0
+
+### Minor Changes
+
+- f128454: feat: enhance style for chat-ui
+
 ## 0.3.2
 
 ### Patch Changes
