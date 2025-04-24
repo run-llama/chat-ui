@@ -7,6 +7,7 @@ import { CitationComponentProps, Markdown } from '../widgets/index.js'
 import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
+  ArtifactAnnotations,
   DocumentFileAnnotations,
   EventAnnotations,
   ImageAnnotations,
@@ -204,6 +205,7 @@ type ComposibleChatMessageContent = typeof ChatMessageContent & {
   DocumentFile: typeof DocumentFileAnnotations
   Source: typeof SourceAnnotations
   SuggestedQuestions: typeof SuggestedQuestionsAnnotations
+  Artifact: typeof ArtifactAnnotations
 }
 
 type ComposibleChatMessage = typeof ChatMessage & {
@@ -230,6 +232,7 @@ PrimiviteChatMessage.Content.Markdown = ChatMarkdown
 PrimiviteChatMessage.Content.DocumentFile = DocumentFileAnnotations
 PrimiviteChatMessage.Content.Source = SourceAnnotations
 PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsAnnotations
+PrimiviteChatMessage.Content.Artifact = ArtifactAnnotations
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions

@@ -27,6 +27,10 @@ export type ChatHandler = {
     message: Message,
     chatRequestOptions?: { data?: any }
   ) => Promise<string | null | undefined>
+
+  // TODO: (Message & { id: string }) is a quick fix for compatibility with Message from ai/react
+  // We should make Message type in ChatHandler more flexible. Eg: ChatHandler<T extends Message = Message>
+  setMessages?: (messages: (Message & { id: string })[]) => void
 }
 
 export type ChatContext = ChatHandler & {

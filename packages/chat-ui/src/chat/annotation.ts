@@ -1,4 +1,4 @@
-import { JSONValue } from './chat.interface'
+import { JSONValue, Message } from './chat.interface'
 
 export enum MessageAnnotationType {
   IMAGE = 'image',
@@ -7,6 +7,7 @@ export enum MessageAnnotationType {
   EVENTS = 'events',
   SUGGESTED_QUESTIONS = 'suggested_questions',
   AGENT_EVENTS = 'agent',
+  ARTIFACT = 'artifact',
 }
 
 export type ImageData = {
@@ -65,6 +66,24 @@ export type AgentEventData = {
 
 export type SuggestedQuestionsData = string[]
 
+export type Artifact<T = unknown> = {
+  created_at: number
+  type: 'code' | 'document'
+  data: T
+}
+
+export type CodeArtifact = Artifact<{
+  file_name: string
+  code: string
+  language: string
+}>
+
+export type DocumentArtifact = Artifact<{
+  title: string
+  content: string
+  type: string
+}>
+
 export type AnnotationData =
   | ImageData
   | DocumentFileData
@@ -72,6 +91,7 @@ export type AnnotationData =
   | EventData
   | AgentEventData
   | SuggestedQuestionsData
+  | Artifact
 
 export type MessageAnnotation = {
   type: MessageAnnotationType
@@ -150,4 +170,29 @@ function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
       return node
     })
   return processedNodes
+}
+
+export type CodeArtifactError = {
+  artifact: CodeArtifact
+  errors: string[]
+}
+
+export function extractArtifactsFromMessage(message: Message): Artifact[] {
+  const artifacts = getChatUIAnnotation<Artifact>(
+    message.annotations as MessageAnnotation[],
+    MessageAnnotationType.ARTIFACT
+  )
+  return artifacts ?? []
+}
+
+// extract artifacts from all messages (sort ascending by created_at)
+export function extractArtifactsFromAllMessages(messages: Message[]) {
+  return messages
+    .flatMap(extractArtifactsFromMessage)
+    .sort((a, b) => a.created_at - b.created_at)
+}
+
+// check if two artifacts are equal by comparing their type and created time
+export function isEqualArtifact(a: Artifact, b: Artifact) {
+  return a.type === b.type && a.created_at === b.created_at
 }
