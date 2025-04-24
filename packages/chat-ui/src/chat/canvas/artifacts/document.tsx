@@ -1,11 +1,11 @@
 'use client'
 
-import { Markdown } from '@llamaindex/chat-ui/widgets'
 import { FileText } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 import { DocumentArtifact } from '../../annotation'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
+import { Markdown } from '../../../widgets'
 
 interface DocumentArtifactViewerProps {
   className?: string

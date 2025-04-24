@@ -1,8 +1,8 @@
 'use client'
 
-import { CodeBlock } from '@llamaindex/chat-ui/widgets'
 import { cn } from '../../../lib/utils'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/tabs'
+import { CodeBlock } from '../../../widgets'
 import { CodeArtifact } from '../../annotation'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
