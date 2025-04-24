@@ -70,7 +70,7 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': 'off',
     'no-await-in-loop': 'off',
     '@typescript-eslint/no-unnecessary-type-assertion': 'off',
-    'camelcase': 'off',
+    camelcase: 'off',
   },
   overrides: [
     {
