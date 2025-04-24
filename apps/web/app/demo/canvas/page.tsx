@@ -556,7 +556,7 @@ function CustomChat() {
       className="block h-screen flex-row gap-4 p-0 md:flex md:p-5"
     >
       <div className="md:max-w-1/2 mx-auto flex h-full min-w-0 max-w-full flex-1 flex-col gap-4">
-        <div className="flex justify-between border-b pb-4">
+        <div className="flex justify-between gap-2 border-b p-4">
           <div>
             <h1 className="bg-gradient-to-r from-[#e711dd] to-[#0fc1e0] bg-clip-text text-lg font-bold text-transparent">
               LlamaIndex ChatUI - Canvas Demo
@@ -570,7 +570,7 @@ function CustomChat() {
             onClick={() => {
               copyToClipboard(code)
             }}
-            className={`flex h-8 items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-600 ${
+            className={`flex h-10 items-center gap-2 rounded-lg bg-zinc-700 px-2 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-600 ${
               isCopied ? 'bg-green-600 hover:bg-green-500' : ''
             }`}
           >
