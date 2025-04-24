@@ -52,6 +52,12 @@ export default function Page(): JSX.Element {
             >
               Custom Chat
             </Link>
+            <Link
+              href="/demo/canvas"
+              className="rounded-full bg-gradient-to-r from-[#ff6b6b] to-[#4ecdc4] px-6 py-2 font-medium text-white transition hover:opacity-90"
+            >
+              Chat with Canvas
+            </Link>
           </div>
         </div>
 

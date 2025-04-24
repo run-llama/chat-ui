@@ -3,11 +3,15 @@ import { Check, Copy, Download } from 'lucide-react'
 import { FC, memo, useEffect, useRef } from 'react'
 import { Button } from '../ui/button'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
+import { cn } from '../lib/utils'
 
 interface Props {
   language: string
   value: string
   className?: string
+  showHeader?: boolean
+  headerClassName?: string
+  codeClassName?: string
 }
 
 interface languageMap {
@@ -50,7 +54,15 @@ export const generateRandomString = (length: number, lowercase = false) => {
   return lowercase ? result.toLowerCase() : result
 }
 
-const CodeBlock: FC<Props> = memo(({ language, value, className }) => {
+const CodeBlock: FC<Props> = memo(props => {
+  const {
+    language,
+    value,
+    className,
+    headerClassName,
+    codeClassName,
+    showHeader = true,
+  } = props
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   const codeRef = useRef<HTMLElement>(null)
 
@@ -94,28 +106,50 @@ const CodeBlock: FC<Props> = memo(({ language, value, className }) => {
   }
 
   return (
-    <div
-      className={`codeblock relative w-full bg-zinc-950 font-sans ${className}`}
-    >
-      <div className="flex w-full items-center justify-between bg-zinc-800 px-6 py-2 pr-4 text-zinc-100">
-        <span className="text-xs lowercase">{language}</span>
-        <div className="flex items-center space-x-1">
-          <Button variant="ghost" onClick={downloadAsFile} size="icon">
-            <Download />
-            <span className="sr-only">Download</span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onCopy}>
-            {isCopied ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-            <span className="sr-only">Copy code</span>
-          </Button>
+    <div className={cn('codeblock relative w-full', className)}>
+      {showHeader && (
+        <div
+          className={cn(
+            'absolute left-0 top-0 flex w-full items-center justify-between px-4 py-2',
+            headerClassName
+          )}
+        >
+          <span className="text-xs lowercase">{language}</span>
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              onClick={downloadAsFile}
+              size="icon"
+              className="size-8"
+            >
+              <Download className="size-4" />
+              <span className="sr-only">Download</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onCopy}
+              className="size-8"
+            >
+              {isCopied ? (
+                <Check className="size-4" />
+              ) : (
+                <Copy className="size-4" />
+              )}
+              <span className="sr-only">Copy code</span>
+            </Button>
+          </div>
         </div>
-      </div>
-      <pre className="border border-zinc-700 text-white">
-        <code ref={codeRef} className={`language-${language} font-mono`}>
+      )}
+      <pre>
+        <code
+          ref={codeRef}
+          className={cn(
+            `language-${language} rounded-lg border font-mono`,
+            codeClassName,
+            { 'pt-12!': showHeader }
+          )}
+        >
           {value}
         </code>
       </pre>

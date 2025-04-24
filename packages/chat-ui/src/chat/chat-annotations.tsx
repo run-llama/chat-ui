@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   ChatAgentEvents,
   ChatEvents,
@@ -10,6 +11,7 @@ import {
   AgentEventData,
   DocumentFileData,
   EventData,
+  extractArtifactsFromMessage,
   getChatUIAnnotation,
   getSourceAnnotationData,
   ImageData,
@@ -19,6 +21,7 @@ import {
 } from './annotation'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
+import { ArtifactCard } from './canvas/card.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -110,5 +113,22 @@ export function SuggestedQuestionsAnnotations() {
   if (!suggestedQuestionsData?.[0]) return null
   return (
     <SuggestedQuestions questions={suggestedQuestionsData[0]} append={append} />
+  )
+}
+
+export function ArtifactAnnotations() {
+  const { message } = useChatMessage()
+  const artifacts = useMemo(
+    () => extractArtifactsFromMessage(message),
+    [message]
+  )
+  if (!artifacts?.length) return null
+
+  return (
+    <div className="flex items-center gap-2">
+      {artifacts.map((artifact, index) => (
+        <ArtifactCard key={index} artifact={artifact} />
+      ))}
+    </div>
   )
 }
