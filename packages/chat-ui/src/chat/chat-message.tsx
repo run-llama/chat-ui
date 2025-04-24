@@ -120,6 +120,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       <DocumentFileAnnotations />
       <SourceAnnotations />
       <SuggestedQuestionsAnnotations />
+      <ArtifactAnnotations />
     </>
   )
 
