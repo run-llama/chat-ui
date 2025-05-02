@@ -128,3 +128,7 @@
   background-color: rgba(0, 0, 0, 0.03);
   font-weight: 500;
 }
+
+.ProseMirror:focus-visible {
+  outline: none;
+}
