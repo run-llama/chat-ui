@@ -18,7 +18,7 @@ export function DocumentArtifactViewer({
   className,
   children,
 }: DocumentArtifactViewerProps) {
-  const { displayedArtifact, updateDocumentArtifact } = useChatCanvas()
+  const { displayedArtifact, updateArtifact } = useChatCanvas()
   const [updatedContent, setUpdatedContent] = useState<string | undefined>()
 
   if (displayedArtifact?.type !== 'document') return null
@@ -34,11 +34,9 @@ export function DocumentArtifactViewer({
 
   const handleSaveChanges = () => {
     if (!updatedContent) return
-    updateDocumentArtifact(documentArtifact, updatedContent)
+    updateArtifact(documentArtifact, updatedContent)
     setUpdatedContent(undefined)
   }
-
-  const isEditing = updatedContent !== content
 
   return (
     <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
@@ -53,7 +51,7 @@ export function DocumentArtifactViewer({
         <ChatCanvasActions />
       </div>
       <div className="relative flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-20 py-4">
-        {isEditing && (
+        {updatedContent && (
           <div className="bg-background absolute right-0 top-0 flex gap-2 py-2 pr-2 text-sm">
             <Button
               size="sm"
@@ -66,7 +64,7 @@ export function DocumentArtifactViewer({
               variant="outline"
               size="sm"
               className="h-7"
-              onClick={() => setUpdatedContent(content)}
+              onClick={() => setUpdatedContent(undefined)}
             >
               Revert
             </Button>

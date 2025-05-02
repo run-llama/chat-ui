@@ -8,7 +8,7 @@ import { keymap } from 'prosemirror-keymap'
 import { baseKeymap } from 'prosemirror-commands'
 import { history, undo, redo } from 'prosemirror-history'
 import { schema as basicSchema } from 'prosemirror-schema-basic'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
 
 export function DocumentEditor({
@@ -22,9 +22,10 @@ export function DocumentEditor({
 }) {
   const editorRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
+  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
-    if (!editorRef.current) return
+    if (!editorRef.current || initialized) return
 
     const state = EditorState.create({
       doc:
@@ -55,26 +56,13 @@ export function DocumentEditor({
 
     viewRef.current = view
 
+    setInitialized(true)
+
     return () => {
       view.destroy()
       viewRef.current = null
     }
-  }, [content, onChange])
-
-  useEffect(() => {
-    const view = viewRef.current
-    if (!view || !content) return
-
-    const newDoc = markdownParser.parse(content)
-    if (newDoc) {
-      const tr = view.state.tr.replaceWith(
-        0,
-        view.state.doc.content.size,
-        newDoc.content
-      )
-      view.dispatch(tr)
-    }
-  }, [content])
+  }, [])
 
   return (
     <div className={cn('custom-markdown h-full', className)}>

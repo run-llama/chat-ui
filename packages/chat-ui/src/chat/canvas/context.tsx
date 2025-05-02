@@ -36,8 +36,7 @@ interface ChatCanvasContextType {
     isLatest: boolean
   }
   restoreArtifact: (artifact: Artifact) => void
-  updateCodeArtifact: (artifact: CodeArtifact, code: string) => void
-  updateDocumentArtifact: (artifact: DocumentArtifact, content: string) => void
+  updateArtifact: (artifact: Artifact, content: string) => void
 }
 
 const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
@@ -126,52 +125,34 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     openArtifactInCanvas(newArtifact)
   }
 
-  const updateCodeArtifact = (artifact: CodeArtifact, code: string) => {
+  const updateArtifact = (artifact: Artifact, content: string) => {
     if (!setMessages) return
 
-    const newArtifact: CodeArtifact = {
-      type: 'code',
-      created_at: Date.now(),
-      data: {
-        code,
-        file_name: artifact.data.file_name,
-        language: artifact.data.language,
-      },
+    let newArtifact: Artifact | undefined
+
+    if (artifact.type === 'code') {
+      const codeArtifact = artifact as CodeArtifact
+      newArtifact = {
+        ...artifact,
+        data: {
+          code: content,
+          file_name: codeArtifact.data.file_name,
+          language: codeArtifact.data.language,
+        },
+      }
+    } else if (artifact.type === 'document') {
+      const documentArtifact = artifact as DocumentArtifact
+      newArtifact = {
+        ...artifact,
+        data: {
+          content,
+          title: documentArtifact.data.title,
+          type: documentArtifact.data.type,
+        },
+      }
     }
 
-    const newMessages = [
-      ...messages,
-      {
-        role: 'user',
-        content: `Update content for ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
-      },
-      {
-        role: 'assistant',
-        content: `Successfully updated content for ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
-        annotations: [{ type: 'artifact', data: newArtifact }],
-      },
-    ] as (Message & { id: string })[]
-
-    setMessages(newMessages)
-
-    openArtifactInCanvas(newArtifact)
-  }
-
-  const updateDocumentArtifact = (
-    artifact: DocumentArtifact,
-    content: string
-  ) => {
-    if (!setMessages) return
-
-    const newArtifact: DocumentArtifact = {
-      type: 'document',
-      created_at: Date.now(),
-      data: {
-        content,
-        title: artifact.data.title,
-        type: artifact.data.type,
-      },
-    }
+    if (!newArtifact) return
 
     const newMessages = [
       ...messages,
@@ -241,8 +222,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
         fixCodeErrors,
         getArtifactVersion,
         restoreArtifact,
-        updateCodeArtifact,
-        updateDocumentArtifact,
+        updateArtifact,
       }}
     >
       {children}

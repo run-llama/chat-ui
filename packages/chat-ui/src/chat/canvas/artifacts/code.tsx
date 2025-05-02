@@ -18,7 +18,7 @@ export function CodeArtifactViewer({
   className,
   tabs,
 }: CodeArtifactViewerProps) {
-  const { displayedArtifact, updateCodeArtifact } = useChatCanvas()
+  const { displayedArtifact, updateArtifact } = useChatCanvas()
   const [updatedCode, setUpdatedCode] = useState<string | undefined>()
 
   if (displayedArtifact?.type !== 'code') return null
@@ -32,7 +32,7 @@ export function CodeArtifactViewer({
   const handleSaveChanges = () => {
     if (!updatedCode) return
     setUpdatedCode(undefined)
-    updateCodeArtifact(codeArtifact, updatedCode)
+    updateArtifact(codeArtifact, updatedCode)
   }
 
   return (
