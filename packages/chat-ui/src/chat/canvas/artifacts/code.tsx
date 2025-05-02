@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { cn } from '../../../lib/utils'
+import { Button } from '../../../ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/tabs'
-import { CodeBlock } from '../../../widgets'
+import { CodeEditor } from '../../../widgets'
 import { CodeArtifact } from '../../annotation'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
@@ -16,14 +18,22 @@ export function CodeArtifactViewer({
   className,
   tabs,
 }: CodeArtifactViewerProps) {
-  const { displayedArtifact } = useChatCanvas()
+  const { displayedArtifact, updateCodeArtifact } = useChatCanvas()
+  const [updatedCode, setUpdatedCode] = useState<string | undefined>()
 
   if (displayedArtifact?.type !== 'code') return null
 
-  const {
-    created_at,
-    data: { language, code },
-  } = displayedArtifact as CodeArtifact
+  const codeArtifact = displayedArtifact as CodeArtifact
+
+  const handleCodeChange = (newValue: string) => {
+    setUpdatedCode(newValue)
+  }
+
+  const handleSaveChanges = () => {
+    if (!updatedCode) return
+    setUpdatedCode(undefined)
+    updateCodeArtifact(codeArtifact, updatedCode)
+  }
 
   return (
     <Tabs
@@ -42,14 +52,43 @@ export function CodeArtifactViewer({
         </TabsList>
         <ChatCanvasActions />
       </div>
+
       <div className="min-h-0 flex-1 overflow-auto pr-2">
-        <TabsContent value="code" className="h-full">
-          <CodeBlock
-            key={created_at} // make the code block re-highlight when changing artifact
-            language={language}
-            value={code}
-            showHeader={false}
+      {updatedCode && (
+            <div className="bg-background absolute right-0 top-0 flex gap-2 p-2 text-sm">
+              <Button size="sm" className="h-8" onClick={handleSaveChanges}>
+                Save
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8"
+                onClick={() => setUpdatedCode(undefined)}
+              >
+                Revert
+              </Button>
+            </div>
+          )}
+        <TabsContent value="code" className="relative h-full">
+          <CodeEditor
+            code={updatedCode ?? codeArtifact.data.code}
+            onChange={handleCodeChange}
           />
+          {updatedCode && (
+            <div className="bg-background absolute right-0 top-0 flex gap-2 p-2 text-sm">
+              <Button size="sm" className="h-8" onClick={handleSaveChanges}>
+                Save
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8"
+                onClick={() => setUpdatedCode(undefined)}
+              >
+                Revert
+              </Button>
+            </div>
+          )}
         </TabsContent>
         {tabs &&
           Object.entries(tabs).map(([key, value]) => (
