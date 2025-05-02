@@ -1,9 +1,13 @@
 import {
-  defaultMarkdownParser,
-  defaultMarkdownSerializer,
+  defaultMarkdownParser as markdownParser,
+  defaultMarkdownSerializer as markdownSerializer,
 } from 'prosemirror-markdown'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+import { keymap } from 'prosemirror-keymap'
+import { baseKeymap } from 'prosemirror-commands'
+import { history, undo, redo } from 'prosemirror-history'
+import { schema as basicSchema } from 'prosemirror-schema-basic'
 import { useEffect, useRef } from 'react'
 import { cn } from '../lib/utils'
 
@@ -23,8 +27,18 @@ export function DocumentEditor({
     if (!editorRef.current) return
 
     const state = EditorState.create({
-      doc: defaultMarkdownParser.parse(content),
-      plugins: [],
+      doc:
+        markdownParser.parse(content) ||
+        basicSchema.topNodeType.createAndFill(),
+      schema: basicSchema,
+      plugins: [
+        history(),
+        keymap({
+          'Mod-z': undo,
+          'Mod-y': redo,
+        }),
+        keymap(baseKeymap),
+      ],
     })
 
     const view = new EditorView(editorRef.current, {
@@ -32,8 +46,8 @@ export function DocumentEditor({
       dispatchTransaction(transaction) {
         const newState = view.state.apply(transaction)
         view.updateState(newState)
-        if (onChange) {
-          const markdown = defaultMarkdownSerializer.serialize(newState.doc)
+        if (onChange && transaction.docChanged) {
+          const markdown = markdownSerializer.serialize(newState.doc)
           onChange(markdown)
         }
       },
@@ -49,18 +63,21 @@ export function DocumentEditor({
 
   useEffect(() => {
     const view = viewRef.current
-    if (!view) return
-    const newDoc = defaultMarkdownParser.parse(content)
-    const tr = view.state.tr.replaceWith(
-      0,
-      view.state.doc.content.size,
-      newDoc.content
-    )
-    view.dispatch(tr)
+    if (!view || !content) return
+
+    const newDoc = markdownParser.parse(content)
+    if (newDoc) {
+      const tr = view.state.tr.replaceWith(
+        0,
+        view.state.doc.content.size,
+        newDoc.content
+      )
+      view.dispatch(tr)
+    }
   }, [content])
 
   return (
-    <div className={cn('prose-mirror-editor h-full', className)}>
+    <div className={cn('custom-markdown h-full', className)}>
       <div ref={editorRef} />
     </div>
   )

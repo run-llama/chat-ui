@@ -40,7 +40,7 @@ export function DocumentArtifactViewer({
         </h3>
         <ChatCanvasActions />
       </div>
-      <div className="flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-4 py-4">
+      <div className="flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-20 py-4">
         {children ?? (
           <DocumentEditor content={content} onChange={handleDocumentChange} />
         )}
