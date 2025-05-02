@@ -6,6 +6,8 @@ import { DocumentEditor } from '../../../widgets'
 import { DocumentArtifact } from '../../annotation'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
+import { useState } from 'react'
+import { Button } from '../../../ui/button'
 
 interface DocumentArtifactViewerProps {
   className?: string
@@ -16,17 +18,27 @@ export function DocumentArtifactViewer({
   className,
   children,
 }: DocumentArtifactViewerProps) {
-  const { displayedArtifact } = useChatCanvas()
+  const { displayedArtifact, updateDocumentArtifact } = useChatCanvas()
+  const [updatedContent, setUpdatedContent] = useState<string | undefined>()
 
   if (displayedArtifact?.type !== 'document') return null
 
+  const documentArtifact = displayedArtifact as DocumentArtifact
   const {
     data: { content, title, type },
-  } = displayedArtifact as DocumentArtifact
+  } = documentArtifact
 
   const handleDocumentChange = (markdown: string) => {
-    console.log(markdown)
+    setUpdatedContent(markdown)
   }
+
+  const handleSaveChanges = () => {
+    if (!updatedContent) return
+    updateDocumentArtifact(documentArtifact, updatedContent)
+    setUpdatedContent(undefined)
+  }
+
+  const isEditing = updatedContent !== content
 
   return (
     <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
@@ -40,7 +52,26 @@ export function DocumentArtifactViewer({
         </h3>
         <ChatCanvasActions />
       </div>
-      <div className="flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-20 py-4">
+      <div className="relative flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-20 py-4">
+        {isEditing && (
+          <div className="bg-background absolute right-0 top-0 flex gap-2 py-2 pr-2 text-sm">
+            <Button
+              size="sm"
+              className="h-7 bg-blue-500 hover:bg-blue-600"
+              onClick={handleSaveChanges}
+            >
+              Save
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7"
+              onClick={() => setUpdatedContent(content)}
+            >
+              Revert
+            </Button>
+          </div>
+        )}
         {children ?? (
           <DocumentEditor content={content} onChange={handleDocumentChange} />
         )}

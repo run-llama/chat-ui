@@ -15,6 +15,7 @@ import {
   CodeArtifactError,
   extractArtifactsFromAllMessages,
   isEqualArtifact,
+  DocumentArtifact,
 } from '../annotation'
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'
@@ -36,6 +37,7 @@ interface ChatCanvasContextType {
   }
   restoreArtifact: (artifact: Artifact) => void
   updateCodeArtifact: (artifact: CodeArtifact, code: string) => void
+  updateDocumentArtifact: (artifact: DocumentArtifact, content: string) => void
 }
 
 const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
@@ -155,6 +157,34 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     openArtifactInCanvas(newArtifact)
   }
 
+  const updateDocumentArtifact = (
+    artifact: DocumentArtifact,
+    content: string
+  ) => {
+    if (!setMessages) return
+
+    const newArtifact: DocumentArtifact = {
+      type: 'document',
+      created_at: Date.now(),
+      data: {
+        content,
+        title: artifact.data.title,
+        type: artifact.data.type,
+      },
+    }
+
+    const newMessages = [
+      ...messages,
+      {
+        role: 'user',
+        content: `Update content for ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
+      },
+    ] as (Message & { id: string })[]
+
+    setMessages(newMessages)
+    openArtifactInCanvas(newArtifact)
+  }
+
   const closeCanvas = () => {
     setIsCanvasOpen(false)
     setDisplayedArtifact(undefined)
@@ -207,6 +237,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
         getArtifactVersion,
         restoreArtifact,
         updateCodeArtifact,
+        updateDocumentArtifact,
       }}
     >
       {children}
