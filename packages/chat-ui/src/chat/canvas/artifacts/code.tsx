@@ -54,21 +54,6 @@ export function CodeArtifactViewer({
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto pr-2">
-      {updatedCode && (
-            <div className="bg-background absolute right-0 top-0 flex gap-2 p-2 text-sm">
-              <Button size="sm" className="h-8" onClick={handleSaveChanges}>
-                Save
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8"
-                onClick={() => setUpdatedCode(undefined)}
-              >
-                Revert
-              </Button>
-            </div>
-          )}
         <TabsContent value="code" className="relative h-full">
           <CodeEditor
             code={updatedCode ?? codeArtifact.data.code}
