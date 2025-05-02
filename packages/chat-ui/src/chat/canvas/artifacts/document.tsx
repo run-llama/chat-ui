@@ -24,6 +24,10 @@ export function DocumentArtifactViewer({
     data: { content, title, type },
   } = displayedArtifact as DocumentArtifact
 
+  const handleDocumentChange = (markdown: string) => {
+    console.log(markdown)
+  }
+
   return (
     <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
       <div className="flex items-center justify-between border-b p-4">
@@ -36,8 +40,10 @@ export function DocumentArtifactViewer({
         </h3>
         <ChatCanvasActions />
       </div>
-      <div className="flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-20 py-4">
-        {children ?? <DocumentEditor content={content} />}
+      <div className="flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-4 py-4">
+        {children ?? (
+          <DocumentEditor content={content} onChange={handleDocumentChange} />
+        )}
       </div>
     </div>
   )
