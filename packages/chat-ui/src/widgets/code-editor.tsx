@@ -4,6 +4,7 @@ import { python } from '@codemirror/lang-python'
 import { html } from '@codemirror/lang-html'
 import { css } from '@codemirror/lang-css'
 import { cn } from '../lib/utils'
+import { githubLight } from '@uiw/codemirror-theme-github'
 
 export function CodeEditor({
   code,
@@ -20,6 +21,7 @@ export function CodeEditor({
       value={code}
       extensions={[javascript({ jsx: true }), python(), html(), css()]}
       onChange={onChange}
+      theme={githubLight}
     />
   )
 }
