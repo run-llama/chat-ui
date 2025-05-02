@@ -2,10 +2,10 @@
 
 import { FileText } from 'lucide-react'
 import { cn } from '../../../lib/utils'
+import { DocumentEditor } from '../../../widgets'
 import { DocumentArtifact } from '../../annotation'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
-import { Markdown } from '../../../widgets'
 
 interface DocumentArtifactViewerProps {
   className?: string
@@ -37,7 +37,7 @@ export function DocumentArtifactViewer({
         <ChatCanvasActions />
       </div>
       <div className="flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-20 py-4">
-        {children ?? <Markdown content={content} />}
+        {children ?? <DocumentEditor content={content} />}
       </div>
     </div>
   )
