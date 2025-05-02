@@ -133,7 +133,8 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     if (artifact.type === 'code') {
       const codeArtifact = artifact as CodeArtifact
       newArtifact = {
-        ...artifact,
+        created_at: Date.now(),
+        type: 'code',
         data: {
           code: content,
           file_name: codeArtifact.data.file_name,
@@ -143,7 +144,8 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     } else if (artifact.type === 'document') {
       const documentArtifact = artifact as DocumentArtifact
       newArtifact = {
-        ...artifact,
+        created_at: Date.now(),
+        type: 'document',
         data: {
           content,
           title: documentArtifact.data.title,

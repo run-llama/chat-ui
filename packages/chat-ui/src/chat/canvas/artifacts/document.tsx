@@ -71,7 +71,11 @@ export function DocumentArtifactViewer({
           </div>
         )}
         {children ?? (
-          <DocumentEditor content={content} onChange={handleDocumentChange} />
+          <DocumentEditor
+            key={documentArtifact.created_at}
+            content={content}
+            onChange={handleDocumentChange}
+          />
         )}
       </div>
     </div>
