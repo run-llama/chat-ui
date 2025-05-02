@@ -17,7 +17,7 @@ export function CodeEditor({
 }) {
   return (
     <CodeMirror
-      className={cn('h-full text-[15px]', className)}
+      className={cn('h-full text-[14px]', className)}
       value={code}
       extensions={[javascript({ jsx: true }), python(), html(), css()]}
       onChange={onChange}
