@@ -60,14 +60,18 @@ export function CodeArtifactViewer({
             onChange={handleCodeChange}
           />
           {updatedCode && (
-            <div className="bg-background absolute right-0 top-0 flex gap-2 p-2 text-sm">
-              <Button size="sm" className="h-8" onClick={handleSaveChanges}>
+            <div className="bg-background absolute right-0 top-0 flex gap-2 pr-2 text-sm">
+              <Button
+                size="sm"
+                className="h-7 bg-blue-500 hover:bg-blue-600"
+                onClick={handleSaveChanges}
+              >
                 Save
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8"
+                className="h-7"
                 onClick={() => setUpdatedCode(undefined)}
               >
                 Revert
