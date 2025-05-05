@@ -106,11 +106,16 @@ const CodeBlock: FC<Props> = memo(props => {
   }
 
   return (
-    <div className={cn('codeblock relative w-full', className)}>
+    <div
+      className={cn(
+        'codeblock border-border relative w-full rounded-lg border bg-[#fafafa] py-2',
+        className
+      )}
+    >
       {showHeader && (
         <div
           className={cn(
-            'absolute left-0 top-0 flex w-full items-center justify-between px-4 py-2',
+            'flex w-full items-center justify-between px-4',
             headerClassName
           )}
         >
@@ -145,9 +150,8 @@ const CodeBlock: FC<Props> = memo(props => {
         <code
           ref={codeRef}
           className={cn(
-            `language-${language} rounded-lg border font-mono`,
-            codeClassName,
-            { 'pt-12!': showHeader }
+            `language-${language} rounded-lg border border-none font-mono`,
+            codeClassName
           )}
         >
           {value}
