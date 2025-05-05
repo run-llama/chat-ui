@@ -184,7 +184,9 @@ export function DocumentEditor({
   }, [])
 
   return (
-    <div className={cn('custom-markdown flex h-full flex-col gap-3', className)}>
+    <div
+      className={cn('custom-markdown flex h-full flex-col gap-3', className)}
+    >
       {showToolbar && <Toolbar view={viewRef.current} />}
       <div ref={editorRef} className="min-h-0 flex-1 overflow-auto" />
     </div>
