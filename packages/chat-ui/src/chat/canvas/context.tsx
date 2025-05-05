@@ -15,6 +15,7 @@ import {
   CodeArtifactError,
   extractArtifactsFromAllMessages,
   isEqualArtifact,
+  DocumentArtifact,
 } from '../annotation'
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'
@@ -35,6 +36,7 @@ interface ChatCanvasContextType {
     isLatest: boolean
   }
   restoreArtifact: (artifact: Artifact) => void
+  updateArtifact: (artifact: Artifact, content: string) => void
 }
 
 const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
@@ -123,6 +125,54 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     openArtifactInCanvas(newArtifact)
   }
 
+  const updateArtifact = (artifact: Artifact, content: string) => {
+    if (!setMessages) return
+
+    let newArtifact: Artifact | undefined
+
+    if (artifact.type === 'code') {
+      const codeArtifact = artifact as CodeArtifact
+      newArtifact = {
+        created_at: Date.now(),
+        type: 'code',
+        data: {
+          code: content,
+          file_name: codeArtifact.data.file_name,
+          language: codeArtifact.data.language,
+        },
+      }
+    } else if (artifact.type === 'document') {
+      const documentArtifact = artifact as DocumentArtifact
+      newArtifact = {
+        created_at: Date.now(),
+        type: 'document',
+        data: {
+          content,
+          title: documentArtifact.data.title,
+          type: documentArtifact.data.type,
+        },
+      }
+    }
+
+    if (!newArtifact) return
+
+    const newMessages = [
+      ...messages,
+      {
+        role: 'user',
+        content: `Update content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+      },
+      {
+        role: 'assistant',
+        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+        annotations: [{ type: 'artifact', data: newArtifact }],
+      },
+    ] as (Message & { id: string })[]
+
+    setMessages(newMessages)
+    openArtifactInCanvas(newArtifact)
+  }
+
   const closeCanvas = () => {
     setIsCanvasOpen(false)
     setDisplayedArtifact(undefined)
@@ -174,6 +224,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
         fixCodeErrors,
         getArtifactVersion,
         restoreArtifact,
+        updateArtifact,
       }}
     >
       {children}

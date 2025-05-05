@@ -1,6 +1,5 @@
 import hljs from 'highlight.js'
 import { useEffect, useRef } from 'react'
-import 'highlight.js/styles/atom-one-dark-reasonable.css'
 import { useCopyToClipboard } from '@/app/use-copy-to-clipboard'
 
 export function Code({
