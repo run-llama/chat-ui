@@ -50,9 +50,9 @@ export function DocumentArtifactViewer({
         </h3>
         <ChatCanvasActions />
       </div>
-      <div className="relative flex min-h-0 flex-1 flex-col items-stretch gap-4 overflow-auto px-20 py-4">
+      <div className="relative mx-20 flex min-h-0 flex-1 flex-col items-stretch gap-4 py-4">
         {updatedContent && (
-          <div className="bg-background absolute right-0 top-0 flex gap-2 py-2 pr-2 text-sm">
+          <div className="bg-background absolute right-0 top-2 flex gap-2 py-2 pr-2 text-sm">
             <Button
               size="sm"
               className="h-7 bg-blue-500 hover:bg-blue-600"

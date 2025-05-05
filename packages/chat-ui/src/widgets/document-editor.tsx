@@ -66,60 +66,60 @@ const Toolbar: React.FC<ToolbarProps> = ({ view }) => {
   }
 
   return (
-    <div className="flex gap-2 border-b border-gray-200 bg-gray-100 p-2">
+    <div className="flex shrink-0 gap-2">
       <Button
-        type="button"
-        onClick={handleBold}
-        variant="outline"
-        size="icon"
-        title="Bold (Ctrl+B)"
-      >
-        <Bold className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        onClick={handleItalic}
-        variant="outline"
-        size="icon"
-        title="Italic (Ctrl+I)"
-      >
-        <Italic className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        onClick={handleCode}
-        variant="outline"
-        size="icon"
-        title="Code (Ctrl+Shift+C)"
-      >
-        <Code className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        onClick={handleLink}
-        variant="outline"
-        size="icon"
-        title="Link"
-      >
-        <Link className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
         onClick={handleUndo}
         variant="outline"
         size="icon"
         title="Undo (Ctrl+Z)"
+        className="size-7"
       >
-        <Undo className="h-4 w-4" />
+        <Undo className="size-4" />
       </Button>
       <Button
-        type="button"
         onClick={handleRedo}
         variant="outline"
         size="icon"
         title="Redo (Ctrl+Y)"
+        className="size-7"
       >
-        <Redo className="h-4 w-4" />
+        <Redo className="size-4" />
+      </Button>
+      <Button
+        onClick={handleBold}
+        variant="outline"
+        size="icon"
+        title="Bold (Ctrl+B)"
+        className="size-7"
+      >
+        <Bold className="size-4" />
+      </Button>
+      <Button
+        onClick={handleItalic}
+        variant="outline"
+        size="icon"
+        title="Italic (Ctrl+I)"
+        className="size-7"
+      >
+        <Italic className="size-4" />
+      </Button>
+      <Button
+        onClick={handleCode}
+        variant="outline"
+        size="icon"
+        title="Code (Ctrl+Shift+C)"
+        className="size-7"
+      >
+        <Code className="size-4" />
+      </Button>
+      <Button
+        onClick={handleLink}
+        variant="outline"
+        size="icon"
+        title="Link"
+        className="size-7"
+      >
+        <Link className="size-4" />
       </Button>
     </div>
   )
@@ -129,10 +129,12 @@ export function DocumentEditor({
   content,
   onChange,
   className,
+  showToolbar = true,
 }: {
   content: string
   onChange?: (markdown: string) => void
   className?: string
+  showToolbar?: boolean
 }) {
   const editorRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
@@ -182,9 +184,9 @@ export function DocumentEditor({
   }, [])
 
   return (
-    <div className={cn('custom-markdown h-full', className)}>
-      <Toolbar view={viewRef.current} />
-      <div ref={editorRef} className="p-4" />
+    <div className={cn('custom-markdown flex h-full flex-col gap-3', className)}>
+      {showToolbar && <Toolbar view={viewRef.current} />}
+      <div ref={editorRef} className="min-h-0 flex-1 overflow-auto" />
     </div>
   )
 }
