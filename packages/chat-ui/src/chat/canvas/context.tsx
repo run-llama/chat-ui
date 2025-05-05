@@ -160,11 +160,11 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
       ...messages,
       {
         role: 'user',
-        content: `Update content for ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
+        content: `Update content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
       },
       {
         role: 'assistant',
-        content: `Successfully updated content for ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
+        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
         annotations: [{ type: 'artifact', data: newArtifact }],
       },
     ] as (Message & { id: string })[]
