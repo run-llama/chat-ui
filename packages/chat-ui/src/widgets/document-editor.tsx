@@ -10,6 +10,8 @@ import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
+import { Button } from '../ui/button'
+import { Bold, Italic, Code, Link, Undo, Redo } from 'lucide-react'
 
 interface ToolbarProps {
   view: EditorView | null
@@ -65,54 +67,60 @@ const Toolbar: React.FC<ToolbarProps> = ({ view }) => {
 
   return (
     <div className="flex gap-2 border-b border-gray-200 bg-gray-100 p-2">
-      <button
+      <Button
         type="button"
         onClick={handleBold}
-        className="rounded border border-gray-300 bg-white px-3 py-1 hover:bg-gray-50"
+        variant="outline"
+        size="icon"
         title="Bold (Ctrl+B)"
       >
-        <strong>B</strong>
-      </button>
-      <button
+        <Bold className="h-4 w-4" />
+      </Button>
+      <Button
         type="button"
         onClick={handleItalic}
-        className="rounded border border-gray-300 bg-white px-3 py-1 hover:bg-gray-50"
+        variant="outline"
+        size="icon"
         title="Italic (Ctrl+I)"
       >
-        <em>I</em>
-      </button>
-      <button
+        <Italic className="h-4 w-4" />
+      </Button>
+      <Button
         type="button"
         onClick={handleCode}
-        className="rounded border border-gray-300 bg-white px-3 py-1 hover:bg-gray-50"
+        variant="outline"
+        size="icon"
         title="Code (Ctrl+Shift+C)"
       >
-        <code>⌗</code>
-      </button>
-      <button
+        <Code className="h-4 w-4" />
+      </Button>
+      <Button
         type="button"
         onClick={handleLink}
-        className="rounded border border-gray-300 bg-white px-3 py-1 hover:bg-gray-50"
+        variant="outline"
+        size="icon"
         title="Link"
       >
-        🔗
-      </button>
-      <button
+        <Link className="h-4 w-4" />
+      </Button>
+      <Button
         type="button"
         onClick={handleUndo}
-        className="rounded border border-gray-300 bg-white px-3 py-1 hover:bg-gray-50"
+        variant="outline"
+        size="icon"
         title="Undo (Ctrl+Z)"
       >
-        ↺
-      </button>
-      <button
+        <Undo className="h-4 w-4" />
+      </Button>
+      <Button
         type="button"
         onClick={handleRedo}
-        className="rounded border border-gray-300 bg-white px-3 py-1 hover:bg-gray-50"
+        variant="outline"
+        size="icon"
         title="Redo (Ctrl+Y)"
       >
-        ↻
-      </button>
+        <Redo className="h-4 w-4" />
+      </Button>
     </div>
   )
 }
