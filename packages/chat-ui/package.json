@@ -44,7 +44,7 @@
   "devDependencies": {
     "@llamaindex/eslint-config": "workspace:*",
     "@llamaindex/typescript-config": "workspace:*",
-    "@tailwindcss/postcss": "^4.0.7",
+    "@tailwindcss/postcss": "4.0.7",
     "@types/react": "^18.2.61",
     "postcss": "^8.4.35",
     "postcss-cli": "^11.0.0",
