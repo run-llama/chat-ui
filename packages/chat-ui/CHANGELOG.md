@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.4.3
+
+### Patch Changes
+
+- 892d792: fix: latest tailwindcss postcss caused absolute paths for fontface
+
 ## 0.4.2
 
 ### Patch Changes
