@@ -142,6 +142,35 @@ const initialMessages: Message[] = [
       },
     ],
   },
+  {
+    id: '5',
+    role: 'user',
+    content: 'Show me a system architecture diagram',
+  },
+  {
+    id: '6',
+    role: 'assistant',
+    content: [
+      'Here is a system architecture diagram showing how LlamaIndex ChatUI components interact:',
+      '',
+      '```mermaid',
+      'graph TD',
+      '  A[User] -->|Input| B[ChatInput]',
+      '  B -->|Process| C[ChatSection]',
+      '  C -->|Render| D[ChatMessages]',
+      '  D -->|Display| E[ChatMessage]',
+      '  E -->|Show| F[Content]',
+      '  F -->|Render| G[Markdown]',
+      '  F -->|Render| H[Images]',
+      '  F -->|Render| I[Documents]',
+      '  F -->|Render| J[Mermaid]',
+      '  style A fill:#f9f,stroke:#333,stroke-width:2px',
+      '  style B fill:#bbf,stroke:#333,stroke-width:2px',
+      '  style C fill:#dfd,stroke:#333,stroke-width:2px',
+      '```',
+      '',
+    ].join('\n'),
+  },
 ]
 
 export default function Page(): JSX.Element {

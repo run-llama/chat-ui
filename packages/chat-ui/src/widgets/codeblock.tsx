@@ -1,9 +1,10 @@
 import hljs from 'highlight.js'
-import { Check, Copy, Download } from 'lucide-react'
+import { Check, Copy, Download, FileDown } from 'lucide-react'
 import { FC, memo, useEffect, useRef } from 'react'
 import { Button } from '../ui/button'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
+import MermaidDiagram, { MermaidDiagramHandle } from './mermaid-diagram'
 
 interface Props {
   language: string
@@ -42,6 +43,7 @@ export const programmingLanguages: languageMap = {
   sql: '.sql',
   html: '.html',
   css: '.css',
+  mermaid: '.mmd',
   // add more file extensions here, make sure the key is same as language prop in CodeBlock.tsx component
 }
 
@@ -65,6 +67,7 @@ const CodeBlock: FC<Props> = memo(props => {
   } = props
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   const codeRef = useRef<HTMLElement>(null)
+  const mermaidRef = useRef<MermaidDiagramHandle>(null)
 
   useEffect(() => {
     if (codeRef.current && codeRef.current.dataset.highlighted !== 'yes') {
@@ -82,13 +85,32 @@ const CodeBlock: FC<Props> = memo(props => {
       true
     )}${fileExtension}`
     const fileName = window.prompt('Enter file name', suggestedFileName)
-
     if (!fileName) {
       // User pressed cancel on prompt.
       return
     }
-
     const blob = new Blob([value], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.download = fileName
+    link.href = url
+    link.style.display = 'none'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  // SVG download button for mermaid diagrams
+  const downloadMermaidSVG = () => {
+    if (typeof window === 'undefined' || !mermaidRef.current) return
+    const svg = mermaidRef.current.getSVG()
+    const blob = new Blob([svg], { type: 'image/svg+xml' })
+    const fileName = window.prompt(
+      'Enter SVG file name',
+      `diagram-${generateRandomString(3, true)}.svg`
+    )
+    if (!fileName) return
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.download = fileName
@@ -121,6 +143,18 @@ const CodeBlock: FC<Props> = memo(props => {
         >
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
+            {/* SVG download button for mermaid diagrams */}
+            {language === 'mermaid' && (
+              <Button
+                variant="ghost"
+                onClick={downloadMermaidSVG}
+                size="icon"
+                className="size-8"
+              >
+                <FileDown className="size-4" />
+                <span className="sr-only">Download SVG</span>
+              </Button>
+            )}
             <Button
               variant="ghost"
               onClick={downloadAsFile}
@@ -146,17 +180,21 @@ const CodeBlock: FC<Props> = memo(props => {
           </div>
         </div>
       )}
-      <pre>
-        <code
-          ref={codeRef}
-          className={cn(
-            `language-${language} rounded-lg border border-none font-mono`,
-            codeClassName
-          )}
-        >
-          {value}
-        </code>
-      </pre>
+      {language === 'mermaid' ? (
+        <MermaidDiagram ref={mermaidRef} code={value} />
+      ) : (
+        <pre>
+          <code
+            ref={codeRef}
+            className={cn(
+              `language-${language} rounded-lg border border-none font-mono`,
+              codeClassName
+            )}
+          >
+            {value}
+          </code>
+        </pre>
+      )}
     </div>
   )
 })
