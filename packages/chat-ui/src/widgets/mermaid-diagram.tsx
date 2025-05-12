@@ -62,8 +62,12 @@ const MermaidDiagram = forwardRef<MermaidDiagramHandle, MermaidDiagramProps>(
       >
         {error && (
           <div
-            style={{ color: 'red', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}
-            className="p-2 text-xs bg-red-50 border border-red-200 rounded"
+            style={{
+              color: 'red',
+              fontFamily: 'monospace',
+              whiteSpace: 'pre-wrap',
+            }}
+            className="rounded border border-red-200 bg-red-50 p-2 text-xs"
           >
             Mermaid render error: {error}
           </div>
