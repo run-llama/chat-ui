@@ -12,6 +12,7 @@ import {
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
+import MermaidDiagram from './mermaid-diagram'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -113,6 +114,8 @@ export function Markdown({
             }
 
             const match = /language-(\w+)/.exec(className || '')
+            const language = (match && match[1]) || ''
+            const codeValue = String(children).replace(/\n$/, '')
 
             if (inline) {
               return (
@@ -122,11 +125,15 @@ export function Markdown({
               )
             }
 
+            if (language === 'mermaid') {
+              return <MermaidDiagram code={codeValue} className="mb-2" />
+            }
+
             return (
               <CodeBlock
                 key={Math.random()}
-                language={(match && match[1]) || ''}
-                value={String(children).replace(/\n$/, '')}
+                language={language}
+                value={codeValue}
                 className="mb-2"
                 {...props}
               />
