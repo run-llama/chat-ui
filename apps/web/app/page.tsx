@@ -58,6 +58,12 @@ export default function Page(): JSX.Element {
             >
               Chat with Canvas
             </Link>
+            <Link
+              href="/demo/mermaid"
+              className="rounded-full bg-gradient-to-r from-[#ff6b6b] to-[#4ecdc4] px-6 py-2 font-medium text-white transition hover:opacity-90"
+            >
+              Mermaid Diagram Demo
+            </Link>
           </div>
         </div>
 
