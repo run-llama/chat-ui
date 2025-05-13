@@ -1,8 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '../ui/button'
 import { Check, Copy, Download, FileDown } from 'lucide-react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
@@ -135,7 +131,11 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
         </div>
       </div>
       {/* Diagram or error */}
-      <div ref={containerRef} className="flex justify-center p-4" style={{ minHeight: '2.5rem' }}>
+      <div
+        ref={containerRef}
+        className="flex justify-center p-4"
+        style={{ minHeight: '2.5rem' }}
+      >
         {error && (
           <div
             style={{
@@ -149,7 +149,6 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
           </div>
         )}
       </div>
-      
     </div>
   )
 }
