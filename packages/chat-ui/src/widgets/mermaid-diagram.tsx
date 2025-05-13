@@ -9,11 +9,16 @@ interface MermaidDiagramProps {
   className?: string
 }
 
+interface MermaidLib {
+  initialize: (config: any) => void
+  render: (id: string, code: string) => Promise<{ svg: string }>
+}
+
 const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<string>('')
   const [error, setError] = useState<string | null>(null)
-  const [mermaidLib, setMermaidLib] = useState<any | null>(null)
+  const [mermaidLib, setMermaidLib] = useState<MermaidLib | null>(null)
   const [mermaidError, setMermaidError] = useState<string | null>(null)
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
 
@@ -103,7 +108,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
 
   if (mermaidError) {
     return (
-      <div className="p-2 text-xs bg-red-50 border border-red-200 rounded text-red-700">
+      <div className="rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
         {mermaidError}
       </div>
     )
@@ -154,7 +159,11 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
         </div>
       </div>
       {/* Diagram or error */}
-      <div ref={containerRef} className="flex justify-center p-4" style={{ minHeight: '2.5rem' }}>
+      <div
+        ref={containerRef}
+        className="flex justify-center p-4"
+        style={{ minHeight: '2.5rem' }}
+      >
         {error && (
           <div
             style={{
