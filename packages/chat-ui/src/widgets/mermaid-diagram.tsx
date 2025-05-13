@@ -3,7 +3,6 @@ import { Button } from '../ui/button'
 import { Check, Copy, Download, FileDown } from 'lucide-react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
-import mermaid from 'mermaid'
 
 interface MermaidDiagramProps {
   code: string
@@ -14,11 +13,27 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<string>('')
   const [error, setError] = useState<string | null>(null)
+  const [mermaidLib, setMermaidLib] = useState<any | null>(null)
+  const [mermaidError, setMermaidError] = useState<string | null>(null)
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
 
   useEffect(() => {
+    setMermaidError(null)
+    import('mermaid')
+      .then(mod => {
+        setMermaidLib(mod.default || mod)
+      })
+      .catch(() => {
+        setMermaidError(
+          'Mermaid library is not installed. Please add it to your project: pnpm add mermaid'
+        )
+      })
+  }, [])
+
+  useEffect(() => {
+    if (!mermaidLib) return
     setError(null)
-    mermaid.initialize({
+    mermaidLib.initialize({
       startOnLoad: true,
       theme: 'default',
       securityLevel: 'strict',
@@ -26,9 +41,9 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
     })
     if (containerRef.current) {
       containerRef.current.innerHTML = ''
-      mermaid
+      mermaidLib
         .render(`mermaid-${Math.random().toString(36).substring(7)}`, code)
-        .then(({ svg }) => {
+        .then(({ svg }: { svg: string }) => {
           if (containerRef.current) {
             containerRef.current.innerHTML = svg
             svgRef.current = svg
@@ -38,7 +53,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
           setError(err.message || 'Failed to render Mermaid diagram.')
         })
     }
-  }, [code])
+  }, [code, mermaidLib])
 
   // Download SVG
   const downloadMermaidSVG = () => {
@@ -86,6 +101,14 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
     copyToClipboard(code)
   }
 
+  if (mermaidError) {
+    return (
+      <div className="p-2 text-xs bg-red-50 border border-red-200 rounded text-red-700">
+        {mermaidError}
+      </div>
+    )
+  }
+
   return (
     <div
       className={cn(
@@ -131,11 +154,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
         </div>
       </div>
       {/* Diagram or error */}
-      <div
-        ref={containerRef}
-        className="flex justify-center p-4"
-        style={{ minHeight: '2.5rem' }}
-      >
+      <div ref={containerRef} className="flex justify-center p-4" style={{ minHeight: '2.5rem' }}>
         {error && (
           <div
             style={{
