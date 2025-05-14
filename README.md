@@ -192,6 +192,7 @@ The `code.css` file uses the `atom-one-dark` theme from highlight.js by default.
 You can use any of them by copying [their CSS](https://github.com/highlightjs/highlight.js/tree/main/src/styles/) to your project and importing it.
 
 ## Mermaid support
+
 When the LLM generates mermaid markdown, the chat ui can optionally render the SVG of the mermaid graph. This requires the project to add the mermaid library (`pnpm add mermaid`)
 
 ## Example
