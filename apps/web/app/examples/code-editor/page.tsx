@@ -1,7 +1,14 @@
 'use client'
 
 import { CodeEditor } from '@llamaindex/chat-ui/widgets'
-import { cssCode, htmlCode, javascriptCode, pythonCode, tsxCode } from './data'
+import {
+  cssCode,
+  htmlCode,
+  javascriptCode,
+  pythonCode,
+  tsxCode,
+  unsupportedCode,
+} from './data'
 
 export default function Page() {
   return (
@@ -44,6 +51,14 @@ export default function Page() {
           className="h-screen overflow-auto"
           code={cssCode}
           language="css"
+        />
+      </div>
+      <div className="w-1/2 space-y-10 overflow-hidden">
+        <h2 className="text-2xl font-bold">Unsupported Language</h2>
+        <CodeEditor
+          className="h-screen overflow-auto"
+          code={unsupportedCode}
+          language={'java' as any} // should show warning in console and fallback to javascript editor
         />
       </div>
     </div>

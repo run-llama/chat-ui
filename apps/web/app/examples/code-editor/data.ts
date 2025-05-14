@@ -306,3 +306,30 @@ footer {
   margin-top: 40px;
 }
 `
+
+export const unsupportedCode = `
+public class HelloWorld {
+    public static void main(String[] args) {
+        // Print a greeting message
+        System.out.println("Hello, world!");
+        
+        // Demonstrate some long operations
+        long number1 = 1234567890L;
+        long number2 = 9876543210L;
+        
+        // Perform calculations
+        long sum = number1 + number2;
+        long product = number1 * number2;
+        
+        // Print results
+        System.out.println("First number: " + number1);
+        System.out.println("Second number: " + number2);
+        System.out.println("Sum: " + sum);
+        System.out.println("Product: " + product);
+        
+        // Demonstrate max and min values
+        System.out.println("Maximum value of long: " + Long.MAX_VALUE);
+        System.out.println("Minimum value of long: " + Long.MIN_VALUE);
+    }
+}
+`
