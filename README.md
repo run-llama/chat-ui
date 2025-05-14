@@ -191,6 +191,9 @@ import '@llamaindex/chat-ui/styles/pdf.css' // pdf styling
 The `code.css` file uses the `atom-one-dark` theme from highlight.js by default. There are a lot of others to choose from: https://highlightjs.org/demo
 You can use any of them by copying [their CSS](https://github.com/highlightjs/highlight.js/tree/main/src/styles/) to your project and importing it.
 
+## Mermaid support
+When the LLM generates mermaid markdown, the chat ui can optionally render the SVG of the mermaid graph. This requires the project to add the mermaid library (`pnpm add mermaid`)
+
 ## Example
 
 See the [example app](https://github.com/run-llama/chat-ui/blob/main/apps/web/README.md) for a complete example. The generate a full-featured project to

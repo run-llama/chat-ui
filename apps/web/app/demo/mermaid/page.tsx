@@ -14,6 +14,9 @@ const code = `
 import { ChatSection, ChatInput, ChatMessage, ChatMessages, useChatUI } from '@llamaindex/chat-ui'
 import {  useChat } from 'ai/react'
 
+// This demo requires mermaid to be installed in your project:
+// pnpm add mermaid
+
 function MermaidChat() {
   const handler = useChat()
   return (
