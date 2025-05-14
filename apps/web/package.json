@@ -24,7 +24,8 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "ai": "4.0.0",
-    "llamaindex": "0.9.3"
+    "llamaindex": "0.9.3",
+    "mermaid": "^11.6.0"
   },
   "devDependencies": {
     "@llamaindex/eslint-config": "workspace:*",
