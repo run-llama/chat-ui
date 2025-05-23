@@ -98,7 +98,7 @@ export function SourceAnnotations() {
 }
 
 export function SuggestedQuestionsAnnotations() {
-  const { append } = useChatUI()
+  const { append, requestData } = useChatUI()
   const { message, isLast } = useChatMessage()
   if (!isLast || !append) return null
 
@@ -112,7 +112,11 @@ export function SuggestedQuestionsAnnotations() {
       : null
   if (!suggestedQuestionsData?.[0]) return null
   return (
-    <SuggestedQuestions questions={suggestedQuestionsData[0]} append={append} />
+    <SuggestedQuestions
+      questions={suggestedQuestionsData[0]}
+      append={append}
+      requestData={requestData}
+    />
   )
 }
 
