@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.4.6
+
+### Patch Changes
+
+- ef66c13: fix: use multiple sources per message
+
 ## 0.4.5
 
 ### Patch Changes
