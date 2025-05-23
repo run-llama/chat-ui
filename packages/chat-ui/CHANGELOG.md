@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.4.5
+
+### Patch Changes
+
+- 2332fa6: fix: send request data when submit suggested questions
+
 ## 0.4.4
 
 ### Patch Changes
