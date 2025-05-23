@@ -98,8 +98,6 @@ export type MessageAnnotation = {
   data: AnnotationData
 }
 
-const NODE_SCORE_THRESHOLD = 0.25
-
 /**
  * Gets custom message annotations that don't match any standard MessageAnnotationType
  * @param annotations - Array of message annotations to filter
@@ -159,16 +157,13 @@ export function getSourceAnnotationData(
 
 function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
   // Filter source nodes has lower score
-  const processedNodes = nodes
-    .filter(node => (node.score ?? 1) > NODE_SCORE_THRESHOLD)
-    .sort((a, b) => (b.score ?? 1) - (a.score ?? 1))
-    .map(node => {
-      // remove trailing slash for node url if exists
-      if (node.url) {
-        node.url = node.url.replace(/\/$/, '')
-      }
-      return node
-    })
+  const processedNodes = nodes.map(node => {
+    // remove trailing slash for node url if exists
+    if (node.url) {
+      node.url = node.url.replace(/\/$/, '')
+    }
+    return node
+  })
   return processedNodes
 }
 

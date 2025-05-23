@@ -1,5 +1,5 @@
 import { Bot, Check, Copy, RefreshCw } from 'lucide-react'
-import { ComponentType, memo } from 'react'
+import { ComponentType, memo, useMemo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
@@ -135,12 +135,15 @@ function ChatMarkdown(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
   const annotations = message.annotations as MessageAnnotation[] | undefined
 
+  const allNodes = useMemo(() => {
+    const sourceData = getSourceAnnotationData(annotations ?? [])
+    return sourceData.flatMap(item => item.nodes)
+  }, [annotations])
+
   return (
     <Markdown
       content={message.content}
-      sources={
-        annotations ? getSourceAnnotationData(annotations)[0] : undefined
-      }
+      sources={{ nodes: allNodes }}
       citationComponent={props.citationComponent}
       className={cn(
         {
