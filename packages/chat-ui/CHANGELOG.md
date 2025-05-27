@@ -1,5 +1,23 @@
 # @llamaindex/chat-ui
 
+## 0.4.6
+
+### Patch Changes
+
+- ef66c13: fix: use multiple sources per message
+
+## 0.4.5
+
+### Patch Changes
+
+- 2332fa6: fix: send request data when submit suggested questions
+
+## 0.4.4
+
+### Patch Changes
+
+- 623a855: fix: using language props to add editor extensions
+
 ## 0.4.3
 
 ### Patch Changes

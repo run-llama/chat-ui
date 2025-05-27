@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../../../ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/tabs'
-import { CodeEditor } from '../../../widgets'
+import { CodeEditor, fileExtensionToEditorLang } from '../../../widgets'
 import { CodeArtifact } from '../../annotation'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
@@ -35,6 +35,10 @@ export function CodeArtifactViewer({
     updateArtifact(codeArtifact, updatedCode)
   }
 
+  const codeEditorLanguage = fileExtensionToEditorLang(
+    codeArtifact.data.file_name.split('.').pop() ?? ''
+  )
+
   return (
     <Tabs
       defaultValue="code"
@@ -58,6 +62,7 @@ export function CodeArtifactViewer({
           <CodeEditor
             code={updatedCode ?? codeArtifact.data.code}
             onChange={handleCodeChange}
+            language={codeEditorLanguage}
           />
           {updatedCode && (
             <div className="bg-background absolute right-0 top-0 flex gap-2 pr-2 text-sm">
