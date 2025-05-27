@@ -9,6 +9,7 @@ import {
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
 import { Code } from '@/components/code'
+import MermaidDiagram from './mermaid-diagram'
 
 const code = `
 import { ChatSection, ChatInput, ChatMessage, ChatMessages, useChatUI } from '@llamaindex/chat-ui'
@@ -117,7 +118,11 @@ function MermaidChatMessages() {
             className="items-start"
           >
             <ChatMessage.Avatar />
-            <ChatMessage.Content isLoading={isLoading} append={append} />
+            <ChatMessage.Content isLoading={isLoading} append={append}>
+              <ChatMessage.Content.Markdown
+                languageRenderers={{ mermaid: MermaidDiagram }}
+              />
+            </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>
         ))}

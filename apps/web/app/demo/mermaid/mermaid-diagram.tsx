@@ -1,52 +1,40 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import { Check, Copy, Download, FileDown } from 'lucide-react'
-import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
-import { cn } from '../lib/utils'
+import { useCopyToClipboard } from '@/app/use-copy-to-clipboard'
+import { cn } from '@/lib/utils'
+import mermaid from 'mermaid'
+import { LanguageRendererProps } from '@llamaindex/chat-ui/widgets'
 
-interface MermaidDiagramProps {
-  code: string
-  className?: string
-}
+// Using the shared LanguageRendererProps interface
 
-interface MermaidLib {
-  initialize: (config: any) => void
-  render: (id: string, code: string) => Promise<{ svg: string }>
-}
-
-const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
+const MermaidDiagram: React.FC<LanguageRendererProps> = ({
+  code,
+  className,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<string>('')
   const [error, setError] = useState<string | null>(null)
-  const [mermaidLib, setMermaidLib] = useState<MermaidLib | null>(null)
-  const [mermaidError, setMermaidError] = useState<string | null>(null)
+  const [isInitialized, setIsInitialized] = useState<boolean>(false)
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
 
   useEffect(() => {
-    setMermaidError(null)
-    import('mermaid')
-      .then(mod => {
-        setMermaidLib(mod.default || mod)
-      })
-      .catch(() => {
-        setMermaidError(
-          'Mermaid library is not installed. Please add it to your project: pnpm add mermaid'
-        )
-      })
-  }, [])
-
-  useEffect(() => {
-    if (!mermaidLib) return
-    setError(null)
-    mermaidLib.initialize({
+    mermaid.initialize({
       startOnLoad: true,
       theme: 'default',
       securityLevel: 'strict',
       suppressErrorRendering: true,
     })
+    setIsInitialized(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isInitialized) return
+    setError(null)
+
     if (containerRef.current) {
       containerRef.current.innerHTML = ''
-      mermaidLib
+      mermaid
         .render(`mermaid-${Math.random().toString(36).substring(7)}`, code)
         .then(({ svg }: { svg: string }) => {
           if (containerRef.current) {
@@ -58,7 +46,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
           setError(err.message || 'Failed to render Mermaid diagram.')
         })
     }
-  }, [code, mermaidLib])
+  }, [code, isInitialized])
 
   // Download SVG
   const downloadMermaidSVG = () => {
@@ -104,14 +92,6 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, className }) => {
   const onCopy = () => {
     if (isCopied) return
     copyToClipboard(code)
-  }
-
-  if (mermaidError) {
-    return (
-      <div className="rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
-        {mermaidError}
-      </div>
-    )
   }
 
   return (

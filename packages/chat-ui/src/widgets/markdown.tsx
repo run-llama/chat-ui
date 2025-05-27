@@ -12,7 +12,6 @@ import {
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
-import MermaidDiagram from './mermaid-diagram'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -74,18 +73,25 @@ const preprocessContent = (content: string) => {
   return preprocessCitations(preprocessLaTeX(preprocessMedia(content)))
 }
 
+export interface LanguageRendererProps {
+  code: string
+  className?: string
+}
+
 export function Markdown({
   content,
   sources,
   backend,
   citationComponent: CitationComponent,
   className: customClassName,
+  languageRenderers,
 }: {
   content: string
   sources?: SourceData
   backend?: string
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
+  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
 }) {
   const processedContent = preprocessContent(content)
 
@@ -125,8 +131,10 @@ export function Markdown({
               )
             }
 
-            if (language === 'mermaid') {
-              return <MermaidDiagram code={codeValue} className="mb-2" />
+            // Check for custom language renderer
+            if (languageRenderers?.[language]) {
+              const CustomRenderer = languageRenderers[language]
+              return <CustomRenderer code={codeValue} className="mb-2" />
             }
 
             return (
