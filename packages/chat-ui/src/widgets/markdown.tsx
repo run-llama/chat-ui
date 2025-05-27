@@ -73,18 +73,25 @@ const preprocessContent = (content: string) => {
   return preprocessCitations(preprocessLaTeX(preprocessMedia(content)))
 }
 
+export interface LanguageRendererProps {
+  code: string
+  className?: string
+}
+
 export function Markdown({
   content,
   sources,
   backend,
   citationComponent: CitationComponent,
   className: customClassName,
+  languageRenderers,
 }: {
   content: string
   sources?: SourceData
   backend?: string
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
+  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
 }) {
   const processedContent = preprocessContent(content)
 
@@ -113,6 +120,8 @@ export function Markdown({
             }
 
             const match = /language-(\w+)/.exec(className || '')
+            const language = (match && match[1]) || ''
+            const codeValue = String(children).replace(/\n$/, '')
 
             if (inline) {
               return (
@@ -122,11 +131,17 @@ export function Markdown({
               )
             }
 
+            // Check for custom language renderer
+            if (languageRenderers?.[language]) {
+              const CustomRenderer = languageRenderers[language]
+              return <CustomRenderer code={codeValue} className="mb-2" />
+            }
+
             return (
               <CodeBlock
                 key={Math.random()}
-                language={(match && match[1]) || ''}
-                value={String(children).replace(/\n$/, '')}
+                language={language}
+                value={codeValue}
                 className="mb-2"
                 {...props}
               />

@@ -103,6 +103,11 @@ export default function Page(): JSX.Element {
                   label: 'Chat with Canvas',
                   gradient: 'from-orange-500 to-red-500',
                 },
+                {
+                  href: '/demo/mermaid',
+                  label: 'Mermaid Diagram',
+                  gradient: 'from-green-500 to-blue-500',
+                },
               ].map((demo, index) => (
                 <Link
                   key={demo.href}

@@ -3,7 +3,11 @@ import { ComponentType, memo, useMemo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
-import { CitationComponentProps, Markdown } from '../widgets/index.js'
+import {
+  CitationComponentProps,
+  Markdown,
+  LanguageRendererProps,
+} from '../widgets/index.js'
 import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
@@ -64,6 +68,7 @@ interface ChatMessageActionsProps extends React.PropsWithChildren {
 interface ChatMarkdownProps extends React.PropsWithChildren {
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
+  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
 }
 
 function ChatMessage(props: ChatMessageProps) {
@@ -145,6 +150,7 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       content={message.content}
       sources={{ nodes: allNodes }}
       citationComponent={props.citationComponent}
+      languageRenderers={props.languageRenderers}
       className={cn(
         {
           'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
