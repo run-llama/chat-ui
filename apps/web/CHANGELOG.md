@@ -1,5 +1,13 @@
 # web
 
+## 1.0.27
+
+### Patch Changes
+
+- 180cc1f: Add language specific renderer to markdown (with mermaid example)
+- Updated dependencies [180cc1f]
+  - @llamaindex/chat-ui@0.4.7
+
 ## 1.0.26
 
 ### Patch Changes
