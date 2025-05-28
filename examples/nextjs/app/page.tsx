@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  ChatCanvas,
   ChatInput,
   ChatMessage,
   ChatMessages,
@@ -20,7 +21,7 @@ const initialMessages: Message[] = [
 export default function Page(): JSX.Element {
   return (
     <div className="flex h-screen flex-col">
-      <header className="border-b p-4">
+      <header className="w-full border-b p-4 text-center">
         <h1 className="text-2xl font-bold">
           LlamaIndex Chat UI - Next.js Example
         </h1>
@@ -28,7 +29,7 @@ export default function Page(): JSX.Element {
           A simple chat interface using @llamaindex/chat-ui
         </p>
       </header>
-      <div className="flex-1">
+      <div className="min-h-0 flex-1">
         <ChatExample />
       </div>
     </div>
@@ -42,20 +43,26 @@ function ChatExample() {
   })
 
   return (
-    <ChatSection handler={handler} className="h-full overflow-hidden">
-      <ChatMessages>
-        <ChatMessages.List className="px-4 py-6">
-          <CustomChatMessages />
-        </ChatMessages.List>
-      </ChatMessages>
-      <div className="border-t p-4">
-        <ChatInput>
-          <ChatInput.Form>
-            <ChatInput.Field placeholder="Type your message..." />
-            <ChatInput.Submit />
-          </ChatInput.Form>
-        </ChatInput>
+    <ChatSection
+      handler={handler}
+      className="block h-full flex-row gap-4 p-0 md:flex md:p-5"
+    >
+      <div className="md:max-w-1/2 mx-auto flex h-full min-w-0 max-w-full flex-1 flex-col gap-4">
+        <ChatMessages>
+          <ChatMessages.List className="px-4 py-6">
+            <CustomChatMessages />
+          </ChatMessages.List>
+        </ChatMessages>
+        <div className="border-t p-4">
+          <ChatInput>
+            <ChatInput.Form>
+              <ChatInput.Field placeholder="Type your message..." />
+              <ChatInput.Submit />
+            </ChatInput.Form>
+          </ChatInput>
+        </div>
       </div>
+      <ChatCanvas className="w-full md:w-2/3" />
     </ChatSection>
   )
 }
@@ -78,13 +85,13 @@ function CustomChatMessages() {
             </div>
           </ChatMessage.Avatar>
           <ChatMessage.Content isLoading={isLoading} append={append}>
-            <ChatMessage.Content.Event />
-            <ChatMessage.Content.AgentEvent />
+            <ChatMessage.Content.Markdown />
             <ChatMessage.Content.Image />
             <ChatMessage.Content.Artifact />
-            <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.DocumentFile />
             <ChatMessage.Content.Source />
+            <ChatMessage.Content.Event />
+            <ChatMessage.Content.AgentEvent />
+            <ChatMessage.Content.DocumentFile />
             <ChatMessage.Content.SuggestedQuestions />
           </ChatMessage.Content>
           <ChatMessage.Actions />

@@ -1,4 +1,9 @@
-import { ImageData, SourceData } from '@llamaindex/chat-ui'
+import {
+  Artifact,
+  CodeArtifact,
+  ImageData,
+  SourceData,
+} from '@llamaindex/chat-ui'
 import { Message } from 'ai'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -59,12 +64,12 @@ const fakeChatStream = (query: string): ReadableStream => {
   `
 
   const annotations = [
-    {
-      type: 'image',
-      data: {
-        url: '/llama.png',
-      },
-    },
+    // {
+    //   type: 'image',
+    //   data: {
+    //     url: '/llama.png',
+    //   },
+    // },
     {
       type: 'sources',
       data: {
@@ -73,6 +78,17 @@ const fakeChatStream = (query: string): ReadableStream => {
           { id: '2', url: '/sample.pdf' },
         ],
       } as SourceData,
+    },
+    {
+      type: 'artifact',
+      data: {
+        type: 'code',
+        data: {
+          file_name: 'sample.ts',
+          language: 'typescript',
+          code: 'function greetUser(name: string) {\n  console.log("Hello " + name + "!");\n  const message = "Welcome to LlamaIndex Chat UI";\n  console.log(message);\n}',
+        },
+      } as CodeArtifact,
     },
   ]
 
