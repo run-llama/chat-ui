@@ -173,7 +173,7 @@ function AgentEventDialog(props: AgentEventDialogProps) {
   return (
     <Drawer direction="left">
       <DrawerTrigger asChild>{props.children}</DrawerTrigger>
-      <DrawerContent className="mt-24 h-full max-h-[96%] w-3/5 ">
+      <DrawerContent className="mt-24 h-full max-h-[96%] w-3/5">
         <DrawerHeader className="flex justify-between">
           <div className="space-y-2">
             <DrawerTitle>{props.title}</DrawerTitle>

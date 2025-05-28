@@ -1,0 +1,33 @@
+{
+  "name": "nextjs-chat-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@llamaindex/chat-ui": "workspace:*",
+    "@llamaindex/openai": "^0.4.2",
+    "ai": "^4.3.16",
+    "llamaindex": "^0.11.3",
+    "next": "^15.3.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@llamaindex/eslint-config": "workspace:*",
+    "@llamaindex/typescript-config": "workspace:*",
+    "@next/eslint-plugin-next": "^14.2.3",
+    "@tailwindcss/postcss": "^4.0.7",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^4.0.7",
+    "typescript": "^5.3.3"
+  }
+}
