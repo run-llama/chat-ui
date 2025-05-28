@@ -1,43 +1,46 @@
-import { Message, LlamaIndexAdapter, StreamData } from 'ai'
-import { ChatMessage, Settings, SimpleChatEngine } from 'llamaindex'
-import { OpenAI, OpenAIEmbedding } from '@llamaindex/openai'
+import { Message } from 'ai'
+import { faker } from '@faker-js/faker'
 import { NextResponse, type NextRequest } from 'next/server'
-
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
-
-Settings.llm = new OpenAI({ model: 'gpt-4o-mini' })
-Settings.embedModel = new OpenAIEmbedding({
-  model: 'text-embedding-3-large',
-  dimensions: 1024,
-})
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { messages: Message[] }
-    const messages = body.messages
+    const { messages } = (await request.json()) as { messages: Message[] }
     const lastMessage = messages[messages.length - 1]
 
-    const vercelStreamData = new StreamData()
+    const stream = fakeChatStream(lastMessage.content)
 
-    const chatEngine = new SimpleChatEngine()
-
-    const response = await chatEngine.chat({
-      message: lastMessage.content,
-      chatHistory: messages as ChatMessage[],
-      stream: true,
-    })
-
-    return LlamaIndexAdapter.toDataStreamResponse(response, {
-      data: vercelStreamData,
-      callbacks: {
-        onCompletion: async () => {
-          await vercelStreamData.close()
-        },
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain',
+        Connection: 'keep-alive',
       },
     })
   } catch (error) {
     const detail = (error as Error).message
     return NextResponse.json({ detail }, { status: 500 })
   }
+}
+
+const TOKEN_DELAY = 30 // 30ms delay between tokens
+
+const fakeChatStream = (query: string): ReadableStream => {
+  const markdown = `
+  Hello, this is the same response for your query: "${query}"
+  #### Markdown Response
+  ${faker.lorem.paragraphs({ min: 1, max: 3 })}
+  `
+  const markdownTokens = markdown.split(' ')
+
+  const encoder = new TextEncoder()
+
+  return new ReadableStream({
+    async start(controller) {
+      for (const token of markdownTokens) {
+        await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
+        controller.enqueue(encoder.encode(`0:${JSON.stringify(token + ' ')}\n`))
+      }
+
+      controller.close()
+    },
+  })
 }
