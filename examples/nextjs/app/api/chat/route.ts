@@ -21,10 +21,9 @@ const TEXT_PREFIX = '0:' // vercel ai text prefix
 const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
 
 const SAMPLE_TEXT = `
-Welcome to the demo of @llamaindex/chat-ui Components
-Let me show you the different types of components that can be triggered from the server
+Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server
 
-## Example Sources
+### Example Sources
 
 \`\`\`js
 {
@@ -38,7 +37,7 @@ Let me show you the different types of components that can be triggered from the
 }
 \`\`\`
 
-## Example Artifacts 
+### Example Artifacts 
 
 \`\`\`js
 {
@@ -72,7 +71,7 @@ const SAMPLE_ANNOTATIONS = [
       data: {
         file_name: 'sample.ts',
         language: 'typescript',
-        code: 'function greetUser(name: string) {\n  console.log("Hello " + name + "!");\n  const message = "Welcome to LlamaIndex Chat UI";\n  console.log(message);\n}',
+        code: 'console.log("Hello, world!");',
       },
     },
   },
