@@ -1,3 +1,4 @@
+import { ImageData, SourceData } from '@llamaindex/chat-ui'
 import { Message } from 'ai'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -21,6 +22,8 @@ export async function POST(request: NextRequest) {
 }
 
 const TOKEN_DELAY = 30 // 30ms delay between tokens
+const TEXT_PREFIX = '0:' // vercel ai text prefix
+const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
 
 const fakeChatStream = (query: string): ReadableStream => {
   const markdown = `
@@ -54,15 +57,47 @@ const fakeChatStream = (query: string): ReadableStream => {
   | Row 1 Cell 1  | Row 1 Cell 2  |
   | Row 2 Cell 1  | Row 2 Cell 2  |
   `
-  const markdownTokens = markdown.split(' ')
 
-  const encoder = new TextEncoder()
+  const annotations = [
+    {
+      type: 'image',
+      data: {
+        url: '/llama.png',
+      },
+    },
+    {
+      type: 'sources',
+      data: {
+        nodes: [
+          { id: '1', url: '/sample.pdf' },
+          { id: '2', url: '/sample.pdf' },
+        ],
+      } as SourceData,
+    },
+  ]
 
   return new ReadableStream({
     async start(controller) {
-      for (const token of markdownTokens) {
-        await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
-        controller.enqueue(encoder.encode(`0:${JSON.stringify(token + ' ')}\n`))
+      const encoder = new TextEncoder()
+
+      // utils function to append sample text to the stream
+      const appendText = async (text: string) => {
+        for (const token of text.split(' ')) {
+          await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
+          controller.enqueue(
+            encoder.encode(`${TEXT_PREFIX}${JSON.stringify(token + ' ')}\n`)
+          )
+        }
+      }
+
+      await appendText(
+        "Welcome to @llamaindex/chat-ui. Here's the demo of how to the different components are triggered from the server"
+      )
+
+      for (const item of annotations) {
+        controller.enqueue(
+          encoder.encode(`${ANNOTATION_PREFIX}${JSON.stringify([item])}\n`)
+        )
       }
 
       controller.close()
