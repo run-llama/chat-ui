@@ -2,7 +2,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const stream = fakeChatStream()
+    const { messages } = await request.json()
+    const lastMessage = messages[messages.length - 1]
+
+    const stream = fakeChatStream(`User query: "${lastMessage.content}".\n`)
 
     return new Response(stream, {
       headers: {
@@ -21,7 +24,7 @@ const TEXT_PREFIX = '0:' // vercel ai text prefix
 const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
 
 const SAMPLE_TEXT = `
-Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server
+Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
 
 ### Example Sources
 
@@ -77,10 +80,13 @@ const SAMPLE_ANNOTATIONS = [
   },
 ]
 
-const fakeChatStream = (): ReadableStream => {
+const fakeChatStream = (query: string): ReadableStream => {
   return new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder()
+      controller.enqueue(
+        encoder.encode(`${TEXT_PREFIX}${JSON.stringify(query)}\n`)
+      )
 
       for (const token of SAMPLE_TEXT.split(' ')) {
         await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
