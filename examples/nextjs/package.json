@@ -10,7 +10,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@faker-js/faker": "^9.4.0",
     "@llamaindex/chat-ui": "workspace:*",
     "ai": "^4.3.16",
     "next": "^15.3.2",

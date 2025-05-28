@@ -111,9 +111,6 @@ importers:
 
   examples/nextjs:
     dependencies:
-      '@faker-js/faker':
-        specifier: ^9.4.0
-        version: 9.7.0
       '@llamaindex/chat-ui':
         specifier: workspace:*
         version: link:../../packages/chat-ui

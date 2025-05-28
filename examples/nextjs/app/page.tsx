@@ -78,7 +78,14 @@ function CustomChatMessages() {
             </div>
           </ChatMessage.Avatar>
           <ChatMessage.Content isLoading={isLoading} append={append}>
+            <ChatMessage.Content.Event />
+            <ChatMessage.Content.AgentEvent />
+            <ChatMessage.Content.Image />
+            <ChatMessage.Content.Artifact />
             <ChatMessage.Content.Markdown />
+            <ChatMessage.Content.DocumentFile />
+            <ChatMessage.Content.Source />
+            <ChatMessage.Content.SuggestedQuestions />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>
