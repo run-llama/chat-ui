@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 const TOKEN_DELAY = 30 // 30ms delay between tokens
 const TEXT_PREFIX = '0:' // vercel ai text prefix
 const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
+const INLINE_ANNOTATION_KEY = 'inline_annotation'
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,8 +37,6 @@ const c = a + b
 console.log(c)
 \`\`\`
 
-### Annotations
-
 `
 const SAMPLE_ANNOTATIONS = [
   {
@@ -62,26 +61,35 @@ const SAMPLE_ANNOTATIONS = [
 ]
 
 const INLINE_ITEMS = [
-  '\n**Generate ts hello world code** \n',
+  '\n ### Demo inline annotations \n',
+  'To set up the project, follow these steps: \n',
+  '1. Create a package.json file',
   {
     type: 'artifact',
     data: {
       type: 'code',
       data: {
-        file_name: 'sample.ts',
-        language: 'typescript',
-        code: 'console.log("Hello, world!");',
+        file_name: 'package.json',
+        language: 'json',
+        code: `
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "My project",
+  "main": "index.js"
+}
+        `,
       },
     },
   },
-  '\n**Change the text to "Hello, LlamaIndex!"** \n',
+  '2. Create a sample.js file',
   {
     type: 'artifact',
     data: {
       type: 'code',
       data: {
-        file_name: 'sample.ts',
-        language: 'typescript',
+        file_name: 'sample.js',
+        language: 'javascript',
         code: 'console.log("Hello, world!");',
       },
     },
@@ -126,7 +134,7 @@ const fakeChatStream = (query: string): ReadableStream => {
           )
         } else {
           // append inline annotation with 0: prefix
-          const annotationCode = `\`\`\`inline_annotation\n${JSON.stringify(item)}\n\`\`\``
+          const annotationCode = toInlineAnnotationCode(item)
           controller.enqueue(
             encoder.encode(`${TEXT_PREFIX}${JSON.stringify(annotationCode)}\n`)
           )
@@ -136,4 +144,8 @@ const fakeChatStream = (query: string): ReadableStream => {
       controller.close()
     },
   })
+}
+
+function toInlineAnnotationCode(item: any) {
+  return `\n\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(item)}\n\`\`\`\n`
 }
