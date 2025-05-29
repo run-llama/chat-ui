@@ -109,6 +109,55 @@ importers:
         specifier: ^5.3.3
         version: 5.8.3
 
+  examples/fastapi/frontend:
+    dependencies:
+      '@llamaindex/chat-ui':
+        specifier: workspace:*
+        version: link:../../../packages/chat-ui
+      ai:
+        specifier: ^4.3.16
+        version: 4.3.16(react@19.1.0)(zod@3.25.32)
+      next:
+        specifier: ^15.3.2
+        version: 15.3.2(react-dom@19.1.0)(react@19.1.0)
+      react:
+        specifier: ^19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@llamaindex/eslint-config':
+        specifier: workspace:*
+        version: link:../../../packages/config-eslint
+      '@llamaindex/typescript-config':
+        specifier: workspace:*
+        version: link:../../../packages/config-typescript
+      '@next/eslint-plugin-next':
+        specifier: ^14.2.3
+        version: 14.2.28
+      '@tailwindcss/postcss':
+        specifier: ^4.0.7
+        version: 4.0.7
+      '@types/node':
+        specifier: ^20.11.24
+        version: 20.17.46
+      '@types/react':
+        specifier: ^18.2.61
+        version: 18.3.21
+      '@types/react-dom':
+        specifier: ^18.2.19
+        version: 18.3.7(@types/react@18.3.21)
+      postcss:
+        specifier: ^8.4.35
+        version: 8.5.3
+      tailwindcss:
+        specifier: ^4.0.7
+        version: 4.1.6
+      typescript:
+        specifier: ^5.3.3
+        version: 5.8.3
+
   examples/nextjs:
     dependencies:
       '@llamaindex/chat-ui':
