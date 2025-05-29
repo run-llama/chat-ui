@@ -2,7 +2,7 @@ import { LanguageRendererProps } from '../widgets/index.js' // this import needs
 import { AnyAnnotation, Artifact } from './annotation'
 import { ArtifactCard } from './canvas/card.js'
 
-export const INLINE_ANNOTATION_KEY = 'inline_annotation'
+export const INLINE_ANNOTATION_KEY = 'inline_annotation' // the language key to detect inline annotation code in markdown
 
 // the default renderer for pre-defined chat-ui annotations
 export const InlineAnnotationRenderer: React.FC<LanguageRendererProps> = ({

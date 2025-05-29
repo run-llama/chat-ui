@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 const TOKEN_DELAY = 30 // 30ms delay between tokens
 const TEXT_PREFIX = '0:' // vercel ai text prefix
 const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
-const INLINE_ANNOTATION_KEY = 'inline_annotation'
+const INLINE_ANNOTATION_KEY = 'inline_annotation' // the language key to detect inline annotation code in markdown
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,14 +71,12 @@ const INLINE_ITEMS = [
       data: {
         file_name: 'package.json',
         language: 'json',
-        code: `
-{
+        code: `{
   "name": "my-project",
   "version": "1.0.0",
   "description": "My project",
   "main": "index.js"
-}
-        `,
+}`,
       },
     },
   },
@@ -104,15 +102,6 @@ const fakeChatStream = (query: string): ReadableStream => {
         encoder.encode(`${TEXT_PREFIX}${JSON.stringify(query)}\n`)
       )
 
-      // const appendText = async (text: string) => {
-      //   for (const token of text.split(' ')) {
-      //     await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
-      //     controller.enqueue(
-      //       encoder.encode(`${TEXT_PREFIX}${JSON.stringify(`${token} `)}\n`)
-      //     )
-      //   }
-      // }
-
       for (const token of SAMPLE_TEXT.split(' ')) {
         await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
         controller.enqueue(
@@ -128,6 +117,8 @@ const fakeChatStream = (query: string): ReadableStream => {
       }
 
       for (const item of INLINE_ITEMS) {
+        await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY * 10))
+
         if (typeof item === 'string') {
           controller.enqueue(
             encoder.encode(`${TEXT_PREFIX}${JSON.stringify(item)}\n`)
