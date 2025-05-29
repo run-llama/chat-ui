@@ -13,7 +13,7 @@ export type JSONValue =
 export interface Message {
   content: string
   role: MessageRole
-  annotations?: any
+  annotations?: JSONValue[]
 }
 
 export type ChatHandler = {
