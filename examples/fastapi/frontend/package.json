@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-chat-example",
+  "name": "fastapi-chat-ui-example",
   "version": "0.1.0",
   "private": true,
   "scripts": {
