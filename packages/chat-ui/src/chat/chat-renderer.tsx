@@ -1,20 +1,25 @@
-import { LanguageRendererProps } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
-import { AnyAnnotation, Artifact } from './annotation'
+import {
+  Artifact,
+  MessageAnnotation,
+  MessageAnnotationType,
+} from './annotation'
 import { ArtifactCard } from './canvas/card.js'
 
 export const INLINE_ANNOTATION_KEY = 'inline_annotation' // the language key to detect inline annotation code in markdown
 
-// the default renderer for pre-defined chat-ui annotations
-export const InlineAnnotationRenderer: React.FC<LanguageRendererProps> = ({
-  code,
-}) => {
-  const annotationValue = JSON.parse(code) as AnyAnnotation
+export interface AnnotationRendererProps {
+  annotation: MessageAnnotation
+}
 
-  if (annotationValue.type === 'artifact') {
+// the default renderer for pre-defined chat-ui annotations
+export const InlineAnnotationRenderer: React.FC<AnnotationRendererProps> = ({
+  annotation,
+}) => {
+  if (annotation.type === MessageAnnotationType.ARTIFACT) {
     // TODO: can use zod to make sure the artifact is valid
     return (
       <div className="my-2">
-        <ArtifactCard artifact={annotationValue.data as Artifact} />
+        <ArtifactCard artifact={annotation.data as Artifact} />
       </div>
     )
   }
@@ -22,12 +27,4 @@ export const InlineAnnotationRenderer: React.FC<LanguageRendererProps> = ({
   // TODO: add other annotation types here
 
   return null
-}
-
-// the default renderer for markdown component
-export const InlineMarkdownRenderer: Record<
-  string,
-  React.FC<LanguageRendererProps>
-> = {
-  [INLINE_ANNOTATION_KEY]: InlineAnnotationRenderer,
 }

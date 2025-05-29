@@ -7,11 +7,16 @@ import { CodeBlock } from './codeblock'
 import {
   DOCUMENT_FILE_TYPES,
   DocumentFileType,
+  MessageAnnotation,
   SourceData,
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
+import {
+  AnnotationRendererProps,
+  INLINE_ANNOTATION_KEY,
+} from '../chat/chat-renderer'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -85,6 +90,7 @@ export function Markdown({
   citationComponent: CitationComponent,
   className: customClassName,
   languageRenderers,
+  annotationsRenderer: AnnotationsRenderer,
 }: {
   content: string
   sources?: SourceData
@@ -92,6 +98,7 @@ export function Markdown({
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
+  annotationsRenderer?: ComponentType<AnnotationRendererProps>
 }) {
   const processedContent = preprocessContent(content)
 
@@ -122,6 +129,19 @@ export function Markdown({
             const match = /language-(\w+)/.exec(className || '')
             const language = (match && match[1]) || ''
             const codeValue = String(children).replace(/\n$/, '')
+
+            if (AnnotationsRenderer && language === INLINE_ANNOTATION_KEY) {
+              const annotation = JSON.parse(codeValue) as MessageAnnotation
+
+              if (typeof annotation !== 'object') {
+                console.warn(
+                  `Invalid inline annotation: ${codeValue}, expected an object`
+                )
+                return null
+              }
+
+              return <AnnotationsRenderer annotation={annotation} />
+            }
 
             if (inline) {
               return (
