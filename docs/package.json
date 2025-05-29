@@ -1,0 +1,10 @@
+{
+  "name": "@llamaindex/chat-ui-docs",
+  "version": "0.0.1",
+  "files": [
+    "chat-ui"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

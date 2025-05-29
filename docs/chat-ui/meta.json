@@ -1,0 +1,17 @@
+{
+  "title": "Chat UI",
+  "description": "React component library for building chat interfaces",
+  "root": true,
+  "defaultOpen": true,
+  "pages": [
+    "index",
+    "getting-started",
+    "core-components",
+    "widgets",
+    "hooks",
+    "annotations",
+    "artifacts",
+    "customization",
+    "examples"
+  ]
+}
