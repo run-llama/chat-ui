@@ -137,6 +137,17 @@ const fakeChatStream = (query: string): ReadableStream => {
   })
 }
 
+/**
+ * To append inline annotations to the stream, we need to wrap the annotation in a code block with the language key.
+ * The language key is `inline_annotation` and the code block is wrapped in backticks.
+ * The prefix is `0:` to make sure it's inline markdown. Example:
+ * 0:\`\`\`inline_annotation
+ * \{
+ *   "type": "artifact",
+ *   "data": \{...\}
+ * \}
+ * \`\`\`
+ */
 function toInlineAnnotationCode(item: any) {
   return `\n\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(item)}\n\`\`\`\n`
 }
