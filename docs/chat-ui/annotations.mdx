@@ -25,7 +25,7 @@ interface Message {
 The library provides several built-in annotation types:
 
 - **IMAGE** - Image data with URLs
-- **DOCUMENT_FILE** - File attachments and metadata  
+- **DOCUMENT_FILE** - File attachments and metadata
 - **SOURCES** - Citation and source references
 - **EVENTS** - Process events and function calls
 - **AGENT_EVENTS** - Agent-specific events with progress
@@ -44,14 +44,14 @@ const imageAnnotation = {
   type: 'IMAGE',
   data: {
     url: 'https://example.com/chart.png',
-    alt: 'Sales chart for Q4 2024'
-  }
+    alt: 'Sales chart for Q4 2024',
+  },
 }
 
 return {
   role: 'assistant',
   content: 'Here is the sales chart you requested:',
-  annotations: [imageAnnotation]
+  annotations: [imageAnnotation],
 }
 ```
 
@@ -65,22 +65,20 @@ const stream = new ReadableStream({
     controller.enqueue(
       encoder.encode('0:"Here is the chart you requested:\\n"\\n')
     )
-    
+
     // Send image annotation
     const annotation = {
       type: 'IMAGE',
       data: {
         url: '/api/generated-chart.png',
-        alt: 'Generated sales chart'
-      }
+        alt: 'Generated sales chart',
+      },
     }
-    
-    controller.enqueue(
-      encoder.encode(`8:${JSON.stringify([annotation])}\\n`)
-    )
-    
+
+    controller.enqueue(encoder.encode(`8:${JSON.stringify([annotation])}\\n`))
+
     controller.close()
-  }
+  },
 })
 ```
 
@@ -92,7 +90,8 @@ Images automatically render when using the content components:
 <ChatMessage message={message}>
   <ChatMessage.Content>
     <ChatMessage.Content.Markdown />
-    <ChatMessage.Content.Image />  {/* Automatically renders IMAGE annotations */}
+    <ChatMessage.Content.Image />{' '}
+    {/* Automatically renders IMAGE annotations */}
   </ChatMessage.Content>
 </ChatMessage>
 ```
@@ -117,8 +116,8 @@ const fileAnnotation = {
         metadata: {
           title: 'Q4 2024 Quarterly Report',
           author: 'Finance Team',
-          pages: 25
-        }
+          pages: 25,
+        },
       },
       {
         id: 'doc2',
@@ -128,11 +127,11 @@ const fileAnnotation = {
         size: 1024000,
         metadata: {
           rows: 5000,
-          columns: 12
-        }
-      }
-    ]
-  }
+          columns: 12,
+        },
+      },
+    ],
+  },
 }
 ```
 
@@ -143,26 +142,28 @@ const fileAnnotation = {
 export async function POST(request: Request) {
   const formData = await request.formData()
   const files = formData.getAll('files') as File[]
-  
+
   const fileAnnotations = await Promise.all(
-    files.map(async (file) => {
+    files.map(async file => {
       const url = await uploadFile(file) // Your upload logic
-      
+
       return {
         type: 'DOCUMENT_FILE',
         data: {
-          files: [{
-            id: generateId(),
-            name: file.name,
-            type: file.type,
-            url,
-            size: file.size
-          }]
-        }
+          files: [
+            {
+              id: generateId(),
+              name: file.name,
+              type: file.type,
+              url,
+              size: file.size,
+            },
+          ],
+        },
       }
     })
   )
-  
+
   return streamResponse(content, fileAnnotations)
 }
 ```
@@ -186,21 +187,21 @@ const sourceAnnotation = {
           author: 'Dr. Jane Smith',
           page_number: 15,
           section: 'Methodology',
-          published_date: '2024-01-15'
-        }
+          published_date: '2024-01-15',
+        },
       },
       {
-        id: 'source2', 
+        id: 'source2',
         url: '/documents/clinical-study.pdf',
         metadata: {
           title: 'Clinical Trial Results',
           author: 'Medical Research Institute',
           page_number: 8,
-          figure: 'Figure 3.2'
-        }
-      }
-    ]
-  }
+          figure: 'Figure 3.2',
+        },
+      },
+    ],
+  },
 }
 ```
 
@@ -221,7 +222,7 @@ with a 95% accuracy rate.
 return {
   role: 'assistant',
   content,
-  annotations: [sourceAnnotation]
+  annotations: [sourceAnnotation],
 }
 ```
 
@@ -240,24 +241,24 @@ const eventAnnotation = {
       name: 'search_database',
       args: {
         query: 'machine learning papers',
-        limit: 10
+        limit: 10,
       },
       result: 'Found 8 relevant papers',
-      timestamp: '2024-01-15T10:30:00Z'
+      timestamp: '2024-01-15T10:30:00Z',
     },
     {
       type: 'tool_use',
       name: 'calculate_statistics',
       args: {
-        dataset: 'user_engagement'
+        dataset: 'user_engagement',
       },
       result: {
         mean: 4.2,
         median: 4.1,
-        std_dev: 0.8
-      }
-    }
-  ]
+        std_dev: 0.8,
+      },
+    },
+  ],
 }
 ```
 
@@ -276,26 +277,26 @@ const agentEventAnnotation = {
         step: 1,
         name: 'Search Documents',
         status: 'completed',
-        result: 'Found 15 relevant documents'
+        result: 'Found 15 relevant documents',
       },
       {
         step: 2,
         name: 'Analyze Content',
         status: 'in_progress',
-        progress: 75
+        progress: 75,
       },
       {
         step: 3,
         name: 'Generate Summary',
-        status: 'pending'
+        status: 'pending',
       },
       {
         step: 4,
         name: 'Create Recommendations',
-        status: 'pending'
-      }
-    ]
-  }
+        status: 'pending',
+      },
+    ],
+  },
 }
 ```
 
@@ -337,9 +338,9 @@ def analyze_sales_data(file_path):
 # Usage
 sales_data = analyze_sales_data('sales.csv')
 print(sales_data)
-      `
-    }
-  }
+      `,
+    },
+  },
 }
 ```
 
@@ -379,9 +380,9 @@ designed to help businesses make data-driven decisions.
 ## Budget Estimate
 
 Total project cost: $250,000
-      `
-    }
-  }
+      `,
+    },
+  },
 }
 ```
 
@@ -397,9 +398,9 @@ const suggestedQuestionsAnnotation = {
       'Can you explain the methodology in more detail?',
       'What are the potential limitations of this approach?',
       'How does this compare to traditional methods?',
-      'What would be the next steps for implementation?'
-    ]
-  }
+      'What would be the next steps for implementation?',
+    ],
+  },
 }
 ```
 
@@ -439,9 +440,9 @@ const weatherAnnotation: WeatherAnnotation = {
     windSpeed: 12,
     forecast: [
       { day: 'Tomorrow', high: 24, low: 18, condition: 'cloudy' },
-      { day: 'Wednesday', high: 26, low: 20, condition: 'sunny' }
-    ]
-  }
+      { day: 'Wednesday', high: 26, low: 20, condition: 'sunny' },
+    ],
+  },
 }
 ```
 
@@ -460,16 +461,16 @@ interface WeatherData {
 
 export function CustomWeatherWidget() {
   const { message } = useChatMessage()
-  
+
   const weatherData = getCustomAnnotations<WeatherData>(
     message.annotations,
     'weather'
   )
-  
+
   if (!weatherData[0]) return null
-  
+
   const data = weatherData[0]
-  
+
   return (
     <div className="my-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="flex items-center gap-3">
@@ -501,16 +502,14 @@ export function CustomWeatherWidget() {
 function WeatherIcon({ condition }: { condition: string }) {
   const iconMap: Record<string, string> = {
     sunny: '☀️',
-    cloudy: '☁️', 
+    cloudy: '☁️',
     rainy: '🌧️',
     snowy: '❄️',
-    stormy: '⛈️'
+    stormy: '⛈️',
   }
-  
+
   return (
-    <span className="text-2xl">
-      {iconMap[condition.toLowerCase()] || '🌤️'}
-    </span>
+    <span className="text-2xl">{iconMap[condition.toLowerCase()] || '🌤️'}</span>
   )
 }
 ```
@@ -528,7 +527,7 @@ function MessageWithCustomWidgets({ message }) {
         <ChatMessage.Content.Markdown />
         <ChatMessage.Content.Image />
         <ChatMessage.Content.Source />
-        <CustomWeatherWidget />  {/* Add custom widget */}
+        <CustomWeatherWidget /> {/* Add custom widget */}
       </ChatMessage.Content>
     </ChatMessage>
   )
@@ -546,37 +545,8 @@ import { getCustomAnnotations } from '@llamaindex/chat-ui'
 
 function useWeatherData() {
   const { message } = useChatMessage()
-  
-  return getCustomAnnotations<WeatherData>(
-    message.annotations,
-    'weather'
-  )
-}
-```
 
-### Annotation Validation
-
-Validate annotation data before rendering:
-
-```tsx
-function validateWeatherData(data: any): data is WeatherData {
-  return (
-    typeof data === 'object' &&
-    typeof data.location === 'string' &&
-    typeof data.temperature === 'number' &&
-    typeof data.condition === 'string'
-  )
-}
-
-function SafeWeatherWidget() {
-  const { message } = useChatMessage()
-  const weatherData = getCustomAnnotations(message.annotations, 'weather')
-  
-  if (!weatherData[0] || !validateWeatherData(weatherData[0])) {
-    return null
-  }
-  
-  return <WeatherDisplay data={weatherData[0]} />
+  return getCustomAnnotations<WeatherData>(message.annotations, 'weather')
 }
 ```
 
@@ -588,43 +558,41 @@ function SafeWeatherWidget() {
 // API route for streaming with annotations
 export async function POST(request: Request) {
   const { messages } = await request.json()
-  
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder()
-      
+
       // Send initial text
       controller.enqueue(
         encoder.encode('0:"Let me analyze the weather data for you.\\n"\\n')
       )
-      
+
       // Process and get weather data
       const weatherData = await getWeatherData(location)
-      
+
       // Send weather annotation
       const annotation = {
         type: 'weather',
-        data: weatherData
+        data: weatherData,
       }
-      
-      controller.enqueue(
-        encoder.encode(`8:${JSON.stringify([annotation])}\\n`)
-      )
-      
+
+      controller.enqueue(encoder.encode(`8:${JSON.stringify([annotation])}\\n`))
+
       // Send follow-up text
       controller.enqueue(
         encoder.encode('0:"Would you like a detailed forecast?"\\n')
       )
-      
+
       controller.close()
-    }
+    },
   })
-  
+
   return new Response(stream, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'X-Vercel-AI-Data-Stream': 'v1'
-    }
+      'X-Vercel-AI-Data-Stream': 'v1',
+    },
   })
 }
 ```
@@ -635,18 +603,18 @@ export async function POST(request: Request) {
 // Process different annotation types
 function createAnnotations(data: any) {
   const annotations = []
-  
+
   // Add image if generated
   if (data.imageUrl) {
     annotations.push({
       type: 'IMAGE',
       data: {
         url: data.imageUrl,
-        alt: data.imageDescription
-      }
+        alt: data.imageDescription,
+      },
     })
   }
-  
+
   // Add sources if referenced
   if (data.sources?.length > 0) {
     annotations.push({
@@ -655,43 +623,23 @@ function createAnnotations(data: any) {
         nodes: data.sources.map(source => ({
           id: source.id,
           url: source.url,
-          metadata: source.metadata
-        }))
-      }
+          metadata: source.metadata,
+        })),
+      },
     })
   }
-  
+
   // Add custom weather data
   if (data.weather) {
     annotations.push({
       type: 'weather',
-      data: data.weather
+      data: data.weather,
     })
   }
-  
+
   return annotations
 }
 ```
-
-## Best Practices
-
-### Performance
-
-- **Lazy Load Images** - Use loading="lazy" for image annotations
-- **Optimize File Sizes** - Compress images and limit file upload sizes
-- **Cache Annotations** - Cache processed annotation data when possible
-
-### Accessibility
-
-- **Alt Text** - Always provide alt text for images
-- **Keyboard Navigation** - Ensure interactive annotations are keyboard accessible
-- **Screen Reader Support** - Use semantic HTML and ARIA labels
-
-### User Experience
-
-- **Loading States** - Show loading indicators for annotation processing
-- **Error Handling** - Gracefully handle failed annotation rendering
-- **Progressive Enhancement** - Ensure content works without annotations
 
 ## Next Steps
 

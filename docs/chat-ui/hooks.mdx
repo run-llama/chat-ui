@@ -9,7 +9,7 @@ The hook system provides access to chat state, context, and functionality throug
 
 ### useChatUI
 
-The primary hook for accessing chat state and handlers from the Vercel AI SDK.
+The primary hook for accessing chat state and handlers to modify the chat state.
 
 ```tsx
 import { useChatUI } from '@llamaindex/chat-ui'
@@ -26,13 +26,13 @@ function CustomChatComponent() {
     stop,
     setMessages,
     requestData,
-    setRequestData
+    setRequestData,
   } = useChatUI()
 
   const handleSendMessage = async () => {
     await append({
       role: 'user',
-      content: input
+      content: input,
     })
   }
 
@@ -102,14 +102,14 @@ function CustomInputField() {
     handleSubmit,
     isLoading,
     onFileUpload,
-    uploadedFiles
+    uploadedFiles,
   } = useChatInput()
 
   return (
     <form onSubmit={handleSubmit}>
       <textarea
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={e => setInput(e.target.value)}
         disabled={isLoading}
         placeholder="Type your message..."
       />
@@ -136,14 +136,8 @@ Access messages list state and handlers.
 import { useChatMessages } from '@llamaindex/chat-ui'
 
 function CustomMessageList() {
-  const {
-    messages,
-    isLoading,
-    reload,
-    stop,
-    isEmpty,
-    scrollToBottom
-  } = useChatMessages()
+  const { messages, isLoading, reload, stop, isEmpty, scrollToBottom } =
+    useChatMessages()
 
   return (
     <div>
@@ -152,16 +146,14 @@ function CustomMessageList() {
           <div key={i}>{msg.content}</div>
         ))}
       </div>
-      
+
       {isEmpty && <p>No messages yet</p>}
-      
+
       <button onClick={reload} disabled={isLoading}>
         Reload
       </button>
       <button onClick={stop}>Stop</button>
-      <button onClick={scrollToBottom}>
-        Scroll to Bottom
-      </button>
+      <button onClick={scrollToBottom}>Scroll to Bottom</button>
     </div>
   )
 }
@@ -190,7 +182,7 @@ function CustomCanvasControls() {
     showCanvas,
     hideCanvas,
     updateArtifact,
-    artifacts
+    artifacts,
   } = useChatCanvas()
 
   return (
@@ -198,7 +190,7 @@ function CustomCanvasControls() {
       <p>Canvas visible: {isVisible ? 'Yes' : 'No'}</p>
       <p>Current artifact: {currentArtifact?.title || 'None'}</p>
       <p>Total artifacts: {artifacts.length}</p>
-      
+
       <button onClick={showCanvas}>Show Canvas</button>
       <button onClick={hideCanvas}>Hide Canvas</button>
     </div>
@@ -231,11 +223,11 @@ function FileUploadComponent() {
     isUploading,
     uploadedFiles,
     removeFile,
-    clearFiles
+    clearFiles,
   } = useFile({
     maxSize: 10 * 1024 * 1024, // 10MB
     accept: ['image/*', 'application/pdf'],
-    multiple: true
+    multiple: true,
   })
 
   const handleFileSelect = async (files: FileList) => {
@@ -247,11 +239,11 @@ function FileUploadComponent() {
       <input
         type="file"
         multiple
-        onChange={(e) => handleFileSelect(e.target.files!)}
+        onChange={e => handleFileSelect(e.target.files!)}
       />
-      
+
       {isUploading && <p>Uploading...</p>}
-      
+
       <div>
         {uploadedFiles.map((file, i) => (
           <div key={i}>
@@ -260,7 +252,7 @@ function FileUploadComponent() {
           </div>
         ))}
       </div>
-      
+
       <button onClick={clearFiles}>Clear All</button>
     </div>
   )
@@ -293,7 +285,7 @@ import { useCopyToClipboard } from '@llamaindex/chat-ui'
 
 function CopyButton({ content }) {
   const { copyToClipboard, isCopied } = useCopyToClipboard({
-    timeout: 2000 // Reset after 2 seconds
+    timeout: 2000, // Reset after 2 seconds
   })
 
   const handleCopy = () => {
@@ -301,7 +293,7 @@ function CopyButton({ content }) {
   }
 
   return (
-    <button 
+    <button
       onClick={handleCopy}
       className={isCopied ? 'text-green-600' : 'text-gray-600'}
     >
@@ -332,28 +324,26 @@ import { useChatUI, useChatMessages } from '@llamaindex/chat-ui'
 function useCustomChat() {
   const chatUI = useChatUI()
   const messages = useChatMessages()
-  
+
   const sendMessageWithMetadata = async (content: string, metadata: any) => {
     await chatUI.append(
       {
         role: 'user',
-        content
+        content,
       },
       { data: metadata }
     )
   }
-  
+
   const getLastAssistantMessage = () => {
-    return chatUI.messages
-      .filter(m => m.role === 'assistant')
-      .pop()
+    return chatUI.messages.filter(m => m.role === 'assistant').pop()
   }
-  
+
   return {
     ...chatUI,
     ...messages,
     sendMessageWithMetadata,
-    getLastAssistantMessage
+    getLastAssistantMessage,
   }
 }
 ```
@@ -368,29 +358,29 @@ import { useChatMessage, useChatUI } from '@llamaindex/chat-ui'
 function useMessageAnalytics() {
   const { message } = useChatMessage()
   const { requestData, setRequestData } = useChatUI()
-  
+
   const trackMessageView = () => {
     // Track message viewed
     console.log('Message viewed:', message.id)
   }
-  
+
   const trackMessageCopy = () => {
     // Track message copied
     setRequestData({
       ...requestData,
-      copiedMessages: [...(requestData?.copiedMessages || []), message.id]
+      copiedMessages: [...(requestData?.copiedMessages || []), message.id],
     })
   }
-  
+
   const trackMessageRegenerate = () => {
     // Track message regenerated
     console.log('Message regenerated:', message.id)
   }
-  
+
   return {
     trackMessageView,
     trackMessageCopy,
-    trackMessageRegenerate
+    trackMessageRegenerate,
   }
 }
 ```
@@ -402,11 +392,11 @@ function useMessageAnalytics() {
 ```tsx
 function ConditionalComponent() {
   const { isLoading, error, messages } = useChatUI()
-  
+
   if (isLoading) return <LoadingSpinner />
   if (error) return <ErrorMessage error={error} />
   if (messages.length === 0) return <EmptyState />
-  
+
   return <MessageList />
 }
 ```
@@ -416,18 +406,18 @@ function ConditionalComponent() {
 ```tsx
 function EventHandler() {
   const { append, setRequestData } = useChatUI()
-  
+
   const handleQuestionClick = async (question: string) => {
     // Track question selection
     setRequestData({ selectedQuestion: question })
-    
+
     // Send message
     await append({
       role: 'user',
-      content: question
+      content: question,
     })
   }
-  
+
   return <SuggestedQuestions onQuestionSelect={handleQuestionClick} />
 }
 ```
@@ -437,15 +427,17 @@ function EventHandler() {
 ```tsx
 function MessageStats() {
   const { messages } = useChatUI()
-  
+
   const stats = useMemo(() => {
     const userMessages = messages.filter(m => m.role === 'user').length
-    const assistantMessages = messages.filter(m => m.role === 'assistant').length
+    const assistantMessages = messages.filter(
+      m => m.role === 'assistant'
+    ).length
     const totalChars = messages.reduce((sum, m) => sum + m.content.length, 0)
-    
+
     return { userMessages, assistantMessages, totalChars }
   }, [messages])
-  
+
   return (
     <div>
       <p>User messages: {stats.userMessages}</p>
@@ -478,7 +470,7 @@ function App() {
           ))}
         </ChatMessages.List>
       </ChatMessages>
-      
+
       <ChatInput>
         {/* useChatInput available here */}
         <CustomInputField />

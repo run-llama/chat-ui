@@ -47,31 +47,31 @@ def create_sales_chart(data_file):
     """Create a sales visualization chart."""
     # Load the data
     df = pd.read_csv(data_file)
-    
+
     # Prepare the data
     monthly_sales = df.groupby('month')['revenue'].sum()
-    
+
     # Create the visualization
     plt.figure(figsize=(12, 6))
-    bars = plt.bar(monthly_sales.index, monthly_sales.values, 
+    bars = plt.bar(monthly_sales.index, monthly_sales.values,
                    color='steelblue', alpha=0.8)
-    
+
     # Customize the chart
     plt.title('Monthly Sales Revenue', fontsize=16, fontweight='bold')
     plt.xlabel('Month', fontsize=12)
     plt.ylabel('Revenue ($)', fontsize=12)
     plt.xticks(rotation=45)
-    
+
     # Add value labels on bars
     for bar in bars:
         height = bar.get_height()
         plt.text(bar.get_x() + bar.get_width()/2., height,
                 f'${height:,.0f}', ha='center', va='bottom')
-    
+
     plt.tight_layout()
     plt.grid(True, alpha=0.3)
     plt.show()
-    
+
     return monthly_sales
 
 # Example usage
@@ -90,19 +90,21 @@ if __name__ == "__main__":
 // In your API route
 export async function POST(request: Request) {
   const { messages } = await request.json()
-  
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder()
-      
+
       // Send initial response
       controller.enqueue(
-        encoder.encode('0:"I\'ll create a Python script for data visualization:\\n"\\n')
+        encoder.encode(
+          '0:"I\'ll create a Python script for data visualization:\\n"\\n'
+        )
       )
-      
+
       // Generate code (could be from LLM)
       const generatedCode = await generateCodeWithLLM(messages)
-      
+
       // Send code artifact
       const artifact = {
         type: 'artifact',
@@ -112,29 +114,29 @@ export async function POST(request: Request) {
             title: 'Data Visualization Script',
             file_name: 'chart_generator.py',
             language: 'python',
-            code: generatedCode
-          }
-        }
+            code: generatedCode,
+          },
+        },
       }
-      
-      controller.enqueue(
-        encoder.encode(`8:${JSON.stringify([artifact])}\\n`)
-      )
-      
+
+      controller.enqueue(encoder.encode(`8:${JSON.stringify([artifact])}\\n`))
+
       // Send follow-up text
       controller.enqueue(
-        encoder.encode('0:"You can edit this code directly in the canvas. Would you like me to explain any part of it?"\\n')
+        encoder.encode(
+          '0:"You can edit this code directly in the canvas. Would you like me to explain any part of it?"\\n'
+        )
       )
-      
+
       controller.close()
-    }
+    },
   })
-  
+
   return new Response(stream, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'X-Vercel-AI-Data-Stream': 'v1'
-    }
+      'X-Vercel-AI-Data-Stream': 'v1',
+    },
   })
 }
 ```
@@ -341,9 +343,9 @@ Configure webhooks to receive real-time notifications:
 - **Status Page**: https://status.example.com
 
 Happy coding! 🚀
-      `
-    }
-  }
+      `,
+    },
+  },
 }
 ```
 
@@ -368,7 +370,7 @@ import { ChatSection, ChatCanvas } from '@llamaindex/chat-ui'
 
 function ChatWithCanvas() {
   const handler = useChat({ api: '/api/chat' })
-  
+
   return (
     <ChatSection handler={handler} className="flex h-full">
       <div className="flex-1">
@@ -390,49 +392,9 @@ The canvas automatically appears when artifacts are present:
 <ChatMessage message={messageWithArtifact}>
   <ChatMessage.Content>
     <ChatMessage.Content.Markdown />
-    <ChatMessage.Content.Artifact />  {/* Triggers canvas display */}
+    <ChatMessage.Content.Artifact /> {/* Triggers canvas display */}
   </ChatMessage.Content>
 </ChatMessage>
-```
-
-### Manual Canvas Control
-
-```tsx
-import { useChatCanvas } from '@llamaindex/chat-ui'
-
-function CanvasControls() {
-  const { 
-    currentArtifact, 
-    isVisible, 
-    showCanvas, 
-    hideCanvas,
-    artifacts 
-  } = useChatCanvas()
-  
-  return (
-    <div className="flex gap-2">
-      <button 
-        onClick={showCanvas}
-        disabled={artifacts.length === 0}
-      >
-        Show Canvas ({artifacts.length})
-      </button>
-      
-      <button 
-        onClick={hideCanvas}
-        disabled={!isVisible}
-      >
-        Hide Canvas
-      </button>
-      
-      {currentArtifact && (
-        <span className="text-sm text-gray-600">
-          Current: {currentArtifact.title}
-        </span>
-      )}
-    </div>
-  )
-}
 ```
 
 ## Version Management
@@ -446,24 +408,27 @@ import { useChatCanvas } from '@llamaindex/chat-ui'
 
 function ArtifactVersions() {
   const { currentArtifact, updateArtifact } = useChatCanvas()
-  
+
   if (!currentArtifact) return null
-  
+
   const versions = currentArtifact.versions || []
-  
+
   const restoreVersion = (version: any) => {
     updateArtifact({
       ...currentArtifact,
       content: version.content,
-      versions: [...versions, {
-        id: generateId(),
-        content: currentArtifact.content,
-        timestamp: new Date().toISOString(),
-        description: 'Current version backup'
-      }]
+      versions: [
+        ...versions,
+        {
+          id: generateId(),
+          content: currentArtifact.content,
+          timestamp: new Date().toISOString(),
+          description: 'Current version backup',
+        },
+      ],
     })
   }
-  
+
   return (
     <div className="space-y-2">
       <h3 className="font-semibold">Version History</h3>
@@ -496,32 +461,32 @@ function ArtifactVersions() {
 function SaveArtifactChanges() {
   const { currentArtifact, updateArtifact } = useChatCanvas()
   const [hasChanges, setHasChanges] = useState(false)
-  
+
   const saveChanges = () => {
     if (!currentArtifact || !hasChanges) return
-    
+
     // Create version backup
     const newVersion = {
       id: generateId(),
       content: currentArtifact.originalContent,
       timestamp: new Date().toISOString(),
-      description: 'Auto-saved version'
+      description: 'Auto-saved version',
     }
-    
+
     updateArtifact({
       ...currentArtifact,
       versions: [...(currentArtifact.versions || []), newVersion],
-      originalContent: currentArtifact.content
+      originalContent: currentArtifact.content,
     })
-    
+
     setHasChanges(false)
   }
-  
+
   return (
     <button
       onClick={saveChanges}
       disabled={!hasChanges}
-      className="bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-50"
+      className="rounded bg-blue-600 px-3 py-1 text-white disabled:opacity-50"
     >
       {hasChanges ? 'Save Changes' : 'Saved'}
     </button>
@@ -536,35 +501,37 @@ function SaveArtifactChanges() {
 ```tsx
 function ArtifactExport() {
   const { currentArtifact } = useChatCanvas()
-  
+
   const exportAsFile = () => {
     if (!currentArtifact) return
-    
-    const content = currentArtifact.type === 'code' 
-      ? currentArtifact.code 
-      : currentArtifact.content
-      
-    const filename = currentArtifact.type === 'code'
-      ? currentArtifact.file_name
-      : `${currentArtifact.title}.md`
-    
-    const blob = new Blob([content], { 
-      type: 'text/plain;charset=utf-8' 
+
+    const content =
+      currentArtifact.type === 'code'
+        ? currentArtifact.code
+        : currentArtifact.content
+
+    const filename =
+      currentArtifact.type === 'code'
+        ? currentArtifact.file_name
+        : `${currentArtifact.title}.md`
+
+    const blob = new Blob([content], {
+      type: 'text/plain;charset=utf-8',
     })
-    
+
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
     link.download = filename
     link.click()
-    
+
     URL.revokeObjectURL(url)
   }
-  
+
   return (
-    <button 
+    <button
       onClick={exportAsFile}
-      className="flex items-center gap-2 px-3 py-1 text-sm border rounded"
+      className="flex items-center gap-2 rounded border px-3 py-1 text-sm"
     >
       <DownloadIcon className="h-4 w-4" />
       Export
@@ -581,21 +548,22 @@ import { useCopyToClipboard } from '@llamaindex/chat-ui'
 function CopyArtifact() {
   const { currentArtifact } = useChatCanvas()
   const { copyToClipboard, isCopied } = useCopyToClipboard()
-  
+
   const handleCopy = () => {
     if (!currentArtifact) return
-    
-    const content = currentArtifact.type === 'code'
-      ? currentArtifact.code
-      : currentArtifact.content
-      
+
+    const content =
+      currentArtifact.type === 'code'
+        ? currentArtifact.code
+        : currentArtifact.content
+
     copyToClipboard(content)
   }
-  
+
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-2 px-3 py-1 text-sm border rounded"
+      className="flex items-center gap-2 rounded border px-3 py-1 text-sm"
     >
       <CopyIcon className="h-4 w-4" />
       {isCopied ? 'Copied!' : 'Copy'}
@@ -603,176 +571,6 @@ function CopyArtifact() {
   )
 }
 ```
-
-## Advanced Features
-
-### Collaborative Editing
-
-```tsx
-// Enable collaborative editing with real-time sync
-function CollaborativeArtifact() {
-  const { currentArtifact, updateArtifact } = useChatCanvas()
-  const [collaborators, setCollaborators] = useState([])
-  
-  useEffect(() => {
-    if (!currentArtifact) return
-    
-    // Connect to collaboration service
-    const socket = io('/artifacts')
-    
-    socket.emit('join-artifact', currentArtifact.id)
-    
-    socket.on('artifact-update', (update) => {
-      updateArtifact(update)
-    })
-    
-    socket.on('collaborators-changed', (users) => {
-      setCollaborators(users)
-    })
-    
-    return () => socket.disconnect()
-  }, [currentArtifact?.id])
-  
-  return (
-    <div className="border-b p-2">
-      <p className="text-sm text-gray-600">
-        {collaborators.length > 0 && (
-          `${collaborators.length} collaborator(s) active`
-        )}
-      </p>
-    </div>
-  )
-}
-```
-
-### AI-Assisted Editing
-
-```tsx
-function AIAssistant() {
-  const { currentArtifact, updateArtifact } = useChatCanvas()
-  const [suggestion, setSuggestion] = useState('')
-  
-  const getSuggestion = async (prompt: string) => {
-    const response = await fetch('/api/ai-assist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        artifact: currentArtifact,
-        prompt
-      })
-    })
-    
-    const { suggestion } = await response.json()
-    setSuggestion(suggestion)
-  }
-  
-  const applySuggestion = () => {
-    if (!currentArtifact || !suggestion) return
-    
-    updateArtifact({
-      ...currentArtifact,
-      content: suggestion
-    })
-    
-    setSuggestion('')
-  }
-  
-  return (
-    <div className="space-y-2">
-      <input
-        placeholder="Ask AI to modify the artifact..."
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            getSuggestion(e.currentTarget.value)
-          }
-        }}
-      />
-      
-      {suggestion && (
-        <div className="border rounded p-2">
-          <p className="text-sm font-medium">AI Suggestion:</p>
-          <pre className="text-xs mt-1">{suggestion}</pre>
-          <button 
-            onClick={applySuggestion}
-            className="mt-2 text-sm bg-green-600 text-white px-2 py-1 rounded"
-          >
-            Apply
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-```
-
-## Custom Artifact Types
-
-### Creating Custom Artifact Viewers
-
-```tsx
-interface CustomArtifactData {
-  type: 'chart'
-  data: {
-    title: string
-    chartType: 'bar' | 'line' | 'pie'
-    data: Array<{ label: string; value: number }>
-  }
-}
-
-function ChartArtifactViewer({ artifact }: { artifact: CustomArtifactData }) {
-  return (
-    <div className="p-4">
-      <h3 className="font-semibold mb-4">{artifact.data.title}</h3>
-      <div className="h-64">
-        {/* Render chart based on artifact.data.chartType */}
-        <CustomChart 
-          type={artifact.data.chartType}
-          data={artifact.data.data}
-        />
-      </div>
-    </div>
-  )
-}
-
-// Register custom artifact type
-function CustomCanvas() {
-  const { currentArtifact } = useChatCanvas()
-  
-  if (!currentArtifact) return <div>No artifact selected</div>
-  
-  // Route to appropriate viewer
-  switch (currentArtifact.type) {
-    case 'code':
-      return <CodeArtifactViewer artifact={currentArtifact} />
-    case 'document':
-      return <DocumentArtifactViewer artifact={currentArtifact} />
-    case 'chart':
-      return <ChartArtifactViewer artifact={currentArtifact} />
-    default:
-      return <div>Unknown artifact type</div>
-  }
-}
-```
-
-## Best Practices
-
-### Performance
-
-- **Lazy Loading** - Only load artifacts when canvas is visible
-- **Debounced Updates** - Debounce edit operations to prevent excessive updates
-- **Virtual Scrolling** - Use virtual scrolling for large code files
-
-### User Experience
-
-- **Auto-Save** - Automatically save changes periodically
-- **Keyboard Shortcuts** - Provide keyboard shortcuts for common actions
-- **Loading States** - Show loading indicators during artifact generation
-
-### Security
-
-- **Content Validation** - Validate artifact content before rendering
-- **Sanitization** - Sanitize HTML content in document artifacts
-- **Access Control** - Implement proper access controls for shared artifacts
 
 ## Next Steps
 
