@@ -9,6 +9,7 @@ import {
   useChatUI,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
+import { CustomWeatherAnnotation } from '../components/custom-weather-annotation'
 
 const initialMessages: Message[] = [
   {
@@ -23,7 +24,7 @@ export default function Page(): JSX.Element {
     <div className="flex h-screen flex-col">
       <header className="w-full border-b p-4 text-center">
         <h1 className="text-2xl font-bold">
-          LlamaIndex Chat UI - Next.js Example
+          LlamaIndex Chat UI - FastAPI Example
         </h1>
         <p className="text-gray-600">
           A simple chat interface using @llamaindex/chat-ui
@@ -86,13 +87,9 @@ function CustomChatMessages() {
           </ChatMessage.Avatar>
           <ChatMessage.Content isLoading={isLoading} append={append}>
             <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Image />
             <ChatMessage.Content.Artifact />
             <ChatMessage.Content.Source />
-            <ChatMessage.Content.Event />
-            <ChatMessage.Content.AgentEvent />
-            <ChatMessage.Content.DocumentFile />
-            <ChatMessage.Content.SuggestedQuestions />
+            <CustomWeatherAnnotation />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>

@@ -14,7 +14,7 @@ The backend just send example data to the frontend.
 
 ### Backend
 
-Navigate to the current directory, and run:
+Navigate to the `backend` directory, and run:
 
 1. **Create a virtual environment and install dependencies using uv (recommended):**
 
@@ -36,8 +36,7 @@ Navigate to `frontend`, then build and run the development server:
 ```bash
 cd frontend
 pnpm install
-pnpm build
-pnpm run dev
+pnpm dev
 ```
 
 Go to `http://localhost:3000` to see the chat UI.
