@@ -66,7 +66,6 @@ const INLINE_ITEMS = [
   {
     type: 'artifact',
     data: {
-      created_at: 1717000000,
       type: 'code',
       data: {
         file_name: 'sample.ts',
@@ -79,7 +78,6 @@ const INLINE_ITEMS = [
   {
     type: 'artifact',
     data: {
-      created_at: 1717000001,
       type: 'code',
       data: {
         file_name: 'sample.ts',
@@ -120,14 +118,6 @@ const fakeChatStream = (query: string): ReadableStream => {
           encoder.encode(`${ANNOTATION_PREFIX}${JSON.stringify([item])}\n`)
         )
       }
-
-      controller.enqueue(
-        encoder.encode(
-          `${TEXT_PREFIX}${JSON.stringify(
-            `\n\nNow you will see inline annotations in the markdown.\n\n `
-          )}\n`
-        )
-      )
 
       for (const item of INLINE_ITEMS) {
         if (typeof item === 'string') {

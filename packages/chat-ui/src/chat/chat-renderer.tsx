@@ -12,7 +12,11 @@ export const InlineAnnotationRenderer: React.FC<LanguageRendererProps> = ({
 
   if (annotationValue.type === 'artifact') {
     // TODO: can use zod to make sure the artifact is valid
-    return <ArtifactCard artifact={annotationValue.data as Artifact} />
+    return (
+      <div className="my-2">
+        <ArtifactCard artifact={annotationValue.data as Artifact} />
+      </div>
+    )
   }
 
   // TODO: add other annotation types here
