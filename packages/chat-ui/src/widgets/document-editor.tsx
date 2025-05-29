@@ -2,16 +2,19 @@ import { baseKeymap, toggleMark } from 'prosemirror-commands'
 import { history, redo, undo } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
 import {
-  defaultMarkdownParser as markdownParser,
+  defaultMarkdownParser,
+  MarkdownParser,
   defaultMarkdownSerializer as markdownSerializer,
+  schema as defaultSchema,
 } from 'prosemirror-markdown'
-import { schema as basicSchema } from 'prosemirror-schema-basic'
+import { tableNodes } from 'prosemirror-tables'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { Bold, Italic, Code, Link, Undo, Redo } from 'lucide-react'
+import { markdownItTable } from 'markdown-it-table'
 
 interface ToolbarProps {
   view: EditorView | null
@@ -125,6 +128,36 @@ const Toolbar: React.FC<ToolbarProps> = ({ view }) => {
   )
 }
 
+const basicSchema: typeof defaultSchema = {
+  ...defaultSchema,
+  nodes: {
+    ...defaultSchema.nodes,
+    ...tableNodes({
+      tableGroup: 'block',
+      cellContent: 'block+',
+      cellAttributes: {
+        alignment: {
+          default: null,
+          getFromDOM(dom) {
+            return dom.style.textAlign || null
+          },
+          setDOMAttr(value, attrs) {
+            // if (value) attrs.style = `${attrs.style || ''}text-align: ${value};`
+          },
+        },
+      },
+    }),
+  },
+}
+
+const customTokenizer = defaultMarkdownParser.tokenizer.configure('default')
+
+const markdownParser = new MarkdownParser(
+  basicSchema,
+  customTokenizer.use(markdownItTable),
+  defaultMarkdownParser.tokens
+)
+
 export function DocumentEditor({
   content,
   onChange,
@@ -139,6 +172,8 @@ export function DocumentEditor({
   const editorRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const [initialized, setInitialized] = useState(false)
+
+  console.log(customTokenizer.configure('default').parse(content, {}))
 
   useEffect(() => {
     if (!editorRef.current || initialized) return
