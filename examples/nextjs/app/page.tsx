@@ -9,6 +9,7 @@ import {
   useChatUI,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
+import { CustomWeatherAnnotation } from '../components/custom-weather-annotation'
 
 const initialMessages: Message[] = [
   {
@@ -86,13 +87,9 @@ function CustomChatMessages() {
           </ChatMessage.Avatar>
           <ChatMessage.Content isLoading={isLoading} append={append}>
             <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Image />
             <ChatMessage.Content.Artifact />
             <ChatMessage.Content.Source />
-            <ChatMessage.Content.Event />
-            <ChatMessage.Content.AgentEvent />
-            <ChatMessage.Content.DocumentFile />
-            <ChatMessage.Content.SuggestedQuestions />
+            <CustomWeatherAnnotation />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>

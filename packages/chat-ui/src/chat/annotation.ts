@@ -98,6 +98,13 @@ export type MessageAnnotation = {
   data: AnnotationData
 }
 
+export type CustomAnnotation<T = unknown> = {
+  type: string
+  data: T
+}
+
+export type AnyAnnotation<T = unknown> = MessageAnnotation | CustomAnnotation<T>
+
 /**
  * Gets custom message annotations that don't match any standard MessageAnnotationType
  * @param annotations - Array of message annotations to filter
@@ -106,6 +113,7 @@ export type MessageAnnotation = {
  *
  * First filters out any annotations that match MessageAnnotationType values,
  * then applies the optional custom filter if provided.
+ * @deprecated Use getCustomAnnotations instead
  */
 export function getCustomAnnotation<T = JSONValue>(
   annotations: JSONValue[] | undefined,
@@ -139,6 +147,30 @@ export function getChatUIAnnotation<T extends AnnotationData>(
   return annotations
     .filter(a => a && 'type' in a && a.type.toString() === type)
     .map(a => a.data as T)
+}
+
+/**
+ * Gets custom annotations by type from message annotations
+ * @param annotations - Array of message annotations (can be undefined)
+ * @param type - The annotation type to filter by
+ * @returns Array of data from custom annotations of the specified type
+ */
+export function getCustomAnnotations<T = unknown>(
+  annotations: JSONValue[] | undefined,
+  type: string
+): T[] {
+  if (!annotations?.length) return []
+  return annotations
+    .filter(
+      a =>
+        a &&
+        typeof a === 'object' &&
+        a !== null &&
+        'type' in a &&
+        a.type === type &&
+        'data' in a
+    )
+    .map(a => (a as CustomAnnotation<T>).data)
 }
 
 export function getSourceAnnotationData(
