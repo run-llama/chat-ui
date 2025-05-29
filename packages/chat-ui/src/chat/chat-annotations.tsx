@@ -5,10 +5,13 @@ import {
   ChatFiles,
   ChatImage,
   ChatSources,
+  LanguageRendererProps,
   SuggestedQuestions,
 } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import {
   AgentEventData,
+  AnyAnnotation,
+  Artifact,
   DocumentFileData,
   EventData,
   extractArtifactsFromMessage,
@@ -19,9 +22,9 @@ import {
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
+import { ArtifactCard } from './canvas/card.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ArtifactCard } from './canvas/card.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -135,4 +138,33 @@ export function ArtifactAnnotations() {
       ))}
     </div>
   )
+}
+
+export const INLINE_ANNOTATION_KEY = 'inline_annotation'
+
+// the default renderer for pre-defined chat-ui annotations
+export const InlineAnnotationsRenderer: React.FC<LanguageRendererProps> = ({
+  code,
+}) => {
+  const annotationValue = JSON.parse(code) as AnyAnnotation
+
+  if (annotationValue.type === 'artifact') {
+    // TODO: can use zod to make sure the artifact is valid
+    return (
+      <div className="my-4">
+        <ArtifactCard artifact={annotationValue.data as Artifact} />
+      </div>
+    )
+  }
+
+  // TODO: add other annotation types here
+
+  return null
+}
+
+export const InlineMarkdownRenderer: Record<
+  string,
+  React.FC<LanguageRendererProps>
+> = {
+  [INLINE_ANNOTATION_KEY]: InlineAnnotationsRenderer,
 }

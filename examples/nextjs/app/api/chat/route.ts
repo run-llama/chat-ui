@@ -50,8 +50,23 @@ const SAMPLE_ANNOTATIONS = [
     },
   },
   {
+    type: 'weather',
+    data: {
+      location: 'San Francisco, CA',
+      temperature: 22,
+      condition: 'sunny',
+      humidity: 65,
+      windSpeed: 12,
+    },
+  },
+]
+
+const INLINE_ITEMS = [
+  '\n**Generate ts hello world code** \n',
+  {
     type: 'artifact',
     data: {
+      created_at: 1717000000,
       type: 'code',
       data: {
         file_name: 'sample.ts',
@@ -60,14 +75,17 @@ const SAMPLE_ANNOTATIONS = [
       },
     },
   },
+  '\n**Change the text to "Hello, LlamaIndex!"** \n',
   {
-    type: 'weather',
+    type: 'artifact',
     data: {
-      location: 'San Francisco, CA',
-      temperature: 22,
-      condition: 'sunny',
-      humidity: 65,
-      windSpeed: 12,
+      created_at: 1717000001,
+      type: 'code',
+      data: {
+        file_name: 'sample.ts',
+        language: 'typescript',
+        code: 'console.log("Hello, world!");',
+      },
     },
   },
 ]
@@ -80,6 +98,15 @@ const fakeChatStream = (query: string): ReadableStream => {
         encoder.encode(`${TEXT_PREFIX}${JSON.stringify(query)}\n`)
       )
 
+      // const appendText = async (text: string) => {
+      //   for (const token of text.split(' ')) {
+      //     await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
+      //     controller.enqueue(
+      //       encoder.encode(`${TEXT_PREFIX}${JSON.stringify(`${token} `)}\n`)
+      //     )
+      //   }
+      // }
+
       for (const token of SAMPLE_TEXT.split(' ')) {
         await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
         controller.enqueue(
@@ -87,10 +114,33 @@ const fakeChatStream = (query: string): ReadableStream => {
         )
       }
 
+      // insert annotations in fixed positions
       for (const item of SAMPLE_ANNOTATIONS) {
         controller.enqueue(
           encoder.encode(`${ANNOTATION_PREFIX}${JSON.stringify([item])}\n`)
         )
+      }
+
+      controller.enqueue(
+        encoder.encode(
+          `${TEXT_PREFIX}${JSON.stringify(
+            `\n\nNow you will see inline annotations in the markdown.\n\n `
+          )}\n`
+        )
+      )
+
+      for (const item of INLINE_ITEMS) {
+        if (typeof item === 'string') {
+          controller.enqueue(
+            encoder.encode(`${TEXT_PREFIX}${JSON.stringify(item)}\n`)
+          )
+        } else {
+          // append inline annotation with 0: prefix
+          const annotationCode = `\`\`\`inline_annotation\n${JSON.stringify(item)}\n\`\`\``
+          controller.enqueue(
+            encoder.encode(`${TEXT_PREFIX}${JSON.stringify(annotationCode)}\n`)
+          )
+        }
       }
 
       controller.close()

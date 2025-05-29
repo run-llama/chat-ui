@@ -21,6 +21,7 @@ import {
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
 import { ChatHandler, Message } from './chat.interface'
+import { InlineMarkdownRenderer } from './chat-renderer.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -150,7 +151,7 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       content={message.content}
       sources={{ nodes: allNodes }}
       citationComponent={props.citationComponent}
-      languageRenderers={props.languageRenderers}
+      languageRenderers={props.languageRenderers ?? InlineMarkdownRenderer}
       className={cn(
         {
           'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
