@@ -4,6 +4,7 @@ const TOKEN_DELAY = 30 // 30ms delay between tokens
 const TEXT_PREFIX = '0:' // vercel ai text prefix
 const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
 const INLINE_ANNOTATION_KEY = 'inline_annotation' // the language key to detect inline annotation code in markdown
+const ANNOTATION_DELAY = 1000 // 1 second delay between annotations
 
 export async function POST(request: NextRequest) {
   try {
@@ -117,13 +118,12 @@ const fakeChatStream = (query: string): ReadableStream => {
       }
 
       for (const item of INLINE_ITEMS) {
-        await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY * 10))
-
         if (typeof item === 'string') {
           controller.enqueue(
             encoder.encode(`${TEXT_PREFIX}${JSON.stringify(item)}\n`)
           )
         } else {
+          await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
           // append inline annotation with 0: prefix
           const annotationCode = toInlineAnnotationCode(item)
           controller.enqueue(
