@@ -1,0 +1,782 @@
+---
+title: Artifacts
+description: Interactive code and document editing with version management
+---
+
+Artifacts are interactive, editable content that appears in the chat canvas. They allow users to view, edit, and interact with generated code and documents directly within the chat interface, similar to OpenAI's ChatGPT canvas feature.
+
+## Artifact System Overview
+
+The artifact system consists of:
+
+- **Artifact Annotations** - Data structure for artifact content
+- **ChatCanvas** - Side panel for displaying artifacts
+- **Artifact Viewers** - Components for rendering different artifact types
+- **Version Management** - Track changes and revisions
+- **Edit Capabilities** - In-place editing with syntax highlighting
+
+### Artifact Types
+
+The system supports two main artifact types:
+
+1. **Code Artifacts** - Interactive code editing with syntax highlighting
+2. **Document Artifacts** - Rich text document editing with markdown support
+
+## Code Artifacts
+
+Code artifacts provide interactive code editing with full syntax highlighting and language support.
+
+### Creating Code Artifacts
+
+```typescript
+// Server-side: Create code artifact annotation
+const codeArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'code',
+    data: {
+      title: 'Data Visualization Script',
+      file_name: 'visualize_data.py',
+      language: 'python',
+      code: `
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+def create_sales_chart(data_file):
+    """Create a sales visualization chart."""
+    # Load the data
+    df = pd.read_csv(data_file)
+    
+    # Prepare the data
+    monthly_sales = df.groupby('month')['revenue'].sum()
+    
+    # Create the visualization
+    plt.figure(figsize=(12, 6))
+    bars = plt.bar(monthly_sales.index, monthly_sales.values, 
+                   color='steelblue', alpha=0.8)
+    
+    # Customize the chart
+    plt.title('Monthly Sales Revenue', fontsize=16, fontweight='bold')
+    plt.xlabel('Month', fontsize=12)
+    plt.ylabel('Revenue ($)', fontsize=12)
+    plt.xticks(rotation=45)
+    
+    # Add value labels on bars
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height,
+                f'${height:,.0f}', ha='center', va='bottom')
+    
+    plt.tight_layout()
+    plt.grid(True, alpha=0.3)
+    plt.show()
+    
+    return monthly_sales
+
+# Example usage
+if __name__ == "__main__":
+    sales_data = create_sales_chart('sales_data.csv')
+    print(f"Total annual revenue: ${sales_data.sum():,.2f}")
+      `
+    }
+  }
+}
+```
+
+### Streaming Code Artifacts
+
+```typescript
+// In your API route
+export async function POST(request: Request) {
+  const { messages } = await request.json()
+  
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder()
+      
+      // Send initial response
+      controller.enqueue(
+        encoder.encode('0:"I\'ll create a Python script for data visualization:\\n"\\n')
+      )
+      
+      // Generate code (could be from LLM)
+      const generatedCode = await generateCodeWithLLM(messages)
+      
+      // Send code artifact
+      const artifact = {
+        type: 'artifact',
+        data: {
+          type: 'code',
+          data: {
+            title: 'Data Visualization Script',
+            file_name: 'chart_generator.py',
+            language: 'python',
+            code: generatedCode
+          }
+        }
+      }
+      
+      controller.enqueue(
+        encoder.encode(`8:${JSON.stringify([artifact])}\\n`)
+      )
+      
+      // Send follow-up text
+      controller.enqueue(
+        encoder.encode('0:"You can edit this code directly in the canvas. Would you like me to explain any part of it?"\\n')
+      )
+      
+      controller.close()
+    }
+  })
+  
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Vercel-AI-Data-Stream': 'v1'
+    }
+  })
+}
+```
+
+### Supported Languages
+
+The code artifact system supports syntax highlighting for:
+
+- **JavaScript/TypeScript** - `.js`, `.ts`, `.jsx`, `.tsx`
+- **Python** - `.py`, `.pyx`
+- **CSS/SCSS** - `.css`, `.scss`, `.sass`
+- **HTML** - `.html`, `.htm`
+- **JSON** - `.json`
+- **Markdown** - `.md`, `.mdx`
+- **SQL** - `.sql`
+- **Shell/Bash** - `.sh`, `.bash`
+
+### Code Artifact Features
+
+```tsx
+// The canvas automatically provides these features:
+// - Syntax highlighting
+// - Line numbers
+// - Code folding
+// - Search and replace
+// - Auto-indentation
+// - Bracket matching
+// - Error highlighting (for supported languages)
+```
+
+## Document Artifacts
+
+Document artifacts provide rich text editing with markdown support and real-time preview.
+
+### Creating Document Artifacts
+
+```typescript
+const documentArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'document',
+    data: {
+      title: 'API Integration Guide',
+      content: `
+# API Integration Guide
+
+## Overview
+
+This guide walks you through integrating our REST API into your application.
+
+## Authentication
+
+All API requests require authentication using API keys:
+
+\`\`\`bash
+curl -H "Authorization: Bearer YOUR_API_KEY" \\
+     https://api.example.com/v1/users
+\`\`\`
+
+## Endpoints
+
+### User Management
+
+#### Get User Profile
+
+\`\`\`
+GET /v1/users/{userId}
+\`\`\`
+
+**Response:**
+\`\`\`json
+{
+  "id": "user_123",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+\`\`\`
+
+#### Update User Profile
+
+\`\`\`
+PUT /v1/users/{userId}
+Content-Type: application/json
+
+{
+  "name": "John Smith",
+  "email": "john.smith@example.com"
+}
+\`\`\`
+
+### Data Operations
+
+#### List Records
+
+\`\`\`
+GET /v1/records?limit=20&offset=0
+\`\`\`
+
+**Query Parameters:**
+- \`limit\`: Number of records to return (default: 20, max: 100)
+- \`offset\`: Number of records to skip (default: 0)
+- \`sort\`: Sort field (default: created_at)
+- \`order\`: Sort order (asc/desc, default: desc)
+
+## Error Handling
+
+The API uses standard HTTP status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | Success |
+| 400  | Bad Request |
+| 401  | Unauthorized |
+| 404  | Not Found |
+| 500  | Internal Server Error |
+
+**Error Response Format:**
+\`\`\`json
+{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "The request is missing required parameters",
+    "details": {
+      "missing_fields": ["name", "email"]
+    }
+  }
+}
+\`\`\`
+
+## Rate Limiting
+
+- **Free Tier**: 100 requests per hour
+- **Pro Tier**: 1,000 requests per hour
+- **Enterprise**: Custom limits
+
+Rate limit headers are included in all responses:
+
+\`\`\`
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1640995200
+\`\`\`
+
+## SDKs and Libraries
+
+We provide official SDKs for popular languages:
+
+### JavaScript/Node.js
+
+\`\`\`bash
+npm install @example/api-client
+\`\`\`
+
+\`\`\`javascript
+import { ApiClient } from '@example/api-client'
+
+const client = new ApiClient({
+  apiKey: 'your-api-key'
+})
+
+const user = await client.users.get('user_123')
+console.log(user)
+\`\`\`
+
+### Python
+
+\`\`\`bash
+pip install example-api-client
+\`\`\`
+
+\`\`\`python
+from example_api import ApiClient
+
+client = ApiClient(api_key='your-api-key')
+user = client.users.get('user_123')
+print(user)
+\`\`\`
+
+## Best Practices
+
+1. **Always use HTTPS** for API requests
+2. **Store API keys securely** - never commit them to version control
+3. **Implement retry logic** with exponential backoff
+4. **Cache responses** when appropriate to reduce API calls
+5. **Monitor rate limits** and implement proper handling
+
+## Webhooks
+
+Configure webhooks to receive real-time notifications:
+
+\`\`\`json
+{
+  "url": "https://yourapp.com/webhooks/api",
+  "events": ["user.created", "user.updated", "user.deleted"],
+  "secret": "webhook-secret-key"
+}
+\`\`\`
+
+## Support
+
+- **Documentation**: https://docs.example.com
+- **Support Email**: support@example.com
+- **Status Page**: https://status.example.com
+
+Happy coding! 🚀
+      `
+    }
+  }
+}
+```
+
+### Document Features
+
+Document artifacts provide:
+
+- **Rich Text Editing** - WYSIWYG editor with markdown output
+- **Live Preview** - Real-time rendering of markdown content
+- **Formatting Tools** - Bold, italic, headers, lists, links
+- **Code Blocks** - Syntax-highlighted code snippets
+- **Tables** - Table creation and editing
+- **Math Support** - LaTeX math rendering
+- **Image Embedding** - Image insertion and management
+
+## Canvas Integration
+
+### Basic Canvas Setup
+
+```tsx
+import { ChatSection, ChatCanvas } from '@llamaindex/chat-ui'
+
+function ChatWithCanvas() {
+  const handler = useChat({ api: '/api/chat' })
+  
+  return (
+    <ChatSection handler={handler} className="flex h-full">
+      <div className="flex-1">
+        <ChatMessages />
+        <ChatInput />
+      </div>
+      <ChatCanvas className="w-1/2 border-l" />
+    </ChatSection>
+  )
+}
+```
+
+### Canvas Auto-Show
+
+The canvas automatically appears when artifacts are present:
+
+```tsx
+// Canvas appears automatically when message contains artifacts
+<ChatMessage message={messageWithArtifact}>
+  <ChatMessage.Content>
+    <ChatMessage.Content.Markdown />
+    <ChatMessage.Content.Artifact />  {/* Triggers canvas display */}
+  </ChatMessage.Content>
+</ChatMessage>
+```
+
+### Manual Canvas Control
+
+```tsx
+import { useChatCanvas } from '@llamaindex/chat-ui'
+
+function CanvasControls() {
+  const { 
+    currentArtifact, 
+    isVisible, 
+    showCanvas, 
+    hideCanvas,
+    artifacts 
+  } = useChatCanvas()
+  
+  return (
+    <div className="flex gap-2">
+      <button 
+        onClick={showCanvas}
+        disabled={artifacts.length === 0}
+      >
+        Show Canvas ({artifacts.length})
+      </button>
+      
+      <button 
+        onClick={hideCanvas}
+        disabled={!isVisible}
+      >
+        Hide Canvas
+      </button>
+      
+      {currentArtifact && (
+        <span className="text-sm text-gray-600">
+          Current: {currentArtifact.title}
+        </span>
+      )}
+    </div>
+  )
+}
+```
+
+## Version Management
+
+Artifacts support version tracking and restoration:
+
+### Version History
+
+```tsx
+import { useChatCanvas } from '@llamaindex/chat-ui'
+
+function ArtifactVersions() {
+  const { currentArtifact, updateArtifact } = useChatCanvas()
+  
+  if (!currentArtifact) return null
+  
+  const versions = currentArtifact.versions || []
+  
+  const restoreVersion = (version: any) => {
+    updateArtifact({
+      ...currentArtifact,
+      content: version.content,
+      versions: [...versions, {
+        id: generateId(),
+        content: currentArtifact.content,
+        timestamp: new Date().toISOString(),
+        description: 'Current version backup'
+      }]
+    })
+  }
+  
+  return (
+    <div className="space-y-2">
+      <h3 className="font-semibold">Version History</h3>
+      {versions.map((version, index) => (
+        <div key={version.id} className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">
+              Version {versions.length - index}
+            </p>
+            <p className="text-xs text-gray-500">
+              {new Date(version.timestamp).toLocaleString()}
+            </p>
+          </div>
+          <button
+            onClick={() => restoreVersion(version)}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Restore
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+### Save Changes
+
+```tsx
+function SaveArtifactChanges() {
+  const { currentArtifact, updateArtifact } = useChatCanvas()
+  const [hasChanges, setHasChanges] = useState(false)
+  
+  const saveChanges = () => {
+    if (!currentArtifact || !hasChanges) return
+    
+    // Create version backup
+    const newVersion = {
+      id: generateId(),
+      content: currentArtifact.originalContent,
+      timestamp: new Date().toISOString(),
+      description: 'Auto-saved version'
+    }
+    
+    updateArtifact({
+      ...currentArtifact,
+      versions: [...(currentArtifact.versions || []), newVersion],
+      originalContent: currentArtifact.content
+    })
+    
+    setHasChanges(false)
+  }
+  
+  return (
+    <button
+      onClick={saveChanges}
+      disabled={!hasChanges}
+      className="bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-50"
+    >
+      {hasChanges ? 'Save Changes' : 'Saved'}
+    </button>
+  )
+}
+```
+
+## Artifact Actions
+
+### Export Functionality
+
+```tsx
+function ArtifactExport() {
+  const { currentArtifact } = useChatCanvas()
+  
+  const exportAsFile = () => {
+    if (!currentArtifact) return
+    
+    const content = currentArtifact.type === 'code' 
+      ? currentArtifact.code 
+      : currentArtifact.content
+      
+    const filename = currentArtifact.type === 'code'
+      ? currentArtifact.file_name
+      : `${currentArtifact.title}.md`
+    
+    const blob = new Blob([content], { 
+      type: 'text/plain;charset=utf-8' 
+    })
+    
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    
+    URL.revokeObjectURL(url)
+  }
+  
+  return (
+    <button 
+      onClick={exportAsFile}
+      className="flex items-center gap-2 px-3 py-1 text-sm border rounded"
+    >
+      <DownloadIcon className="h-4 w-4" />
+      Export
+    </button>
+  )
+}
+```
+
+### Copy to Clipboard
+
+```tsx
+import { useCopyToClipboard } from '@llamaindex/chat-ui'
+
+function CopyArtifact() {
+  const { currentArtifact } = useChatCanvas()
+  const { copyToClipboard, isCopied } = useCopyToClipboard()
+  
+  const handleCopy = () => {
+    if (!currentArtifact) return
+    
+    const content = currentArtifact.type === 'code'
+      ? currentArtifact.code
+      : currentArtifact.content
+      
+    copyToClipboard(content)
+  }
+  
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex items-center gap-2 px-3 py-1 text-sm border rounded"
+    >
+      <CopyIcon className="h-4 w-4" />
+      {isCopied ? 'Copied!' : 'Copy'}
+    </button>
+  )
+}
+```
+
+## Advanced Features
+
+### Collaborative Editing
+
+```tsx
+// Enable collaborative editing with real-time sync
+function CollaborativeArtifact() {
+  const { currentArtifact, updateArtifact } = useChatCanvas()
+  const [collaborators, setCollaborators] = useState([])
+  
+  useEffect(() => {
+    if (!currentArtifact) return
+    
+    // Connect to collaboration service
+    const socket = io('/artifacts')
+    
+    socket.emit('join-artifact', currentArtifact.id)
+    
+    socket.on('artifact-update', (update) => {
+      updateArtifact(update)
+    })
+    
+    socket.on('collaborators-changed', (users) => {
+      setCollaborators(users)
+    })
+    
+    return () => socket.disconnect()
+  }, [currentArtifact?.id])
+  
+  return (
+    <div className="border-b p-2">
+      <p className="text-sm text-gray-600">
+        {collaborators.length > 0 && (
+          `${collaborators.length} collaborator(s) active`
+        )}
+      </p>
+    </div>
+  )
+}
+```
+
+### AI-Assisted Editing
+
+```tsx
+function AIAssistant() {
+  const { currentArtifact, updateArtifact } = useChatCanvas()
+  const [suggestion, setSuggestion] = useState('')
+  
+  const getSuggestion = async (prompt: string) => {
+    const response = await fetch('/api/ai-assist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        artifact: currentArtifact,
+        prompt
+      })
+    })
+    
+    const { suggestion } = await response.json()
+    setSuggestion(suggestion)
+  }
+  
+  const applySuggestion = () => {
+    if (!currentArtifact || !suggestion) return
+    
+    updateArtifact({
+      ...currentArtifact,
+      content: suggestion
+    })
+    
+    setSuggestion('')
+  }
+  
+  return (
+    <div className="space-y-2">
+      <input
+        placeholder="Ask AI to modify the artifact..."
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            getSuggestion(e.currentTarget.value)
+          }
+        }}
+      />
+      
+      {suggestion && (
+        <div className="border rounded p-2">
+          <p className="text-sm font-medium">AI Suggestion:</p>
+          <pre className="text-xs mt-1">{suggestion}</pre>
+          <button 
+            onClick={applySuggestion}
+            className="mt-2 text-sm bg-green-600 text-white px-2 py-1 rounded"
+          >
+            Apply
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+## Custom Artifact Types
+
+### Creating Custom Artifact Viewers
+
+```tsx
+interface CustomArtifactData {
+  type: 'chart'
+  data: {
+    title: string
+    chartType: 'bar' | 'line' | 'pie'
+    data: Array<{ label: string; value: number }>
+  }
+}
+
+function ChartArtifactViewer({ artifact }: { artifact: CustomArtifactData }) {
+  return (
+    <div className="p-4">
+      <h3 className="font-semibold mb-4">{artifact.data.title}</h3>
+      <div className="h-64">
+        {/* Render chart based on artifact.data.chartType */}
+        <CustomChart 
+          type={artifact.data.chartType}
+          data={artifact.data.data}
+        />
+      </div>
+    </div>
+  )
+}
+
+// Register custom artifact type
+function CustomCanvas() {
+  const { currentArtifact } = useChatCanvas()
+  
+  if (!currentArtifact) return <div>No artifact selected</div>
+  
+  // Route to appropriate viewer
+  switch (currentArtifact.type) {
+    case 'code':
+      return <CodeArtifactViewer artifact={currentArtifact} />
+    case 'document':
+      return <DocumentArtifactViewer artifact={currentArtifact} />
+    case 'chart':
+      return <ChartArtifactViewer artifact={currentArtifact} />
+    default:
+      return <div>Unknown artifact type</div>
+  }
+}
+```
+
+## Best Practices
+
+### Performance
+
+- **Lazy Loading** - Only load artifacts when canvas is visible
+- **Debounced Updates** - Debounce edit operations to prevent excessive updates
+- **Virtual Scrolling** - Use virtual scrolling for large code files
+
+### User Experience
+
+- **Auto-Save** - Automatically save changes periodically
+- **Keyboard Shortcuts** - Provide keyboard shortcuts for common actions
+- **Loading States** - Show loading indicators during artifact generation
+
+### Security
+
+- **Content Validation** - Validate artifact content before rendering
+- **Sanitization** - Sanitize HTML content in document artifacts
+- **Access Control** - Implement proper access controls for shared artifacts
+
+## Next Steps
+
+- [Examples](./examples) - See complete artifact implementations
+- [Customization](./customization) - Style and customize artifact appearance
+- [Widgets](./widgets) - Explore related widget functionality
+- [Annotations](./annotations) - Understand the annotation system

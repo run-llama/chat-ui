@@ -1,0 +1,701 @@
+---
+title: Annotations
+description: Working with rich content annotations for multimedia and interactive chat experiences
+---
+
+Annotations are the key to creating rich, interactive chat experiences beyond simple text. They allow you to embed images, files, sources, events, and custom content types directly into chat messages.
+
+## Annotation System Overview
+
+Annotations are structured data attached to messages that widgets can render as rich content. The system supports both built-in annotation types and custom annotations for domain-specific content.
+
+### Message Structure with Annotations
+
+```typescript
+interface Message {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  annotations?: JSONValue[]
+}
+```
+
+### Built-in Annotation Types
+
+The library provides several built-in annotation types:
+
+- **IMAGE** - Image data with URLs
+- **DOCUMENT_FILE** - File attachments and metadata  
+- **SOURCES** - Citation and source references
+- **EVENTS** - Process events and function calls
+- **AGENT_EVENTS** - Agent-specific events with progress
+- **ARTIFACT** - Interactive code and document artifacts
+- **SUGGESTED_QUESTIONS** - Follow-up question suggestions
+
+## Image Annotations
+
+Display images within chat messages with zoom and preview functionality.
+
+### Creating Image Annotations
+
+```typescript
+// Server-side: Add image annotation to message
+const imageAnnotation = {
+  type: 'IMAGE',
+  data: {
+    url: 'https://example.com/chart.png',
+    alt: 'Sales chart for Q4 2024'
+  }
+}
+
+return {
+  role: 'assistant',
+  content: 'Here is the sales chart you requested:',
+  annotations: [imageAnnotation]
+}
+```
+
+### Streaming Image Annotations
+
+```typescript
+// In your API route
+const stream = new ReadableStream({
+  start(controller) {
+    // Send text content first
+    controller.enqueue(
+      encoder.encode('0:"Here is the chart you requested:\\n"\\n')
+    )
+    
+    // Send image annotation
+    const annotation = {
+      type: 'IMAGE',
+      data: {
+        url: '/api/generated-chart.png',
+        alt: 'Generated sales chart'
+      }
+    }
+    
+    controller.enqueue(
+      encoder.encode(`8:${JSON.stringify([annotation])}\\n`)
+    )
+    
+    controller.close()
+  }
+})
+```
+
+### Client-side Rendering
+
+Images automatically render when using the content components:
+
+```tsx
+<ChatMessage message={message}>
+  <ChatMessage.Content>
+    <ChatMessage.Content.Markdown />
+    <ChatMessage.Content.Image />  {/* Automatically renders IMAGE annotations */}
+  </ChatMessage.Content>
+</ChatMessage>
+```
+
+## File Annotations
+
+Display file attachments with download links and preview capabilities.
+
+### Document File Annotations
+
+```typescript
+const fileAnnotation = {
+  type: 'DOCUMENT_FILE',
+  data: {
+    files: [
+      {
+        id: 'doc1',
+        name: 'quarterly-report.pdf',
+        type: 'application/pdf',
+        url: '/files/quarterly-report.pdf',
+        size: 2048576, // 2MB in bytes
+        metadata: {
+          title: 'Q4 2024 Quarterly Report',
+          author: 'Finance Team',
+          pages: 25
+        }
+      },
+      {
+        id: 'doc2',
+        name: 'data-analysis.csv',
+        type: 'text/csv',
+        url: '/files/data-analysis.csv',
+        size: 1024000,
+        metadata: {
+          rows: 5000,
+          columns: 12
+        }
+      }
+    ]
+  }
+}
+```
+
+### File Upload Integration
+
+```typescript
+// Handle file uploads in your API
+export async function POST(request: Request) {
+  const formData = await request.formData()
+  const files = formData.getAll('files') as File[]
+  
+  const fileAnnotations = await Promise.all(
+    files.map(async (file) => {
+      const url = await uploadFile(file) // Your upload logic
+      
+      return {
+        type: 'DOCUMENT_FILE',
+        data: {
+          files: [{
+            id: generateId(),
+            name: file.name,
+            type: file.type,
+            url,
+            size: file.size
+          }]
+        }
+      }
+    })
+  )
+  
+  return streamResponse(content, fileAnnotations)
+}
+```
+
+## Source Annotations
+
+Display citations and source references with document grouping.
+
+### Creating Source Annotations
+
+```typescript
+const sourceAnnotation = {
+  type: 'sources',
+  data: {
+    nodes: [
+      {
+        id: 'source1',
+        url: '/documents/research-paper.pdf',
+        metadata: {
+          title: 'Machine Learning in Healthcare',
+          author: 'Dr. Jane Smith',
+          page_number: 15,
+          section: 'Methodology',
+          published_date: '2024-01-15'
+        }
+      },
+      {
+        id: 'source2', 
+        url: '/documents/clinical-study.pdf',
+        metadata: {
+          title: 'Clinical Trial Results',
+          author: 'Medical Research Institute',
+          page_number: 8,
+          figure: 'Figure 3.2'
+        }
+      }
+    ]
+  }
+}
+```
+
+### Citation in Content
+
+Reference sources directly in your content using citation syntax:
+
+```typescript
+const content = `
+Based on recent research [^1], machine learning shows promising results 
+in medical diagnosis. The clinical trial data [^2] supports these findings 
+with a 95% accuracy rate.
+
+[^1]: Machine Learning in Healthcare, p. 15
+[^2]: Clinical Trial Results, Figure 3.2
+`
+
+return {
+  role: 'assistant',
+  content,
+  annotations: [sourceAnnotation]
+}
+```
+
+## Event Annotations
+
+Display process events, function calls, and system activities.
+
+### Basic Events
+
+```typescript
+const eventAnnotation = {
+  type: 'events',
+  data: [
+    {
+      type: 'function_call',
+      name: 'search_database',
+      args: {
+        query: 'machine learning papers',
+        limit: 10
+      },
+      result: 'Found 8 relevant papers',
+      timestamp: '2024-01-15T10:30:00Z'
+    },
+    {
+      type: 'tool_use',
+      name: 'calculate_statistics',
+      args: {
+        dataset: 'user_engagement'
+      },
+      result: {
+        mean: 4.2,
+        median: 4.1,
+        std_dev: 0.8
+      }
+    }
+  ]
+}
+```
+
+### Agent Events with Progress
+
+```typescript
+const agentEventAnnotation = {
+  type: 'agent_events',
+  data: {
+    agent_name: 'Research Assistant',
+    total_steps: 4,
+    current_step: 2,
+    progress: 50,
+    events: [
+      {
+        step: 1,
+        name: 'Search Documents',
+        status: 'completed',
+        result: 'Found 15 relevant documents'
+      },
+      {
+        step: 2,
+        name: 'Analyze Content',
+        status: 'in_progress',
+        progress: 75
+      },
+      {
+        step: 3,
+        name: 'Generate Summary',
+        status: 'pending'
+      },
+      {
+        step: 4,
+        name: 'Create Recommendations',
+        status: 'pending'
+      }
+    ]
+  }
+}
+```
+
+## Artifact Annotations
+
+Create interactive code and document artifacts that users can edit.
+
+### Code Artifacts
+
+```typescript
+const codeArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'code',
+    data: {
+      title: 'Data Analysis Script',
+      file_name: 'analyze_data.py',
+      language: 'python',
+      code: `
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def analyze_sales_data(file_path):
+    # Load data
+    df = pd.read_csv(file_path)
+    
+    # Calculate monthly totals
+    monthly_sales = df.groupby('month')['sales'].sum()
+    
+    # Create visualization
+    plt.figure(figsize=(10, 6))
+    monthly_sales.plot(kind='bar')
+    plt.title('Monthly Sales Analysis')
+    plt.ylabel('Sales ($)')
+    plt.show()
+    
+    return monthly_sales
+
+# Usage
+sales_data = analyze_sales_data('sales.csv')
+print(sales_data)
+      `
+    }
+  }
+}
+```
+
+### Document Artifacts
+
+```typescript
+const documentArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'document',
+    data: {
+      title: 'Project Proposal',
+      content: `
+# AI-Powered Analytics Platform
+
+## Executive Summary
+
+This proposal outlines the development of an AI-powered analytics platform 
+designed to help businesses make data-driven decisions.
+
+## Key Features
+
+- **Real-time Data Processing**: Stream analytics with sub-second latency
+- **Machine Learning Models**: Automated insight generation
+- **Interactive Dashboards**: Self-service analytics for business users
+
+## Implementation Timeline
+
+### Phase 1 (Months 1-3)
+- Core platform development
+- Basic ML model integration
+
+### Phase 2 (Months 4-6)  
+- Advanced analytics features
+- Dashboard creation tools
+
+## Budget Estimate
+
+Total project cost: $250,000
+      `
+    }
+  }
+}
+```
+
+## Suggested Questions
+
+Provide interactive follow-up questions to guide the conversation.
+
+```typescript
+const suggestedQuestionsAnnotation = {
+  type: 'suggested_questions',
+  data: {
+    questions: [
+      'Can you explain the methodology in more detail?',
+      'What are the potential limitations of this approach?',
+      'How does this compare to traditional methods?',
+      'What would be the next steps for implementation?'
+    ]
+  }
+}
+```
+
+## Custom Annotations
+
+Create domain-specific annotations for specialized content.
+
+### Weather Widget Example
+
+```typescript
+// Define custom annotation type
+interface WeatherAnnotation {
+  type: 'weather'
+  data: {
+    location: string
+    temperature: number
+    condition: string
+    humidity: number
+    windSpeed: number
+    forecast?: Array<{
+      day: string
+      high: number
+      low: number
+      condition: string
+    }>
+  }
+}
+
+// Create annotation
+const weatherAnnotation: WeatherAnnotation = {
+  type: 'weather',
+  data: {
+    location: 'San Francisco, CA',
+    temperature: 22,
+    condition: 'sunny',
+    humidity: 65,
+    windSpeed: 12,
+    forecast: [
+      { day: 'Tomorrow', high: 24, low: 18, condition: 'cloudy' },
+      { day: 'Wednesday', high: 26, low: 20, condition: 'sunny' }
+    ]
+  }
+}
+```
+
+### Custom Widget Implementation
+
+```tsx
+import { useChatMessage, getCustomAnnotations } from '@llamaindex/chat-ui'
+
+interface WeatherData {
+  location: string
+  temperature: number
+  condition: string
+  humidity: number
+  windSpeed: number
+}
+
+export function CustomWeatherWidget() {
+  const { message } = useChatMessage()
+  
+  const weatherData = getCustomAnnotations<WeatherData>(
+    message.annotations,
+    'weather'
+  )
+  
+  if (!weatherData[0]) return null
+  
+  const data = weatherData[0]
+  
+  return (
+    <div className="my-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <WeatherIcon condition={data.condition} />
+        </div>
+        <div className="flex-1">
+          <h3 className="font-semibold text-blue-900">{data.location}</h3>
+          <div className="flex items-center gap-4 text-sm text-blue-700">
+            <span className="text-2xl font-bold">{data.temperature}°C</span>
+            <span>{data.condition}</span>
+          </div>
+        </div>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-4 text-sm text-blue-600">
+        <div className="flex items-center gap-2">
+          <span>💧 Humidity:</span>
+          <span className="font-medium">{data.humidity}%</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>🌬️ Wind:</span>
+          <span className="font-medium">{data.windSpeed} km/h</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function WeatherIcon({ condition }: { condition: string }) {
+  const iconMap: Record<string, string> = {
+    sunny: '☀️',
+    cloudy: '☁️', 
+    rainy: '🌧️',
+    snowy: '❄️',
+    stormy: '⛈️'
+  }
+  
+  return (
+    <span className="text-2xl">
+      {iconMap[condition.toLowerCase()] || '🌤️'}
+    </span>
+  )
+}
+```
+
+### Using Custom Widgets
+
+```tsx
+import { ChatMessage } from '@llamaindex/chat-ui'
+import { CustomWeatherWidget } from './custom-weather-widget'
+
+function MessageWithCustomWidgets({ message }) {
+  return (
+    <ChatMessage message={message}>
+      <ChatMessage.Content>
+        <ChatMessage.Content.Markdown />
+        <ChatMessage.Content.Image />
+        <ChatMessage.Content.Source />
+        <CustomWeatherWidget />  {/* Add custom widget */}
+      </ChatMessage.Content>
+    </ChatMessage>
+  )
+}
+```
+
+## Annotation Utilities
+
+### getCustomAnnotations
+
+Extract custom annotations from a message:
+
+```tsx
+import { getCustomAnnotations } from '@llamaindex/chat-ui'
+
+function useWeatherData() {
+  const { message } = useChatMessage()
+  
+  return getCustomAnnotations<WeatherData>(
+    message.annotations,
+    'weather'
+  )
+}
+```
+
+### Annotation Validation
+
+Validate annotation data before rendering:
+
+```tsx
+function validateWeatherData(data: any): data is WeatherData {
+  return (
+    typeof data === 'object' &&
+    typeof data.location === 'string' &&
+    typeof data.temperature === 'number' &&
+    typeof data.condition === 'string'
+  )
+}
+
+function SafeWeatherWidget() {
+  const { message } = useChatMessage()
+  const weatherData = getCustomAnnotations(message.annotations, 'weather')
+  
+  if (!weatherData[0] || !validateWeatherData(weatherData[0])) {
+    return null
+  }
+  
+  return <WeatherDisplay data={weatherData[0]} />
+}
+```
+
+## Server-side Implementation
+
+### Streaming Annotations
+
+```typescript
+// API route for streaming with annotations
+export async function POST(request: Request) {
+  const { messages } = await request.json()
+  
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder()
+      
+      // Send initial text
+      controller.enqueue(
+        encoder.encode('0:"Let me analyze the weather data for you.\\n"\\n')
+      )
+      
+      // Process and get weather data
+      const weatherData = await getWeatherData(location)
+      
+      // Send weather annotation
+      const annotation = {
+        type: 'weather',
+        data: weatherData
+      }
+      
+      controller.enqueue(
+        encoder.encode(`8:${JSON.stringify([annotation])}\\n`)
+      )
+      
+      // Send follow-up text
+      controller.enqueue(
+        encoder.encode('0:"Would you like a detailed forecast?"\\n')
+      )
+      
+      controller.close()
+    }
+  })
+  
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Vercel-AI-Data-Stream': 'v1'
+    }
+  })
+}
+```
+
+### Annotation Processing
+
+```typescript
+// Process different annotation types
+function createAnnotations(data: any) {
+  const annotations = []
+  
+  // Add image if generated
+  if (data.imageUrl) {
+    annotations.push({
+      type: 'IMAGE',
+      data: {
+        url: data.imageUrl,
+        alt: data.imageDescription
+      }
+    })
+  }
+  
+  // Add sources if referenced
+  if (data.sources?.length > 0) {
+    annotations.push({
+      type: 'sources',
+      data: {
+        nodes: data.sources.map(source => ({
+          id: source.id,
+          url: source.url,
+          metadata: source.metadata
+        }))
+      }
+    })
+  }
+  
+  // Add custom weather data
+  if (data.weather) {
+    annotations.push({
+      type: 'weather',
+      data: data.weather
+    })
+  }
+  
+  return annotations
+}
+```
+
+## Best Practices
+
+### Performance
+
+- **Lazy Load Images** - Use loading="lazy" for image annotations
+- **Optimize File Sizes** - Compress images and limit file upload sizes
+- **Cache Annotations** - Cache processed annotation data when possible
+
+### Accessibility
+
+- **Alt Text** - Always provide alt text for images
+- **Keyboard Navigation** - Ensure interactive annotations are keyboard accessible
+- **Screen Reader Support** - Use semantic HTML and ARIA labels
+
+### User Experience
+
+- **Loading States** - Show loading indicators for annotation processing
+- **Error Handling** - Gracefully handle failed annotation rendering
+- **Progressive Enhancement** - Ensure content works without annotations
+
+## Next Steps
+
+- [Artifacts](./artifacts) - Learn about interactive code and document artifacts
+- [Widgets](./widgets) - Explore widget implementation details
+- [Examples](./examples) - See complete annotation examples
+- [Customization](./customization) - Style and customize annotation appearance

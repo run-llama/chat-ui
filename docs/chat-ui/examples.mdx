@@ -1,0 +1,894 @@
+---
+title: Examples
+description: Real-world implementation examples and use cases
+---
+
+This section provides complete, working examples that demonstrate how to implement various features and use cases with LlamaIndex Chat UI.
+
+## Basic Chat Interface
+
+A simple chat interface with all essential features.
+
+### Complete Implementation
+
+```tsx
+'use client'
+
+import {
+  ChatSection,
+  ChatMessages,
+  ChatMessage,
+  ChatInput,
+  useChatUI,
+} from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+const initialMessages = [
+  {
+    id: '1',
+    content: 'Hello! How can I help you today?',
+    role: 'assistant' as const,
+  },
+]
+
+export default function BasicChat() {
+  return (
+    <div className="flex h-screen flex-col">
+      <header className="border-b bg-white p-4 text-center">
+        <h1 className="text-2xl font-bold">My Chat App</h1>
+        <p className="text-gray-600">
+          A simple chat interface using @llamaindex/chat-ui
+        </p>
+      </header>
+      
+      <div className="min-h-0 flex-1">
+        <ChatExample />
+      </div>
+    </div>
+  )
+}
+
+function ChatExample() {
+  const handler = useChat({
+    api: '/api/chat',
+    initialMessages,
+  })
+
+  return (
+    <ChatSection handler={handler} className="h-full">
+      <ChatMessages>
+        <ChatMessages.List className="px-4 py-6">
+          <MessageList />
+        </ChatMessages.List>
+      </ChatMessages>
+      
+      <div className="border-t p-4">
+        <ChatInput>
+          <ChatInput.Form>
+            <ChatInput.Field placeholder="Type your message..." />
+            <ChatInput.Submit />
+          </ChatInput.Form>
+        </ChatInput>
+      </div>
+    </ChatSection>
+  )
+}
+
+function MessageList() {
+  const { messages, isLoading } = useChatUI()
+
+  return (
+    <>
+      {messages.map((message, index) => (
+        <ChatMessage
+          key={index}
+          message={message}
+          isLast={index === messages.length - 1}
+          className="mb-4"
+        >
+          <ChatMessage.Avatar>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-semibold text-white">
+              {message.role === 'user' ? 'U' : 'AI'}
+            </div>
+          </ChatMessage.Avatar>
+          
+          <ChatMessage.Content isLoading={isLoading}>
+            <ChatMessage.Content.Markdown />
+            <ChatMessage.Content.Image />
+            <ChatMessage.Content.Artifact />
+            <ChatMessage.Content.Source />
+          </ChatMessage.Content>
+          
+          <ChatMessage.Actions />
+        </ChatMessage>
+      ))}
+    </>
+  )
+}
+```
+
+### API Route
+
+```typescript
+// app/api/chat/route.ts
+import { NextResponse } from 'next/server'
+
+export async function POST(request: Request) {
+  try {
+    const { messages } = await request.json()
+    
+    // Your chat logic here - integrate with OpenAI, LlamaIndex, etc.
+    const response = await generateChatResponse(messages)
+    
+    return new Response(response, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Vercel-AI-Data-Stream': 'v1',
+      },
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+## Advanced Chat with Canvas
+
+A sophisticated chat interface with artifact support and custom annotations.
+
+```tsx
+'use client'
+
+import {
+  ChatSection,
+  ChatMessages,
+  ChatMessage,
+  ChatInput,
+  ChatCanvas,
+  useChatUI,
+} from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+import { CustomWeatherAnnotation } from './components/custom-weather-annotation'
+
+export default function AdvancedChat() {
+  const handler = useChat({
+    api: '/api/chat',
+    initialMessages: [
+      {
+        id: '1',
+        content: 'Hello! I can help you with code generation, data analysis, and more. What would you like to work on?',
+        role: 'assistant',
+      },
+    ],
+  })
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <ChatSection
+        handler={handler}
+        className="flex h-full flex-row gap-0 p-0"
+      >
+        {/* Main chat area */}
+        <div className="flex min-w-0 flex-1 flex-col bg-white">
+          <div className="border-b p-4">
+            <h1 className="text-xl font-semibold">Advanced Chat</h1>
+            <p className="text-sm text-gray-600">
+              Chat with artifacts, file upload, and custom annotations
+            </p>
+          </div>
+
+          <ChatMessages className="flex-1">
+            <ChatMessages.List className="px-6 py-4">
+              <AdvancedMessageList />
+            </ChatMessages.List>
+            
+            <ChatMessages.Loading>
+              <div className="flex items-center gap-2 px-6 py-4">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500"></div>
+                <span className="text-sm text-gray-500">AI is thinking...</span>
+              </div>
+            </ChatMessages.Loading>
+          </ChatMessages>
+
+          <div className="border-t bg-gray-50 p-4">
+            <ChatInput>
+              <ChatInput.Form className="flex gap-2">
+                <ChatInput.Field
+                  placeholder="Ask me to create code, documents, or analyze data..."
+                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2"
+                />
+                <ChatInput.Upload>
+                  <button
+                    type="button"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100"
+                  >
+                    📎
+                  </button>
+                </ChatInput.Upload>
+                <ChatInput.Submit>
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Send
+                  </button>
+                </ChatInput.Submit>
+              </ChatInput.Form>
+            </ChatInput>
+          </div>
+        </div>
+
+        {/* Artifact canvas */}
+        <ChatCanvas className="w-1/2 border-l bg-white" />
+      </ChatSection>
+    </div>
+  )
+}
+
+function AdvancedMessageList() {
+  const { messages, isLoading, append } = useChatUI()
+
+  return (
+    <div className="space-y-6">
+      {messages.map((message, index) => (
+        <ChatMessage
+          key={index}
+          message={message}
+          isLast={index === messages.length - 1}
+        >
+          <div className="flex gap-4">
+            <ChatMessage.Avatar>
+              <div
+                className={`
+                  flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold
+                  ${message.role === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                  }
+                `}
+              >
+                {message.role === 'user' ? '👤' : '🤖'}
+              </div>
+            </ChatMessage.Avatar>
+
+            <div className="min-w-0 flex-1">
+              <div className="mb-2">
+                <span className="text-sm font-medium capitalize text-gray-900">
+                  {message.role}
+                </span>
+                <span className="ml-2 text-xs text-gray-500">
+                  {new Date().toLocaleTimeString()}
+                </span>
+              </div>
+
+              <ChatMessage.Content isLoading={isLoading} append={append}>
+                <div className="prose prose-sm max-w-none">
+                  <ChatMessage.Content.Markdown />
+                </div>
+                <ChatMessage.Content.Image />
+                <ChatMessage.Content.Artifact />
+                <ChatMessage.Content.Source />
+                <ChatMessage.Content.Event />
+                <ChatMessage.Content.AgentEvent />
+                <ChatMessage.Content.DocumentFile />
+                <ChatMessage.Content.SuggestedQuestions />
+                <CustomWeatherAnnotation />
+              </ChatMessage.Content>
+
+              <ChatMessage.Actions>
+                <div className="mt-2 flex gap-2">
+                  <button className="text-xs text-gray-500 hover:text-gray-700">
+                    👍
+                  </button>
+                  <button className="text-xs text-gray-500 hover:text-gray-700">
+                    👎
+                  </button>
+                  <button className="text-xs text-gray-500 hover:text-gray-700">
+                    📋 Copy
+                  </button>
+                  <button className="text-xs text-gray-500 hover:text-gray-700">
+                    🔄 Regenerate
+                  </button>
+                </div>
+              </ChatMessage.Actions>
+            </div>
+          </div>
+        </ChatMessage>
+      ))}
+    </div>
+  )
+}
+```
+
+## Custom Weather Annotation
+
+Implementation of a custom annotation type for weather data.
+
+```tsx
+// components/custom-weather-annotation.tsx
+'use client'
+
+import { useChatMessage, getCustomAnnotations } from '@llamaindex/chat-ui'
+
+interface WeatherData {
+  location: string
+  temperature: number
+  condition: string
+  humidity: number
+  windSpeed: number
+  forecast?: Array<{
+    day: string
+    high: number
+    low: number
+    condition: string
+  }>
+}
+
+export function CustomWeatherAnnotation() {
+  const { message } = useChatMessage()
+
+  const weatherData = getCustomAnnotations<WeatherData>(
+    message.annotations,
+    'weather'
+  )
+
+  if (!weatherData[0]) return null
+
+  const data = weatherData[0]
+
+  return (
+    <div className="my-4 overflow-hidden rounded-lg border border-blue-200 bg-blue-50">
+      <div className="border-b border-blue-200 bg-blue-100 px-4 py-3">
+        <h3 className="font-semibold text-blue-900">Weather Information</h3>
+      </div>
+      
+      <div className="p-4">
+        <div className="flex items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <WeatherIcon condition={data.condition} />
+          </div>
+          
+          <div className="flex-1">
+            <h4 className="text-lg font-semibold text-blue-900">
+              {data.location}
+            </h4>
+            <div className="flex items-center gap-4 text-blue-700">
+              <span className="text-3xl font-bold">{data.temperature}°C</span>
+              <span className="capitalize">{data.condition}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+          <div className="flex items-center gap-2 text-blue-600">
+            <span>💧 Humidity:</span>
+            <span className="font-medium">{data.humidity}%</span>
+          </div>
+          <div className="flex items-center gap-2 text-blue-600">
+            <span>🌬️ Wind Speed:</span>
+            <span className="font-medium">{data.windSpeed} km/h</span>
+          </div>
+        </div>
+
+        {data.forecast && data.forecast.length > 0 && (
+          <div className="mt-4">
+            <h5 className="mb-2 font-medium text-blue-900">Forecast</h5>
+            <div className="grid grid-cols-3 gap-2">
+              {data.forecast.map((day, index) => (
+                <div
+                  key={index}
+                  className="rounded bg-white p-2 text-center text-xs"
+                >
+                  <div className="font-medium text-gray-900">{day.day}</div>
+                  <div className="my-1">
+                    <WeatherIcon condition={day.condition} size="sm" />
+                  </div>
+                  <div className="text-gray-600">
+                    {day.high}° / {day.low}°
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function WeatherIcon({ 
+  condition, 
+  size = 'default' 
+}: { 
+  condition: string
+  size?: 'sm' | 'default' 
+}) {
+  const iconMap: Record<string, string> = {
+    sunny: '☀️',
+    cloudy: '☁️',
+    rainy: '🌧️',
+    snowy: '❄️',
+    stormy: '⛈️',
+    windy: '💨',
+    foggy: '🌫️',
+  }
+
+  const sizeClass = size === 'sm' ? 'text-lg' : 'text-3xl'
+
+  return (
+    <span className={sizeClass}>
+      {iconMap[condition.toLowerCase()] || '🌤️'}
+    </span>
+  )
+}
+```
+
+## File Upload Integration
+
+Complete file upload implementation with preview and processing.
+
+```tsx
+import { useState } from 'react'
+import { useFile } from '@llamaindex/chat-ui'
+import { FileUploader } from '@llamaindex/chat-ui/widgets'
+
+function FileUploadChat() {
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  
+  const handler = useChat({
+    api: '/api/chat',
+    body: {
+      files: uploadedFiles.map(file => ({
+        name: file.name,
+        type: file.type,
+        size: file.size
+      }))
+    }
+  })
+
+  const { uploadFiles, isUploading } = useFile({
+    maxSize: 10 * 1024 * 1024, // 10MB
+    accept: [
+      'image/*',
+      'application/pdf',
+      'text/*',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ],
+    multiple: true,
+    onUpload: (files) => {
+      setUploadedFiles(prev => [...prev, ...files])
+    }
+  })
+
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages>
+        <ChatMessages.List>
+          {/* Messages */}
+        </ChatMessages.List>
+        
+        {uploadedFiles.length > 0 && (
+          <div className="border-t p-4">
+            <h3 className="mb-2 text-sm font-medium">Uploaded Files</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {uploadedFiles.map((file, index) => (
+                <FilePreview
+                  key={index}
+                  file={file}
+                  onRemove={() => {
+                    setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </ChatMessages>
+
+      <div className="border-t p-4">
+        <div className="mb-4">
+          <FileUploader
+            onFiles={uploadFiles}
+            accept={{
+              'image/*': ['.png', '.jpg', '.jpeg', '.gif'],
+              'application/pdf': ['.pdf'],
+              'text/*': ['.txt', '.md'],
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
+            }}
+            maxSize={10 * 1024 * 1024}
+            multiple
+            disabled={isUploading}
+          >
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+              {isUploading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+                  <span className="text-sm text-gray-600">Uploading...</span>
+                </div>
+              ) : (
+                <div>
+                  <div className="text-2xl mb-2">📎</div>
+                  <p className="text-sm text-gray-600">
+                    Drag files here or click to upload
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Supports images, PDFs, text files, and Word documents
+                  </p>
+                </div>
+              )}
+            </div>
+          </FileUploader>
+        </div>
+
+        <ChatInput>
+          <ChatInput.Form>
+            <ChatInput.Field placeholder="Ask about your uploaded files..." />
+            <ChatInput.Submit />
+          </ChatInput.Form>
+        </ChatInput>
+      </div>
+    </ChatSection>
+  )
+}
+
+function FilePreview({ 
+  file, 
+  onRemove 
+}: { 
+  file: File
+  onRemove: () => void 
+}) {
+  const [preview, setPreview] = useState<string>()
+
+  useEffect(() => {
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (e) => setPreview(e.target?.result as string)
+      reader.readAsDataURL(file)
+    }
+  }, [file])
+
+  return (
+    <div className="relative rounded border bg-gray-50 p-2">
+      {preview ? (
+        <img
+          src={preview}
+          alt={file.name}
+          className="h-16 w-full rounded object-cover"
+        />
+      ) : (
+        <div className="flex h-16 items-center justify-center bg-gray-200 rounded">
+          <span className="text-2xl">
+            {file.type.includes('pdf') ? '📄' : 
+             file.type.includes('word') ? '📝' : '📄'}
+          </span>
+        </div>
+      )}
+      
+      <div className="mt-1">
+        <p className="truncate text-xs font-medium">{file.name}</p>
+        <p className="text-xs text-gray-500">
+          {(file.size / 1024 / 1024).toFixed(1)} MB
+        </p>
+      </div>
+      
+      <button
+        onClick={onRemove}
+        className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+      >
+        ×
+      </button>
+    </div>
+  )
+}
+```
+
+## Multi-Agent Workflow
+
+Example showing multiple agents working together with progress tracking.
+
+```tsx
+import { ChatAgentEvents } from '@llamaindex/chat-ui/widgets'
+
+// API route for multi-agent workflow
+export async function POST(request: Request) {
+  const { messages } = await request.json()
+  
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder()
+      
+      // Initial response
+      controller.enqueue(
+        encoder.encode('0:"I\'ll analyze this using multiple specialized agents.\\n"\\n')
+      )
+      
+      // Start research agent
+      const researchAgent = {
+        type: 'agent_events',
+        data: {
+          agent_name: 'Research Agent',
+          total_steps: 3,
+          current_step: 1,
+          progress: 33,
+          events: [
+            {
+              step: 1,
+              name: 'Search Knowledge Base',
+              status: 'in_progress',
+              progress: 50
+            },
+            {
+              step: 2,
+              name: 'Analyze Sources',
+              status: 'pending'
+            },
+            {
+              step: 3,
+              name: 'Generate Summary',
+              status: 'pending'
+            }
+          ]
+        }
+      }
+      
+      controller.enqueue(
+        encoder.encode(`8:${JSON.stringify([researchAgent])}\\n`)
+      )
+      
+      // Simulate progress updates
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Update research agent progress
+      researchAgent.data.current_step = 2
+      researchAgent.data.progress = 66
+      researchAgent.data.events[0].status = 'completed'
+      researchAgent.data.events[1].status = 'in_progress'
+      
+      controller.enqueue(
+        encoder.encode(`8:${JSON.stringify([researchAgent])}\\n`)
+      )
+      
+      // Start analysis agent
+      const analysisAgent = {
+        type: 'agent_events',
+        data: {
+          agent_name: 'Analysis Agent',
+          total_steps: 2,
+          current_step: 1,
+          progress: 50,
+          events: [
+            {
+              step: 1,
+              name: 'Process Data',
+              status: 'in_progress'
+            },
+            {
+              step: 2,
+              name: 'Generate Insights',
+              status: 'pending'
+            }
+          ]
+        }
+      }
+      
+      controller.enqueue(
+        encoder.encode(`8:${JSON.stringify([analysisAgent])}\\n`)
+      )
+      
+      // Complete workflow
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      controller.enqueue(
+        encoder.encode('0:"Analysis complete! Here are the results:\\n\\n"\\n')
+      )
+      
+      // Add final results
+      const results = {
+        type: 'artifact',
+        data: {
+          type: 'document',
+          data: {
+            title: 'Analysis Results',
+            content: '# Analysis Results\\n\\nBased on the multi-agent analysis...'
+          }
+        }
+      }
+      
+      controller.enqueue(
+        encoder.encode(`8:${JSON.stringify([results])}\\n`)
+      )
+      
+      controller.close()
+    }
+  })
+  
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Vercel-AI-Data-Stream': 'v1'
+    }
+  })
+}
+```
+
+## Code Generation with Execution
+
+Interactive code generation and execution environment.
+
+```tsx
+import { useState } from 'react'
+import { CodeEditor } from '@llamaindex/chat-ui/widgets'
+
+function CodeGenerationChat() {
+  const [executionResults, setExecutionResults] = useState<string>()
+  
+  const handler = useChat({
+    api: '/api/code-chat',
+    onFinish: (message) => {
+      // Auto-execute generated code if it's Python
+      if (message.annotations) {
+        const codeArtifacts = message.annotations.filter(
+          (ann: any) => ann.type === 'artifact' && ann.data.type === 'code'
+        )
+        
+        codeArtifacts.forEach(async (artifact: any) => {
+          if (artifact.data.data.language === 'python') {
+            await executeCode(artifact.data.data.code)
+          }
+        })
+      }
+    }
+  })
+
+  const executeCode = async (code: string) => {
+    try {
+      const response = await fetch('/api/execute-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, language: 'python' })
+      })
+      
+      const result = await response.json()
+      setExecutionResults(result.output)
+    } catch (error) {
+      setExecutionResults(`Error: ${error.message}`)
+    }
+  }
+
+  return (
+    <ChatSection handler={handler} className="flex-row">
+      <div className="flex-1">
+        <ChatMessages />
+        <ChatInput />
+      </div>
+      
+      <div className="w-1/2 border-l">
+        <ChatCanvas>
+          {/* Enhanced canvas with execution results */}
+          <div className="h-full flex flex-col">
+            <div className="flex-1">
+              {/* Canvas content */}
+            </div>
+            
+            {executionResults && (
+              <div className="border-t bg-gray-50 p-4">
+                <h4 className="font-medium mb-2">Execution Results</h4>
+                <pre className="bg-black text-green-400 p-3 rounded text-sm overflow-auto">
+                  {executionResults}
+                </pre>
+              </div>
+            )}
+          </div>
+        </ChatCanvas>
+      </div>
+    </ChatSection>
+  )
+}
+```
+
+## Production Deployment
+
+Complete production-ready setup with error handling and monitoring.
+
+```tsx
+// app/chat/page.tsx
+'use client'
+
+import { ErrorBoundary } from 'react-error-boundary'
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+function ErrorFallback({ error, resetErrorBoundary }: {
+  error: Error
+  resetErrorBoundary: () => void
+}) {
+  return (
+    <div className="flex h-full items-center justify-center bg-red-50">
+      <div className="text-center">
+        <h2 className="text-lg font-semibold text-red-900">
+          Something went wrong
+        </h2>
+        <p className="mt-2 text-sm text-red-700">
+          {error.message}
+        </p>
+        <button
+          onClick={resetErrorBoundary}
+          className="mt-4 rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+        >
+          Try again
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default function ProductionChat() {
+  const handler = useChat({
+    api: '/api/chat',
+    onError: (error) => {
+      // Log to monitoring service
+      console.error('Chat error:', error)
+      // Could send to Sentry, LogRocket, etc.
+    }
+  })
+
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <div className="flex h-screen flex-col">
+        <ChatSection handler={handler} />
+      </div>
+    </ErrorBoundary>
+  )
+}
+```
+
+```typescript
+// app/api/chat/route.ts - Production API
+import { NextRequest } from 'next/server'
+import { ratelimit } from '@/lib/ratelimit'
+
+export async function POST(request: NextRequest) {
+  try {
+    // Rate limiting
+    const ip = request.ip ?? '127.0.0.1'
+    const { success } = await ratelimit.limit(ip)
+    
+    if (!success) {
+      return new Response('Rate limit exceeded', { status: 429 })
+    }
+
+    // Input validation
+    const body = await request.json()
+    if (!body.messages || !Array.isArray(body.messages)) {
+      return new Response('Invalid request body', { status: 400 })
+    }
+
+    // Generate response
+    const stream = await generateChatStream(body.messages)
+    
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Vercel-AI-Data-Stream': 'v1',
+        'Cache-Control': 'no-cache',
+      },
+    })
+  } catch (error) {
+    console.error('Chat API error:', error)
+    return new Response('Internal server error', { status: 500 })
+  }
+}
+```
+
+These examples demonstrate the full range of capabilities available with LlamaIndex Chat UI, from simple implementations to complex, production-ready applications with custom features and integrations.
+
+## Next Steps
+
+- Explore the [NextJS Example](/examples/nextjs) in the repository
+- Check out the [FastAPI Example](/examples/fastapi) for backend integration
+- Review the [Core Components](./core-components) documentation for detailed API references
+- See [Customization](./customization) for styling and theming options

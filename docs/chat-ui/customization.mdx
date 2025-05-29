@@ -1,0 +1,718 @@
+---
+title: Customization
+description: Style and customize the appearance and behavior of chat components
+---
+
+LlamaIndex Chat UI is built with customization in mind. You can style components, override default behaviors, and create custom themes to match your application's design system.
+
+## Styling System
+
+The library uses Tailwind CSS for styling and provides several customization approaches:
+
+### CSS Variables
+
+The library exposes CSS variables for easy theming:
+
+```css
+/* Custom theme variables */
+:root {
+  --chat-primary: #3b82f6;
+  --chat-secondary: #6b7280;
+  --chat-background: #ffffff;
+  --chat-surface: #f9fafb;
+  --chat-border: #e5e7eb;
+  --chat-text: #1f2937;
+  --chat-text-secondary: #6b7280;
+  --chat-success: #10b981;
+  --chat-warning: #f59e0b;
+  --chat-error: #ef4444;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --chat-primary: #60a5fa;
+  --chat-secondary: #9ca3af;
+  --chat-background: #111827;
+  --chat-surface: #1f2937;
+  --chat-border: #374151;
+  --chat-text: #f9fafb;
+  --chat-text-secondary: #d1d5db;
+}
+```
+
+### Component-Level Styling
+
+Override component styles using className props:
+
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+
+function CustomStyledChat() {
+  return (
+    <ChatSection 
+      handler={handler}
+      className="bg-gradient-to-b from-blue-50 to-white"
+    >
+      <ChatMessages className="bg-white/80 backdrop-blur rounded-lg shadow-lg">
+        <ChatMessages.List className="space-y-6 p-6">
+          {/* Custom message rendering */}
+        </ChatMessages.List>
+      </ChatMessages>
+      
+      <ChatInput className="bg-white border-2 border-blue-200 rounded-xl p-4">
+        <ChatInput.Form className="flex items-end gap-3">
+          <ChatInput.Field 
+            className="flex-1 border-none bg-gray-50 rounded-lg px-4 py-2"
+            placeholder="Ask me anything..."
+          />
+          <ChatInput.Submit className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2">
+            Send
+          </ChatInput.Submit>
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
+
+## Message Customization
+
+### Custom Message Layout
+
+```tsx
+import { ChatMessage, useChatMessage } from '@llamaindex/chat-ui'
+
+function CustomMessageLayout() {
+  const { message, isLast } = useChatMessage()
+  
+  return (
+    <ChatMessage 
+      message={message} 
+      isLast={isLast}
+      className={`
+        ${message.role === 'user' ? 'ml-8' : 'mr-8'}
+        transition-all duration-200 hover:shadow-md
+      `}
+    >
+      <div className={`
+        flex gap-3 p-4 rounded-2xl
+        ${message.role === 'user' 
+          ? 'bg-blue-600 text-white ml-auto' 
+          : 'bg-gray-100 text-gray-900'
+        }
+      `}>
+        <ChatMessage.Avatar>
+          <CustomAvatar role={message.role} />
+        </ChatMessage.Avatar>
+        
+        <div className="flex-1">
+          <ChatMessage.Content>
+            <ChatMessage.Content.Markdown />
+            <ChatMessage.Content.Image />
+            <ChatMessage.Content.Source />
+          </ChatMessage.Content>
+          
+          <ChatMessage.Actions>
+            <CustomMessageActions />
+          </ChatMessage.Actions>
+        </div>
+      </div>
+    </ChatMessage>
+  )
+}
+
+function CustomAvatar({ role }: { role: string }) {
+  const avatarClass = role === 'user' 
+    ? 'bg-blue-500 text-white' 
+    : 'bg-gray-300 text-gray-700'
+    
+  return (
+    <div className={`
+      h-10 w-10 rounded-full flex items-center justify-center 
+      text-sm font-semibold ${avatarClass}
+    `}>
+      {role === 'user' ? '👤' : '🤖'}
+    </div>
+  )
+}
+```
+
+### Message Role Styling
+
+```tsx
+function RoleBasedMessage() {
+  const { message } = useChatMessage()
+  
+  const roleStyles = {
+    user: {
+      container: 'justify-end',
+      bubble: 'bg-blue-600 text-white rounded-l-2xl rounded-tr-2xl',
+      maxWidth: 'max-w-[80%]'
+    },
+    assistant: {
+      container: 'justify-start',
+      bubble: 'bg-white border shadow-sm rounded-r-2xl rounded-tl-2xl',
+      maxWidth: 'max-w-[85%]'
+    },
+    system: {
+      container: 'justify-center',
+      bubble: 'bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800',
+      maxWidth: 'max-w-[70%]'
+    }
+  }
+  
+  const styles = roleStyles[message.role] || roleStyles.assistant
+  
+  return (
+    <div className={`flex ${styles.container} mb-4`}>
+      <div className={`${styles.bubble} ${styles.maxWidth} p-4`}>
+        <ChatMessage.Content>
+          <ChatMessage.Content.Markdown />
+        </ChatMessage.Content>
+      </div>
+    </div>
+  )
+}
+```
+
+## Input Customization
+
+### Custom Input Design
+
+```tsx
+import { ChatInput, useChatInput } from '@llamaindex/chat-ui'
+
+function CustomChatInput() {
+  const { input, setInput, handleSubmit, isLoading } = useChatInput()
+  
+  return (
+    <div className="relative border-t bg-white p-4">
+      <div className="mx-auto max-w-4xl">
+        <ChatInput>
+          <ChatInput.Form className="relative flex items-end gap-3">
+            {/* Custom input field with enhanced styling */}
+            <div className="relative flex-1">
+              <ChatInput.Field
+                className="
+                  w-full resize-none rounded-2xl border border-gray-300 
+                  bg-white px-4 py-3 pr-12 text-sm
+                  focus:border-blue-500 focus:outline-none focus:ring-2 
+                  focus:ring-blue-500/20 disabled:opacity-50
+                  max-h-32 min-h-[44px]
+                "
+                placeholder="Type your message..."
+                disabled={isLoading}
+              />
+              
+              {/* Character counter */}
+              <div className="absolute bottom-1 right-12 text-xs text-gray-400">
+                {input.length}/2000
+              </div>
+            </div>
+            
+            {/* Upload button */}
+            <ChatInput.Upload>
+              <button
+                type="button"
+                className="
+                  flex h-11 w-11 items-center justify-center rounded-xl
+                  border border-gray-300 bg-white hover:bg-gray-50
+                  transition-colors disabled:opacity-50
+                "
+                disabled={isLoading}
+              >
+                <PaperclipIcon className="h-5 w-5 text-gray-600" />
+              </button>
+            </ChatInput.Upload>
+            
+            {/* Submit button */}
+            <ChatInput.Submit>
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="
+                  flex h-11 w-11 items-center justify-center rounded-xl
+                  bg-blue-600 text-white hover:bg-blue-700
+                  transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+                "
+              >
+                {isLoading ? (
+                  <LoadingSpinner className="h-5 w-5" />
+                ) : (
+                  <SendIcon className="h-5 w-5" />
+                )}
+              </button>
+            </ChatInput.Submit>
+          </ChatInput.Form>
+        </ChatInput>
+      </div>
+    </div>
+  )
+}
+```
+
+### Input with Suggestions
+
+```tsx
+function InputWithSuggestions() {
+  const [suggestions, setSuggestions] = useState([])
+  const { input, setInput } = useChatInput()
+  
+  const commonSuggestions = [
+    "How can I help you today?",
+    "Explain this concept",
+    "Write some code for",
+    "Summarize this document"
+  ]
+  
+  const filteredSuggestions = commonSuggestions.filter(s =>
+    s.toLowerCase().includes(input.toLowerCase()) && input.length > 0
+  )
+  
+  return (
+    <div className="relative">
+      <ChatInput>
+        <ChatInput.Form>
+          <ChatInput.Field
+            onFocus={() => setSuggestions(filteredSuggestions)}
+            onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+          />
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+      
+      {suggestions.length > 0 && (
+        <div className="absolute bottom-full left-0 right-0 mb-2">
+          <div className="bg-white border rounded-lg shadow-lg max-h-32 overflow-y-auto">
+            {suggestions.map((suggestion, index) => (
+              <button
+                key={index}
+                className="w-full px-3 py-2 text-left hover:bg-gray-50 text-sm"
+                onClick={() => {
+                  setInput(suggestion)
+                  setSuggestions([])
+                }}
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+## Canvas Customization
+
+### Custom Canvas Layout
+
+```tsx
+import { ChatCanvas, useChatCanvas } from '@llamaindex/chat-ui'
+
+function CustomCanvas() {
+  const { currentArtifact, isVisible, hideCanvas } = useChatCanvas()
+  
+  if (!isVisible || !currentArtifact) return null
+  
+  return (
+    <div className="w-1/2 bg-gray-50 border-l flex flex-col">
+      {/* Custom header */}
+      <div className="flex items-center justify-between p-4 border-b bg-white">
+        <div>
+          <h2 className="font-semibold text-gray-900">
+            {currentArtifact.title}
+          </h2>
+          <p className="text-sm text-gray-500">
+            {currentArtifact.type === 'code' ? 'Code Editor' : 'Document'}
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <CustomCanvasActions />
+          <button
+            onClick={hideCanvas}
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <XIcon className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      
+      {/* Custom content area */}
+      <div className="flex-1 overflow-hidden">
+        <ChatCanvas className="h-full">
+          {/* Canvas content renders here */}
+        </ChatCanvas>
+      </div>
+      
+      {/* Custom footer */}
+      <div className="border-t bg-white p-3">
+        <div className="flex items-center justify-between text-sm text-gray-500">
+          <span>
+            {currentArtifact.type === 'code' 
+              ? `${currentArtifact.language} • ${currentArtifact.file_name}`
+              : 'Markdown Document'
+            }
+          </span>
+          <span>
+            Last modified: {new Date().toLocaleTimeString()}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+## Widget Styling
+
+### Custom Markdown Styling
+
+```tsx
+import { Markdown } from '@llamaindex/chat-ui/widgets'
+
+function CustomMarkdown({ children }: { children: string }) {
+  return (
+    <div className="prose prose-sm max-w-none">
+      <style jsx>{`
+        .prose {
+          --tw-prose-body: #374151;
+          --tw-prose-headings: #111827;
+          --tw-prose-links: #3b82f6;
+          --tw-prose-bold: #111827;
+          --tw-prose-code: #dc2626;
+          --tw-prose-pre-bg: #f3f4f6;
+          --tw-prose-pre-code: #374151;
+        }
+        
+        .prose code {
+          background: #f3f4f6;
+          padding: 0.125rem 0.25rem;
+          border-radius: 0.25rem;
+          font-size: 0.875em;
+        }
+        
+        .prose blockquote {
+          border-left: 4px solid #3b82f6;
+          background: #eff6ff;
+          padding: 1rem;
+          margin: 1rem 0;
+        }
+      `}</style>
+      
+      <Markdown>{children}</Markdown>
+    </div>
+  )
+}
+```
+
+### Custom Code Block Styling
+
+```tsx
+import { CodeBlock } from '@llamaindex/chat-ui/widgets'
+
+function StyledCodeBlock({ code, language, filename }: {
+  code: string
+  language: string
+  filename?: string
+}) {
+  return (
+    <div className="my-4 overflow-hidden rounded-lg border border-gray-200">
+      {filename && (
+        <div className="flex items-center justify-between bg-gray-50 px-4 py-2">
+          <span className="text-sm font-medium text-gray-700">
+            {filename}
+          </span>
+          <span className="text-xs text-gray-500 uppercase">
+            {language}
+          </span>
+        </div>
+      )}
+      
+      <div className="relative">
+        <CodeBlock
+          code={code}
+          language={language}
+          className="bg-gray-900 text-gray-100"
+          showLineNumbers={true}
+        />
+        
+        {/* Custom copy button */}
+        <button
+          className="absolute top-2 right-2 p-2 bg-gray-800 hover:bg-gray-700 rounded"
+          onClick={() => navigator.clipboard.writeText(code)}
+        >
+          <CopyIcon className="h-4 w-4 text-gray-300" />
+        </button>
+      </div>
+    </div>
+  )
+}
+```
+
+## Theme System
+
+### Theme Provider
+
+```tsx
+import { createContext, useContext, useState } from 'react'
+
+interface Theme {
+  mode: 'light' | 'dark'
+  primaryColor: string
+  borderRadius: 'none' | 'sm' | 'md' | 'lg'
+  fontSize: 'sm' | 'base' | 'lg'
+}
+
+const ThemeContext = createContext<{
+  theme: Theme
+  updateTheme: (updates: Partial<Theme>) => void
+}>({
+  theme: {
+    mode: 'light',
+    primaryColor: 'blue',
+    borderRadius: 'md',
+    fontSize: 'base'
+  },
+  updateTheme: () => {}
+})
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>({
+    mode: 'light',
+    primaryColor: 'blue',
+    borderRadius: 'md',
+    fontSize: 'base'
+  })
+  
+  const updateTheme = (updates: Partial<Theme>) => {
+    setTheme(prev => ({ ...prev, ...updates }))
+  }
+  
+  return (
+    <ThemeContext.Provider value={{ theme, updateTheme }}>
+      <div 
+        className={`theme-${theme.mode} theme-${theme.primaryColor}`}
+        data-theme={theme.mode}
+        data-radius={theme.borderRadius}
+        data-font-size={theme.fontSize}
+      >
+        {children}
+      </div>
+    </ThemeContext.Provider>
+  )
+}
+
+export const useTheme = () => useContext(ThemeContext)
+```
+
+### Themed Components
+
+```tsx
+function ThemedChatSection() {
+  const { theme } = useTheme()
+  const handler = useChat({ api: '/api/chat' })
+  
+  const themeClasses = {
+    light: 'bg-white text-gray-900',
+    dark: 'bg-gray-900 text-white'
+  }
+  
+  const radiusClasses = {
+    none: 'rounded-none',
+    sm: 'rounded-sm',
+    md: 'rounded-md',
+    lg: 'rounded-lg'
+  }
+  
+  const fontSizeClasses = {
+    sm: 'text-sm',
+    base: 'text-base',
+    lg: 'text-lg'
+  }
+  
+  return (
+    <ChatSection
+      handler={handler}
+      className={`
+        ${themeClasses[theme.mode]}
+        ${fontSizeClasses[theme.fontSize]}
+        transition-all duration-200
+      `}
+    >
+      <ChatMessages 
+        className={`
+          ${radiusClasses[theme.borderRadius]}
+          border border-current/10
+        `}
+      />
+      
+      <ChatInput 
+        className={`
+          ${radiusClasses[theme.borderRadius]}
+          border border-current/20
+        `}
+      />
+    </ChatSection>
+  )
+}
+```
+
+## Animation and Transitions
+
+### Message Animations
+
+```tsx
+import { motion, AnimatePresence } from 'framer-motion'
+
+function AnimatedMessages() {
+  const { messages } = useChatUI()
+  
+  return (
+    <AnimatePresence>
+      {messages.map((message, index) => (
+        <motion.div
+          key={message.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3, delay: index * 0.1 }}
+        >
+          <ChatMessage message={message}>
+            {/* Message content */}
+          </ChatMessage>
+        </motion.div>
+      ))}
+    </AnimatePresence>
+  )
+}
+```
+
+### Typing Indicator
+
+```tsx
+function TypingIndicator() {
+  const { isLoading } = useChatUI()
+  
+  if (!isLoading) return null
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      className="flex items-center gap-2 p-4"
+    >
+      <div className="flex gap-1">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="h-2 w-2 bg-gray-400 rounded-full"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 1, 0.5]
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              delay: i * 0.2
+            }}
+          />
+        ))}
+      </div>
+      <span className="text-sm text-gray-500">AI is typing...</span>
+    </motion.div>
+  )
+}
+```
+
+## Responsive Design
+
+### Mobile-First Layout
+
+```tsx
+function ResponsiveChatLayout() {
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  
+  return (
+    <ChatSection
+      handler={handler}
+      className={isMobile ? 'flex-col h-full' : 'flex-row h-full'}
+    >
+      <div className={isMobile ? 'flex-1' : 'flex-1 flex flex-col'}>
+        <ChatMessages className={isMobile ? 'flex-1' : 'flex-1'} />
+        <ChatInput className={isMobile ? 'sticky bottom-0' : ''} />
+      </div>
+      
+      {!isMobile && <ChatCanvas className="w-1/2" />}
+    </ChatSection>
+  )
+}
+```
+
+## Accessibility Customization
+
+### Enhanced Accessibility
+
+```tsx
+function AccessibleChat() {
+  const { messages, isLoading } = useChatUI()
+  
+  return (
+    <div
+      role="log"
+      aria-live="polite"
+      aria-label="Chat conversation"
+      className="relative"
+    >
+      <ChatMessages>
+        <ChatMessages.List
+          role="log"
+          aria-busy={isLoading}
+        >
+          {messages.map((message, index) => (
+            <div
+              key={message.id}
+              role="article"
+              aria-label={`Message from ${message.role}`}
+              tabIndex={0}
+              className="focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <ChatMessage message={message} />
+            </div>
+          ))}
+        </ChatMessages.List>
+      </ChatMessages>
+      
+      <ChatInput>
+        <ChatInput.Form>
+          <ChatInput.Field
+            aria-label="Type your message"
+            aria-describedby="chat-input-help"
+          />
+          <div id="chat-input-help" className="sr-only">
+            Press Enter to send, Shift+Enter for new line
+          </div>
+          <ChatInput.Submit aria-label="Send message" />
+        </ChatInput.Form>
+      </ChatInput>
+    </div>
+  )
+}
+```
+
+## Next Steps
+
+- [Examples](./examples) - See complete customization examples
+- [Core Components](./core-components) - Understand component structure for customization
+- [Widgets](./widgets) - Customize widget appearance and behavior
+- [Hooks](./hooks) - Use hooks for dynamic customization

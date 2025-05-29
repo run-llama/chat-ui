@@ -1,0 +1,89 @@
+---
+title: LlamaIndex Chat UI
+description: A React component library for building modern chat interfaces with LLM applications
+---
+
+LlamaIndex Chat UI is a comprehensive React component library designed for building sophisticated chat interfaces in LLM applications. It provides pre-built, customizable components that integrate seamlessly with any backend by using the Vercel's [Streaming Protocol](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol).
+
+## Key Features
+
+- **Complete Chat Interface** - Full-featured chat components with message history, input, and OpenAI-style canvas
+- **Rich Annotations** - Support for images, files, sources, events, and custom annotations
+- **Interactive Artifacts** - Code and document artifacts with editing and version management
+- **File Upload Support** - Built-in handling for multiple file types (PDF, images, documents)
+- **Beautiful** - Built on shadcn/ui for beautiful UI
+- **Composable Architecture** - Highly customizable components that can be composed together
+- **TypeScript First** - Full type safety and excellent developer experience
+- **Vercel Streaming Protocol** - Designed to work seamlessly with `useChat` hook in the frontend and any backend that implements the protocol
+
+## Core Components
+
+- **ChatSection** - Main container that provides context and layout
+- **ChatMessages** - Scrollable message history with loading states
+- **ChatMessage** - Individual message display with role-based styling
+- **ChatInput** - Input interface with file upload and keyboard shortcuts
+- **ChatCanvas** - Side panel for displaying interactive code or document artifacts
+
+## Widget System
+
+The library includes a comprehensive widget system for handling various content types:
+
+- **Content Widgets** - Markdown, code blocks, image display
+- **Annotation Widgets** - Sources, events, suggested questions
+- **Interactive Widgets** - File upload, document editing, code editing
+
+## Getting Started
+
+```shell
+npm install @llamaindex/chat-ui
+
+yarn add @llamaindex/chat-ui
+
+pnpm add @llamaindex/chat-ui
+```
+
+## Quick Example
+
+```tsx
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+export default function MyChat() {
+  const handler = useChat({
+    api: '/api/chat',
+  })
+
+  return <ChatSection handler={handler} />
+}
+```
+
+This creates a complete chat interface with:
+
+- Message history display
+- User input with file upload
+- Loading states and error handling
+- Support for rich content and annotations
+
+## Architecture
+
+The library follows a composable architecture where you can:
+
+1. **Use the complete solution** - `ChatSection` provides everything out of the box
+2. **Compose custom layouts** - Mix and match components for custom designs
+3. **Extend with widgets** - Add specialized content handling
+4. **Create custom annotations** - Build domain-specific content types
+
+## Integration
+
+Chat UI is designed to work with any chat backend that implements Vercel's [Streaming Protocol](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol), to simplify getting started we provide examples for:
+
+- **NextJS** - [NextJS Example](https://github.com/run-llama/chat-ui/tree/main/examples/nextjs)
+- **FastAPI** - [FastAPI Example](https://github.com/run-llama/chat-ui/tree/main/examples/fastapi)
+
+## Next Steps
+
+- [Getting Started](./getting-started) - Installation and basic setup
+- [Core Components](./core-components) - Detailed guide to main components
+- [Widgets](./widgets) - Comprehensive widget documentation
+- [Annotations](./annotations) - Working with rich content
+- [Examples](./examples) - Real-world implementation examples
