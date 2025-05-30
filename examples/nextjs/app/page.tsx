@@ -41,9 +41,9 @@ export default function Page(): JSX.Element {
 
 function ChatExample() {
   const handler = useChat({
-    // api: '/api/chat',
+    api: '/api/chat',
     // uncomment this to try the advanced example about inline annotations (app/api/chat/advanced/route.ts)
-    api: '/api/chat/advanced',
+    // api: '/api/chat/advanced',
     initialMessages,
   })
 
