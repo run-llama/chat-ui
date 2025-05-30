@@ -70,7 +70,7 @@ export type AgentEventData = {
 export type SuggestedQuestionsData = string[]
 
 export type Artifact<T = unknown> = {
-  readonly?: boolean // default is false, if true, artifact won't show version and cannot be edited
+  readonly?: boolean // if enabled, artifact won't show version and cannot be edited
   created_at: number
   type: 'code' | 'document'
   data: T

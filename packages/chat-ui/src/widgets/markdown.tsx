@@ -141,7 +141,11 @@ export function Markdown({
               // Check if we have a specific renderer for it
               if (annotation.type && annotationRenderers?.[annotation.type]) {
                 const CustomRenderer = annotationRenderers[annotation.type]
-                return <CustomRenderer data={annotation.data} />
+                return (
+                  <div className="my-4">
+                    <CustomRenderer data={annotation.data} />
+                  </div>
+                )
               }
 
               // If no custom renderer found, render an error message

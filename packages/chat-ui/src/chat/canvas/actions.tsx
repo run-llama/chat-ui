@@ -48,7 +48,7 @@ function ArtifactVersionHistory() {
 
   const [isOpen, setIsOpen] = useState(false)
 
-  if (!displayedArtifact) return null
+  if (!displayedArtifact || displayedArtifact.readonly) return null
 
   const allArtifactsByCurrentType = getArtifactsByType(displayedArtifact.type)
 

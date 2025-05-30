@@ -66,35 +66,44 @@ const SAMPLE_ANNOTATIONS = [
 
 const INLINE_ITEMS = [
   '\n ### Demo inline annotations \n',
-  'To set up the project, follow these steps: \n',
-  '1. Create a package.json file',
+  'Here are some weather-related examples: \n',
+  '1. View the weather API configuration:',
   {
     type: 'artifact',
     data: {
       type: 'code',
-      readonly: true,
+      readonly: true, // this artifact is readonly
       data: {
-        file_name: 'package.json',
+        file_name: 'weather-config.json',
         language: 'json',
         code: `{
-  "name": "my-project",
+  "name": "weather-app",
   "version": "1.0.0",
-  "description": "My project",
-  "main": "index.js"
+  "description": "Weather monitoring application",
+  "main": "weather.js",
+  "dependencies": {
+    "axios": "^1.0.0",
+    "weather-api": "^2.1.0"
+  }
 }`,
       },
     },
   },
-  '2. Create a sample.js file',
+  '2. Check the weather fetching script:',
   {
     type: 'artifact',
     data: {
-      readonly: true,
+      readonly: true, // this artifact is readonly
       type: 'code',
       data: {
-        file_name: 'sample.js',
+        file_name: 'weather.js',
         language: 'javascript',
-        code: 'console.log("Hello, world!");',
+        code: `async function getWeather(location) {
+  const response = await fetch("/api/weather?location=" + location);
+  const data = await response.json();
+  return data;
+}
+getWeather("San Francisco, CA");`,
       },
     },
   },
@@ -109,6 +118,61 @@ const INLINE_ITEMS = [
       windSpeed: 12,
     },
   },
+  '#### 🎯 Demo generating a document artifact',
+  {
+    type: 'artifact',
+    data: {
+      type: 'document',
+      data: {
+        title: 'Sample document',
+        content: `# Getting Started Guide
+  
+  ## Introduction
+  This comprehensive guide will walk you through everything you need to know to get started with our platform. Whether you're a beginner or an experienced user, you'll find valuable information here.
+  
+  ## Key Features
+  - **Easy Setup**: Get running in minutes
+  - **Powerful Tools**: Access advanced capabilities
+  - **Great Documentation**: Find answers quickly
+  - **Active Community**: Get help when needed
+  
+  ## Setup Process
+  1. Install Dependencies
+     First, ensure you have all required dependencies installed on your system.
+  
+  2. Configuration
+     Update your configuration files with the necessary settings:
+     - API keys
+     - Environment variables
+     - User preferences
+  
+  3. First Steps
+     Begin with basic operations to familiarize yourself with the platform.
+  
+  ## Best Practices
+  - Always backup your data
+  - Follow security guidelines
+  - Keep your dependencies updated
+  - Document your changes
+  
+  ## Troubleshooting
+  If you encounter issues, try these steps:
+  1. Check logs for errors
+  2. Verify configurations
+  3. Update to latest version
+  4. Contact support if needed
+  
+  ## Additional Resources
+  - [Documentation](https://docs.example.com)
+  - [API Reference](https://api.example.com)
+  - [Community Forums](https://community.example.com)
+  
+  Feel free to explore and reach out if you need assistance!`,
+        type: 'markdown',
+      },
+    },
+  },
+  '\n\n Please feel free to open the document in the canvas and edit it. The document will be saved as a new version',
 ]
 
 const fakeChatStream = (query: string): ReadableStream => {
