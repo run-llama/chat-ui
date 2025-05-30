@@ -96,7 +96,10 @@ export function Markdown({
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
-  annotationRenderers?: Record<string, ComponentType<{ data: any; isInline?: boolean }>>
+  annotationRenderers?: Record<
+    string,
+    ComponentType<{ data: any; isInline?: boolean }>
+  >
 }) {
   const processedContent = preprocessContent(content)
 
