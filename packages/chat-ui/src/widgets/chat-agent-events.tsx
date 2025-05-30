@@ -39,9 +39,11 @@ type MergedEvent = {
 export function ChatAgentEvents({
   data,
   isFinished,
+  isLast,
 }: {
   data: AgentEventData[]
   isFinished: boolean
+  isLast: boolean
 }) {
   const events = useMemo(() => mergeAdjacentEvents(data), [data])
   return (
@@ -51,7 +53,7 @@ export function ChatAgentEvents({
           <AgentEventContent
             key={index}
             event={eventItem}
-            isLast={index === events.length - 1}
+            isLast={isLast}
             isFinished={isFinished}
           />
         ))}
