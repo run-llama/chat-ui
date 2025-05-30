@@ -6,28 +6,58 @@ import {
   Artifact,
   CodeArtifact,
   DocumentArtifact,
+  extractArtifactsFromMessage,
   isEqualArtifact,
 } from '../annotation'
+import { Message } from '../chat.interface'
 import { useChatCanvas } from './context'
+import { memo, useEffect, useState } from 'react'
+import { useChatUI } from '../chat.context'
+import { useChatMessage } from '../chat-message.context'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
   code: FileCode,
   document: FileText,
 }
 
-export function ArtifactCard({ artifact }: { artifact: Artifact }) {
+export const ArtifactCard = memo(ArtifactCardComp)
+
+export function ArtifactCardComp({ data }: { data: Artifact }) {
   const {
     openArtifactInCanvas,
     getArtifactVersion,
     restoreArtifact,
     displayedArtifact,
   } = useChatCanvas()
-  const { versionNumber, isLatest } = getArtifactVersion(artifact)
+  const { setMessages, messages } = useChatUI()
+  const { message, isLast } = useChatMessage()
+  const { versionNumber, isLatest } = getArtifactVersion(data)
+  const [isTriggered, setIsTriggered] = useState(false)
 
-  const Icon = IconMap[artifact.type]
-  const title = getCardTitle(artifact)
+  const Icon = IconMap[data.type]
+  const title = getCardTitle(data)
   const isDisplayed =
-    displayedArtifact && isEqualArtifact(artifact, displayedArtifact)
+    displayedArtifact && isEqualArtifact(data, displayedArtifact)
+
+  useEffect(() => {
+    if (isTriggered) return
+    setIsTriggered(true)
+
+    const artifacts = extractArtifactsFromMessage(message) ?? []
+    // if current last message hasn't contain this inline artifact, add it to annotations of the message
+    const artifact = artifacts.find(a => isEqualArtifact(a, data))
+    if (!artifact && isLast && setMessages) {
+      const currentAnnotations = message.annotations ?? []
+      setMessages([
+        ...messages.slice(0, -1),
+        {
+          role: 'assistant',
+          content: message.content,
+          annotations: [...currentAnnotations, { type: 'artifact', data }],
+        },
+      ] as (Message & { id: string })[])
+    }
+  }, [])
 
   return (
     <div
@@ -35,12 +65,14 @@ export function ArtifactCard({ artifact }: { artifact: Artifact }) {
         'border-border flex w-full max-w-72 cursor-pointer items-center justify-between gap-2 rounded-lg border-2 p-2 hover:border-blue-500',
         isDisplayed && 'border-blue-500'
       )}
-      onClick={() => openArtifactInCanvas(artifact)}
+      onClick={() => openArtifactInCanvas(data)}
     >
       <div className="flex flex-1 items-center gap-2">
         <Icon className="size-7 shrink-0 text-blue-500" />
         <div className="flex flex-col">
-          <div className="text-sm font-semibold">Version {versionNumber}</div>
+          {!data.readonly && (
+            <div className="text-sm font-semibold">Version {versionNumber}</div>
+          )}
           {title && <div className="text-xs text-gray-600">{title}</div>}
         </div>
       </div>
@@ -53,7 +85,7 @@ export function ArtifactCard({ artifact }: { artifact: Artifact }) {
           className="h-8 shrink-0 cursor-pointer text-xs"
           onClick={e => {
             e.stopPropagation()
-            restoreArtifact(artifact)
+            restoreArtifact(data)
           }}
         >
           Restore

@@ -12,6 +12,7 @@ import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
   ArtifactAnnotations,
+  defaultAnnotationRenderers,
   DocumentFileAnnotations,
   EventAnnotations,
   ImageAnnotations,
@@ -69,6 +70,7 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
+  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
 }
 
 function ChatMessage(props: ChatMessageProps) {
@@ -151,6 +153,9 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       sources={{ nodes: allNodes }}
       citationComponent={props.citationComponent}
       languageRenderers={props.languageRenderers}
+      annotationRenderers={
+        props.annotationRenderers ?? defaultAnnotationRenderers
+      }
       className={cn(
         {
           'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':

@@ -1,4 +1,7 @@
+import { z } from 'zod'
 import { JSONValue, Message } from './chat.interface'
+
+export const INLINE_ANNOTATION_KEY = 'annotation'
 
 export enum MessageAnnotationType {
   IMAGE = 'image',
@@ -67,6 +70,8 @@ export type AgentEventData = {
 export type SuggestedQuestionsData = string[]
 
 export type Artifact<T = unknown> = {
+  readonly?: boolean // if enabled, artifact won't show version and cannot be edited
+  inline?: boolean // mark artifact as inline, it only displayed in the markdown without showing in artifact annotations section
   created_at: number
   type: 'code' | 'document'
   data: T
@@ -105,6 +110,7 @@ export type CustomAnnotation<T = unknown> = {
 
 export type AnyAnnotation<T = unknown> = MessageAnnotation | CustomAnnotation<T>
 
+export const AnyAnnotationSchema = z.object({ type: z.string(), data: z.any() })
 /**
  * Gets custom message annotations that don't match any standard MessageAnnotationType
  * @param annotations - Array of message annotations to filter

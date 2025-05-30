@@ -63,6 +63,7 @@ export function CodeArtifactViewer({
             code={updatedCode ?? codeArtifact.data.code}
             onChange={handleCodeChange}
             language={codeEditorLanguage}
+            readonly={codeArtifact.readonly}
           />
           {updatedCode && (
             <div className="bg-background absolute right-0 top-0 flex gap-2 pr-2 text-sm">

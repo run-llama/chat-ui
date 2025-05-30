@@ -8,6 +8,9 @@ import {
   DOCUMENT_FILE_TYPES,
   DocumentFileType,
   SourceData,
+  AnyAnnotation,
+  INLINE_ANNOTATION_KEY,
+  AnyAnnotationSchema,
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
@@ -85,6 +88,7 @@ export function Markdown({
   citationComponent: CitationComponent,
   className: customClassName,
   languageRenderers,
+  annotationRenderers,
 }: {
   content: string
   sources?: SourceData
@@ -92,6 +96,7 @@ export function Markdown({
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
+  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
 }) {
   const processedContent = preprocessContent(content)
 
@@ -122,6 +127,37 @@ export function Markdown({
             const match = /language-(\w+)/.exec(className || '')
             const language = (match && match[1]) || ''
             const codeValue = String(children).replace(/\n$/, '')
+
+            if (language === INLINE_ANNOTATION_KEY) {
+              const annotation = JSON.parse(codeValue) as AnyAnnotation
+
+              if (!AnyAnnotationSchema.safeParse(annotation).success) {
+                console.warn(
+                  `Invalid inline annotation: ${codeValue}, expected an object`
+                )
+                return null
+              }
+
+              // Check if we have a specific renderer for it
+              if (annotation.type && annotationRenderers?.[annotation.type]) {
+                const CustomRenderer = annotationRenderers[annotation.type]
+                return (
+                  <div className="my-4">
+                    <CustomRenderer data={annotation.data} />
+                  </div>
+                )
+              }
+
+              // If no custom renderer found, render an error message
+              return (
+                <div className="mb-2 max-w-full overflow-hidden rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+                  <div className="overflow-wrap-anywhere whitespace-pre-wrap break-words text-sm text-red-800 dark:text-red-200">
+                    <strong>Annotation Render Error:</strong> No renderer found
+                    for annotation type &ldquo;{annotation.type}&rdquo;.
+                  </div>
+                </div>
+              )
+            }
 
             if (inline) {
               return (

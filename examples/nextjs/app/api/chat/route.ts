@@ -1,3 +1,15 @@
+/**
+ * Basic Chat API Route Example
+ *
+ * This is a simple example demonstrating:
+ * - Text streaming with token-by-token delivery
+ * - Standard annotations (sources) sent after text completion
+ * - Basic markdown content with code blocks
+ * - Custom annotations (wiki) sent after text completion
+ *
+ * Use this example as a starting point for implementing basic chat functionality
+ * with @llamaindex/chat-ui components.
+ */
 import { NextResponse, type NextRequest } from 'next/server'
 
 const TOKEN_DELAY = 30 // 30ms delay between tokens
@@ -50,24 +62,13 @@ const SAMPLE_ANNOTATIONS = [
     },
   },
   {
-    type: 'artifact',
+    type: 'wiki',
     data: {
-      type: 'code',
-      data: {
-        file_name: 'sample.ts',
-        language: 'typescript',
-        code: 'console.log("Hello, world!");',
-      },
-    },
-  },
-  {
-    type: 'weather',
-    data: {
-      location: 'San Francisco, CA',
-      temperature: 22,
-      condition: 'sunny',
-      humidity: 65,
-      windSpeed: 12,
+      title: 'Sample Wiki',
+      summary: 'This is a sample wiki',
+      url: 'https://www.sample.com',
+      category: 'Sample',
+      lastUpdated: '2021-01-01',
     },
   },
 ]

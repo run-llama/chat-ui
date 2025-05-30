@@ -1,7 +1,5 @@
 'use client'
 
-import { useChatMessage, getCustomAnnotations } from '@llamaindex/chat-ui'
-
 interface WeatherData {
   location: string
   temperature: number
@@ -10,18 +8,7 @@ interface WeatherData {
   windSpeed: number
 }
 
-export function CustomWeatherAnnotation() {
-  const { message } = useChatMessage()
-
-  const weatherData = getCustomAnnotations<WeatherData>(
-    message.annotations,
-    'weather'
-  )
-
-  if (!weatherData[0]) return null
-
-  const data = weatherData[0]
-
+export function CustomWeatherCard({ data }: { data: WeatherData }) {
   return (
     <div className="my-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="flex items-center gap-3">

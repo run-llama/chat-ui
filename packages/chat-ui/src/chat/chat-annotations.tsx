@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { ComponentType, useMemo } from 'react'
 import {
   ChatAgentEvents,
   ChatEvents,
@@ -19,9 +19,10 @@ import {
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
+import { ArtifactCard } from './canvas/artifact-card.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ArtifactCard } from './canvas/card.js'
+import ChatCanvas from './canvas/index.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -130,9 +131,18 @@ export function ArtifactAnnotations() {
 
   return (
     <div className="flex items-center gap-2">
-      {artifacts.map((artifact, index) => (
-        <ArtifactCard key={index} artifact={artifact} />
-      ))}
+      {artifacts
+        .filter(a => !a.inline) // already show inline artifacts in the markdown
+        .map((artifact, index) => (
+          <ArtifactCard key={index} data={artifact} />
+        ))}
     </div>
   )
+}
+
+export const defaultAnnotationRenderers: Record<
+  string,
+  ComponentType<{ data: any }>
+> = {
+  artifact: ChatCanvas.Artifact,
 }
