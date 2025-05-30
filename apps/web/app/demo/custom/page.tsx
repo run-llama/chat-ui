@@ -10,6 +10,7 @@ import {
   useFile,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const code = `
 import {
@@ -21,6 +22,7 @@ import {
   useFile,
 } from '@llamaindex/chat-ui'
 import { useChat } from 'ai/react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export function CustomChat() {
   const handler = useChat()
@@ -68,29 +70,38 @@ function CustomChatMessages() {
   const { messages, isLoading, append } = useChatUI()
   return (
     <ChatMessages>
-      <ChatMessages.List>
-        {messages.map((message, index) => (
-          <ChatMessage
-            key={index}
-            message={message}
-            isLast={index === messages.length - 1}
-            className="items-start"
-          >
-            <ChatMessage.Avatar>
-              <img
-                className="border-1 rounded-full border-[#e711dd]"
-                alt="LlamaIndex"
-                src="/llama.png"
-              />
-            </ChatMessage.Avatar>
-            <ChatMessage.Content isLoading={isLoading} append={append}>
-              <ChatMessage.Content.Image />
-              <ChatMessage.Content.Markdown />
-              <ChatMessage.Content.DocumentFile />
-            </ChatMessage.Content>
-            <ChatMessage.Actions />
-          </ChatMessage>
-        ))}
+      <ChatMessages.List className="px-0 md:px-16">
+        <AnimatePresence>
+          {messages.map((message, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <ChatMessage
+                message={message}
+                isLast={index === messages.length - 1}
+                className="items-start"
+              >
+                <ChatMessage.Avatar>
+                  <img
+                    className="border-1 rounded-full border-[#e711dd]"
+                    alt="LlamaIndex"
+                    src="/llama.png"
+                  />
+                </ChatMessage.Avatar>
+                <ChatMessage.Content isLoading={isLoading} append={append}>
+                  <ChatMessage.Content.Image />
+                  <ChatMessage.Content.Markdown />
+                  <ChatMessage.Content.DocumentFile />
+                </ChatMessage.Content>
+                <ChatMessage.Actions />
+              </ChatMessage>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </ChatMessages.List>
     </ChatMessages>
   )
@@ -208,28 +219,37 @@ function CustomChatMessages() {
   return (
     <ChatMessages>
       <ChatMessages.List className="px-0 md:px-16">
-        {messages.map((message, index) => (
-          <ChatMessage
-            key={index}
-            message={message}
-            isLast={index === messages.length - 1}
-            className="items-start"
-          >
-            <ChatMessage.Avatar>
-              <img
-                className="border-1 rounded-full border-[#e711dd]"
-                alt="LlamaIndex"
-                src="/llama.png"
-              />
-            </ChatMessage.Avatar>
-            <ChatMessage.Content isLoading={isLoading} append={append}>
-              <ChatMessage.Content.Image />
-              <ChatMessage.Content.Markdown />
-              <ChatMessage.Content.DocumentFile />
-            </ChatMessage.Content>
-            <ChatMessage.Actions />
-          </ChatMessage>
-        ))}
+        <AnimatePresence>
+          {messages.map((message, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <ChatMessage
+                message={message}
+                isLast={index === messages.length - 1}
+                className="items-start"
+              >
+                <ChatMessage.Avatar>
+                  <img
+                    className="border-1 rounded-full border-[#e711dd]"
+                    alt="LlamaIndex"
+                    src="/llama.png"
+                  />
+                </ChatMessage.Avatar>
+                <ChatMessage.Content isLoading={isLoading} append={append}>
+                  <ChatMessage.Content.Image />
+                  <ChatMessage.Content.Markdown />
+                  <ChatMessage.Content.DocumentFile />
+                </ChatMessage.Content>
+                <ChatMessage.Actions />
+              </ChatMessage>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </ChatMessages.List>
     </ChatMessages>
   )

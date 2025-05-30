@@ -1,5 +1,11 @@
 # web
 
+## 1.0.29
+
+### Patch Changes
+
+- 3481173: docs: update documentation
+
 ## 1.0.28
 
 ### Patch Changes
