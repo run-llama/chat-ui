@@ -66,15 +66,15 @@ const SAMPLE_ANNOTATIONS = [
 
 const INLINE_ITEMS = [
   '\n ### Demo inline annotations \n',
-  'Here are some weather-related examples: \n',
-  '1. View the weather API configuration:',
+  'Here are some steps to create a simple weather app: \n',
+  '1. Create package.json file:',
   {
     type: 'artifact',
     data: {
       type: 'code',
       readonly: true, // this artifact is readonly
       data: {
-        file_name: 'weather-config.json',
+        file_name: 'package.json',
         language: 'json',
         code: `{
   "name": "weather-app",
@@ -197,6 +197,7 @@ const fakeChatStream = (query: string): ReadableStream => {
         )
       }
 
+      // insert inline annotations
       for (const item of INLINE_ITEMS) {
         if (typeof item === 'string') {
           controller.enqueue(

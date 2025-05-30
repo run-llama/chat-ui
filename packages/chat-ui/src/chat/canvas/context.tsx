@@ -37,6 +37,8 @@ interface ChatCanvasContextType {
   }
   restoreArtifact: (artifact: Artifact) => void
   updateArtifact: (artifact: Artifact, content: string) => void
+  inlineArtifacts: Artifact[]
+  setInlineArtifacts: (artifacts: Artifact[]) => void
 }
 
 const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
@@ -49,11 +51,15 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
   const [isCanvasOpen, setIsCanvasOpen] = useState(false) // whether the canvas is open
   const [displayedArtifact, setDisplayedArtifact] = useState<Artifact>() // the artifact currently displayed in the canvas
   const [codeErrors, setCodeErrors] = useState<CodeArtifactError[]>([]) // contain all errors when compiling with Babel and runtime
+  const [inlineArtifacts, setInlineArtifacts] = useState<Artifact[]>([]) // contains all artifacts that are inline in markdown
 
-  const allArtifacts = useMemo(
-    () => extractArtifactsFromAllMessages(messages),
-    [messages]
-  )
+  const allArtifacts = useMemo(() => {
+    const allItems = [
+      ...inlineArtifacts,
+      ...extractArtifactsFromAllMessages(messages),
+    ]
+    return allItems.sort((a, b) => a.created_at - b.created_at)
+  }, [messages, inlineArtifacts])
 
   // get all artifacts from the last message, this may not be the latest artifact in case last message doesn't have any artifact
   const artifactsFromLastMessage = useMemo(() => {
@@ -225,6 +231,8 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
         getArtifactVersion,
         restoreArtifact,
         updateArtifact,
+        inlineArtifacts,
+        setInlineArtifacts,
       }}
     >
       {children}

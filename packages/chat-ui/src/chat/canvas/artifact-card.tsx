@@ -9,18 +9,24 @@ import {
   isEqualArtifact,
 } from '../annotation'
 import { useChatCanvas } from './context'
+import { memo, useEffect } from 'react'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
   code: FileCode,
   document: FileText,
 }
 
-export function ArtifactCard({ data }: { data: Artifact }) {
+export const ArtifactCard = memo(ArtifactCardComp)
+
+function ArtifactCardComp({ data }: { data: Artifact }) {
   const {
     openArtifactInCanvas,
     getArtifactVersion,
     restoreArtifact,
     displayedArtifact,
+    inlineArtifacts,
+    setInlineArtifacts,
+    isCanvasOpen,
   } = useChatCanvas()
   const { versionNumber, isLatest } = getArtifactVersion(data)
 
@@ -28,6 +34,22 @@ export function ArtifactCard({ data }: { data: Artifact }) {
   const title = getCardTitle(data)
   const isDisplayed =
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
+
+  useEffect(() => {
+    if (!data.readonly && !inlineArtifacts.includes(data)) {
+      // when a inline artifact is added, add it to the artifacts list, also open the canvas
+      setInlineArtifacts([...inlineArtifacts, data])
+      if (!isCanvasOpen) {
+        openArtifactInCanvas(data)
+      }
+    }
+  }, [
+    data,
+    inlineArtifacts,
+    setInlineArtifacts,
+    isCanvasOpen,
+    openArtifactInCanvas,
+  ])
 
   return (
     <div
