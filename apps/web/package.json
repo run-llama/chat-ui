@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "registry:build": "rm -rf public/r && npx shadcn@latest build"
+    "registry:build": "rm -rf public/r && npx shadcn@latest build && npm run registry:post-build",
+    "registry:post-build": "node scripts/add-css-source.js"
   },
   "dependencies": {
     "framer-motion": "^12.15.0",
