@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { JSONValue, Message } from './chat.interface'
 
 export const INLINE_ANNOTATION_KEY = 'annotation'
@@ -107,6 +108,7 @@ export type CustomAnnotation<T = unknown> = {
 
 export type AnyAnnotation<T = unknown> = MessageAnnotation | CustomAnnotation<T>
 
+export const AnyAnnotationSchema = z.object({ type: z.string(), data: z.any() })
 /**
  * Gets custom message annotations that don't match any standard MessageAnnotationType
  * @param annotations - Array of message annotations to filter

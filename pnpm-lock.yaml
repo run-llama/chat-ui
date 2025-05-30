@@ -43,7 +43,7 @@ importers:
         version: 1.1.11(@types/react-dom@18.3.7)(@types/react@18.3.21)(react-dom@18.3.1)(react@18.3.1)
       ai:
         specifier: 4.0.0
-        version: 4.0.0(react@18.3.1)(zod@3.25.32)
+        version: 4.0.0(react@18.3.1)(zod@3.25.42)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -58,7 +58,7 @@ importers:
         version: 11.11.1
       llamaindex:
         specifier: 0.9.3
-        version: 0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.32)
+        version: 0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.42)
       lucide-react:
         specifier: ^0.453.0
         version: 0.453.0(react@18.3.1)
@@ -121,7 +121,7 @@ importers:
         version: link:../../../packages/chat-ui
       ai:
         specifier: ^4.3.16
-        version: 4.3.16(react@19.1.0)(zod@3.25.32)
+        version: 4.3.16(react@19.1.0)(zod@3.25.42)
       next:
         specifier: ^15.3.2
         version: 15.3.2(react-dom@19.1.0)(react@19.1.0)
@@ -170,7 +170,7 @@ importers:
         version: link:../../packages/chat-ui
       ai:
         specifier: ^4.3.16
-        version: 4.3.16(react@19.1.0)(zod@3.25.32)
+        version: 4.3.16(react@19.1.0)(zod@3.25.42)
       next:
         specifier: ^15.3.2
         version: 15.3.2(react-dom@19.1.0)(react@19.1.0)
@@ -328,6 +328,9 @@ importers:
       vaul:
         specifier: ^0.9.1
         version: 0.9.9(@types/react@18.3.21)(react-dom@18.3.1)(react@18.3.1)
+      zod:
+        specifier: ^3.25.42
+        version: 3.25.42
     devDependencies:
       '@llamaindex/eslint-config':
         specifier: workspace:*
@@ -370,7 +373,7 @@ importers:
 
 packages:
 
-  /@ai-sdk/provider-utils@2.0.0(zod@3.25.32):
+  /@ai-sdk/provider-utils@2.0.0(zod@3.25.42):
     resolution: {integrity: sha512-uITgVJByhtzuQU2ZW+2CidWRmQqTUTp6KADevy+4aRnmILZxY2LCt+UZ/ZtjJqq0MffwkuQPPY21ExmFAQ6kKA==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -383,10 +386,10 @@ packages:
       eventsource-parser: 3.0.1
       nanoid: 5.1.5
       secure-json-parse: 2.7.0
-      zod: 3.25.32
+      zod: 3.25.42
     dev: false
 
-  /@ai-sdk/provider-utils@2.2.8(zod@3.25.32):
+  /@ai-sdk/provider-utils@2.2.8(zod@3.25.42):
     resolution: {integrity: sha512-fqhG+4sCVv8x7nFzYnFo19ryhAa3w096Kmc3hWxMQfW/TubPOmt3A6tYZhl4mUfQWWQMsuSkLrtjlWuXBVSGQA==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -395,7 +398,7 @@ packages:
       '@ai-sdk/provider': 1.1.3
       nanoid: 3.3.11
       secure-json-parse: 2.7.0
-      zod: 3.25.32
+      zod: 3.25.42
     dev: false
 
   /@ai-sdk/provider@1.0.0:
@@ -412,7 +415,7 @@ packages:
       json-schema: 0.4.0
     dev: false
 
-  /@ai-sdk/react@1.0.0(react@18.3.1)(zod@3.25.32):
+  /@ai-sdk/react@1.0.0(react@18.3.1)(zod@3.25.42):
     resolution: {integrity: sha512-BDrZqQA07Btg64JCuhFvBgYV+tt2B8cXINzEqWknGoxqcwgdE8wSLG2gkXoLzyC2Rnj7oj0HHpOhLUxDCmoKZg==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -424,15 +427,15 @@ packages:
       zod:
         optional: true
     dependencies:
-      '@ai-sdk/provider-utils': 2.0.0(zod@3.25.32)
-      '@ai-sdk/ui-utils': 1.0.0(zod@3.25.32)
+      '@ai-sdk/provider-utils': 2.0.0(zod@3.25.42)
+      '@ai-sdk/ui-utils': 1.0.0(zod@3.25.42)
       react: 18.3.1
       swr: 2.3.3(react@18.3.1)
       throttleit: 2.1.0
-      zod: 3.25.32
+      zod: 3.25.42
     dev: false
 
-  /@ai-sdk/react@1.2.12(react@19.1.0)(zod@3.25.32):
+  /@ai-sdk/react@1.2.12(react@19.1.0)(zod@3.25.42):
     resolution: {integrity: sha512-jK1IZZ22evPZoQW3vlkZ7wvjYGYF+tRBKXtrcolduIkQ/m/sOAVcVeVDUDvh1T91xCnWCdUGCPZg2avZ90mv3g==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -442,15 +445,15 @@ packages:
       zod:
         optional: true
     dependencies:
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.32)
-      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.32)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.42)
+      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.42)
       react: 19.1.0
       swr: 2.3.3(react@19.1.0)
       throttleit: 2.1.0
-      zod: 3.25.32
+      zod: 3.25.42
     dev: false
 
-  /@ai-sdk/ui-utils@1.0.0(zod@3.25.32):
+  /@ai-sdk/ui-utils@1.0.0(zod@3.25.42):
     resolution: {integrity: sha512-oXBDIM/0niWeTWyw77RVl505dNxBUDLLple7bTsqo2d3i1UKwGlzBUX8XqZsh7GbY7I6V05nlG0Y8iGlWxv1Aw==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -460,21 +463,21 @@ packages:
         optional: true
     dependencies:
       '@ai-sdk/provider': 1.0.0
-      '@ai-sdk/provider-utils': 2.0.0(zod@3.25.32)
-      zod: 3.25.32
-      zod-to-json-schema: 3.24.5(zod@3.25.32)
+      '@ai-sdk/provider-utils': 2.0.0(zod@3.25.42)
+      zod: 3.25.42
+      zod-to-json-schema: 3.24.5(zod@3.25.42)
     dev: false
 
-  /@ai-sdk/ui-utils@1.2.11(zod@3.25.32):
+  /@ai-sdk/ui-utils@1.2.11(zod@3.25.42):
     resolution: {integrity: sha512-3zcwCc8ezzFlwp3ZD15wAPjf2Au4s3vAbKsXQVyhxODHcmu0iyPO2Eua6D/vicq/AUm/BAo60r97O6HU+EI0+w==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.23.8
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.32)
-      zod: 3.25.32
-      zod-to-json-schema: 3.24.5(zod@3.25.32)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.42)
+      zod: 3.25.42
+      zod-to-json-schema: 3.24.5(zod@3.25.42)
     dev: false
 
   /@alloc/quick-lru@5.2.0:
@@ -1616,8 +1619,8 @@ packages:
       '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
       '@types/node': 22.15.23
       magic-bytes.js: 1.12.1
-      zod: 3.24.4
-      zod-to-json-schema: 3.24.5(zod@3.24.4)
+      zod: 3.25.42
+      zod-to-json-schema: 3.24.5(zod@3.25.42)
     transitivePeerDependencies:
       - '@aws-crypto/sha256-js'
       - '@huggingface/transformers'
@@ -1666,12 +1669,12 @@ packages:
       web-tree-sitter: 0.24.7
     dev: false
 
-  /@llamaindex/openai@0.1.54(gpt-tokenizer@2.9.0)(zod@3.25.32):
+  /@llamaindex/openai@0.1.54(gpt-tokenizer@2.9.0)(zod@3.25.42):
     resolution: {integrity: sha512-C1r5PleKcIihiDQ9mCCVVBwmub/hT4o8Yi97U9KNR2u0oSOVXfuYWuxx9ViYiiYG4GnnwO5DqmEGzlC32TR5oA==}
     dependencies:
       '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
       '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
-      openai: 4.98.0(zod@3.25.32)
+      openai: 4.98.0(zod@3.25.42)
     transitivePeerDependencies:
       - '@aws-crypto/sha256-js'
       - '@huggingface/transformers'
@@ -3983,7 +3986,7 @@ packages:
       humanize-ms: 1.2.1
     dev: false
 
-  /ai@4.0.0(react@18.3.1)(zod@3.25.32):
+  /ai@4.0.0(react@18.3.1)(zod@3.25.42):
     resolution: {integrity: sha512-cqf2GCaXnOPhUU+Ccq6i+5I0jDjnFkzfq7t6mc0SUSibSa1wDPn5J4p8+Joh2fDGDYZOJ44rpTW9hSs40rXNAw==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -3996,17 +3999,17 @@ packages:
         optional: true
     dependencies:
       '@ai-sdk/provider': 1.0.0
-      '@ai-sdk/provider-utils': 2.0.0(zod@3.25.32)
-      '@ai-sdk/react': 1.0.0(react@18.3.1)(zod@3.25.32)
-      '@ai-sdk/ui-utils': 1.0.0(zod@3.25.32)
+      '@ai-sdk/provider-utils': 2.0.0(zod@3.25.42)
+      '@ai-sdk/react': 1.0.0(react@18.3.1)(zod@3.25.42)
+      '@ai-sdk/ui-utils': 1.0.0(zod@3.25.42)
       '@opentelemetry/api': 1.9.0
       jsondiffpatch: 0.6.0
       react: 18.3.1
-      zod: 3.25.32
-      zod-to-json-schema: 3.24.5(zod@3.25.32)
+      zod: 3.25.42
+      zod-to-json-schema: 3.24.5(zod@3.25.42)
     dev: false
 
-  /ai@4.3.16(react@19.1.0)(zod@3.25.32):
+  /ai@4.3.16(react@19.1.0)(zod@3.25.42):
     resolution: {integrity: sha512-KUDwlThJ5tr2Vw0A1ZkbDKNME3wzWhuVfAOwIvFUzl1TPVDFAXDFTXio3p+jaKneB+dKNCvFFlolYmmgHttG1g==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -4017,13 +4020,13 @@ packages:
         optional: true
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.32)
-      '@ai-sdk/react': 1.2.12(react@19.1.0)(zod@3.25.32)
-      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.32)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.42)
+      '@ai-sdk/react': 1.2.12(react@19.1.0)(zod@3.25.42)
+      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.42)
       '@opentelemetry/api': 1.9.0
       jsondiffpatch: 0.6.0
       react: 19.1.0
-      zod: 3.25.32
+      zod: 3.25.42
     dev: false
 
   /ajv@6.12.6:
@@ -7087,7 +7090,7 @@ packages:
       wrap-ansi: 9.0.0
     dev: true
 
-  /llamaindex@0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.32):
+  /llamaindex@0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.42):
     resolution: {integrity: sha512-NgMD2eddBxwvrhGsHsma7XxfEda015u4IMzWzUCq94ZnlVfXaRNMe/hWUOkief+huvUV3EkTTSWpSrXhZyiriQ==}
     engines: {node: '>=18.0.0'}
     dependencies:
@@ -7095,7 +7098,7 @@ packages:
       '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
       '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
       '@llamaindex/node-parser': 1.0.2(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
-      '@llamaindex/openai': 0.1.54(gpt-tokenizer@2.9.0)(zod@3.25.32)
+      '@llamaindex/openai': 0.1.54(gpt-tokenizer@2.9.0)(zod@3.25.42)
       '@types/lodash': 4.17.16
       '@types/node': 22.15.17
       ajv: 8.17.1
@@ -8054,7 +8057,7 @@ packages:
       mimic-function: 5.0.1
     dev: true
 
-  /openai@4.98.0(zod@3.25.32):
+  /openai@4.98.0(zod@3.25.42):
     resolution: {integrity: sha512-TmDKur1WjxxMPQAtLG5sgBSCJmX7ynTsGmewKzoDwl1fRxtbLOsiR0FA/AOAAtYUmP6azal+MYQuOENfdU+7yg==}
     hasBin: true
     peerDependencies:
@@ -8073,7 +8076,7 @@ packages:
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
       node-fetch: 2.7.0
-      zod: 3.25.32
+      zod: 3.25.42
     transitivePeerDependencies:
       - encoding
     dev: false
@@ -10592,28 +10595,16 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zod-to-json-schema@3.24.5(zod@3.24.4):
+  /zod-to-json-schema@3.24.5(zod@3.25.42):
     resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
     peerDependencies:
       zod: ^3.24.1
     dependencies:
-      zod: 3.24.4
+      zod: 3.25.42
     dev: false
 
-  /zod-to-json-schema@3.24.5(zod@3.25.32):
-    resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
-    peerDependencies:
-      zod: ^3.24.1
-    dependencies:
-      zod: 3.25.32
-    dev: false
-
-  /zod@3.24.4:
-    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
-    dev: false
-
-  /zod@3.25.32:
-    resolution: {integrity: sha512-OSm2xTIRfW8CV5/QKgngwmQW/8aPfGdaQFlrGoErlgg/Epm7cjb6K6VEyExfe65a3VybUOnu381edLb0dfJl0g==}
+  /zod@3.25.42:
+    resolution: {integrity: sha512-PcALTLskaucbeHc41tU/xfjfhcz8z0GdhhDcSgrCTmSazUuqnYqiXO63M0QUBVwpBlsLsNVn5qHSC5Dw3KZvaQ==}
     dev: false
 
   /zwitch@2.0.4:
