@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.4.8
+
+### Patch Changes
+
+- 09d6ec6: Improve type-safety of custom annotations
+
 ## 0.4.7
 
 ### Patch Changes

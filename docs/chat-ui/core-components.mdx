@@ -1,0 +1,423 @@
+---
+title: Core Components
+description: Detailed guide to the main chat interface components
+---
+
+The core components form the foundation of any chat interface built with LlamaIndex Chat UI. These components work together to provide a complete chat experience.
+
+## ChatSection
+
+The `ChatSection` is the root component that provides context and layout for all other chat components.
+
+### Basic Usage
+
+```tsx
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+function MyChat() {
+  const handler = useChat({ api: '/api/chat' })
+  return <ChatSection handler={handler} />
+}
+```
+
+### Props
+
+```typescript
+interface ChatSectionProps {
+  handler: ChatHandler
+  className?: string
+  children?: React.ReactNode
+}
+```
+
+- **handler**: Chat handler from `useChat` or custom implementation
+- **className**: Custom CSS classes for styling
+- **children**: Custom layout (defaults to `ChatMessages` + `ChatInput`)
+
+### Default Layout
+
+When no children are provided, `ChatSection` renders:
+
+```tsx
+<>
+  <ChatMessages />
+  <ChatInput />
+</>
+```
+
+### Custom Layout
+
+```tsx
+<ChatSection handler={handler} className="flex-row gap-4">
+  <div className="flex-1">
+    <ChatMessages />
+    <ChatInput />
+  </div>
+  <ChatCanvas className="w-1/3" />
+</ChatSection>
+```
+
+## ChatMessages
+
+The `ChatMessages` component displays the conversation history with automatic scrolling and loading states.
+
+### Basic Usage
+
+```tsx
+import { ChatMessages } from '@llamaindex/chat-ui'
+
+function MessageHistory() {
+  return (
+    <ChatMessages>
+      <ChatMessages.List>
+        {/* Custom message rendering */}
+      </ChatMessages.List>
+    </ChatMessages>
+  )
+}
+```
+
+### Sub-components
+
+#### ChatMessages.List
+
+Contains the actual message list with scroll management:
+
+```tsx
+<ChatMessages.List className="px-4 py-6">
+  {messages.map((message, index) => (
+    <ChatMessage key={index} message={message} />
+  ))}
+</ChatMessages.List>
+```
+
+#### ChatMessages.Loading
+
+Shows loading indicator when chat is processing:
+
+```tsx
+<ChatMessages.Loading>
+  <div className="animate-pulse">Thinking...</div>
+</ChatMessages.Loading>
+```
+
+#### ChatMessages.Empty
+
+Displays when no messages exist:
+
+```tsx
+<ChatMessages.Empty
+  heading="Welcome to Chat"
+  subheading="Start a conversation by typing below"
+/>
+```
+
+#### ChatMessages.Actions
+
+Action buttons for the message list:
+
+```tsx
+<ChatMessages.Actions>
+  <button onClick={reload}>Reload</button>
+  <button onClick={stop}>Stop</button>
+</ChatMessages.Actions>
+```
+
+### Features
+
+- **Auto-scroll** - Automatically scrolls to new messages
+- **Loading states** - Shows when chat is processing
+- **Empty state** - Customizable welcome message
+- **Performance** - Optimized for large message histories
+
+## ChatMessage
+
+Individual message component with full annotation support and role-based rendering.
+
+### Basic Usage
+
+```tsx
+import { ChatMessage } from '@llamaindex/chat-ui'
+
+function CustomMessage({ message, isLast }) {
+  return (
+    <ChatMessage message={message} isLast={isLast}>
+      <ChatMessage.Avatar>
+        <UserAvatar role={message.role} />
+      </ChatMessage.Avatar>
+      <ChatMessage.Content>
+        <ChatMessage.Content.Markdown />
+        <ChatMessage.Content.Artifact />
+      </ChatMessage.Content>
+      <ChatMessage.Actions />
+    </ChatMessage>
+  )
+}
+```
+
+### Props
+
+```typescript
+interface ChatMessageProps {
+  message: Message
+  isLast?: boolean
+  className?: string
+  children?: React.ReactNode
+}
+```
+
+### Sub-components
+
+#### ChatMessage.Avatar
+
+User/assistant avatar display:
+
+```tsx
+<ChatMessage.Avatar>
+  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500">
+    {message.role === 'user' ? 'U' : 'AI'}
+  </div>
+</ChatMessage.Avatar>
+```
+
+#### ChatMessage.Content
+
+Main content area with annotation support:
+
+```tsx
+<ChatMessage.Content isLoading={isLoading} append={append}>
+  <ChatMessage.Content.Markdown />
+  <ChatMessage.Content.Image />
+  <ChatMessage.Content.Artifact />
+  <ChatMessage.Content.Source />
+  <ChatMessage.Content.Event />
+  <ChatMessage.Content.AgentEvent />
+  <ChatMessage.Content.DocumentFile />
+  <ChatMessage.Content.SuggestedQuestions />
+</ChatMessage.Content>
+```
+
+#### ChatMessage.Actions
+
+Message-level actions (copy, regenerate, etc.):
+
+```tsx
+<ChatMessage.Actions>
+  <button onClick={copyMessage}>Copy</button>
+  <button onClick={regenerate}>Regenerate</button>
+</ChatMessage.Actions>
+```
+
+### Content Types
+
+The content system supports multiple annotation types:
+
+- **Markdown** - Rich text with LaTeX support
+- **Image** - Image display with preview
+- **Artifact** - Interactive code/document editing
+- **Source** - Citation and source links
+- **Event** - Process events and status
+- **AgentEvent** - Agent-specific events with progress
+- **DocumentFile** - File attachments
+- **SuggestedQuestions** - Follow-up question suggestions
+
+## ChatInput
+
+Input component with file upload support and keyboard shortcuts.
+
+### Basic Usage
+
+```tsx
+import { ChatInput } from '@llamaindex/chat-ui'
+
+function MessageInput() {
+  return (
+    <ChatInput>
+      <ChatInput.Form>
+        <ChatInput.Field placeholder="Type your message..." />
+        <ChatInput.Upload />
+        <ChatInput.Submit />
+      </ChatInput.Form>
+    </ChatInput>
+  )
+}
+```
+
+### Sub-components
+
+#### ChatInput.Form
+
+Form wrapper with submit handling:
+
+```tsx
+<ChatInput.Form onSubmit={handleSubmit}>
+  {/* Input components */}
+</ChatInput.Form>
+```
+
+#### ChatInput.Field
+
+Auto-resizing textarea with keyboard shortcuts:
+
+```tsx
+<ChatInput.Field
+  placeholder="Type your message..."
+  disabled={isLoading}
+  className="min-h-12 max-h-32"
+/>
+```
+
+**Keyboard Shortcuts:**
+- `Enter` - Submit message
+- `Shift + Enter` - New line
+- `Escape` - Clear input
+
+#### ChatInput.Upload
+
+File upload trigger:
+
+```tsx
+<ChatInput.Upload>
+  <button type="button">
+    <PaperclipIcon className="h-4 w-4" />
+  </button>
+</ChatInput.Upload>
+```
+
+#### ChatInput.Submit
+
+Submit button with loading state:
+
+```tsx
+<ChatInput.Submit>
+  <button type="submit" disabled={isLoading}>
+    <SendIcon className="h-4 w-4" />
+  </button>
+</ChatInput.Submit>
+```
+
+### Features
+
+- **Auto-resize** - Textarea grows with content
+- **File upload** - Drag & drop or click to upload
+- **Keyboard shortcuts** - Intuitive message sending
+- **Loading states** - Disabled during processing
+- **Validation** - Built-in input validation
+
+## ChatCanvas
+
+Side panel component for displaying interactive artifacts like code and documents.
+
+### Basic Usage
+
+```tsx
+import { ChatCanvas } from '@llamaindex/chat-ui'
+
+function ChatWithCanvas() {
+  return (
+    <div className="flex h-full">
+      <div className="flex-1">
+        <ChatMessages />
+        <ChatInput />
+      </div>
+      <ChatCanvas className="w-1/2" />
+    </div>
+  )
+}
+```
+
+### Features
+
+- **Slide Animation** - Smooth slide-in when artifacts appear
+- **Version Management** - Track changes to artifacts
+- **Edit Support** - Interactive editing for code and documents
+- **Responsive** - Adapts to different screen sizes
+
+### Artifact Types
+
+#### Code Artifacts
+
+```tsx
+<ChatCanvas>
+  <ChatCanvas.CodeArtifact
+    filename="example.py"
+    language="python"
+    code="print('Hello, world!')"
+  />
+</ChatCanvas>
+```
+
+#### Document Artifacts
+
+```tsx
+<ChatCanvas>
+  <ChatCanvas.DocumentArtifact
+    title="Meeting Notes"
+    content="# Meeting Summary\n\n..."
+  />
+</ChatCanvas>
+```
+
+## Component Composition
+
+### Full Custom Layout
+
+```tsx
+function AdvancedChat() {
+  const handler = useChat({ api: '/api/chat' })
+  
+  return (
+    <ChatSection handler={handler} className="flex h-full">
+      <div className="flex flex-1 flex-col">
+        <header className="border-b p-4">
+          <h1>My Chat App</h1>
+        </header>
+        
+        <ChatMessages className="flex-1">
+          <ChatMessages.List className="p-4">
+            {/* Custom message rendering */}
+          </ChatMessages.List>
+          <ChatMessages.Loading>
+            <CustomLoader />
+          </ChatMessages.Loading>
+        </ChatMessages>
+        
+        <div className="border-t p-4">
+          <ChatInput>
+            <ChatInput.Form className="flex gap-2">
+              <ChatInput.Field className="flex-1" />
+              <ChatInput.Upload />
+              <ChatInput.Submit />
+            </ChatInput.Form>
+          </ChatInput>
+        </div>
+      </div>
+      
+      <ChatCanvas className="w-1/2 border-l" />
+    </ChatSection>
+  )
+}
+```
+
+## Context Access
+
+All components have access to chat context through hooks:
+
+```tsx
+import { useChatUI, useChatMessage } from '@llamaindex/chat-ui'
+
+function CustomComponent() {
+  const { messages, isLoading, append } = useChatUI()
+  const { message } = useChatMessage() // Only in message context
+  
+  // Component logic
+}
+```
+
+## Next Steps
+
+- [Widgets](./widgets) - Learn about specialized content widgets
+- [Annotations](./annotations) - Implement rich content support
+- [Hooks](./hooks) - Understand the hook system
+- [Customization](./customization) - Style and theme the components

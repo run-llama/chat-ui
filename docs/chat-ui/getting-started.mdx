@@ -1,0 +1,282 @@
+---
+title: Getting Started
+description: Learn how to install and set up LlamaIndex Chat UI in your project
+---
+
+This guide will help you get started with LlamaIndex Chat UI, from installation to building your first chat interface.
+
+## Quick Start
+
+The fastest way to add a chatbot to your project is using the Shadcn CLI command:
+
+```shell
+npx shadcn@latest add https://ui.llamaindex.ai/r/chat.json
+```
+
+## Manual Installation
+
+Install the package using your preferred package manager:
+
+```shell
+npm install @llamaindex/chat-ui
+
+yarn add @llamaindex/chat-ui
+
+pnpm add @llamaindex/chat-ui
+
+bun add @llamaindex/chat-ui
+```
+
+## Peer Dependencies
+
+Chat UI requires React 18+:
+
+```shell
+npm install react react-dom
+```
+
+## Basic Setup
+
+### 1. Configure Tailwind CSS
+
+**For Tailwind CSS version 4.x**, update `globals.css` to include the chat-ui components (update the relative path to node_modules if necessary):
+
+```css
+@source '../node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}';
+```
+
+**For Tailwind CSS version 3.x**, add the following to your `tailwind.config.ts` file:
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}',
+  ],
+  // ... rest of config
+}
+```
+
+### 2. Import Styles
+
+Import the CSS styles in your app's root file (e.g., `_app.tsx` or `layout.tsx`):
+
+```tsx
+import '@llamaindex/chat-ui/styles/markdown.css' // code, latex and custom markdown styling
+import '@llamaindex/chat-ui/styles/pdf.css' // pdf styling
+```
+
+The `markdown.css` file includes styling for code blocks using [highlight.js](https://highlightjs.org/) with the `atom-one-dark` theme by default, [katex](https://katex.org/) for latex, and [pdf-viewer](https://github.com/run-llama/pdf-viewer) for PDF files. You can use any highlight.js theme by copying [their CSS](https://github.com/highlightjs/highlight.js/tree/main/src/styles/) to your project and importing it.
+
+### 3. Create a Chat API Route
+
+Set up an API route to handle chat requests. Here's an example using Next.js:
+
+```typescript
+// app/api/chat/route.ts
+import { NextResponse } from 'next/server'
+
+export async function POST(request: Request) {
+  const { messages } = await request.json()
+
+  // Your chat logic here
+  const response = await generateChatResponse(messages)
+
+  return new Response(response, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Vercel-AI-Data-Stream': 'v1',
+    },
+  })
+}
+```
+
+### 4. Create Your Chat Component
+
+The easiest way to get started is to connect the whole `ChatSection` component with `useChat` hook from [vercel/ai](https://github.com/vercel/ai):
+
+```tsx
+'use client'
+
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+export default function Chat() {
+  const handler = useChat({
+    api: '/api/chat',
+  })
+
+  return (
+    <div className="h-screen">
+      <ChatSection handler={handler} />
+    </div>
+  )
+}
+```
+
+## Component Composition
+
+Components are designed to be composable. You can use them as is with the simple `ChatSection`, or extend them with your own children components:
+
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import LlamaCloudSelector from './components/LlamaCloudSelector' // your custom component
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages />
+      <ChatInput>
+        <ChatInput.Form className="bg-lime-500">
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <LlamaCloudSelector /> {/* custom component */}
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
+
+Your custom component can use the `useChatUI` hook to send additional data to the chat API endpoint:
+
+```tsx
+import { useChatUI } from '@llamaindex/chat-ui'
+
+const LlamaCloudSelector = () => {
+  const { requestData, setRequestData } = useChatUI()
+  return (
+    <div>
+      <select
+        value={requestData?.model}
+        onChange={e => setRequestData({ model: e.target.value })}
+      >
+        <option value="llama-3.1-70b-instruct">Pipeline 1</option>
+        <option value="llama-3.1-8b-instruct">Pipeline 2</option>
+      </select>
+    </div>
+  )
+}
+```
+
+## Styling
+
+### Components
+
+`chat-ui` components are based on [shadcn](https://ui.shadcn.com/) components using Tailwind CSS.
+
+You can override the default styles by changing CSS variables in the `globals.css` file of your Tailwind CSS configuration. For example, to change the background and foreground colors:
+
+```css
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+}
+```
+
+For a list of all available CSS variables, please refer to the [Shadcn Theme Config](https://ui.shadcn.com/themes).
+
+Additionally, you can also override each component's styles by setting custom classes in the `className` prop. For example, setting the background color of the `ChatInput.Form` component:
+
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages />
+      <ChatInput>
+        <ChatInput.Preview />
+        <ChatInput.Form className="bg-lime-500">
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
+
+## Advanced Features
+
+### Custom Layout
+
+For more control over the layout, compose components manually:
+
+```tsx
+import {
+  ChatSection,
+  ChatMessages,
+  ChatInput,
+  ChatCanvas,
+} from '@llamaindex/chat-ui'
+
+function CustomChat() {
+  const handler = useChat({ api: '/api/chat' })
+
+  return (
+    <ChatSection handler={handler} className="flex-row gap-4">
+      <div className="flex-1">
+        <ChatMessages />
+        <ChatInput />
+      </div>
+      <ChatCanvas className="w-1/3" />
+    </ChatSection>
+  )
+}
+```
+
+### With Initial Messages
+
+Provide initial context or welcome messages:
+
+```tsx
+const handler = useChat({
+  api: '/api/chat',
+  initialMessages: [
+    {
+      id: '1',
+      role: 'assistant',
+      content: 'Hello! How can I help you today?',
+    },
+  ],
+})
+```
+
+### Language Renderer Support
+
+For any language that the LLM generates, you can specify a custom renderer to render the output. For example, you can render mermaid code as SVG using a custom renderer.
+
+## Next Steps
+
+Now that you have a basic chat interface running:
+
+1. **Explore Components** - Learn about [Core Components](./core-components) for customization
+2. **Add Rich Content** - Implement [Annotations](./annotations) for images, files, and sources
+3. **Enable Artifacts** - Set up [Artifacts](./artifacts) for interactive code and documents
+4. **Customize Styling** - Read the [Customization](./customization) guide for theming
+
+## Troubleshooting
+
+### Common Issues
+
+**Styles not loading**: Make sure you've imported the CSS files in your app root and configured Tailwind CSS properly.
+
+**TypeScript errors**: Ensure you have the correct peer dependencies and TypeScript configuration.
+
+**Build errors**: Check that your bundler supports the package's export conditions.
+
+**Chat not working**: Verify your API route is returning the correct response format for the Vercel AI SDK.
+
+### Getting Help
+
+- Check the [Examples](./examples) for working implementations
+- Review the component documentation for detailed API references
+- Open an issue on GitHub for bugs or feature requests
