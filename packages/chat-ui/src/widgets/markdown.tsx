@@ -9,11 +9,11 @@ import {
   DocumentFileType,
   SourceData,
   AnyAnnotation,
+  INLINE_ANNOTATION_KEY,
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
-import { INLINE_ANNOTATION_KEY } from '../chat/chat-renderer'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,

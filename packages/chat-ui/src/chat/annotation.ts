@@ -1,5 +1,7 @@
 import { JSONValue, Message } from './chat.interface'
 
+export const INLINE_ANNOTATION_KEY = 'annotation'
+
 export enum MessageAnnotationType {
   IMAGE = 'image',
   DOCUMENT_FILE = 'document_file',
