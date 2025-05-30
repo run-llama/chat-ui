@@ -86,6 +86,31 @@ export default function Page(): JSX.Element {
               </a>
 
               <a
+                href="https://ts.llamaindex.ai/docs/chat-ui"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-3 font-semibold text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/25"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Documentation
+                </span>
+                <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+              </a>
+
+              <a
                 href="https://www.npmjs.com/package/@llamaindex/chat-ui"
                 target="_blank"
                 rel="noopener noreferrer"
