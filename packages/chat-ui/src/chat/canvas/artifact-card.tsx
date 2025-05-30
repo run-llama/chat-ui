@@ -6,10 +6,14 @@ import {
   Artifact,
   CodeArtifact,
   DocumentArtifact,
+  extractArtifactsFromMessage,
   isEqualArtifact,
 } from '../annotation'
+import { Message } from '../chat.interface'
 import { useChatCanvas } from './context'
 import { memo, useEffect } from 'react'
+import { useChatUI } from '../chat.context'
+import { useChatMessage } from '../chat-message.context'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
   code: FileCode,
@@ -24,10 +28,9 @@ function ArtifactCardComp({ data }: { data: Artifact }) {
     getArtifactVersion,
     restoreArtifact,
     displayedArtifact,
-    inlineArtifacts,
-    setInlineArtifacts,
-    isCanvasOpen,
   } = useChatCanvas()
+  const { setMessages, messages } = useChatUI()
+  const { message, isLast } = useChatMessage()
   const { versionNumber, isLatest } = getArtifactVersion(data)
 
   const Icon = IconMap[data.type]
@@ -36,20 +39,20 @@ function ArtifactCardComp({ data }: { data: Artifact }) {
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
 
   useEffect(() => {
-    if (!data.readonly && !inlineArtifacts.includes(data)) {
-      // when a inline artifact is added, add it to the artifacts list, also open the canvas
-      setInlineArtifacts([...inlineArtifacts, data])
-      if (!isCanvasOpen) {
-        openArtifactInCanvas(data)
-      }
+    const artifacts = extractArtifactsFromMessage(message) ?? []
+    // if current last message hasn't contain this inline artifact, add it to annotations of the message
+    const artifact = artifacts.find(a => isEqualArtifact(a, data))
+    if (!artifact && isLast && setMessages) {
+      setMessages([
+        ...messages.slice(0, -1),
+        {
+          role: 'assistant',
+          content: message.content,
+          annotations: [{ type: 'artifact', data }],
+        },
+      ] as (Message & { id: string })[])
     }
-  }, [
-    data,
-    inlineArtifacts,
-    setInlineArtifacts,
-    isCanvasOpen,
-    openArtifactInCanvas,
-  ])
+  }, [])
 
   return (
     <div

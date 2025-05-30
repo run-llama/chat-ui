@@ -131,9 +131,11 @@ export function ArtifactAnnotations() {
 
   return (
     <div className="flex items-center gap-2">
-      {artifacts.map((artifact, index) => (
-        <ArtifactCard key={index} data={artifact} />
-      ))}
+      {artifacts
+        .filter(a => !a.inline) // already show inline artifacts in the markdown
+        .map((artifact, index) => (
+          <ArtifactCard key={index} data={artifact} />
+        ))}
     </div>
   )
 }

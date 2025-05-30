@@ -73,6 +73,7 @@ const INLINE_ITEMS = [
     data: {
       type: 'code',
       readonly: true, // this artifact is readonly
+      inline: true, // this artifact will be only displayed inline in the message
       data: {
         file_name: 'package.json',
         language: 'json',
@@ -94,6 +95,7 @@ const INLINE_ITEMS = [
     type: 'artifact',
     data: {
       readonly: true, // this artifact is readonly
+      inline: true, // this artifact will be only displayed inline in the message
       type: 'code',
       data: {
         file_name: 'weather.js',
@@ -122,6 +124,7 @@ getWeather("San Francisco, CA");`,
   {
     type: 'artifact',
     data: {
+      inline: true, // this artifact will be only displayed inline in the message
       type: 'document',
       data: {
         title: 'Sample document',
