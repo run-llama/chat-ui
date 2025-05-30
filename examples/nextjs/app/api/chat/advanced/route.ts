@@ -72,6 +72,7 @@ const INLINE_ITEMS = [
     type: 'artifact',
     data: {
       type: 'code',
+      readonly: true,
       data: {
         file_name: 'package.json',
         language: 'json',
@@ -88,6 +89,7 @@ const INLINE_ITEMS = [
   {
     type: 'artifact',
     data: {
+      readonly: true,
       type: 'code',
       data: {
         file_name: 'sample.js',

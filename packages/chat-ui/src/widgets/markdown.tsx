@@ -96,10 +96,7 @@ export function Markdown({
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
-  annotationRenderers?: Record<
-    string,
-    ComponentType<{ data: any; isInline?: boolean }>
-  >
+  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
 }) {
   const processedContent = preprocessContent(content)
 
@@ -144,7 +141,7 @@ export function Markdown({
               // Check if we have a specific renderer for it
               if (annotation.type && annotationRenderers?.[annotation.type]) {
                 const CustomRenderer = annotationRenderers[annotation.type]
-                return <CustomRenderer data={annotation.data} isInline />
+                return <CustomRenderer data={annotation.data} />
               }
 
               // If no custom renderer found, render an error message

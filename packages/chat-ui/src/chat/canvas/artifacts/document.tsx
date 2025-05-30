@@ -75,6 +75,7 @@ export function DocumentArtifactViewer({
             key={documentArtifact.created_at}
             content={content}
             onChange={handleDocumentChange}
+            readonly={documentArtifact.readonly}
           />
         )}
       </div>

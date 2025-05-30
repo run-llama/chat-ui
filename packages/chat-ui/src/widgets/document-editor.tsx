@@ -130,11 +130,13 @@ export function DocumentEditor({
   onChange,
   className,
   showToolbar = true,
+  readonly = false,
 }: {
   content: string
   onChange?: (markdown: string) => void
   className?: string
   showToolbar?: boolean
+  readonly?: boolean
 }) {
   const editorRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
@@ -164,6 +166,7 @@ export function DocumentEditor({
 
     const view = new EditorView(editorRef.current, {
       state,
+      editable: () => !readonly,
       dispatchTransaction(transaction) {
         const newState = view.state.apply(transaction)
         view.updateState(newState)
@@ -187,7 +190,7 @@ export function DocumentEditor({
     <div
       className={cn('custom-markdown flex h-full flex-col gap-3', className)}
     >
-      {showToolbar && <Toolbar view={viewRef.current} />}
+      {showToolbar && !readonly && <Toolbar view={viewRef.current} />}
       <div ref={editorRef} className="min-h-0 flex-1 overflow-auto" />
     </div>
   )
