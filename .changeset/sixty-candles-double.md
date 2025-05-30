@@ -1,6 +1,6 @@
 ---
-"web": patch
-"@llamaindex/chat-ui-docs": patch
+'web': patch
+'@llamaindex/chat-ui-docs': patch
 ---
 
 docs: update documentation
