@@ -19,7 +19,7 @@ import {
   MessageAnnotationType,
   SuggestedQuestionsData,
 } from './annotation'
-import { ArtifactCard } from './canvas/card.js'
+import { ArtifactCard } from './canvas/artifact-card.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
 
@@ -131,7 +131,7 @@ export function ArtifactAnnotations() {
   return (
     <div className="flex items-center gap-2">
       {artifacts.map((artifact, index) => (
-        <ArtifactCard key={index} artifact={artifact} />
+        <ArtifactCard key={index} data={artifact} />
       ))}
     </div>
   )

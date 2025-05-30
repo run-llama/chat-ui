@@ -1,7 +1,6 @@
 // Chat components
 export * from './chat/chat.interface'
 export * from './chat/annotation'
-export * from './chat/chat-renderer'
 
 export { default as ChatSection } from './chat/chat-section'
 export { default as ChatCanvas } from './chat/canvas'

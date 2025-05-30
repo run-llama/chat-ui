@@ -1,9 +1,11 @@
+// TODO: this example is too complicated, make two: one
+// with inline annotations and one with normal annotations
 import { NextResponse, type NextRequest } from 'next/server'
 
 const TOKEN_DELAY = 30 // 30ms delay between tokens
 const TEXT_PREFIX = '0:' // vercel ai text prefix
 const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
-const INLINE_ANNOTATION_KEY = 'inline_annotation' // the language key to detect inline annotation code in markdown
+const INLINE_ANNOTATION_KEY = 'annotation' // the language key to detect inline annotation code in markdown
 const ANNOTATION_DELAY = 1000 // 1 second delay between annotations
 
 export async function POST(request: NextRequest) {
@@ -49,16 +51,6 @@ const SAMPLE_ANNOTATIONS = [
       ],
     },
   },
-  {
-    type: 'weather',
-    data: {
-      location: 'San Francisco, CA',
-      temperature: 22,
-      condition: 'sunny',
-      humidity: 65,
-      windSpeed: 12,
-    },
-  },
 ]
 
 const INLINE_ITEMS = [
@@ -91,6 +83,17 @@ const INLINE_ITEMS = [
         language: 'javascript',
         code: 'console.log("Hello, world!");',
       },
+    },
+  },
+  '3. Check the current weather:',
+  {
+    type: 'weather',
+    data: {
+      location: 'San Francisco, CA',
+      temperature: 22,
+      condition: 'sunny',
+      humidity: 65,
+      windSpeed: 12,
     },
   },
 ]

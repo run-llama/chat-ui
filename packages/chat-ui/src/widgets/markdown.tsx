@@ -7,16 +7,13 @@ import { CodeBlock } from './codeblock'
 import {
   DOCUMENT_FILE_TYPES,
   DocumentFileType,
-  MessageAnnotation,
   SourceData,
+  AnyAnnotation,
 } from '../chat/annotation'
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
-import {
-  AnnotationRendererProps,
-  INLINE_ANNOTATION_KEY,
-} from '../chat/chat-renderer'
+import { INLINE_ANNOTATION_KEY } from '../chat/chat-renderer'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -90,7 +87,7 @@ export function Markdown({
   citationComponent: CitationComponent,
   className: customClassName,
   languageRenderers,
-  annotationsRenderer: AnnotationsRenderer,
+  annotationRenderers,
 }: {
   content: string
   sources?: SourceData
@@ -98,7 +95,8 @@ export function Markdown({
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
-  annotationsRenderer?: ComponentType<AnnotationRendererProps>
+  // TODO: update our existing renderers so we can use them
+  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
 }) {
   const processedContent = preprocessContent(content)
 
@@ -130,9 +128,10 @@ export function Markdown({
             const language = (match && match[1]) || ''
             const codeValue = String(children).replace(/\n$/, '')
 
-            if (AnnotationsRenderer && language === INLINE_ANNOTATION_KEY) {
-              const annotation = JSON.parse(codeValue) as MessageAnnotation
+            if (language === INLINE_ANNOTATION_KEY) {
+              const annotation = JSON.parse(codeValue) as AnyAnnotation
 
+              // TODO: use zod to validate this is a AnyAnnotation
               if (typeof annotation !== 'object') {
                 console.warn(
                   `Invalid inline annotation: ${codeValue}, expected an object`
@@ -140,7 +139,22 @@ export function Markdown({
                 return null
               }
 
-              return <AnnotationsRenderer annotation={annotation} />
+              // Check if we have a specific renderer for it
+              if (annotation.type && annotationRenderers?.[annotation.type]) {
+                const CustomRenderer = annotationRenderers[annotation.type]
+                return <CustomRenderer data={annotation.data} />
+              }
+
+              // If no custom renderer found, render an error message
+              // TODO: Check if we can reuse any of our existing error message styles
+              return (
+                <div className="mb-2 max-w-full overflow-hidden rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+                  <div className="overflow-wrap-anywhere whitespace-pre-wrap break-words text-sm text-red-800 dark:text-red-200">
+                    <strong>Annotation Render Error:</strong> No renderer found
+                    for annotation type &ldquo;{annotation.type}&rdquo;.
+                  </div>
+                </div>
+              )
             }
 
             if (inline) {

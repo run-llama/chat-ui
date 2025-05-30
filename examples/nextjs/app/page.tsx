@@ -9,7 +9,7 @@ import {
   useChatUI,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
-import { CustomWeatherAnnotation } from '../components/custom-weather-annotation'
+import { CustomWeatherCard } from '../components/custom-weather'
 
 const initialMessages: Message[] = [
   {
@@ -86,10 +86,14 @@ function CustomChatMessages() {
             </div>
           </ChatMessage.Avatar>
           <ChatMessage.Content isLoading={isLoading} append={append}>
-            <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Artifact />
+            <ChatMessage.Content.Markdown
+              annotationRenderers={{
+                weather: CustomWeatherCard,
+                /* TODO: how do we fix the version problem for the artifact card? */
+                artifact: ChatCanvas.Artifact,
+              }}
+            />
             <ChatMessage.Content.Source />
-            <CustomWeatherAnnotation />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>
