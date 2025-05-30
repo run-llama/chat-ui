@@ -15,7 +15,13 @@ const IconMap: Record<Artifact['type'], LucideIcon> = {
   document: FileText,
 }
 
-export function ArtifactCard({ data }: { data: Artifact }) {
+export function ArtifactCard({
+  data,
+  isInline,
+}: {
+  data: Artifact
+  isInline?: boolean
+}) {
   const {
     openArtifactInCanvas,
     getArtifactVersion,
@@ -40,7 +46,9 @@ export function ArtifactCard({ data }: { data: Artifact }) {
       <div className="flex flex-1 items-center gap-2">
         <Icon className="size-7 shrink-0 text-blue-500" />
         <div className="flex flex-col">
-          <div className="text-sm font-semibold">Version {versionNumber}</div>
+          {!isInline && (
+            <div className="text-sm font-semibold">Version {versionNumber}</div>
+          )}
           {title && <div className="text-xs text-gray-600">{title}</div>}
         </div>
       </div>
