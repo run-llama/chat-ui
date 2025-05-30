@@ -5,39 +5,35 @@ description: Learn how to install and set up LlamaIndex Chat UI in your project
 
 This guide will help you get started with LlamaIndex Chat UI, from installation to building your first chat interface.
 
-## Quick Start
+## Installation
 
-The fastest way to add a chatbot to your project is using the Shadcn CLI command:
+### Quick Start with Shadcn CLI
+
+If you're using shadcn, then the fastest way to add a chatbot to your project is using the Shadcn CLI command:
 
 ```shell
 npx shadcn@latest add https://ui.llamaindex.ai/r/chat.json
 ```
 
-## Manual Installation
+**Note for React 19 users:** Select **"Use --force"** if asked and continue with the installation. This will resolve the peer dependency conflicts and allow the components to install properly.
 
-Install the package using your preferred package manager:
+### Manual Installation
 
-```shell
-npm install @llamaindex/chat-ui
-
-yarn add @llamaindex/chat-ui
-
-pnpm add @llamaindex/chat-ui
-
-bun add @llamaindex/chat-ui
-```
-
-## Peer Dependencies
-
-Chat UI requires React 18+:
+First, install the package using your preferred package manager:
 
 ```shell
-npm install react react-dom
+npm install @llamaindex/chat-ui react react-dom
+
+yarn add @llamaindex/chat-ui react react-dom
+
+pnpm add @llamaindex/chat-ui react react-dom
+
+bun add @llamaindex/chat-ui react react-dom
 ```
 
-## Basic Setup
+Then, you need to configure your styling with the following three steps:
 
-### 1. Configure Tailwind CSS
+#### 1. Configure Tailwind CSS
 
 **For Tailwind CSS version 4.x**, update `globals.css` to include the chat-ui components (update the relative path to node_modules if necessary):
 
@@ -58,7 +54,58 @@ module.exports = {
 }
 ```
 
-### 2. Import Styles
+#### 2. Define theme:
+
+Chat UI components use the same theming system as [shadcn/ui](https://ui.shadcn.com/), based on CSS custom properties.
+
+**If you already have shadcn/ui set up with a theme in your project, you can skip this step** - Chat UI will automatically inherit your existing theme configuration.
+
+**If you're not using shadcn/ui**, you need to define theme variables in your `app/globals.css` file to make Chat UI work properly. These CSS custom properties control colors, typography, spacing, and other visual aspects of the components.
+
+##### Theme Generation
+
+We recommend using [Shadcn Studio Theme Editor](https://shadcnstudio.com/theme-editor) to easily generate and customize your theme:
+
+1. Visit [https://shadcnstudio.com/theme-editor](https://shadcnstudio.com/theme-editor)
+2. Select or customize a theme that matches your design
+3. Copy the generated CSS variables
+4. Add them to your `globals.css` file
+
+##### Sample Configuration
+
+Here's a complete example of `globals.css` after configuring Tailwind CSS and adding theme variables:
+
+You can use this [sample globals.css file](./sample-globals.css) as a reference, or copy the following basic structure:
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}';
+
+:root {
+  /* Theme variables - see sample file for complete configuration */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.14 0 285.86);
+  /* ... other theme variables ... */
+}
+
+.dark {
+  /* Dark mode theme variables */
+  --background: oklch(0.14 0 285.86);
+  --foreground: oklch(0.99 0 0);
+  /* ... other dark theme variables ... */
+}
+
+@theme inline {
+  /* Theme mapping for Tailwind CSS */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* ... other color mappings ... */
+}
+```
+
+For a complete configuration with all theme variables, download and use the [full sample globals.css file](./sample-globals.css).
+
+#### 3. Import Styles
 
 Import the CSS styles in your app's root file (e.g., `_app.tsx` or `layout.tsx`):
 
@@ -69,7 +116,9 @@ import '@llamaindex/chat-ui/styles/pdf.css' // pdf styling
 
 The `markdown.css` file includes styling for code blocks using [highlight.js](https://highlightjs.org/) with the `atom-one-dark` theme by default, [katex](https://katex.org/) for latex, and [pdf-viewer](https://github.com/run-llama/pdf-viewer) for PDF files. You can use any highlight.js theme by copying [their CSS](https://github.com/highlightjs/highlight.js/tree/main/src/styles/) to your project and importing it.
 
-### 3. Create a Chat API Route
+## Basic Usage
+
+### 1. Create a Chat API Route
 
 Set up an API route to handle chat requests. Here's an example using Next.js:
 
@@ -92,7 +141,7 @@ export async function POST(request: Request) {
 }
 ```
 
-### 4. Create Your Chat Component
+### 2. Create Your Chat Component
 
 The easiest way to get started is to connect the whole `ChatSection` component with `useChat` hook from [vercel/ai](https://github.com/vercel/ai):
 
@@ -258,10 +307,10 @@ For any language that the LLM generates, you can specify a custom renderer to re
 
 Now that you have a basic chat interface running:
 
-1. **Explore Components** - Learn about [Core Components](./core-components) for customization
-2. **Add Rich Content** - Implement [Annotations](./annotations) for images, files, and sources
-3. **Enable Artifacts** - Set up [Artifacts](./artifacts) for interactive code and documents
-4. **Customize Styling** - Read the [Customization](./customization) guide for theming
+1. **Explore Components** - Learn about [Core Components](./core-components.mdx) for customization
+2. **Add Rich Content** - Implement [Annotations](./annotations.mdx) for images, files, and sources
+3. **Enable Artifacts** - Set up [Artifacts](./artifacts.mdx) for interactive code and documents
+4. **Customize Styling** - Read the [Customization](./customization.mdx) guide for theming
 
 ## Troubleshooting
 
@@ -277,6 +326,6 @@ Now that you have a basic chat interface running:
 
 ### Getting Help
 
-- Check the [Examples](./examples) for working implementations
+- Check the [Examples](./examples.mdx) for working implementations
 - Review the component documentation for detailed API references
 - Open an issue on GitHub for bugs or feature requests

@@ -7,6 +7,7 @@ import {
 } from '@llamaindex/chat-ui'
 
 import '@llamaindex/chat-ui/styles/markdown.css'
+import '@llamaindex/chat-ui/styles/pdf.css'
 import { useState } from 'react'
 
 const initialMessages: Message[] = [
