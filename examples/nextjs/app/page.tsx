@@ -99,8 +99,11 @@ function CustomChatMessages() {
               }}
             />
 
-            {/* A custom annotation outside of Markdown text */}
+            {/* A custom annotation component outside of Markdown text */}
             <CustomWikiCard />
+
+            {/* Artifact annotation outside of Markdown text */}
+            <ChatMessage.Content.Artifact />
 
             {/* Sources Annotation at the bottom of the chat */}
             <ChatMessage.Content.Source />
