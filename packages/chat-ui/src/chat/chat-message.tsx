@@ -12,6 +12,7 @@ import { getSourceAnnotationData, MessageAnnotation } from './annotation'
 import {
   AgentEventAnnotations,
   ArtifactAnnotations,
+  defaultAnnotationRenderers,
   DocumentFileAnnotations,
   EventAnnotations,
   ImageAnnotations,
@@ -152,7 +153,9 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       sources={{ nodes: allNodes }}
       citationComponent={props.citationComponent}
       languageRenderers={props.languageRenderers}
-      annotationRenderers={props.annotationRenderers}
+      annotationRenderers={
+        props.annotationRenderers ?? defaultAnnotationRenderers
+      }
       className={cn(
         {
           'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':

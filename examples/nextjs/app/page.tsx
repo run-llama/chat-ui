@@ -7,6 +7,7 @@ import {
   ChatMessages,
   ChatSection,
   useChatUI,
+  defaultAnnotationRenderers,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
 import { CustomWeatherCard } from '../components/custom-weather'
@@ -88,9 +89,8 @@ function CustomChatMessages() {
           <ChatMessage.Content isLoading={isLoading} append={append}>
             <ChatMessage.Content.Markdown
               annotationRenderers={{
+                ...defaultAnnotationRenderers,
                 weather: CustomWeatherCard,
-                /* TODO: how do we fix the version problem for the artifact card? */
-                artifact: ChatCanvas.Artifact,
               }}
             />
             <ChatMessage.Content.Source />

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { ComponentType, useMemo } from 'react'
 import {
   ChatAgentEvents,
   ChatEvents,
@@ -22,6 +22,7 @@ import {
 import { ArtifactCard } from './canvas/artifact-card.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
+import ChatCanvas from './canvas/index.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -135,4 +136,11 @@ export function ArtifactAnnotations() {
       ))}
     </div>
   )
+}
+
+export const defaultAnnotationRenderers: Record<
+  string,
+  ComponentType<{ data: any }>
+> = {
+  artifact: ChatCanvas.Artifact,
 }
