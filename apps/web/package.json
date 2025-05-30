@@ -11,6 +11,7 @@
     "registry:build": "rm -rf public/r && npx shadcn@latest build"
   },
   "dependencies": {
+    "framer-motion": "^12.15.0",
     "@faker-js/faker": "^9.4.0",
     "@llamaindex/chat-ui": "workspace:*",
     "@radix-ui/react-slot": "^1.0.2",
