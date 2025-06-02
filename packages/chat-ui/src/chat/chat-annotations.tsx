@@ -98,7 +98,15 @@ export function SuggestedQuestionsAnnotations() {
   )
 }
 
-export function ArtifactAnnotations() {
+export interface ArtifactAnnotationsProps {
+  showInline?: boolean
+}
+
+export function ArtifactAnnotations({
+  // by default, inline artifact has been shown in the markdown
+  // so we don't need to show it again in the annotation list
+  showInline = false,
+}: ArtifactAnnotationsProps) {
   const { message } = useChatMessage()
   const artifacts = useMemo(
     () => extractArtifactsFromMessage(message),
@@ -109,7 +117,7 @@ export function ArtifactAnnotations() {
   return (
     <div className="flex items-center gap-2">
       {artifacts
-        .filter(a => !a.inline) // already show inline artifacts in the markdown
+        .filter(a => !a.inline || showInline)
         .map((artifact, index) => (
           <ArtifactCard key={index} data={artifact} />
         ))}
