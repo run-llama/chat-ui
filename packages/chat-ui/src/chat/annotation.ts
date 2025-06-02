@@ -1,5 +1,8 @@
 import { z } from 'zod'
 import { JSONValue, Message } from './chat.interface'
+import { remark } from 'remark'
+import remarkParse from 'remark-parse'
+import { visit } from 'unist-util-visit'
 
 export const INLINE_ANNOTATION_KEY = 'annotation'
 
@@ -111,6 +114,7 @@ export type CustomAnnotation<T = unknown> = {
 export type AnyAnnotation<T = unknown> = MessageAnnotation | CustomAnnotation<T>
 
 export const AnyAnnotationSchema = z.object({ type: z.string(), data: z.any() })
+
 /**
  * Gets custom message annotations that don't match any standard MessageAnnotationType
  * @param annotations - Array of message annotations to filter
@@ -210,12 +214,55 @@ export type CodeArtifactError = {
   errors: string[]
 }
 
+// Function to parse Markdown and extract code blocks
+export function parseMarkdownCodeBlocks(markdown: string) {
+  const markdownCodeBlocks: {
+    language: string | null
+    code: string
+  }[] = []
+
+  // Parse Markdown to AST using remark
+  const processor = remark().use(remarkParse)
+  const ast = processor.parse(markdown)
+
+  // Visit all code nodes in the AST
+  visit(ast, 'code', (node: any) => {
+    markdownCodeBlocks.push({
+      language: node.lang || null, // Language is stored in node.lang
+      code: node.value, // Code content is stored in node.value
+    })
+  })
+
+  return markdownCodeBlocks
+}
+
+// extract all inline annotations from markdown
+export function extractInlineAnnotations(markdown: string): AnyAnnotation[] {
+  const codeBlocks = parseMarkdownCodeBlocks(markdown)
+  const inlineAnnotations = codeBlocks
+    .filter(block => block.language === INLINE_ANNOTATION_KEY)
+    .map(block => JSON.parse(block.code))
+
+  return inlineAnnotations.filter(a => AnyAnnotationSchema.safeParse(a).success)
+}
+
+// extract all inline artifacts from markdown
+export function extractInlineArtifacts(markdown: string): Artifact[] {
+  const inlineAnnotations = extractInlineAnnotations(markdown)
+  return inlineAnnotations
+    .filter(a => a.type === MessageAnnotationType.ARTIFACT.toString())
+    .map(a => a.data) as Artifact[]
+}
+
 export function extractArtifactsFromMessage(message: Message): Artifact[] {
-  const artifacts = getChatUIAnnotation<Artifact>(
+  const inlineArtifacts = extractInlineArtifacts(message.content)
+  const normalArtifacts = getChatUIAnnotation<Artifact>(
     message.annotations as MessageAnnotation[],
     MessageAnnotationType.ARTIFACT
   )
-  return artifacts ?? []
+  return [...inlineArtifacts, ...normalArtifacts].sort(
+    (a, b) => a.created_at - b.created_at
+  )
 }
 
 // extract artifacts from all messages (sort ascending by created_at)
