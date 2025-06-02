@@ -1,5 +1,3 @@
-import { z } from 'zod'
-
 export enum MessageAnnotationType {
   IMAGE = 'image',
   DOCUMENT_FILE = 'document_file',
@@ -15,7 +13,14 @@ export type MessageAnnotation<T = unknown> = {
   data: T
 }
 
-export const MessageAnnotationSchema = z.object({
-  type: z.string(),
-  data: z.any(),
-})
+export function isMessageAnnotation(
+  annotation: unknown
+): annotation is MessageAnnotation {
+  return (
+    annotation !== null &&
+    typeof annotation === 'object' &&
+    'type' in annotation &&
+    'data' in annotation &&
+    typeof (annotation as any).type === 'string'
+  )
+}

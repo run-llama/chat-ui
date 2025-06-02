@@ -1,6 +1,6 @@
 import { Message } from '../chat.interface'
 import { getInlineAnnotations } from './inline'
-import { MessageAnnotation, MessageAnnotationSchema } from './types'
+import { isMessageAnnotation, MessageAnnotation } from './types'
 import { getVercelAnnotations } from './vercel'
 
 /**
@@ -22,9 +22,7 @@ export function getAnnotationData<T = unknown>(
 ): T[] {
   const allAnnotations = parsers
     .flatMap(parser => parser(message))
-    .filter(
-      a => MessageAnnotationSchema.safeParse(a).success
-    ) as MessageAnnotation<T>[]
+    .filter(a => isMessageAnnotation(a)) as MessageAnnotation<T>[]
 
   return allAnnotations.filter(a => a.type === type).map(a => a.data) as T[]
 }

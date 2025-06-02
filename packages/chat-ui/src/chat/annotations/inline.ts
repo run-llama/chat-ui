@@ -2,7 +2,7 @@ import { remark } from 'remark'
 import remarkParse from 'remark-parse'
 import { visit } from 'unist-util-visit'
 import { Message } from '../chat.interface'
-import { MessageAnnotation, MessageAnnotationSchema } from './types'
+import { isMessageAnnotation, MessageAnnotation } from './types'
 
 const INLINE_ANNOTATION_KEY = 'annotation'
 
@@ -59,7 +59,7 @@ export function parseInlineAnnotation(
   try {
     const annotation = JSON.parse(codeValue)
 
-    if (!MessageAnnotationSchema.safeParse(annotation).success) {
+    if (!isMessageAnnotation(annotation)) {
       console.warn(
         `Invalid inline annotation: ${codeValue}, expected an object`
       )
