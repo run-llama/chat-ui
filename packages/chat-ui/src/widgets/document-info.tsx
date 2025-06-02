@@ -4,7 +4,7 @@ import {
   HoverCardTrigger,
 } from '@radix-ui/react-hover-card'
 import { Check, Copy, FileIcon, XCircleIcon } from 'lucide-react'
-import { DocumentFileType } from '../chat/annotations/data'
+import { DocumentFileType } from './chat-files'
 import { SourceNode } from '../chat/annotations/sources'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { Button } from '../ui/button'
