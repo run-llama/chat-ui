@@ -71,7 +71,6 @@ module.exports = {
     'no-await-in-loop': 'off',
     '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     '@typescript-eslint/unbound-method': 'off',
-    'react-hooks/exhaustive-deps': 'off',
     camelcase: 'off',
   },
   overrides: [
