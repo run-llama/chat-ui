@@ -16,10 +16,10 @@ import {
   extractArtifactsFromAllMessages,
   isEqualArtifact,
   DocumentArtifact,
-  toInlineMarkdownArtifact,
 } from './artifacts'
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'
+import { toInlineAnnotation } from '../annotations'
 
 interface ChatCanvasContextType {
   allArtifacts: Artifact[]
@@ -112,7 +112,9 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
         id: `restore-success-${Date.now()}`,
         role: 'assistant',
         content: `Successfully restored to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}${
-          newArtifact.inline ? `\n${toInlineMarkdownArtifact(newArtifact)}` : ''
+          newArtifact.inline
+            ? `\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`
+            : ''
         }`,
         annotations: newArtifact.inline
           ? [] // no need to add artifact annotation for inline artifact
@@ -172,7 +174,9 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
       {
         role: 'assistant',
         content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}${
-          newArtifact.inline ? `\n${toInlineMarkdownArtifact(newArtifact)}` : ''
+          newArtifact.inline
+            ? `\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`
+            : ''
         }`,
         annotations: newArtifact.inline
           ? [] // no need to add artifact annotation for inline artifact

@@ -14,7 +14,7 @@ import {
   SourceData,
   SourceNode,
 } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
-import { MessageAnnotationType } from './annotations/data.js'
+import { MessageAnnotationType } from './annotations/types.js'
 import { getAnnotationData } from './annotations/annotations.js'
 import { extractArtifactsFromMessage } from './canvas/artifacts.js'
 import { useChatMessage } from './chat-message.context.js'
