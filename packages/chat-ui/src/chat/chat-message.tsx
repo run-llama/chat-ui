@@ -8,7 +8,7 @@ import {
   Markdown,
   LanguageRendererProps,
 } from '../widgets/index.js'
-import { getSourceAnnotationData, MessageAnnotation } from './annotation'
+import { getSourceAnnotationData } from './annotations/sources.js'
 import {
   AgentEventAnnotations,
   ArtifactAnnotations,
@@ -138,12 +138,11 @@ function ChatMessageContent(props: ChatMessageContentProps) {
 
 function ChatMarkdown(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
-  const annotations = message.annotations as MessageAnnotation[] | undefined
 
   const allNodes = useMemo(() => {
-    const sourceData = getSourceAnnotationData(annotations ?? [])
+    const sourceData = getSourceAnnotationData(message)
     return sourceData.flatMap(item => item.nodes)
-  }, [annotations])
+  }, [message])
 
   return (
     <Markdown

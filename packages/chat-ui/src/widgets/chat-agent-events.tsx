@@ -10,7 +10,6 @@ import {
   DrawerTrigger,
 } from '../ui/drawer'
 import { Markdown } from './markdown'
-import { AgentEventData, ProgressData } from '../chat/annotation'
 import { Progress } from '../ui/progress'
 
 const AgentIcons: Record<string, LucideIcon> = {
@@ -36,6 +35,18 @@ type MergedEvent = {
   steps: (StepText | StepProgress)[]
 }
 
+export type ProgressData = {
+  id: string
+  total: number
+  current: number
+}
+
+export type AgentEventData = {
+  agent: string
+  text: string
+  type: 'text' | 'progress'
+  data?: ProgressData
+}
 export function ChatAgentEvents({
   data,
   isFinished,

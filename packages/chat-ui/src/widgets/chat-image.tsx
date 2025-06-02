@@ -1,4 +1,6 @@
-import { type ImageData } from '../index'
+export type ImageData = {
+  url: string
+}
 
 export function ChatImage({ data }: { data: ImageData }) {
   return (

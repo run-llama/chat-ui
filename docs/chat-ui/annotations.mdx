@@ -449,7 +449,7 @@ const weatherAnnotation: WeatherAnnotation = {
 ### Custom Widget Implementation
 
 ```tsx
-import { useChatMessage, getCustomAnnotations } from '@llamaindex/chat-ui'
+import { useChatMessage, getAnnotationData } from '@llamaindex/chat-ui'
 
 interface WeatherData {
   location: string
@@ -459,79 +459,27 @@ interface WeatherData {
   windSpeed: number
 }
 
-export function CustomWeatherWidget() {
+function WeatherWidget() {
   const { message } = useChatMessage()
 
-  const weatherData = getCustomAnnotations<WeatherData>(
-    message.annotations,
-    'weather'
-  )
+  const weatherData = getAnnotationData<WeatherData>(message, 'weather')
 
-  if (!weatherData[0]) return null
+  if (!weatherData?.[0]) return null
 
   const data = weatherData[0]
-
-  return (
-    <div className="my-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-      <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-          <WeatherIcon condition={data.condition} />
-        </div>
-        <div className="flex-1">
-          <h3 className="font-semibold text-blue-900">{data.location}</h3>
-          <div className="flex items-center gap-4 text-sm text-blue-700">
-            <span className="text-2xl font-bold">{data.temperature}°C</span>
-            <span>{data.condition}</span>
-          </div>
-        </div>
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-4 text-sm text-blue-600">
-        <div className="flex items-center gap-2">
-          <span>💧 Humidity:</span>
-          <span className="font-medium">{data.humidity}%</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span>🌬️ Wind:</span>
-          <span className="font-medium">{data.windSpeed} km/h</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function WeatherIcon({ condition }: { condition: string }) {
-  const iconMap: Record<string, string> = {
-    sunny: '☀️',
-    cloudy: '☁️',
-    rainy: '🌧️',
-    snowy: '❄️',
-    stormy: '⛈️',
-  }
-
-  return (
-    <span className="text-2xl">{iconMap[condition.toLowerCase()] || '🌤️'}</span>
-  )
+  // Render weather data...
 }
 ```
 
-### Using Custom Widgets
+### getAnnotationData
+
+Extract annotation data by type from messages:
 
 ```tsx
-import { ChatMessage } from '@llamaindex/chat-ui'
-import { CustomWeatherWidget } from './custom-weather-widget'
+import { getAnnotationData } from '@llamaindex/chat-ui'
 
-function MessageWithCustomWidgets({ message }) {
-  return (
-    <ChatMessage message={message}>
-      <ChatMessage.Content>
-        <ChatMessage.Content.Markdown />
-        <ChatMessage.Content.Image />
-        <ChatMessage.Content.Source />
-        <CustomWeatherWidget /> {/* Add custom widget */}
-      </ChatMessage.Content>
-    </ChatMessage>
-  )
-}
+// Usage
+return getAnnotationData<WeatherData>(message, 'weather')
 ```
 
 ## Annotation Utilities

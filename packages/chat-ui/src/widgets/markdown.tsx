@@ -7,9 +7,9 @@ import { CodeBlock } from './codeblock'
 import {
   DOCUMENT_FILE_TYPES,
   DocumentFileType,
-  SourceData,
-} from '../chat/annotation'
-import { DocumentInfo } from './document-info'
+  DocumentInfo,
+} from './document-info'
+import { SourceData } from '../chat/annotations/sources'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
 

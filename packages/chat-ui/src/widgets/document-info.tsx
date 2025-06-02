@@ -4,7 +4,7 @@ import {
   HoverCardTrigger,
 } from '@radix-ui/react-hover-card'
 import { Check, Copy, FileIcon, XCircleIcon } from 'lucide-react'
-import { DocumentFileType, SourceNode } from '../chat/annotation'
+import { SourceNode } from '../chat/annotations/sources'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { Button } from '../ui/button'
 import { PdfDialog } from './pdf-dialog'
@@ -15,6 +15,22 @@ import { DocxIcon } from '../ui/icons/docx'
 import { PDFIcon } from '../ui/icons/pdf'
 import { SheetIcon } from '../ui/icons/sheet'
 import { TxtIcon } from '../ui/icons/txt'
+
+export type DocumentFileType = 'csv' | 'pdf' | 'txt' | 'docx'
+export const DOCUMENT_FILE_TYPES: DocumentFileType[] = [
+  'csv',
+  'pdf',
+  'txt',
+  'docx',
+]
+export type DocumentFile = {
+  id: string
+  name: string // The uploaded file name in the backend
+  size: number // The file size in bytes
+  type: DocumentFileType
+  url: string // The URL of the uploaded file in the backend
+  refs?: string[] // DocumentIDs of the uploaded file in the vector index
+}
 
 type Document = {
   url: string

@@ -1,5 +1,6 @@
-import { SuggestedQuestionsData } from '../chat/annotation'
 import { ChatHandler } from '../chat/chat.interface'
+
+export type SuggestedQuestionsData = string[]
 
 export function SuggestedQuestions({
   questions,
