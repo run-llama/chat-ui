@@ -4,7 +4,6 @@ import {
   HoverCardTrigger,
 } from '@radix-ui/react-hover-card'
 import { Check, Copy, FileIcon, XCircleIcon } from 'lucide-react'
-import { SourceNode } from '../chat/annotations/sources'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { Button } from '../ui/button'
 import { PdfDialog } from './pdf-dialog'
@@ -32,7 +31,15 @@ export type DocumentFile = {
   refs?: string[] // DocumentIDs of the uploaded file in the vector index
 }
 
-type Document = {
+export type SourceNode = {
+  id: string
+  metadata: Record<string, unknown>
+  score?: number
+  text: string
+  url?: string
+}
+
+export type Document = {
   url: string
   sources: SourceNode[]
 }

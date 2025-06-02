@@ -11,15 +11,17 @@ import {
   AgentEventData,
   SuggestedQuestionsData,
   SuggestedQuestions,
+  SourceData,
+  SourceNode,
 } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { MessageAnnotationType } from './annotations/data.js'
 import { getAnnotationData } from './annotations/annotations.js'
-import { getSourceAnnotationData } from './annotations/sources.js'
 import { extractArtifactsFromMessage } from './annotations/artifacts.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import ChatCanvas from './canvas/index.js'
 import { ArtifactCard } from './canvas/artifact-card.js'
+import { Message } from './chat.interface.js'
+import ChatCanvas from "./canvas/index.js"
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -67,6 +69,30 @@ export function DocumentFileAnnotations() {
   )
   if (!contentFileData) return null
   return contentFileData[0] ? <ChatFiles data={contentFileData[0]} /> : null
+}
+
+function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
+  // Filter source nodes has lower score
+  const processedNodes = nodes.map(node => {
+    // remove trailing slash for node url if exists
+    if (node.url) {
+      node.url = node.url.replace(/\/$/, '')
+    }
+    return node
+  })
+  return processedNodes
+}
+
+export function getSourceAnnotationData(message: Message): SourceData[] {
+  const data = getAnnotationData<SourceData>(
+    message,
+    MessageAnnotationType.SOURCES
+  )
+  if (!data?.length) return []
+  return data.map(item => ({
+    ...item,
+    nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
+  }))
 }
 
 export function SourceAnnotations() {
