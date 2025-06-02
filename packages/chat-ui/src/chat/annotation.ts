@@ -276,3 +276,12 @@ export function extractArtifactsFromAllMessages(messages: Message[]) {
 export function isEqualArtifact(a: Artifact, b: Artifact) {
   return a.type === b.type && a.created_at === b.created_at
 }
+
+// convert artifact to inline markdown
+export function toInlineMarkdownArtifact(artifact: Artifact) {
+  const artifactInlineAnnotation = {
+    type: MessageAnnotationType.ARTIFACT,
+    data: artifact,
+  }
+  return `\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(artifactInlineAnnotation)}\n\`\`\``
+}

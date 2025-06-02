@@ -1,4 +1,5 @@
 import { FileCode, FileText, LucideIcon } from 'lucide-react'
+import { memo } from 'react'
 import { cn } from '../../lib/utils'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
@@ -6,14 +7,9 @@ import {
   Artifact,
   CodeArtifact,
   DocumentArtifact,
-  extractArtifactsFromMessage,
   isEqualArtifact,
 } from '../annotation'
-import { Message } from '../chat.interface'
 import { useChatCanvas } from './context'
-import { memo, useEffect, useState } from 'react'
-import { useChatUI } from '../chat.context'
-import { useChatMessage } from '../chat-message.context'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
   code: FileCode,
@@ -29,35 +25,12 @@ export function ArtifactCardComp({ data }: { data: Artifact }) {
     restoreArtifact,
     displayedArtifact,
   } = useChatCanvas()
-  const { setMessages, messages } = useChatUI()
-  const { message, isLast } = useChatMessage()
   const { versionNumber, isLatest } = getArtifactVersion(data)
-  const [isTriggered, setIsTriggered] = useState(false)
 
   const Icon = IconMap[data.type]
   const title = getCardTitle(data)
   const isDisplayed =
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
-
-  useEffect(() => {
-    if (isTriggered) return
-    setIsTriggered(true)
-
-    const artifacts = extractArtifactsFromMessage(message) ?? []
-    // if current last message hasn't contain this inline artifact, add it to annotations of the message
-    const artifact = artifacts.find(a => isEqualArtifact(a, data))
-    if (!artifact && isLast && setMessages) {
-      const currentAnnotations = message.annotations ?? []
-      setMessages([
-        ...messages.slice(0, -1),
-        {
-          role: 'assistant',
-          content: message.content,
-          annotations: [...currentAnnotations, { type: 'artifact', data }],
-        },
-      ] as (Message & { id: string })[])
-    }
-  }, [])
 
   return (
     <div
