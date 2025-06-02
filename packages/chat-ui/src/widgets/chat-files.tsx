@@ -1,21 +1,4 @@
-import { DocumentInfo } from './document-info'
-
-export type DocumentFileType = 'csv' | 'pdf' | 'txt' | 'docx'
-export const DOCUMENT_FILE_TYPES: DocumentFileType[] = [
-  'csv',
-  'pdf',
-  'txt',
-  'docx',
-]
-
-export type DocumentFile = {
-  id: string
-  name: string // The uploaded file name in the backend
-  size: number // The file size in bytes
-  type: DocumentFileType
-  url: string // The URL of the uploaded file in the backend
-  refs?: string[] // DocumentIDs of the uploaded file in the vector index
-}
+import { DocumentInfo, DocumentFile } from './document-info'
 
 export type DocumentFileData = {
   files: DocumentFile[]
