@@ -21,7 +21,7 @@ import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
 import { ArtifactCard } from './canvas/artifact-card.js'
 import { Message } from './chat.interface.js'
-import ChatCanvas from "./canvas/index.js"
+import ChatCanvas from './canvas/index.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
