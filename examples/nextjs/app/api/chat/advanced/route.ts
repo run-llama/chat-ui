@@ -5,7 +5,7 @@
  * - Text streaming with token-by-token delivery
  * - Both standard annotations (sent after text) and inline annotations (embedded in text)
  * - Inline annotations are embedded as special code blocks within the markdown stream
- * - Multiple annotation types: sources, artifacts, and custom components (weather)
+ * - Multiple annotation types: sources, artifacts, and custom components (wiki)
  *
  * Use this example to understand how to mix regular content with interactive
  * components that appear at specific positions in the chat stream.
@@ -66,7 +66,7 @@ const SAMPLE_ANNOTATIONS = [
 
 const INLINE_ITEMS = [
   '\n ### Demo inline annotations \n',
-  'Here are some steps to create a simple weather app: \n',
+  'Here are some steps to create a simple wiki app: \n',
   '1. Create package.json file:',
   {
     type: 'artifact',
@@ -78,19 +78,19 @@ const INLINE_ITEMS = [
         file_name: 'package.json',
         language: 'json',
         code: `{
-  "name": "weather-app",
+  "name": "wiki-app",
   "version": "1.0.0",
-  "description": "Weather monitoring application",
-  "main": "weather.js",
+  "description": "Wiki application",
+  "main": "wiki.js",
   "dependencies": {
     "axios": "^1.0.0",
-    "weather-api": "^2.1.0"
+    "wiki-api": "^2.1.0"
   }
 }`,
       },
     },
   },
-  '2. Check the weather fetching script:',
+  '2. Check the wiki fetching script:',
   {
     type: 'artifact',
     data: {
@@ -98,26 +98,26 @@ const INLINE_ITEMS = [
       inline: true, // this artifact will be only displayed inline in the message
       type: 'code',
       data: {
-        file_name: 'weather.js',
+        file_name: 'wiki.js',
         language: 'javascript',
-        code: `async function getWeather(location) {
-  const response = await fetch("/api/weather?location=" + location);
+        code: `async function getWiki(search) {
+  const response = await fetch("/api/wiki?search=" + search);
   const data = await response.json();
   return data;
 }
-getWeather("San Francisco, CA");`,
+getWiki("What is LlamaIndex?");`,
       },
     },
   },
-  '3. Check the current weather:',
+  '3. Check the current wiki:',
   {
-    type: 'weather',
+    type: 'wiki',
     data: {
-      location: 'San Francisco, CA',
-      temperature: 22,
-      condition: 'sunny',
-      humidity: 65,
-      windSpeed: 12,
+      title: 'LlamaIndex',
+      summary: 'LlamaIndex is a framework for building AI applications.',
+      url: 'https://www.llamaindex.ai',
+      category: 'AI',
+      lastUpdated: '2025-06-02',
     },
   },
   '#### 🎯 Demo generating a document artifact',
