@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui-docs
 
+## 0.0.4
+
+### Patch Changes
+
+- 8e60c05: Cleaned up internal annotation retrieval
+
 ## 0.0.3
 
 ### Patch Changes

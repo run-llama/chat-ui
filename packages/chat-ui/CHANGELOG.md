@@ -1,5 +1,12 @@
 # @llamaindex/chat-ui
 
+## 0.4.9
+
+### Patch Changes
+
+- effc6f5: Use isLast from useChatMessage hook in AgentEventAnnotations
+- 8e60c05: Cleaned up internal annotation retrieval
+
 ## 0.4.8
 
 ### Patch Changes
