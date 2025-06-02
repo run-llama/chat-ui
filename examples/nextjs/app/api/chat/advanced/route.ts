@@ -72,7 +72,7 @@ const INLINE_ITEMS = [
     type: 'artifact',
     data: {
       type: 'code',
-      readonly: true, // this artifact is readonly
+      created_at: 1717334400000,
       inline: true, // this artifact will be only displayed inline in the message
       data: {
         file_name: 'package.json',
@@ -94,7 +94,7 @@ const INLINE_ITEMS = [
   {
     type: 'artifact',
     data: {
-      readonly: true, // this artifact is readonly
+      created_at: 1717334500000,
       inline: true, // this artifact will be only displayed inline in the message
       type: 'code',
       data: {

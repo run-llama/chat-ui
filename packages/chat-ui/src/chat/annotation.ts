@@ -73,7 +73,6 @@ export type AgentEventData = {
 export type SuggestedQuestionsData = string[]
 
 export type Artifact<T = unknown> = {
-  readonly?: boolean // if enabled, artifact won't show version and cannot be edited
   inline?: boolean // mark artifact as inline, it only displayed in the markdown without showing in artifact annotations section
   created_at: number
   type: 'code' | 'document'

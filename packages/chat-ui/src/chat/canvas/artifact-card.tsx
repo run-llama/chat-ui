@@ -43,9 +43,7 @@ export function ArtifactCardComp({ data }: { data: Artifact }) {
       <div className="flex flex-1 items-center gap-2">
         <Icon className="size-7 shrink-0 text-blue-500" />
         <div className="flex flex-col">
-          {!data.readonly && (
-            <div className="text-sm font-semibold">Version {versionNumber}</div>
-          )}
+          <div className="text-sm font-semibold">Version {versionNumber}</div>
           {title && <div className="text-xs text-gray-600">{title}</div>}
         </div>
       </div>

@@ -31,13 +31,11 @@ export function CodeEditor({
   onChange,
   className,
   language = 'javascript',
-  readonly = false,
 }: {
   code: string
   onChange?: (code: string) => void
   className?: string
   language?: 'javascript' | 'python' | 'html' | 'css'
-  readonly?: boolean
 }) {
   return (
     <CodeMirror
@@ -46,7 +44,6 @@ export function CodeEditor({
       extensions={[getLanguageExtension(language)]}
       onChange={onChange}
       theme={githubLight}
-      readOnly={readonly}
     />
   )
 }
