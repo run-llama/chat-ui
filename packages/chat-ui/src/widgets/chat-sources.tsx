@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { SourceData } from '../chat/annotations/sources'
-import { SourceNode } from '../chat/annotations/sources'
 import { DocumentInfo } from './document-info'
 
 type Document = {
