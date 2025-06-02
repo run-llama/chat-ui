@@ -15,7 +15,7 @@ export function CustomWeatherAnnotation() {
 
   const weatherData = getAnnotationData<WeatherData>(message, 'weather')
 
-  if (!weatherData?.[0]) return null
+  if (weatherData.length === 0) return null
 
   const data = weatherData[0]
 
