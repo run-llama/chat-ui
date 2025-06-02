@@ -16,7 +16,7 @@ import {
 } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { MessageAnnotationType } from './annotations/data.js'
 import { getAnnotationData } from './annotations/annotations.js'
-import { extractArtifactsFromMessage } from './annotations/artifacts.js'
+import { extractArtifactsFromMessage } from './canvas/artifacts.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
 import { ArtifactCard } from './canvas/artifact-card.js'

@@ -7,7 +7,7 @@ import {
   CodeArtifact,
   isEqualArtifact,
   Artifact,
-} from '../annotations/artifacts'
+} from './artifacts'
 import { useChatCanvas } from './context'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {

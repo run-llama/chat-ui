@@ -5,7 +5,7 @@ import { cn } from '../../../lib/utils'
 import { Button } from '../../../ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/tabs'
 import { CodeEditor, fileExtensionToEditorLang } from '../../../widgets'
-import { CodeArtifact } from '../../annotations/artifacts'
+import { CodeArtifact } from '../artifacts'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
 
