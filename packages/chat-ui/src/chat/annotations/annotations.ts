@@ -57,7 +57,7 @@ export type MessageAnnotation<T = unknown> = {
 export function getAnnotationData<T = unknown>(
   message: Message,
   type: string
-): T[] | null {
+): T[] {
   const annotations = message.annotations
   if (!annotations) return []
 

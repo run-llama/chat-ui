@@ -20,8 +20,10 @@ export function extractArtifactsFromAllMessages(messages: Message[]) {
 
 export function extractArtifactsFromMessage(message: Message): Artifact[] {
   const inlineArtifacts = extractInlineArtifacts(message.content)
-  const normalArtifacts =
-    getAnnotationData<Artifact>(message, MessageAnnotationType.ARTIFACT) ?? []
+  const normalArtifacts = getAnnotationData<Artifact>(
+    message,
+    MessageAnnotationType.ARTIFACT
+  )
   return [...inlineArtifacts, ...normalArtifacts].sort(
     (a, b) => a.created_at - b.created_at
   )

@@ -31,7 +31,7 @@ export function EventAnnotations() {
     message,
     MessageAnnotationType.EVENTS
   )
-  if (!eventData?.length) return null
+  if (eventData.length === 0) return null
   return <ChatEvents data={eventData} showLoading={showLoading} />
 }
 
@@ -42,7 +42,7 @@ export function AgentEventAnnotations() {
     message,
     MessageAnnotationType.AGENT_EVENTS
   )
-  if (!agentEventData?.length) return null
+  if (agentEventData.length === 0) return null
   return (
     <ChatAgentEvents
       data={agentEventData}
@@ -56,8 +56,8 @@ export function ImageAnnotations() {
   const { message } = useChatMessage()
 
   const imageData = getAnnotationData<ImageData>(message, 'image')
-  if (!imageData) return null
-  return imageData[0] ? <ChatImage data={imageData[0]} /> : null
+  if (imageData.length === 0) return null
+  return <ChatImage data={imageData[0]} />
 }
 
 export function DocumentFileAnnotations() {
@@ -67,8 +67,8 @@ export function DocumentFileAnnotations() {
     message,
     MessageAnnotationType.DOCUMENT_FILE
   )
-  if (!contentFileData) return null
-  return contentFileData[0] ? <ChatFiles data={contentFileData[0]} /> : null
+  if (contentFileData.length === 0) return null
+  return <ChatFiles data={contentFileData[0]} />
 }
 
 function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
@@ -83,26 +83,25 @@ function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
   return processedNodes
 }
 
-export function getSourceAnnotationData(message: Message): SourceData[] {
+export function getSourceNodes(message: Message): SourceNode[] {
   const data = getAnnotationData<SourceData>(
     message,
     MessageAnnotationType.SOURCES
   )
-  if (!data?.length) return []
-  return data.map(item => ({
-    ...item,
-    nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
-  }))
+  return data
+    .map(item => ({
+      ...item,
+      nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
+    }))
+    .flatMap(item => item.nodes)
 }
 
 export function SourceAnnotations() {
   const { message } = useChatMessage()
 
-  const sourceData = getSourceAnnotationData(message)
-
-  if (!sourceData?.length) return null
-  const allNodes = sourceData.flatMap(item => item.nodes)
-  return <ChatSources data={{ nodes: allNodes }} />
+  const nodes = getSourceNodes(message)
+  if (nodes.length === 0) return null
+  return <ChatSources data={{ nodes }} />
 }
 
 export function SuggestedQuestionsAnnotations() {
@@ -114,7 +113,7 @@ export function SuggestedQuestionsAnnotations() {
     message,
     MessageAnnotationType.SUGGESTED_QUESTIONS
   )
-  if (!suggestedQuestionsData?.[0]) return null
+  if (suggestedQuestionsData.length === 0) return null
   return (
     <SuggestedQuestions
       questions={suggestedQuestionsData[0]}
