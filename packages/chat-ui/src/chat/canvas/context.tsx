@@ -16,6 +16,7 @@ import {
   extractArtifactsFromAllMessages,
   isEqualArtifact,
   DocumentArtifact,
+  toInlineMarkdownArtifact,
 } from '../annotations/artifacts'
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'

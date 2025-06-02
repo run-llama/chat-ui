@@ -1,6 +1,46 @@
 import { Message } from '../chat.interface'
+import { remark } from 'remark'
+import remarkParse from 'remark-parse'
+import { visit } from 'unist-util-visit'
+import { z } from 'zod'
 
-// TODO: add different methods to retrieve annotations from a message - e.g. by parsing its content for inline annotations
+export const INLINE_ANNOTATION_KEY = 'annotation'
+
+export const AnnotationSchema = z.object({ type: z.string(), data: z.any() })
+
+// parse Markdown and extract code blocks
+export function parseMarkdownCodeBlocks(markdown: string) {
+  const markdownCodeBlocks: {
+    language: string | null
+    code: string
+  }[] = []
+
+  // Parse Markdown to AST using remark
+  const processor = remark().use(remarkParse)
+  const ast = processor.parse(markdown)
+
+  // Visit all code nodes in the AST
+  visit(ast, 'code', (node: any) => {
+    markdownCodeBlocks.push({
+      language: node.lang || null, // Language is stored in node.lang
+      code: node.value, // Code content is stored in node.value
+    })
+  })
+
+  return markdownCodeBlocks
+}
+
+// extract all inline annotations from markdown
+export function extractInlineAnnotations(
+  markdown: string
+): z.infer<typeof AnnotationSchema>[] {
+  const codeBlocks = parseMarkdownCodeBlocks(markdown)
+  const inlineAnnotations = codeBlocks
+    .filter(block => block.language === INLINE_ANNOTATION_KEY)
+    .map(block => JSON.parse(block.code))
+
+  return inlineAnnotations.filter(a => AnnotationSchema.safeParse(a).success)
+}
 
 export type MessageAnnotation<T = unknown> = {
   type: string

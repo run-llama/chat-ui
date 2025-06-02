@@ -1,6 +1,10 @@
 import { Message } from '../chat.interface'
 import { MessageAnnotationType } from './data'
-import { getAnnotationData } from './annotations'
+import {
+  extractInlineAnnotations,
+  getAnnotationData,
+  INLINE_ANNOTATION_KEY,
+} from './annotations'
 
 // check if two artifacts are equal by comparing their type and created time
 export function isEqualArtifact(a: Artifact, b: Artifact) {
@@ -15,11 +19,29 @@ export function extractArtifactsFromAllMessages(messages: Message[]) {
 }
 
 export function extractArtifactsFromMessage(message: Message): Artifact[] {
-  const artifacts = getAnnotationData<Artifact>(
-    message,
-    MessageAnnotationType.ARTIFACT
+  const inlineArtifacts = extractInlineArtifacts(message.content)
+  const normalArtifacts =
+    getAnnotationData<Artifact>(message, MessageAnnotationType.ARTIFACT) ?? []
+  return [...inlineArtifacts, ...normalArtifacts].sort(
+    (a, b) => a.created_at - b.created_at
   )
-  return artifacts ?? []
+}
+
+// extract all inline artifacts from markdown
+export function extractInlineArtifacts(markdown: string): Artifact[] {
+  const inlineAnnotations = extractInlineAnnotations(markdown)
+  return inlineAnnotations
+    .filter(a => a.type === MessageAnnotationType.ARTIFACT.toString())
+    .map(a => a.data) as Artifact[]
+}
+
+// convert artifact to inline markdown
+export function toInlineMarkdownArtifact(artifact: Artifact) {
+  const artifactInlineAnnotation = {
+    type: MessageAnnotationType.ARTIFACT,
+    data: artifact,
+  }
+  return `\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(artifactInlineAnnotation)}\n\`\`\``
 }
 
 export type CodeArtifactError = {
@@ -27,6 +49,7 @@ export type CodeArtifactError = {
   errors: string[]
 }
 export type Artifact<T = unknown> = {
+  inline?: boolean
   created_at: number
   type: 'code' | 'document'
   data: T
