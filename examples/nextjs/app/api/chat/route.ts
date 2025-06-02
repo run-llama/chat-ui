@@ -3,9 +3,9 @@
  *
  * This is a simple example demonstrating:
  * - Text streaming with token-by-token delivery
- * - Standard annotations (sources) sent after text completion
  * - Basic markdown content with code blocks
  * - Custom annotations (weather) sent after text completion
+ * - Standard annotations (sources) sent after text completion
  *
  * Use this example as a starting point for implementing basic chat functionality
  * with @llamaindex/chat-ui components.
@@ -53,15 +53,6 @@ console.log(c)
 `
 const SAMPLE_ANNOTATIONS = [
   {
-    type: 'sources',
-    data: {
-      nodes: [
-        { id: '1', url: '/sample.pdf' },
-        { id: '2', url: '/sample.pdf' },
-      ],
-    },
-  },
-  {
     type: 'weather',
     data: {
       location: 'San Francisco, CA',
@@ -69,6 +60,15 @@ const SAMPLE_ANNOTATIONS = [
       condition: 'sunny',
       humidity: 65,
       windSpeed: 12,
+    },
+  },
+  {
+    type: 'sources',
+    data: {
+      nodes: [
+        { id: '1', url: '/sample.pdf' },
+        { id: '2', url: '/sample.pdf' },
+      ],
     },
   },
 ]
