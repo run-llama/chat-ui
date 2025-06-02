@@ -30,7 +30,7 @@ export function WikiCard({ data }: { data: WikiData }) {
           </span>
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-green-900 my-0!">{data.title}</h3>
+          <h3 className="my-0! font-semibold text-green-900">{data.title}</h3>
           <div className="text-sm text-green-700">
             <p className="mt-1 whitespace-pre-wrap">{data.summary}</p>
           </div>
