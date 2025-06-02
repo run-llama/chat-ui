@@ -13,7 +13,7 @@ import {
   DocumentArtifact,
   CodeArtifact,
   isEqualArtifact,
-} from '../annotations/artifacts'
+} from './artifacts'
 
 interface ChatCanvasActionsProps {
   children?: React.ReactNode

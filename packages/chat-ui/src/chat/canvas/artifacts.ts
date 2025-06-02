@@ -1,6 +1,6 @@
 import { Message } from '../chat.interface'
-import { MessageAnnotationType } from './data'
-import { getAnnotationData } from './annotations'
+import { MessageAnnotationType } from '../annotations/data'
+import { getAnnotationData } from '../annotations/annotations'
 
 // check if two artifacts are equal by comparing their type and created time
 export function isEqualArtifact(a: Artifact, b: Artifact) {
