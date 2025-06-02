@@ -15,11 +15,7 @@ export function extractArtifactsFromAllMessages(messages: Message[]) {
 }
 
 export function extractArtifactsFromMessage(message: Message): Artifact[] {
-  const artifacts = getAnnotationData<Artifact>(
-    message,
-    MessageAnnotationType.ARTIFACT
-  )
-  return artifacts ?? []
+  return getAnnotationData<Artifact>(message, MessageAnnotationType.ARTIFACT)
 }
 
 export type CodeArtifactError = {

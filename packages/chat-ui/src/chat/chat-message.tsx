@@ -16,7 +16,7 @@ import {
   ImageAnnotations,
   SourceAnnotations,
   SuggestedQuestionsAnnotations,
-  getSourceAnnotationData,
+  getSourceNodes,
 } from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
@@ -139,15 +139,12 @@ function ChatMessageContent(props: ChatMessageContentProps) {
 function ChatMarkdown(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
 
-  const allNodes = useMemo(() => {
-    const sourceData = getSourceAnnotationData(message)
-    return sourceData.flatMap(item => item.nodes)
-  }, [message])
+  const nodes = useMemo(() => getSourceNodes(message), [message])
 
   return (
     <Markdown
       content={message.content}
-      sources={{ nodes: allNodes }}
+      sources={{ nodes }}
       citationComponent={props.citationComponent}
       languageRenderers={props.languageRenderers}
       className={cn(
