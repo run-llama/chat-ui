@@ -9,7 +9,7 @@ import {
   DocumentFileType,
   DocumentInfo,
 } from './document-info'
-import { SourceData } from '../chat/annotations/sources'
+import { SourceData } from './chat-sources'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
 

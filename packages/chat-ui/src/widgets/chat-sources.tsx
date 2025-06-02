@@ -1,10 +1,8 @@
 import { useMemo } from 'react'
-import { SourceData, SourceNode } from '../chat/annotations/sources'
-import { DocumentInfo } from './document-info'
+import { Document, DocumentInfo, SourceNode } from './document-info'
 
-type Document = {
-  url: string
-  sources: SourceNode[]
+export type SourceData = {
+  nodes: SourceNode[]
 }
 
 export function ChatSources({ data }: { data: SourceData }) {

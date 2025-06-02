@@ -8,7 +8,6 @@ import {
   Markdown,
   LanguageRendererProps,
 } from '../widgets/index.js'
-import { getSourceAnnotationData } from './annotations/sources.js'
 import {
   AgentEventAnnotations,
   ArtifactAnnotations,
@@ -17,6 +16,7 @@ import {
   ImageAnnotations,
   SourceAnnotations,
   SuggestedQuestionsAnnotations,
+  getSourceAnnotationData,
 } from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
