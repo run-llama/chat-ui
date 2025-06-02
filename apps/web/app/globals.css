@@ -43,13 +43,7 @@
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
-  --animate-fade-in: fade-in 0.5s ease-out;
-  --animate-fade-in-up: fade-in-up 0.6s ease-out;
-  --animate-scale-in: scale-in 0.3s ease-out;
-  --animate-slide-in-right: slide-in-right 0.4s ease-out;
   --animate-shimmer: shimmer 2s linear infinite;
-  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
-  --animate-float: float 3s ease-in-out infinite;
 
   --background-image-glow-conic:
     radial-gradient(at 21% 11%, rgba(186, 186, 233, 0.53) 0, transparent 50%),
@@ -57,14 +51,27 @@
     radial-gradient(at 91% 36%, rgba(194, 213, 255, 0.68) 0, transparent 50%),
     radial-gradient(at 8% 40%, rgba(251, 218, 239, 0.46) 0, transparent 50%);
 
-  --background-mesh-gradient:
-    conic-gradient(from 230.29deg at 51.63% 52.16%, #2400ff 0deg, #b000ff 67.5deg, #ff006e 198.75deg, #ff7d10 251.25deg, #ffaa44 301.88deg, #2400ff 360deg);
+  --background-mesh-gradient: conic-gradient(
+    from 230.29deg at 51.63% 52.16%,
+    #2400ff 0deg,
+    #b000ff 67.5deg,
+    #ff006e 198.75deg,
+    #ff7d10 251.25deg,
+    #ffaa44 301.88deg,
+    #2400ff 360deg
+  );
 
-  --glass-gradient:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  --glass-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
 
-  --glass-border:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  --glass-border: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
 
   @keyframes accordion-down {
     from {
@@ -82,66 +89,12 @@
       height: 0;
     }
   }
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  @keyframes fade-in-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes scale-in {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  @keyframes slide-in-right {
-    from {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
   @keyframes shimmer {
     0% {
       background-position: -1000px 0;
     }
     100% {
       background-position: 1000px 0;
-    }
-  }
-  @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 20px rgba(186, 186, 233, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 40px rgba(186, 186, 233, 0.6), 0 0 60px rgba(186, 186, 233, 0.4);
-    }
-  }
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
     }
   }
 }
@@ -227,82 +180,60 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv11", "ss01";
-    font-variation-settings: "opsz" 32;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
   }
-  
+
   /* Selection styling */
   ::selection {
     background: rgba(186, 186, 233, 0.3);
     color: inherit;
   }
-  
+
   ::-moz-selection {
     background: rgba(186, 186, 233, 0.3);
     color: inherit;
   }
 
-  /* Utility classes for animations */
-  .animate-fade-in {
-    animation: var(--animate-fade-in);
-  }
-  
-  .animate-fade-in-up {
-    animation: var(--animate-fade-in-up);
-  }
-  
-  .animate-scale-in {
-    animation: var(--animate-scale-in);
-  }
-  
-  .animate-slide-in-right {
-    animation: var(--animate-slide-in-right);
-  }
-  
-  .animate-pulse-glow {
-    animation: var(--animate-pulse-glow);
-  }
-  
-  .animate-float {
-    animation: var(--animate-float);
-  }
-  
   /* Glass morphism utilities */
   .glass {
     background: var(--glass-gradient);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
   }
-  
+
   .glass-border {
     border: 1px solid;
     border-image: var(--glass-border) 1;
   }
-  
+
   /* Shimmer effect */
   .shimmer {
     background: linear-gradient(
@@ -314,15 +245,17 @@
     background-size: 1000px 100%;
     animation: var(--animate-shimmer);
   }
-  
+
   /* Text gradient utilities */
   .text-gradient-purple {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
-  
+
   .text-gradient-rainbow {
     background: linear-gradient(
       90deg,
@@ -337,6 +270,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     background-size: 300% 100%;
-    animation: var(--animate-shimmer);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 }

@@ -1,4 +1,4 @@
-import { SourceNode } from '../chat/annotation'
+import { SourceNode } from '../chat/annotations/sources'
 import { SourceNumberButton } from './source-number-button'
 
 export interface CitationComponentProps {

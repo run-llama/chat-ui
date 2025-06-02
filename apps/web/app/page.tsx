@@ -1,29 +1,40 @@
+'use client'
+
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 export default function Page(): JSX.Element {
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated background elements */}
+      {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="animate-pulse-glow absolute -right-40 -top-40 h-80 w-80 rounded-full bg-purple-500/30 blur-3xl" />
-        <div
-          className="animate-pulse-glow absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-blue-500/30 blur-3xl"
-          style={{ animationDelay: '1s' }}
-        />
-        <div className="bg-gradient-conic animate-float absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full from-purple-500/20 via-pink-500/20 to-blue-500/20 blur-3xl" />
+        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-purple-500/30 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-blue-500/30 blur-3xl" />
+        <div className="bg-gradient-conic absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full from-purple-500/20 via-pink-500/20 to-blue-500/20 blur-3xl" />
       </div>
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="animate-fade-in-up mb-20 flex flex-col items-center justify-center space-y-8 text-center">
+          <motion.div
+            className="mb-20 flex flex-col items-center justify-center space-y-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
             <div className="group relative">
-              <div className="animate-pulse-glow absolute -inset-4 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 opacity-75 blur-lg transition duration-1000 group-hover:opacity-100" />
+              <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 opacity-75 blur-lg transition duration-1000 group-hover:opacity-100" />
               <div className="relative rounded-full bg-gradient-to-r from-[#fad6f8] to-[#b5f2fd] p-1">
                 <div className="rounded-full bg-black p-3">
-                  <img
+                  <motion.img
                     src="/llama.png"
                     alt="LlamaIndex Logo"
-                    className="animate-float h-16 w-16 rounded-full sm:h-20 sm:w-20"
+                    className="h-16 w-16 rounded-full sm:h-20 sm:w-20"
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
                   />
                 </div>
               </div>
@@ -36,20 +47,24 @@ export default function Page(): JSX.Element {
               <div className="mx-auto h-px w-24 bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
             </div>
 
-            <p
-              className="animate-fade-in-up max-w-3xl text-xl leading-relaxed text-slate-300 sm:text-2xl"
-              style={{ animationDelay: '0.2s' }}
+            <motion.p
+              className="max-w-3xl text-xl leading-relaxed text-slate-300 sm:text-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
             >
               A powerful React component library for building{' '}
               <span className="text-gradient-purple font-semibold">
                 state-of-the-art
               </span>{' '}
               chat interfaces in LLM applications
-            </p>
+            </motion.p>
 
-            <div
-              className="animate-fade-in-up flex flex-col gap-6 pt-8 sm:flex-row sm:items-center"
-              style={{ animationDelay: '0.4s' }}
+            <motion.div
+              className="flex flex-col gap-6 pt-8 sm:flex-row sm:items-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
             >
               <a
                 href="https://github.com/run-llama/chat-ui"
@@ -71,6 +86,31 @@ export default function Page(): JSX.Element {
               </a>
 
               <a
+                href="https://ts.llamaindex.ai/docs/chat-ui"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-3 font-semibold text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/25"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Documentation
+                </span>
+                <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+              </a>
+
+              <a
                 href="https://www.npmjs.com/package/@llamaindex/chat-ui"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -81,11 +121,13 @@ export default function Page(): JSX.Element {
                 </span>
                 <div className="absolute inset-0 -translate-x-full transform bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
               </a>
-            </div>
+            </motion.div>
 
-            <div
-              className="animate-fade-in-up flex flex-wrap justify-center gap-4 pt-6"
-              style={{ animationDelay: '0.6s' }}
+            <motion.div
+              className="flex flex-wrap justify-center gap-4 pt-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
             >
               {[
                 {
@@ -109,22 +151,33 @@ export default function Page(): JSX.Element {
                   gradient: 'from-green-500 to-blue-500',
                 },
               ].map((demo, index) => (
-                <Link
+                <motion.div
                   key={demo.href}
-                  href={demo.href}
-                  className={`group relative overflow-hidden rounded-full bg-gradient-to-r ${demo.gradient} animate-scale-in px-6 py-2 font-medium text-white transition-all duration-300 hover:scale-105 hover:shadow-xl`}
-                  style={{ animationDelay: `${0.8 + index * 0.1}s` }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: 0.8 + index * 0.1,
+                    ease: 'easeOut',
+                  }}
                 >
-                  <span className="relative z-10">{demo.label}</span>
-                  <div className="absolute inset-0 -translate-y-full transform bg-gradient-to-b from-white/20 to-transparent transition-transform duration-300 group-hover:translate-y-0" />
-                </Link>
+                  <Link
+                    href={demo.href}
+                    className={`group relative overflow-hidden rounded-full bg-gradient-to-r ${demo.gradient} block px-6 py-2 font-medium text-white transition-all duration-300 hover:scale-105 hover:shadow-xl`}
+                  >
+                    <span className="relative z-10">{demo.label}</span>
+                    <div className="absolute inset-0 -translate-y-full transform bg-gradient-to-b from-white/20 to-transparent transition-transform duration-300 group-hover:translate-y-0" />
+                  </Link>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div
-            className="animate-fade-in-up mx-auto mb-16 max-w-5xl"
-            style={{ animationDelay: '1s' }}
+          <motion.div
+            className="mx-auto mb-16 max-w-5xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1, ease: 'easeOut' }}
           >
             <div className="glass rounded-2xl p-8 shadow-2xl">
               <div className="mb-6 flex items-center gap-3">
@@ -212,7 +265,7 @@ export default function Page(): JSX.Element {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </main>

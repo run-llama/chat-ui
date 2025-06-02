@@ -15,22 +15,20 @@ Renders rich text with LaTeX math support, syntax highlighting, and citations.
 import { Markdown } from '@llamaindex/chat-ui/widgets'
 
 function RichText({ content }) {
-  return (
-    <Markdown>
-      {content}
-    </Markdown>
-  )
+  return <Markdown>{content}</Markdown>
 }
 ```
 
 **Features:**
+
 - **LaTeX Math** - Inline and block math rendering with KaTeX
 - **Code Highlighting** - Syntax highlighting with highlight.js
 - **Citations** - Clickable citation links
 - **Custom Renderers** - Extensible rendering pipeline
 
 **Example Content:**
-```markdown
+
+````markdown
 # Mathematical Formula
 
 The quadratic formula is: $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$
@@ -43,11 +41,13 @@ def fibonacci(n):
         return n
     return fibonacci(n-1) + fibonacci(n-2)
 ```
+````
 
 This algorithm has O(2^n) complexity [^1].
 
 [^1]: Introduction to Algorithms, Chapter 15
-```
+
+````
 
 ### CodeBlock
 
@@ -66,9 +66,10 @@ function CodeDisplay({ code, language, filename }) {
     />
   )
 }
-```
+````
 
 **Props:**
+
 - `code` - Source code string
 - `language` - Programming language for highlighting
 - `filename` - Optional filename display
@@ -95,14 +96,16 @@ function InteractiveCode({ initialCode, language, onChange }) {
 ```
 
 **Supported Languages:**
+
 - JavaScript/TypeScript
-- Python  
+- Python
 - CSS/SCSS
 - HTML
 - JSON
 - Markdown
 
 **Features:**
+
 - **Syntax Highlighting** - Real-time highlighting
 - **Auto-completion** - Language-aware suggestions
 - **Code Folding** - Collapse code blocks
@@ -129,6 +132,7 @@ function DocumentEdit({ content, onChange, title }) {
 ```
 
 **Features:**
+
 - **WYSIWYG Editing** - Visual editing with markdown output
 - **Formatting Tools** - Bold, italic, lists, headers
 - **Link Support** - Insert and edit links
@@ -149,16 +153,17 @@ const imageAnnotation = {
   type: 'IMAGE',
   data: {
     url: 'https://example.com/image.jpg',
-    alt: 'Description of the image'
-  }
+    alt: 'Description of the image',
+  },
 }
 
 function ImageDisplay() {
-  return <ChatImage />  // Automatically renders from context
+  return <ChatImage /> // Automatically renders from context
 }
 ```
 
 **Features:**
+
 - **Zoom & Pan** - Interactive image viewing
 - **Lazy Loading** - Performance optimization
 - **Alt Text** - Accessibility support
@@ -181,18 +186,19 @@ const fileAnnotation = {
         name: 'report.pdf',
         type: 'application/pdf',
         url: '/files/report.pdf',
-        size: 1024000
-      }
-    ]
-  }
+        size: 1024000,
+      },
+    ],
+  },
 }
 
 function FileDisplay() {
-  return <ChatFiles />  // Automatically renders from context
+  return <ChatFiles /> // Automatically renders from context
 }
 ```
 
 **Supported File Types:**
+
 - **PDF** - Inline viewer
 - **Images** - Thumbnail preview
 - **Text Files** - Content preview
@@ -216,19 +222,20 @@ const sourceAnnotation = {
         url: '/documents/paper.pdf',
         metadata: {
           title: 'Research Paper',
-          page_number: 5
-        }
-      }
-    ]
-  }
+          page_number: 5,
+        },
+      },
+    ],
+  },
 }
 
 function SourceDisplay() {
-  return <ChatSources />  // Automatically renders from context
+  return <ChatSources /> // Automatically renders from context
 }
 ```
 
 **Features:**
+
 - **Document Grouping** - Groups citations by document
 - **Page Numbers** - Shows specific page references
 - **Click to View** - Opens source documents
@@ -249,13 +256,13 @@ const eventAnnotation = {
       type: 'function_call',
       name: 'search_documents',
       args: { query: 'machine learning' },
-      result: 'Found 15 relevant documents'
-    }
-  ]
+      result: 'Found 15 relevant documents',
+    },
+  ],
 }
 
 function EventDisplay() {
-  return <ChatEvents />  // Automatically renders from context
+  return <ChatEvents /> // Automatically renders from context
 }
 ```
 
@@ -276,13 +283,13 @@ const agentAnnotation = {
     events: [
       { step: 'Searching', status: 'completed' },
       { step: 'Analyzing', status: 'in_progress' },
-      { step: 'Summarizing', status: 'pending' }
-    ]
-  }
+      { step: 'Summarizing', status: 'pending' },
+    ],
+  },
 }
 
 function AgentEventDisplay() {
-  return <ChatAgentEvents />  // Automatically renders from context
+  return <ChatAgentEvents /> // Automatically renders from context
 }
 ```
 
@@ -300,13 +307,13 @@ const suggestionsAnnotation = {
     questions: [
       'Can you explain this in more detail?',
       'What are the practical applications?',
-      'How does this compare to other approaches?'
-    ]
-  }
+      'How does this compare to other approaches?',
+    ],
+  },
 }
 
 function QuestionSuggestions() {
-  return <SuggestedQuestions />  // Automatically renders from context
+  return <SuggestedQuestions /> // Automatically renders from context
 }
 ```
 
@@ -321,7 +328,7 @@ const starterQuestions = [
   'How can I improve my code?',
   'Explain machine learning concepts',
   'Help me debug this error',
-  'What are best practices for React?'
+  'What are best practices for React?',
 ]
 
 function ChatStarters() {
@@ -349,7 +356,7 @@ function UploadArea({ onFilesSelected }) {
       accept={{
         'image/*': ['.png', '.jpg', '.jpeg'],
         'application/pdf': ['.pdf'],
-        'text/*': ['.txt', '.md']
+        'text/*': ['.txt', '.md'],
       }}
       maxSize={10 * 1024 * 1024} // 10MB
       onFiles={onFilesSelected}
@@ -364,6 +371,7 @@ function UploadArea({ onFilesSelected }) {
 ```
 
 **Features:**
+
 - **Drag & Drop** - Intuitive file selection
 - **File Validation** - Type and size checking
 - **Multiple Files** - Batch upload support
@@ -444,9 +452,9 @@ function MessageWithWidgets({ message }) {
     <ChatMessage message={message}>
       <ChatMessage.Content>
         <ChatMessage.Content.Markdown />
-        <ChatMessage.Content.Image />      {/* Renders ChatImage */}
-        <ChatMessage.Content.Source />     {/* Renders ChatSources */}
-        <ChatMessage.Content.Event />      {/* Renders ChatEvents */}
+        <ChatMessage.Content.Image /> {/* Renders ChatImage */}
+        <ChatMessage.Content.Source /> {/* Renders ChatSources */}
+        <ChatMessage.Content.Event /> {/* Renders ChatEvents */}
       </ChatMessage.Content>
     </ChatMessage>
   )
@@ -458,35 +466,25 @@ function MessageWithWidgets({ message }) {
 Use widgets independently for custom layouts:
 
 ```tsx
-import { 
-  Markdown, 
-  CodeBlock, 
+import {
+  Markdown,
+  CodeBlock,
   ChatImage,
-  SuggestedQuestions 
+  SuggestedQuestions,
 } from '@llamaindex/chat-ui/widgets'
 
 function CustomMessageLayout({ message }) {
   return (
     <div className="space-y-4">
       <Markdown>{message.content}</Markdown>
-      
-      {message.code && (
-        <CodeBlock 
-          code={message.code} 
-          language="python" 
-        />
-      )}
-      
+
+      {message.code && <CodeBlock code={message.code} language="python" />}
+
       {message.imageUrl && (
-        <ChatImage 
-          src={message.imageUrl} 
-          alt="Generated image" 
-        />
+        <ChatImage src={message.imageUrl} alt="Generated image" />
       )}
-      
-      <SuggestedQuestions 
-        questions={message.suggestions} 
-      />
+
+      <SuggestedQuestions questions={message.suggestions} />
     </div>
   )
 }
@@ -497,26 +495,25 @@ function CustomMessageLayout({ message }) {
 Create custom widgets by following the pattern:
 
 ```tsx
-import { useChatMessage, getCustomAnnotations } from '@llamaindex/chat-ui'
+import { useChatMessage, getAnnotationData } from '@llamaindex/chat-ui'
 
 interface WeatherData {
   location: string
   temperature: number
   condition: string
+  humidity: number
+  windSpeed: number
 }
 
-function CustomWeatherWidget() {
+export function CustomWeatherWidget() {
   const { message } = useChatMessage()
-  
-  const weatherData = getCustomAnnotations<WeatherData>(
-    message.annotations,
-    'weather'
-  )
-  
-  if (!weatherData[0]) return null
-  
+
+  const weatherData = getAnnotationData<WeatherData>(message, 'weather')
+
+  if (!weatherData?.[0]) return null
+
   const data = weatherData[0]
-  
+
   return (
     <div className="rounded-lg bg-blue-50 p-4">
       <h3 className="font-semibold">{data.location}</h3>

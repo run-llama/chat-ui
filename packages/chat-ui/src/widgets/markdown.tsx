@@ -7,14 +7,13 @@ import { CodeBlock } from './codeblock'
 import {
   DOCUMENT_FILE_TYPES,
   DocumentFileType,
-  SourceData,
-  AnyAnnotation,
-  INLINE_ANNOTATION_KEY,
-  AnyAnnotationSchema,
-} from '../chat/annotation'
-import { DocumentInfo } from './document-info'
+  DocumentInfo,
+} from './document-info'
+import { SourceData } from '../chat/annotations/sources'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
+import { AnnotationSchema } from '../chat/annotations/annotations'
+import { INLINE_ANNOTATION_KEY } from '../chat/annotations'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -129,9 +128,9 @@ export function Markdown({
             const codeValue = String(children).replace(/\n$/, '')
 
             if (language === INLINE_ANNOTATION_KEY) {
-              const annotation = JSON.parse(codeValue) as AnyAnnotation
+              const annotation = JSON.parse(codeValue)
 
-              if (!AnyAnnotationSchema.safeParse(annotation).success) {
+              if (!AnnotationSchema.safeParse(annotation).success) {
                 console.warn(
                   `Invalid inline annotation: ${codeValue}, expected an object`
                 )

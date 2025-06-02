@@ -1,14 +1,13 @@
 import { FileCode, FileText, LucideIcon } from 'lucide-react'
-import { memo } from 'react'
 import { cn } from '../../lib/utils'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
 import {
-  Artifact,
-  CodeArtifact,
   DocumentArtifact,
+  CodeArtifact,
   isEqualArtifact,
-} from '../annotation'
+  Artifact,
+} from '../annotations/artifacts'
 import { useChatCanvas } from './context'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
@@ -16,9 +15,7 @@ const IconMap: Record<Artifact['type'], LucideIcon> = {
   document: FileText,
 }
 
-export const ArtifactCard = memo(ArtifactCardComp)
-
-export function ArtifactCardComp({ data }: { data: Artifact }) {
+export function ArtifactCard({ data }: { data: Artifact }) {
   const {
     openArtifactInCanvas,
     getArtifactVersion,
