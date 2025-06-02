@@ -16,7 +16,7 @@ export function WeatherAnnotation() {
   const { message } = useChatMessage()
   const weatherData = getAnnotationData<WeatherData>(message, 'weather')
 
-  if (!weatherData?.[0]) return null
+  if (weatherData.length === 0) return null
   return <WeatherCard data={weatherData[0]} />
 }
 
