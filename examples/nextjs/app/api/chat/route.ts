@@ -5,7 +5,7 @@
  * - Text streaming with token-by-token delivery
  * - Standard annotations (sources) sent after text completion
  * - Basic markdown content with code blocks
- * - Custom annotations (wiki) sent after text completion
+ * - Custom annotations (weather) sent after text completion
  *
  * Use this example as a starting point for implementing basic chat functionality
  * with @llamaindex/chat-ui components.
@@ -62,13 +62,13 @@ const SAMPLE_ANNOTATIONS = [
     },
   },
   {
-    type: 'wiki',
+    type: 'weather',
     data: {
-      title: 'Sample Wiki',
-      summary: 'This is a sample wiki',
-      url: 'https://www.sample.com',
-      category: 'Sample',
-      lastUpdated: '2021-01-01',
+      location: 'San Francisco, CA',
+      temperature: 22,
+      condition: 'sunny',
+      humidity: 65,
+      windSpeed: 12,
     },
   },
 ]

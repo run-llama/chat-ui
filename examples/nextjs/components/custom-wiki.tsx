@@ -1,7 +1,5 @@
 'use client'
 
-import { useChatMessage, getCustomAnnotations } from '@llamaindex/chat-ui'
-
 interface WikiData {
   title: string
   summary: string
@@ -10,20 +8,25 @@ interface WikiData {
   lastUpdated: string
 }
 
-export function CustomWikiCard() {
-  const { message } = useChatMessage()
-
-  const wikiData = getCustomAnnotations<WikiData>(message.annotations, 'wiki')
-
-  if (!wikiData[0]) return null
-
-  const data = wikiData[0]
+export function WikiCard({ data }: { data: WikiData }) {
+  const iconMap: Record<string, string> = {
+    science: '🧪',
+    history: '📜',
+    technology: '💻',
+    biology: '🧬',
+    geography: '🌍',
+    literature: '📚',
+    art: '🎨',
+    music: '🎵',
+  }
 
   return (
     <div className="my-4 rounded-lg border border-green-200 bg-green-50 p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-          <WikiIcon category={data.category} />
+          <span className="text-2xl">
+            {iconMap[data.category.toLowerCase()] || '📖'}
+          </span>
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-green-900">{data.title}</h3>
@@ -54,22 +57,5 @@ export function CustomWikiCard() {
         </a>
       </div>
     </div>
-  )
-}
-
-function WikiIcon({ category }: { category: string }) {
-  const iconMap: Record<string, string> = {
-    science: '🧪',
-    history: '📜',
-    technology: '💻',
-    biology: '🧬',
-    geography: '🌍',
-    literature: '📚',
-    art: '🎨',
-    music: '🎵',
-  }
-
-  return (
-    <span className="text-2xl">{iconMap[category.toLowerCase()] || '📖'}</span>
   )
 }

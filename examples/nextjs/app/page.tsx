@@ -7,11 +7,10 @@ import {
   ChatMessages,
   ChatSection,
   useChatUI,
-  defaultAnnotationRenderers,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
-import { CustomWeatherCard } from '../components/custom-weather'
-import { CustomWikiCard } from '@/components/custom-wiki'
+import { WeatherAnnotation } from '../components/custom-weather'
+import { WikiCard } from '@/components/custom-wiki'
 
 const initialMessages: Message[] = [
   {
@@ -41,9 +40,9 @@ export default function Page(): JSX.Element {
 
 function ChatExample() {
   const handler = useChat({
-    api: '/api/chat/advanced',
-    // uncomment this to try simple example in app/api/chat/route.ts
-    // api: '/api/chat',
+    api: '/api/chat',
+    // uncomment this to try advanced example in app/api/chat/advanced/route.ts
+    // api: '/api/chat/advanced',
     initialMessages,
   })
 
@@ -92,17 +91,14 @@ function CustomChatMessages() {
           <ChatMessage.Content isLoading={isLoading} append={append}>
             <ChatMessage.Content.Markdown
               annotationRenderers={{
-                // chat-ui supports default annotation renderers out of the box
-                ...defaultAnnotationRenderers,
-                // This is a custom annotation inline with Markdown text
-                weather: CustomWeatherCard,
+                // these annotations are rendered inline with the Markdown text
+                artifact: ChatCanvas.Artifact,
+                wiki: WikiCard,
               }}
             />
 
-            {/* A custom annotation component outside of Markdown text */}
-            <CustomWikiCard />
-
-            {/* Sources Annotation at the bottom of the chat */}
+            {/* annotation components under the Markdown text */}
+            <WeatherAnnotation />
             <ChatMessage.Content.Source />
           </ChatMessage.Content>
           <ChatMessage.Actions />
