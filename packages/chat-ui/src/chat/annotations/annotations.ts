@@ -1,77 +1,30 @@
 import { Message } from '../chat.interface'
-import { remark } from 'remark'
-import remarkParse from 'remark-parse'
-import { visit } from 'unist-util-visit'
-import { z } from 'zod'
-
-export const INLINE_ANNOTATION_KEY = 'annotation'
-
-export const AnnotationSchema = z.object({ type: z.string(), data: z.any() })
-
-// parse Markdown and extract code blocks
-export function parseMarkdownCodeBlocks(markdown: string) {
-  const markdownCodeBlocks: {
-    language: string | null
-    code: string
-  }[] = []
-
-  // Parse Markdown to AST using remark
-  const processor = remark().use(remarkParse)
-  const ast = processor.parse(markdown)
-
-  // Visit all code nodes in the AST
-  visit(ast, 'code', (node: any) => {
-    markdownCodeBlocks.push({
-      language: node.lang || null, // Language is stored in node.lang
-      code: node.value, // Code content is stored in node.value
-    })
-  })
-
-  return markdownCodeBlocks
-}
-
-// extract all inline annotations from markdown
-export function extractInlineAnnotations(
-  markdown: string
-): z.infer<typeof AnnotationSchema>[] {
-  const codeBlocks = parseMarkdownCodeBlocks(markdown)
-  const inlineAnnotations = codeBlocks
-    .filter(block => block.language === INLINE_ANNOTATION_KEY)
-    .map(block => JSON.parse(block.code))
-
-  return inlineAnnotations.filter(a => AnnotationSchema.safeParse(a).success)
-}
-
-export type MessageAnnotation<T = unknown> = {
-  type: string
-  data: T
-}
+import { getInlineAnnotations } from './inline'
+import { MessageAnnotation, MessageAnnotationSchema } from './types'
+import { getVercelAnnotations } from './vercel'
 
 /**
- * Gets annotation data directly from a message by type
+ * Type for annotation parser functions
+ */
+type AnnotationParser = (message: Message) => unknown[]
+
+/**
+ * Gets all annotation data from a message by type, combining results from multiple parsers
  * @param message - The message to extract annotations from
  * @param type - The annotation type to filter by (can be standard or custom)
- * @returns Array of data from annotations of the specified type, or null if none found
+ * @param parsers - Array of parser functions to use (defaults to Vercel and inline parsers)
+ * @returns Array of data from annotations of the specified type from all parsers
  */
-
 export function getAnnotationData<T = unknown>(
   message: Message,
-  type: string
+  type: string,
+  parsers: AnnotationParser[] = [getVercelAnnotations, getInlineAnnotations]
 ): T[] {
-  const annotations = message.annotations
-  if (!annotations) return []
-
-  const matchingAnnotations = annotations
+  const allAnnotations = parsers
+    .flatMap(parser => parser(message))
     .filter(
-      a =>
-        a &&
-        typeof a === 'object' &&
-        a !== null &&
-        'type' in a &&
-        a.type === type &&
-        'data' in a
-    )
-    .map(a => (a as { data: T }).data)
+      a => MessageAnnotationSchema.safeParse(a).success
+    ) as MessageAnnotation<T>[]
 
-  return matchingAnnotations
+  return allAnnotations.filter(a => a.type === type).map(a => a.data) as T[]
 }

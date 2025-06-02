@@ -12,8 +12,7 @@ import {
 import { SourceData } from './chat-sources'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
-import { AnnotationSchema } from '../chat/annotations/annotations'
-import { INLINE_ANNOTATION_KEY } from '../chat/annotations'
+import { parseInlineAnnotation } from '../chat/annotations/inline'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -127,18 +126,11 @@ export function Markdown({
             const language = (match && match[1]) || ''
             const codeValue = String(children).replace(/\n$/, '')
 
-            if (language === INLINE_ANNOTATION_KEY) {
-              const annotation = JSON.parse(codeValue)
+            const annotation = parseInlineAnnotation(language, codeValue)
 
-              if (!AnnotationSchema.safeParse(annotation).success) {
-                console.warn(
-                  `Invalid inline annotation: ${codeValue}, expected an object`
-                )
-                return null
-              }
-
+            if (annotation) {
               // Check if we have a specific renderer for it
-              if (annotation.type && annotationRenderers?.[annotation.type]) {
+              if (annotationRenderers?.[annotation.type]) {
                 const CustomRenderer = annotationRenderers[annotation.type]
                 return (
                   <div className="my-4">
