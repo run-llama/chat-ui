@@ -5,16 +5,14 @@ import {
   ChatFiles,
   ChatImage,
   ChatSources,
-  SuggestedQuestions,
-} from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
-import {
-  AgentEventData,
-  DocumentFileData,
   EventData,
   ImageData,
-  MessageAnnotationType,
+  DocumentFileData,
+  AgentEventData,
   SuggestedQuestionsData,
-} from './annotations/data.js'
+  SuggestedQuestions,
+} from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
+import { MessageAnnotationType } from './annotations/data.js'
 import { getAnnotationData } from './annotations/annotations.js'
 import { getSourceAnnotationData } from './annotations/sources.js'
 import { extractArtifactsFromMessage } from './annotations/artifacts.js'

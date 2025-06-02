@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DocumentFileType, DocumentFile } from '../chat/annotations/data'
+import { DocumentFileType, DocumentFile } from '../widgets'
 
 const docMineTypeMap: Record<string, DocumentFileType> = {
   'text/csv': 'csv',

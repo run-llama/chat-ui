@@ -1,5 +1,25 @@
-import { DocumentFileData } from '../chat/annotations/data'
 import { DocumentInfo } from './document-info'
+
+export type DocumentFileType = 'csv' | 'pdf' | 'txt' | 'docx'
+export const DOCUMENT_FILE_TYPES: DocumentFileType[] = [
+  'csv',
+  'pdf',
+  'txt',
+  'docx',
+]
+
+export type DocumentFile = {
+  id: string
+  name: string // The uploaded file name in the backend
+  size: number // The file size in bytes
+  type: DocumentFileType
+  url: string // The URL of the uploaded file in the backend
+  refs?: string[] // DocumentIDs of the uploaded file in the vector index
+}
+
+export type DocumentFileData = {
+  files: DocumentFile[]
+}
 
 export function ChatFiles({ data }: { data: DocumentFileData }) {
   if (!data.files.length) return null

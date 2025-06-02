@@ -6,7 +6,10 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '../ui/collapsible'
-import { EventData } from '../chat/annotations/data'
+
+export type EventData = {
+  title: string
+}
 
 export function ChatEvents({
   data,
