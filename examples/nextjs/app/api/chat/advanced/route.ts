@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-const SAMPLE_TEXT = `
+const SAMPLE_TEXT = [
+  `
 Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
 
 ### Markdown with code block
@@ -51,20 +52,7 @@ const c = a + b
 console.log(c)
 \`\`\`
 
-`
-const SAMPLE_ANNOTATIONS = [
-  {
-    type: 'sources',
-    data: {
-      nodes: [
-        { id: '1', url: '/sample.pdf' },
-        { id: '2', url: '/sample.pdf' },
-      ],
-    },
-  },
-]
-
-const INLINE_ITEMS = [
+`,
   '\n ### Demo inline annotations \n',
   'Here are some steps to create a simple wiki app: \n',
   '1. Create package.json file:',
@@ -178,6 +166,18 @@ getWiki("What is LlamaIndex?");`,
   '\n\n Please feel free to open the document in the canvas and edit it. The document will be saved as a new version',
 ]
 
+const SAMPLE_SOURCES = [
+  {
+    type: 'sources',
+    data: {
+      nodes: [
+        { id: '1', url: '/sample.pdf' },
+        { id: '2', url: '/sample.pdf' },
+      ],
+    },
+  },
+]
+
 const fakeChatStream = (query: string): ReadableStream => {
   return new ReadableStream({
     async start(controller) {
@@ -186,26 +186,15 @@ const fakeChatStream = (query: string): ReadableStream => {
         encoder.encode(`${TEXT_PREFIX}${JSON.stringify(query)}\n`)
       )
 
-      for (const token of SAMPLE_TEXT.split(' ')) {
-        await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
-        controller.enqueue(
-          encoder.encode(`${TEXT_PREFIX}${JSON.stringify(`${token} `)}\n`)
-        )
-      }
-
-      // insert annotations in fixed positions
-      for (const item of SAMPLE_ANNOTATIONS) {
-        controller.enqueue(
-          encoder.encode(`${ANNOTATION_PREFIX}${JSON.stringify([item])}\n`)
-        )
-      }
-
       // insert inline annotations
-      for (const item of INLINE_ITEMS) {
+      for (const item of SAMPLE_TEXT) {
         if (typeof item === 'string') {
-          controller.enqueue(
-            encoder.encode(`${TEXT_PREFIX}${JSON.stringify(item)}\n`)
-          )
+          for (const token of item.split(' ')) {
+            await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
+            controller.enqueue(
+              encoder.encode(`${TEXT_PREFIX}${JSON.stringify(`${token} `)}\n`)
+            )
+          }
         } else {
           await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
           // append inline annotation with 0: prefix
@@ -214,6 +203,13 @@ const fakeChatStream = (query: string): ReadableStream => {
             encoder.encode(`${TEXT_PREFIX}${JSON.stringify(annotationCode)}\n`)
           )
         }
+      }
+
+      // insert sources in fixed positions
+      for (const item of SAMPLE_SOURCES) {
+        controller.enqueue(
+          encoder.encode(`${ANNOTATION_PREFIX}${JSON.stringify([item])}\n`)
+        )
       }
 
       controller.close()
