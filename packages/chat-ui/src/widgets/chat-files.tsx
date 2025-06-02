@@ -1,4 +1,4 @@
-import { DocumentFileData } from '../chat/annotation'
+import { DocumentFileData } from '../chat/annotations/data'
 import { DocumentInfo } from './document-info'
 
 export function ChatFiles({ data }: { data: DocumentFileData }) {

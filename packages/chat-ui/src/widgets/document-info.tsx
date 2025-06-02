@@ -4,7 +4,8 @@ import {
   HoverCardTrigger,
 } from '@radix-ui/react-hover-card'
 import { Check, Copy, FileIcon, XCircleIcon } from 'lucide-react'
-import { DocumentFileType, SourceNode } from '../chat/annotation'
+import { DocumentFileType } from '../chat/annotations/data'
+import { SourceNode } from '../chat/annotations/sources'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { Button } from '../ui/button'
 import { PdfDialog } from './pdf-dialog'

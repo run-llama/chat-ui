@@ -4,11 +4,8 @@ import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { CodeBlock } from './codeblock'
-import {
-  DOCUMENT_FILE_TYPES,
-  DocumentFileType,
-  SourceData,
-} from '../chat/annotation'
+import { DOCUMENT_FILE_TYPES, DocumentFileType } from '../chat/annotations/data'
+import { SourceData } from '../chat/annotations/sources'
 import { DocumentInfo } from './document-info'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'

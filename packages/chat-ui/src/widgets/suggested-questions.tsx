@@ -1,4 +1,4 @@
-import { SuggestedQuestionsData } from '../chat/annotation'
+import { SuggestedQuestionsData } from '../chat/annotations/data'
 import { ChatHandler } from '../chat/chat.interface'
 
 export function SuggestedQuestions({

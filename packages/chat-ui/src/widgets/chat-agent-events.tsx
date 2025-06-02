@@ -10,7 +10,7 @@ import {
   DrawerTrigger,
 } from '../ui/drawer'
 import { Markdown } from './markdown'
-import { AgentEventData, ProgressData } from '../chat/annotation'
+import { AgentEventData, ProgressData } from '../chat/annotations/data'
 import { Progress } from '../ui/progress'
 
 const AgentIcons: Record<string, LucideIcon> = {
