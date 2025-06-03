@@ -46,7 +46,20 @@ const initialMessages: Message[] = [
     id: 'Yqc9VoIR3ANyzTj3',
     role: 'assistant',
     content:
-      'The artifact is a Python implementation of the binary search algorithm, which efficiently searches for a target value in a sorted list.',
+      'The artifact is a Python implementation of the binary search algorithm, which efficiently searches for a target value in a sorted list.' +
+      `\n\`\`\`annotation\n${JSON.stringify({
+        type: 'artifact',
+        data: {
+          type: 'code',
+          data: {
+            file_name: 'binary_search.py',
+            code: 'def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = left + (right - left) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\n# Example usage:\n# sorted_list = [1, 2, 3, 4, 5]\n# target = 3\n# result = binary_search(sorted_list, target)\n# print(result)  # Output: 2',
+            language: 'python',
+          },
+          created_at: 1745480281756,
+        },
+      })}
+      \n\`\`\`\n`,
     annotations: [
       {
         userInput: 'Write binary search algorithm in python',
@@ -199,18 +212,6 @@ const initialMessages: Message[] = [
         ],
       },
       {
-        type: 'artifact',
-        data: {
-          type: 'code',
-          data: {
-            file_name: 'binary_search.py',
-            code: 'def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = left + (right - left) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\n# Example usage:\n# sorted_list = [1, 2, 3, 4, 5]\n# target = 3\n# result = binary_search(sorted_list, target)\n# print(result)  # Output: 2',
-            language: 'python',
-          },
-          created_at: 1745480281756,
-        },
-      },
-      {
         input: [
           {
             role: 'user',
@@ -275,7 +276,20 @@ const initialMessages: Message[] = [
     id: 'yWQHYXgn6WT0oE7J',
     role: 'assistant',
     content:
-      'The artifact is a Python implementation of the binary search algorithm that includes logging statements to track the values of the left, right, and mid indices during each step of the search process.',
+      'The artifact is a Python implementation of the binary search algorithm that includes logging statements to track the values of the left, right, and mid indices during each step of the search process.' +
+      `\n\`\`\`annotation\n${JSON.stringify({
+        type: 'artifact',
+        data: {
+          type: 'code',
+          data: {
+            file_name: 'binary_search.py',
+            code: "import logging\n\nlogging.basicConfig(level=logging.INFO)\n\ndef binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = left + (right - left) // 2\n        logging.info(f'Left: {left}, Right: {right}, Mid: {mid}, Mid Value: {arr[mid]}')\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\n# Example usage\nif __name__ == '__main__':\n    arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n    target = 7\n    result = binary_search(arr, target)\n    if result != -1:\n        logging.info(f'Target found at index: {result}')\n    else:\n        logging.info('Target not found')",
+            language: 'python',
+          },
+          created_at: 1745480319651,
+        },
+      })}
+      \n\`\`\`\n`,
     annotations: [
       {
         userInput: 'Add some logs to the code',
@@ -454,18 +468,6 @@ const initialMessages: Message[] = [
             displayName: 'AgentToolCallResult',
           },
         ],
-      },
-      {
-        type: 'artifact',
-        data: {
-          type: 'code',
-          data: {
-            file_name: 'binary_search.py',
-            code: "import logging\n\nlogging.basicConfig(level=logging.INFO)\n\ndef binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = left + (right - left) // 2\n        logging.info(f'Left: {left}, Right: {right}, Mid: {mid}, Mid Value: {arr[mid]}')\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\n# Example usage\nif __name__ == '__main__':\n    arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n    target = 7\n    result = binary_search(arr, target)\n    if result != -1:\n        logging.info(f'Target found at index: {result}')\n    else:\n        logging.info('Target not found')",
-            language: 'python',
-          },
-          created_at: 1745480319651,
-        },
       },
       {
         input: [
