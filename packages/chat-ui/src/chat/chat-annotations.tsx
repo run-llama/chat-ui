@@ -121,10 +121,6 @@ export function SuggestedQuestionsAnnotations() {
   )
 }
 
-export interface ArtifactAnnotationsProps {
-  showInline?: boolean
-}
-
 export const defaultAnnotationRenderers: Record<
   string,
   ComponentType<{ data: any }>
