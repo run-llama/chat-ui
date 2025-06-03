@@ -33,7 +33,8 @@ export function getInlineAnnotations(message: Message): unknown[] {
   const codeBlocks = parseMarkdownCodeBlocks(message.content)
   return codeBlocks
     .filter(block => block.language === INLINE_ANNOTATION_KEY)
-    .map(block => JSON.parse(block.code))
+    .map(block => tryParse(block.code))
+    .filter(Boolean) // filter out null values
 }
 
 // convert annotation to inline markdown
@@ -57,9 +58,9 @@ export function parseInlineAnnotation(
   }
 
   try {
-    const annotation = JSON.parse(codeValue)
+    const annotation = tryParse(codeValue)
 
-    if (!isMessageAnnotation(annotation)) {
+    if (annotation === null || !isMessageAnnotation(annotation)) {
       console.warn(
         `Invalid inline annotation: ${codeValue}, expected an object`
       )
@@ -69,6 +70,15 @@ export function parseInlineAnnotation(
     return annotation
   } catch (error) {
     console.warn(`Failed to parse inline annotation: ${codeValue}`, error)
+    return null
+  }
+}
+
+// try to parse the code value as a JSON object and return null if it fails
+function tryParse(codeValue: string) {
+  try {
+    return JSON.parse(codeValue)
+  } catch (error) {
     return null
   }
 }
