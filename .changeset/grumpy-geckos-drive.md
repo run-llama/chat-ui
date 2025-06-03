@@ -1,5 +1,5 @@
 ---
-'@llamaindex/chat-ui': patch
+'@llamaindex/chat-ui': minor
 ---
 
-feat: render annotation inline
+feat: support inline rendering of annotations and use it for artifacts
