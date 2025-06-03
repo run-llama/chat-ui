@@ -10,7 +10,6 @@ import {
 } from '../widgets/index.js'
 import {
   AgentEventAnnotations,
-  ArtifactAnnotations,
   defaultAnnotationRenderers,
   DocumentFileAnnotations,
   EventAnnotations,
@@ -127,7 +126,6 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       <DocumentFileAnnotations />
       <SourceAnnotations />
       <SuggestedQuestionsAnnotations />
-      <ArtifactAnnotations />
     </>
   )
 
@@ -216,7 +214,6 @@ type ComposibleChatMessageContent = typeof ChatMessageContent & {
   DocumentFile: typeof DocumentFileAnnotations
   Source: typeof SourceAnnotations
   SuggestedQuestions: typeof SuggestedQuestionsAnnotations
-  Artifact: typeof ArtifactAnnotations
 }
 
 type ComposibleChatMessage = typeof ChatMessage & {
@@ -243,7 +240,6 @@ PrimiviteChatMessage.Content.Markdown = ChatMarkdown
 PrimiviteChatMessage.Content.DocumentFile = DocumentFileAnnotations
 PrimiviteChatMessage.Content.Source = SourceAnnotations
 PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsAnnotations
-PrimiviteChatMessage.Content.Artifact = ArtifactAnnotations
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions

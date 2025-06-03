@@ -111,19 +111,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
       {
         id: `restore-success-${Date.now()}`,
         role: 'assistant',
-        content: `Successfully restored to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}${
-          newArtifact.inline
-            ? `\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`
-            : ''
-        }`,
-        annotations: newArtifact.inline
-          ? [] // no need to add artifact annotation for inline artifact
-          : [
-              {
-                type: 'artifact',
-                data: newArtifact,
-              },
-            ],
+        content: `Successfully restored to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`,
       },
     ] as (Message & { id: string })[]
 
@@ -140,7 +128,6 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     if (artifact.type === 'code') {
       const codeArtifact = artifact as CodeArtifact
       newArtifact = {
-        inline: artifact.inline,
         created_at: Date.now(),
         type: 'code',
         data: {
@@ -152,7 +139,6 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     } else if (artifact.type === 'document') {
       const documentArtifact = artifact as DocumentArtifact
       newArtifact = {
-        inline: artifact.inline,
         created_at: Date.now(),
         type: 'document',
         data: {
@@ -173,14 +159,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
       },
       {
         role: 'assistant',
-        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}${
-          newArtifact.inline
-            ? `\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`
-            : ''
-        }`,
-        annotations: newArtifact.inline
-          ? [] // no need to add artifact annotation for inline artifact
-          : [{ type: 'artifact', data: newArtifact }],
+        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`,
       },
     ] as (Message & { id: string })[]
 

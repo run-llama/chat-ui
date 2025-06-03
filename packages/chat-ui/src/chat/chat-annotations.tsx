@@ -1,4 +1,4 @@
-import { ComponentType, useMemo } from 'react'
+import { ComponentType } from 'react'
 import {
   ChatAgentEvents,
   ChatEvents,
@@ -16,10 +16,8 @@ import {
 } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { MessageAnnotationType } from './annotations/types.js'
 import { getAnnotationData } from './annotations/annotations.js'
-import { extractArtifactsFromMessage } from './canvas/artifacts.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ArtifactCard } from './canvas/artifact-card.js'
 import { Message } from './chat.interface.js'
 import ChatCanvas from './canvas/index.js'
 
@@ -125,29 +123,6 @@ export function SuggestedQuestionsAnnotations() {
 
 export interface ArtifactAnnotationsProps {
   showInline?: boolean
-}
-
-export function ArtifactAnnotations({
-  // by default, inline artifact has been shown in the markdown
-  // so we don't need to show it again in the annotation list
-  showInline = false,
-}: ArtifactAnnotationsProps) {
-  const { message } = useChatMessage()
-  const artifacts = useMemo(
-    () => extractArtifactsFromMessage(message),
-    [message]
-  )
-  if (!artifacts?.length) return null
-
-  return (
-    <div className="flex items-center gap-2">
-      {artifacts
-        .filter(a => !a.inline || showInline)
-        .map((artifact, index) => (
-          <ArtifactCard key={index} data={artifact} />
-        ))}
-    </div>
-  )
 }
 
 export const defaultAnnotationRenderers: Record<

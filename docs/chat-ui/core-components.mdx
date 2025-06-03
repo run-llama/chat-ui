@@ -148,7 +148,6 @@ function CustomMessage({ message, isLast }) {
       </ChatMessage.Avatar>
       <ChatMessage.Content>
         <ChatMessage.Content.Markdown />
-        <ChatMessage.Content.Artifact />
       </ChatMessage.Content>
       <ChatMessage.Actions />
     </ChatMessage>
@@ -189,7 +188,6 @@ Main content area with annotation support:
 <ChatMessage.Content isLoading={isLoading} append={append}>
   <ChatMessage.Content.Markdown />
   <ChatMessage.Content.Image />
-  <ChatMessage.Content.Artifact />
   <ChatMessage.Content.Source />
   <ChatMessage.Content.Event />
   <ChatMessage.Content.AgentEvent />

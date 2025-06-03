@@ -22,7 +22,6 @@ export type CodeArtifactError = {
   errors: string[]
 }
 export type Artifact<T = unknown> = {
-  inline?: boolean
   created_at: number
   type: 'code' | 'document'
   data: T
