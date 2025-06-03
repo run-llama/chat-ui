@@ -61,7 +61,6 @@ console.log(c)
     data: {
       type: 'code',
       created_at: 1717334400000,
-      inline: true, // this artifact will be only displayed inline in the message
       data: {
         file_name: 'package.json',
         language: 'json',
@@ -83,7 +82,6 @@ console.log(c)
     type: 'artifact',
     data: {
       created_at: 1717334500000,
-      inline: true, // this artifact will be only displayed inline in the message
       type: 'code',
       data: {
         file_name: 'wiki.js',
@@ -101,7 +99,6 @@ console.log(c)
     type: 'artifact',
     data: {
       created_at: 1717334600000,
-      inline: true, // this artifact will be only displayed inline in the message
       type: 'code',
       data: {
         file_name: 'wiki.js',
@@ -125,7 +122,6 @@ console.log(c)
   {
     type: 'artifact',
     data: {
-      inline: true, // this artifact will be only displayed inline in the message
       type: 'document',
       data: {
         title: 'Sample document',
