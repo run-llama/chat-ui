@@ -3,7 +3,9 @@ title: Widgets
 description: Comprehensive guide to specialized content widgets for rich chat experiences
 ---
 
-Widgets are specialized components for displaying and interacting with different types of content in chat messages. They provide rich functionality beyond simple text, enabling multimedia, interactive elements, and custom annotations.
+Widgets are specialized components for displaying and interacting with rich content in chat messages. They provide functionality beyond simple text, enabling multimedia, interactive elements, and custom annotations.
+
+This section describes how to use them standalone.
 
 ## Content Widgets
 
@@ -41,13 +43,6 @@ def fibonacci(n):
         return n
     return fibonacci(n-1) + fibonacci(n-2)
 ```
-````
-
-This algorithm has O(2^n) complexity [^1].
-
-[^1]: Introduction to Algorithms, Chapter 15
-
-````
 
 ### CodeBlock
 
@@ -66,6 +61,7 @@ function CodeDisplay({ code, language, filename }) {
     />
   )
 }
+```
 ````
 
 **Props:**
@@ -141,6 +137,8 @@ function DocumentEdit({ content, onChange, title }) {
 
 ## Annotation Widgets
 
+Used for rendering additional rich content in a chat message. See [Annotations](./annotations.mdx) for more information on how to add annotations to a message.
+
 ### ChatImage
 
 Displays images with preview and zoom functionality.
@@ -148,17 +146,15 @@ Displays images with preview and zoom functionality.
 ```tsx
 import { ChatImage } from '@llamaindex/chat-ui/widgets'
 
-// From annotation data
-const imageAnnotation = {
-  type: 'IMAGE',
-  data: {
-    url: 'https://example.com/image.jpg',
-    alt: 'Description of the image',
-  },
-}
-
 function ImageDisplay() {
-  return <ChatImage /> // Automatically renders from context
+  return (
+    <ChatImage
+      data={{
+        url: 'https://example.com/image.jpg',
+        alt: 'Description of the image',
+      }}
+    />
+  )
 }
 ```
 
@@ -176,24 +172,22 @@ Displays file attachments with download and preview.
 ```tsx
 import { ChatFiles } from '@llamaindex/chat-ui/widgets'
 
-// From annotation data
-const fileAnnotation = {
-  type: 'DOCUMENT_FILE',
-  data: {
-    files: [
-      {
-        id: '1',
-        name: 'report.pdf',
-        type: 'application/pdf',
-        url: '/files/report.pdf',
-        size: 1024000,
-      },
-    ],
-  },
-}
-
 function FileDisplay() {
-  return <ChatFiles /> // Automatically renders from context
+  return (
+    <ChatFiles
+      data={{
+        files: [
+          {
+            id: '1',
+            name: 'report.pdf',
+            type: 'application/pdf',
+            url: '/files/report.pdf',
+            size: 1024000,
+          },
+        ],
+      }}
+    />
+  )
 }
 ```
 
@@ -212,25 +206,23 @@ Displays source citations with document grouping.
 ```tsx
 import { ChatSources } from '@llamaindex/chat-ui/widgets'
 
-// From annotation data
-const sourceAnnotation = {
-  type: 'sources',
-  data: {
-    nodes: [
-      {
-        id: '1',
-        url: '/documents/paper.pdf',
-        metadata: {
-          title: 'Research Paper',
-          page_number: 5,
-        },
-      },
-    ],
-  },
-}
-
 function SourceDisplay() {
-  return <ChatSources /> // Automatically renders from context
+  return (
+    <ChatSources
+      data={{
+        nodes: [
+          {
+            id: '1',
+            url: '/documents/paper.pdf',
+            metadata: {
+              title: 'Research Paper',
+              page_number: 5,
+            },
+          },
+        ],
+      }}
+    />
+  )
 }
 ```
 
@@ -248,21 +240,20 @@ Displays collapsible process events and status updates.
 ```tsx
 import { ChatEvents } from '@llamaindex/chat-ui/widgets'
 
-// From annotation data
-const eventAnnotation = {
-  type: 'events',
-  data: [
-    {
-      type: 'function_call',
-      name: 'search_documents',
-      args: { query: 'machine learning' },
-      result: 'Found 15 relevant documents',
-    },
-  ],
-}
-
 function EventDisplay() {
-  return <ChatEvents /> // Automatically renders from context
+  return (
+    <ChatEvents
+      data={[
+        {
+          type: 'function_call',
+          name: 'search_documents',
+          args: { query: 'machine learning' },
+          result: 'Found 15 relevant documents',
+        },
+      ]}
+      showLoading={false}
+    />
+  )
 }
 ```
 
@@ -273,23 +264,23 @@ Displays agent-specific events with progress tracking.
 ```tsx
 import { ChatAgentEvents } from '@llamaindex/chat-ui/widgets'
 
-// From annotation data
-const agentAnnotation = {
-  type: 'agent_events',
-  data: {
-    agent_name: 'Research Assistant',
-    progress: 75,
-    current_step: 'Analyzing documents',
-    events: [
-      { step: 'Searching', status: 'completed' },
-      { step: 'Analyzing', status: 'in_progress' },
-      { step: 'Summarizing', status: 'pending' },
-    ],
-  },
-}
-
 function AgentEventDisplay() {
-  return <ChatAgentEvents /> // Automatically renders from context
+  return (
+    <ChatAgentEvents
+      data={{
+        agent_name: 'Research Assistant',
+        progress: 75,
+        current_step: 'Analyzing documents',
+        events: [
+          { step: 'Searching', status: 'completed' },
+          { step: 'Analyzing', status: 'in_progress' },
+          { step: 'Summarizing', status: 'pending' },
+        ],
+      }}
+      isFinished={true}
+      isLast={false}
+    />
+  )
 }
 ```
 
@@ -300,20 +291,18 @@ Interactive follow-up question suggestions.
 ```tsx
 import { SuggestedQuestions } from '@llamaindex/chat-ui/widgets'
 
-// From annotation data
-const suggestionsAnnotation = {
-  type: 'suggested_questions',
-  data: {
-    questions: [
-      'Can you explain this in more detail?',
-      'What are the practical applications?',
-      'How does this compare to other approaches?',
-    ],
-  },
-}
-
-function QuestionSuggestions() {
-  return <SuggestedQuestions /> // Automatically renders from context
+function QuestionSuggestions({ append, requestData }) {
+  return (
+    <SuggestedQuestions
+      questions={[
+        'Can you explain this in more detail?',
+        'What are the practical applications?',
+        'How does this compare to other approaches?',
+      ]}
+      append={append}
+      requestData={requestData}
+    />
+  )
 }
 ```
 
@@ -442,7 +431,7 @@ function CitationLink({ source, index }) {
 
 ### Automatic Rendering
 
-Widgets automatically render based on message annotations:
+Annotation widgets render based on message annotations through dedicated annotation components:
 
 ```tsx
 import { ChatMessage } from '@llamaindex/chat-ui'
@@ -460,6 +449,8 @@ function MessageWithWidgets({ message }) {
   )
 }
 ```
+
+The `ChatMessage.Content.*` components internally use the annotation pattern described in [Annotations](./annotations.mdx), extracting data with `getAnnotationData` and passing it to the respective widgets.
 
 ### Manual Widget Usage
 
@@ -492,11 +483,9 @@ function CustomMessageLayout({ message }) {
 
 ### Custom Widget Creation
 
-Create custom widgets by following the pattern:
+Create custom widgets by following this pattern:
 
 ```tsx
-import { useChatMessage, getAnnotationData } from '@llamaindex/chat-ui'
-
 interface WeatherData {
   location: string
   temperature: number
@@ -505,21 +494,28 @@ interface WeatherData {
   windSpeed: number
 }
 
-export function CustomWeatherWidget() {
-  const { message } = useChatMessage()
-
-  const weatherData = getAnnotationData<WeatherData>(message, 'weather')
-
-  if (!weatherData?.[0]) return null
-
-  const data = weatherData[0]
-
+export function WeatherWidget({ data }: { data: WeatherData }) {
   return (
     <div className="rounded-lg bg-blue-50 p-4">
       <h3 className="font-semibold">{data.location}</h3>
       <p className="text-2xl">{data.temperature}°C</p>
       <p className="text-sm text-gray-600">{data.condition}</p>
     </div>
+  )
+}
+
+// Usage example
+function App() {
+  return (
+    <WeatherWidget
+      data={{
+        location: 'San Francisco',
+        temperature: 22,
+        condition: 'Partly cloudy',
+        humidity: 65,
+        windSpeed: 8,
+      }}
+    />
   )
 }
 ```

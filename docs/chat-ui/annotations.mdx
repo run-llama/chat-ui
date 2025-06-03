@@ -32,69 +32,45 @@ The library provides several built-in annotation types:
 - **ARTIFACT** - Interactive code and document artifacts
 - **SUGGESTED_QUESTIONS** - Follow-up question suggestions
 
-## Image Annotations
+## Using Annotations
 
-Display images within chat messages with zoom and preview functionality.
-
-### Creating Image Annotations
-
-```typescript
-// Server-side: Add image annotation to message
-const imageAnnotation = {
-  type: 'IMAGE',
-  data: {
-    url: 'https://example.com/chart.png',
-    alt: 'Sales chart for Q4 2024',
-  },
-}
-
-return {
-  role: 'assistant',
-  content: 'Here is the sales chart you requested:',
-  annotations: [imageAnnotation],
-}
-```
-
-### Streaming Image Annotations
-
-```typescript
-// In your API route
-const stream = new ReadableStream({
-  start(controller) {
-    // Send text content first
-    controller.enqueue(
-      encoder.encode('0:"Here is the chart you requested:\\n"\\n')
-    )
-
-    // Send image annotation
-    const annotation = {
-      type: 'IMAGE',
-      data: {
-        url: '/api/generated-chart.png',
-        alt: 'Generated sales chart',
-      },
-    }
-
-    controller.enqueue(encoder.encode(`8:${JSON.stringify([annotation])}\\n`))
-
-    controller.close()
-  },
-})
-```
-
-### Client-side Rendering
-
-Images automatically render when using the content components:
+Annotations automatically render when using the `annotations` property on a message. Here's an example of how to render an image annotation:
 
 ```tsx
-<ChatMessage message={message}>
-  <ChatMessage.Content>
-    <ChatMessage.Content.Markdown />
-    <ChatMessage.Content.Image />{' '}
-    {/* Automatically renders IMAGE annotations */}
-  </ChatMessage.Content>
-</ChatMessage>
+const handler = useChat({
+  initialMessages: [
+    {
+    role: 'assistant',
+    content: 'Here is an image',
+    annotations: [
+      {
+        type: 'image',
+        data: {
+          url: '/llama.png',
+        },
+      },
+    ],
+  }
+})
+
+return (
+  <ChatSection
+    handler={handler}
+    className="block h-full flex-row gap-4 p-0 md:flex md:p-5"
+  >
+    <ChatMessage message={message}>
+      <ChatMessage.Content>
+        <ChatMessage.Content.Markdown />
+        <ChatMessage.Content.Image />{' '}
+        {/* Automatically renders IMAGE annotations */}
+      </ChatMessage.Content>
+    </ChatMessage>
+  </ChatSection>
+)
 ```
+
+In the example above, the `ChatMessage.Content.Image` component automatically renders the image annotation retrieved from the `annotations` property on the message which is retrieved by the `useChatMessage` hook.
+The annotation is then passed to the `ChatImage` component which renders the image.
 
 ## File Annotations
 
@@ -132,39 +108,6 @@ const fileAnnotation = {
       },
     ],
   },
-}
-```
-
-### File Upload Integration
-
-```typescript
-// Handle file uploads in your API
-export async function POST(request: Request) {
-  const formData = await request.formData()
-  const files = formData.getAll('files') as File[]
-
-  const fileAnnotations = await Promise.all(
-    files.map(async file => {
-      const url = await uploadFile(file) // Your upload logic
-
-      return {
-        type: 'DOCUMENT_FILE',
-        data: {
-          files: [
-            {
-              id: generateId(),
-              name: file.name,
-              type: file.type,
-              url,
-              size: file.size,
-            },
-          ],
-        },
-      }
-    })
-  )
-
-  return streamResponse(content, fileAnnotations)
 }
 ```
 
@@ -471,6 +414,8 @@ function WeatherWidget() {
 }
 ```
 
+## Annotation Utilities
+
 ### getAnnotationData
 
 Extract annotation data by type from messages:
@@ -480,113 +425,6 @@ import { getAnnotationData } from '@llamaindex/chat-ui'
 
 // Usage
 return getAnnotationData<WeatherData>(message, 'weather')
-```
-
-## Annotation Utilities
-
-### getCustomAnnotations
-
-Extract custom annotations from a message:
-
-```tsx
-import { getCustomAnnotations } from '@llamaindex/chat-ui'
-
-function useWeatherData() {
-  const { message } = useChatMessage()
-
-  return getCustomAnnotations<WeatherData>(message.annotations, 'weather')
-}
-```
-
-## Server-side Implementation
-
-### Streaming Annotations
-
-```typescript
-// API route for streaming with annotations
-export async function POST(request: Request) {
-  const { messages } = await request.json()
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      const encoder = new TextEncoder()
-
-      // Send initial text
-      controller.enqueue(
-        encoder.encode('0:"Let me analyze the weather data for you.\\n"\\n')
-      )
-
-      // Process and get weather data
-      const weatherData = await getWeatherData(location)
-
-      // Send weather annotation
-      const annotation = {
-        type: 'weather',
-        data: weatherData,
-      }
-
-      controller.enqueue(encoder.encode(`8:${JSON.stringify([annotation])}\\n`))
-
-      // Send follow-up text
-      controller.enqueue(
-        encoder.encode('0:"Would you like a detailed forecast?"\\n')
-      )
-
-      controller.close()
-    },
-  })
-
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'X-Vercel-AI-Data-Stream': 'v1',
-    },
-  })
-}
-```
-
-### Annotation Processing
-
-```typescript
-// Process different annotation types
-function createAnnotations(data: any) {
-  const annotations = []
-
-  // Add image if generated
-  if (data.imageUrl) {
-    annotations.push({
-      type: 'IMAGE',
-      data: {
-        url: data.imageUrl,
-        alt: data.imageDescription,
-      },
-    })
-  }
-
-  // Add sources if referenced
-  if (data.sources?.length > 0) {
-    annotations.push({
-      type: 'sources',
-      data: {
-        nodes: data.sources.map(source => ({
-          id: source.id,
-          url: source.url,
-          metadata: source.metadata,
-        })),
-      },
-    })
-  }
-
-  // Add custom weather data
-  if (data.weather) {
-    annotations.push({
-      type: 'weather',
-      data: data.weather,
-    })
-  }
-
-  return annotations
-}
 ```
 
 ## Next Steps

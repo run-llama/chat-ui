@@ -3,7 +3,7 @@ title: Hooks
 description: Understanding the hook system for accessing chat state and functionality
 ---
 
-The hook system provides access to chat state, context, and functionality throughout the component tree. These hooks enable deep customization and integration with the chat interface.
+The hook system provides access to chat state (e.g. message content), context, and functionality throughout the component tree without the need to pass props. These hooks enable deep customization and integration with the chat interface.
 
 ## Context Hooks
 
@@ -345,106 +345,6 @@ function useCustomChat() {
     sendMessageWithMetadata,
     getLastAssistantMessage,
   }
-}
-```
-
-### Message Analytics Hook
-
-Track message interactions:
-
-```tsx
-import { useChatMessage, useChatUI } from '@llamaindex/chat-ui'
-
-function useMessageAnalytics() {
-  const { message } = useChatMessage()
-  const { requestData, setRequestData } = useChatUI()
-
-  const trackMessageView = () => {
-    // Track message viewed
-    console.log('Message viewed:', message.id)
-  }
-
-  const trackMessageCopy = () => {
-    // Track message copied
-    setRequestData({
-      ...requestData,
-      copiedMessages: [...(requestData?.copiedMessages || []), message.id],
-    })
-  }
-
-  const trackMessageRegenerate = () => {
-    // Track message regenerated
-    console.log('Message regenerated:', message.id)
-  }
-
-  return {
-    trackMessageView,
-    trackMessageCopy,
-    trackMessageRegenerate,
-  }
-}
-```
-
-## Hook Usage Patterns
-
-### Conditional Rendering
-
-```tsx
-function ConditionalComponent() {
-  const { isLoading, error, messages } = useChatUI()
-
-  if (isLoading) return <LoadingSpinner />
-  if (error) return <ErrorMessage error={error} />
-  if (messages.length === 0) return <EmptyState />
-
-  return <MessageList />
-}
-```
-
-### Event Handling
-
-```tsx
-function EventHandler() {
-  const { append, setRequestData } = useChatUI()
-
-  const handleQuestionClick = async (question: string) => {
-    // Track question selection
-    setRequestData({ selectedQuestion: question })
-
-    // Send message
-    await append({
-      role: 'user',
-      content: question,
-    })
-  }
-
-  return <SuggestedQuestions onQuestionSelect={handleQuestionClick} />
-}
-```
-
-### Data Transformation
-
-```tsx
-function MessageStats() {
-  const { messages } = useChatUI()
-
-  const stats = useMemo(() => {
-    const userMessages = messages.filter(m => m.role === 'user').length
-    const assistantMessages = messages.filter(
-      m => m.role === 'assistant'
-    ).length
-    const totalChars = messages.reduce((sum, m) => sum + m.content.length, 0)
-
-    return { userMessages, assistantMessages, totalChars }
-  }, [messages])
-
-  return (
-    <div>
-      <p>User messages: {stats.userMessages}</p>
-      <p>Assistant messages: {stats.assistantMessages}</p>
-      <p>Total characters: {stats.totalChars}</p>
-    </div>
-  )
 }
 ```
 
