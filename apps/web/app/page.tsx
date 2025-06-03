@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import './home.css'
 
 export default function Page(): JSX.Element {
   return (
