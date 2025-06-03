@@ -142,6 +142,11 @@ export default function Page(): JSX.Element {
                   gradient: 'from-pink-500 to-violet-500',
                 },
                 {
+                  href: '/demo/latex',
+                  label: 'Latex Chat',
+                  gradient: 'from-yellow-500 to-orange-500',
+                },
+                {
                   href: '/demo/canvas',
                   label: 'Chat with Canvas',
                   gradient: 'from-orange-500 to-red-500',

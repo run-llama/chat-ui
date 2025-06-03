@@ -54,5 +54,6 @@ module.exports = {
     'react/no-array-index-key': 'off',
     '@next/next/no-img-element': 'off',
     'react/jsx-sort-props': 'off',
+    'no-template-curly-in-string': 'off',
   },
 }
