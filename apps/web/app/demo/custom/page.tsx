@@ -153,6 +153,41 @@ const initialMessages: Message[] = [
       },
     ],
   },
+  {
+    role: 'user',
+    content: 'The product costs $10 and the discount is $5',
+    id: 'DQXPGjYiCEK1MlXg',
+  },
+  {
+    id: '0wR35AGp8GEDoHZu',
+    role: 'assistant',
+    content:
+      'If the product costs $10 and there is a discount of $5, you can calculate the final price by subtracting the discount from the original price:\n\nFinal Price = Original Price - Discount  \nFinal Price = $10 - $5  \nFinal Price = $5\n\nSo, after applying the discount, the product will cost $5.',
+  },
+
+  {
+    role: 'user',
+    content:
+      'Write js code that accept a location and console log Hello from location',
+    id: '2VH8xx07DxwibdFX',
+  },
+  {
+    id: 'Jb1Xs8w8p2RBTdUQ',
+    role: 'assistant',
+    content:
+      'You can create a simple JavaScript function that accepts a location as an argument and logs a message to the console. Here\'s an example of how you can do this:\n\n```javascript\nfunction greetFromLocation(location) {\n    console.log(`Hello from ${location}`);\n}\n\n// Example usage:\ngreetFromLocation("New York");\ngreetFromLocation("Tokyo");\ngreetFromLocation("Paris");\n```\n\nIn this code:\n\n- The `greetFromLocation` function takes one parameter, `location`.\n- It uses template literals (the backticks ``) to create a string that includes the location.\n- The `console.log` function is used to print the message to the console.\n\nYou can call the function with different locations to see the output.',
+  },
+  {
+    role: 'user',
+    content: 'Formula to caculate triangle',
+    id: 'G7MEUgkjwqq0RDLk',
+  },
+  {
+    id: 'aonMZaAcoUglAjka',
+    role: 'assistant',
+    content:
+      "To calculate various properties of a triangle, you can use different formulas depending on what you want to find. Here are some common calculations:\n\n1. **Area of a Triangle**:\n   - Using base and height: \n     \\[\n     \\text{Area} = \\frac{1}{2} \\times \\text{base} \\times \\text{height}\n     \\]\n   - Using Heron's formula (when you know all three sides \\(a\\), \\(b\\), and \\(c\\)):\n     \\[\n     s = \\frac{a + b + c}{2} \\quad \\text{(semi-perimeter)}\n     \\]\n     \\[\n     \\text{Area} = \\sqrt{s(s-a)(s-b)(s-c)}\n     \\]\n\n2. **Perimeter of a Triangle**:\n   - If you know the lengths of all three sides \\(a\\), \\(b\\), and \\(c\\):\n     \\[\n     \\text{Perimeter} = a + b + c\n     \\]\n\n3. **Pythagorean Theorem** (for right triangles):\n   - If \\(c\\) is the length of the hypotenuse and \\(a\\) and \\(b\\) are the lengths of the other two sides:\n     \\[\n     c^2 = a^2 + b^2\n     \\]\n\n4. **Angles**:\n   - To find angles using the sides (Law of Cosines):\n     \\[\n     c^2 = a^2 + b^2 - 2ab \\cdot \\cos(C)\n     \\]\n   - Rearranging gives:\n     \\[\n     \\cos(C) = \\frac{a^2 + b^2 - c^2}{2ab}\n     \\]\n\nThese formulas can help you calculate the area, perimeter, and angles of a triangle based on the information you have.",
+  },
 ]
 
 export default function Page(): JSX.Element {
