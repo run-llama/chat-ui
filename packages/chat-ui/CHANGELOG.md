@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.0
+
+### Minor Changes
+
+- bdae046: feat: support inline rendering of annotations and use it for artifacts
+
 ## 0.4.9
 
 ### Patch Changes
