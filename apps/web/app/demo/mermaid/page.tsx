@@ -86,7 +86,7 @@ export default function MermaidDemoPage(): JSX.Element {
     <div className="flex gap-10">
       <div className="hidden max-h-screen w-1/2 overflow-y-auto p-10 md:block">
         <h1 className="mb-4 text-2xl font-bold">Mermaid Diagram Demo</h1>
-        <Code content={code} language="markdown" />
+        <Code content={code} language="jsx" />
       </div>
       <div className="w-full md:w-1/2 md:border-l">
         <MermaidChat />
