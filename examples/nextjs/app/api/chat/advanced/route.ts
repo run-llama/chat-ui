@@ -92,12 +92,25 @@ console.log(c)
   const response = await fetch("/api/wiki?search=" + search);
   const data = await response.json();
   return data;
-}
-getWiki("What is LlamaIndex?");`,
+}`,
       },
     },
   },
-  '3. Check the current wiki:',
+  '3. Run getWiki with the search term:',
+  {
+    type: 'artifact',
+    data: {
+      created_at: 1717334600000,
+      inline: true, // this artifact will be only displayed inline in the message
+      type: 'code',
+      data: {
+        file_name: 'wiki.js',
+        language: 'javascript',
+        code: `getWiki(\`What is \${search}?\`);`,
+      },
+    },
+  },
+  '4. Check the current wiki:',
   {
     type: 'wiki',
     data: {
