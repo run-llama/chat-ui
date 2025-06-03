@@ -77,10 +77,7 @@ export function parseInlineAnnotation(
 // try to parse the code value as a JSON object and return null if it fails
 function tryParse(codeValue: string) {
   try {
-    // dollar sign in code will make JSON.parse fail, so we need to escape it
-    // replace \\$ with \\\\$
-    const escaped = codeValue.replace(/\\\$/g, '\\\\$')
-    return JSON.parse(escaped)
+    return JSON.parse(codeValue)
   } catch (error) {
     return null
   }
