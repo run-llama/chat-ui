@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui-docs
 
+## 0.0.5
+
+### Patch Changes
+
+- 91a9562: Manually review most of the docs
+
 ## 0.0.4
 
 ### Patch Changes
