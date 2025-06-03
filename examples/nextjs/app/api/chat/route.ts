@@ -8,7 +8,7 @@
  * - Standard annotations (sources) sent after text completion
  *
  * Use this example as a starting point for implementing basic chat functionality
- * with @llamaindex/chat-ui components.
+ * with \@llamaindex/chat-ui components.
  */
 import { NextResponse, type NextRequest } from 'next/server'
 
