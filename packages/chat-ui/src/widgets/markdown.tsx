@@ -21,17 +21,58 @@ const MemoizedReactMarkdown: FC<Options> = memo(
     prevProps.className === nextProps.className
 )
 
+// Inspired by https://github.com/remarkjs/react-markdown/issues/785#issuecomment-2307567823
 const preprocessLaTeX = (content: string) => {
+  // First, we need to protect code blocks and inline code from LaTeX processing
+  const codeBlockPlaceholders: string[] = []
+  const inlineCodePlaceholders: string[] = []
+
+  // Temporarily replace code blocks with placeholders
+  let processedContent = content.replace(/```[\s\S]*?```/g, match => {
+    const placeholder = `__CODE_BLOCK_${codeBlockPlaceholders.length}__`
+    codeBlockPlaceholders.push(match)
+    return placeholder
+  })
+
+  // Temporarily replace inline code with placeholders
+  processedContent = processedContent.replace(/`[^`\n]+`/g, match => {
+    const placeholder = `__INLINE_CODE_${inlineCodePlaceholders.length}__`
+    inlineCodePlaceholders.push(match)
+    return placeholder
+  })
+
+  // Escape dollar signs to prevent them from being treated as LaTeX math delimiters
+  // For example, in "$10 million and $20 million", the content between the dollar signs might be incorrectly parsed as a math block
+  // Replacing $ with \$ avoids this issue
+  const escapedDollarSigns = processedContent.replace(/\$/g, '\\$')
+
   // Replace block-level LaTeX delimiters \[ \] with $$ $$
-  const blockProcessedContent = content.replace(
+  const blockProcessedContent = escapedDollarSigns.replace(
     /\\\[([\s\S]*?)\\\]/g,
     (_, equation) => `$$${equation}$$`
   )
+
   // Replace inline LaTeX delimiters \( \) with $ $
-  const inlineProcessedContent = blockProcessedContent.replace(
+  let inlineProcessedContent = blockProcessedContent.replace(
     /\\\(([\s\S]*?)\\\)/g,
     (_, equation) => `$${equation}$`
   )
+
+  // Restore code blocks
+  codeBlockPlaceholders.forEach((codeBlock, index) => {
+    inlineProcessedContent = inlineProcessedContent.replace(
+      `__CODE_BLOCK_${index}__`,
+      codeBlock
+    )
+  })
+
+  // Restore inline code
+  inlineCodePlaceholders.forEach((inlineCode, index) => {
+    inlineProcessedContent = inlineProcessedContent.replace(
+      `__INLINE_CODE_${index}__`,
+      inlineCode
+    )
+  })
 
   return inlineProcessedContent
 }
@@ -100,10 +141,7 @@ export function Markdown({
           'prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 custom-markdown break-words',
           customClassName
         )}
-        remarkPlugins={[
-          remarkGfm,
-          [remarkMath, { singleDollarTextMath: false }],
-        ]}
+        remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex as any]}
         components={{
           p({ children }) {
