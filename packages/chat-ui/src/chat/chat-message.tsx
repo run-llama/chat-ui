@@ -10,7 +10,7 @@ import {
 } from '../widgets/index.js'
 import {
   AgentEventAnnotations,
-  ArtifactAnnotations,
+  defaultAnnotationRenderers,
   DocumentFileAnnotations,
   EventAnnotations,
   ImageAnnotations,
@@ -69,6 +69,7 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
+  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
 }
 
 function ChatMessage(props: ChatMessageProps) {
@@ -125,7 +126,6 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       <DocumentFileAnnotations />
       <SourceAnnotations />
       <SuggestedQuestionsAnnotations />
-      <ArtifactAnnotations />
     </>
   )
 
@@ -147,6 +147,9 @@ function ChatMarkdown(props: ChatMarkdownProps) {
       sources={{ nodes }}
       citationComponent={props.citationComponent}
       languageRenderers={props.languageRenderers}
+      annotationRenderers={
+        props.annotationRenderers ?? defaultAnnotationRenderers
+      }
       className={cn(
         {
           'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
@@ -211,7 +214,6 @@ type ComposibleChatMessageContent = typeof ChatMessageContent & {
   DocumentFile: typeof DocumentFileAnnotations
   Source: typeof SourceAnnotations
   SuggestedQuestions: typeof SuggestedQuestionsAnnotations
-  Artifact: typeof ArtifactAnnotations
 }
 
 type ComposibleChatMessage = typeof ChatMessage & {
@@ -238,7 +240,6 @@ PrimiviteChatMessage.Content.Markdown = ChatMarkdown
 PrimiviteChatMessage.Content.DocumentFile = DocumentFileAnnotations
 PrimiviteChatMessage.Content.Source = SourceAnnotations
 PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsAnnotations
-PrimiviteChatMessage.Content.Artifact = ArtifactAnnotations
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions

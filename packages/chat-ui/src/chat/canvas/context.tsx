@@ -19,6 +19,7 @@ import {
 } from './artifacts'
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'
+import { toInlineAnnotation } from '../annotations'
 
 interface ChatCanvasContextType {
   allArtifacts: Artifact[]
@@ -110,13 +111,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
       {
         id: `restore-success-${Date.now()}`,
         role: 'assistant',
-        content: `Successfully restored to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
-        annotations: [
-          {
-            type: 'artifact',
-            data: newArtifact,
-          },
-        ],
+        content: `Successfully restored to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`,
       },
     ] as (Message & { id: string })[]
 
@@ -164,8 +159,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
       },
       {
         role: 'assistant',
-        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
-        annotations: [{ type: 'artifact', data: newArtifact }],
+        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}\n${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`,
       },
     ] as (Message & { id: string })[]
 

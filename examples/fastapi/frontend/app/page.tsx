@@ -87,7 +87,6 @@ function CustomChatMessages() {
           </ChatMessage.Avatar>
           <ChatMessage.Content isLoading={isLoading} append={append}>
             <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Artifact />
             <ChatMessage.Content.Source />
             <CustomWeatherAnnotation />
           </ChatMessage.Content>

@@ -9,7 +9,6 @@ Artifacts are interactive, editable content that appears in the chat canvas. The
 
 The artifact system consists of:
 
-- **Artifact Annotations** - Data structure for artifact content
 - **ChatCanvas** - Side panel for displaying artifacts
 - **Artifact Viewers** - Components for rendering different artifact types
 - **Version Management** - Track changes and revisions
@@ -119,7 +118,11 @@ export async function POST(request: Request) {
         },
       }
 
-      controller.enqueue(encoder.encode(`8:${JSON.stringify([artifact])}\\n`))
+      // wrap the annotation in a code block with the language key is 'annotation'
+      const codeBlock = `\n\`\`\`annotation\n${JSON.stringify(codeArtifact)}\n\`\`\`\n`
+
+      // send the artifact with the 0: prefix to make it inline
+      controller.enqueue(encoder.encode(`0:${JSON.stringify(codeBlock)}\\n`))
 
       // Send follow-up text
       controller.enqueue(
@@ -392,7 +395,6 @@ The canvas automatically appears when artifacts are present:
 <ChatMessage message={messageWithArtifact}>
   <ChatMessage.Content>
     <ChatMessage.Content.Markdown />
-    <ChatMessage.Content.Artifact /> {/* Triggers canvas display */}
   </ChatMessage.Content>
 </ChatMessage>
 ```

@@ -9,7 +9,8 @@ import {
   useChatUI,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
-import { CustomWeatherAnnotation } from '../components/custom-weather-annotation'
+import { WeatherAnnotation } from '../components/custom-weather'
+import { WikiCard } from '@/components/custom-wiki'
 
 const initialMessages: Message[] = [
   {
@@ -39,7 +40,9 @@ export default function Page(): JSX.Element {
 
 function ChatExample() {
   const handler = useChat({
-    api: '/api/chat',
+    // api: '/api/chat',
+    // uncomment this to try advanced example in app/api/chat/advanced/route.ts
+    api: '/api/chat/advanced',
     initialMessages,
   })
 
@@ -86,10 +89,17 @@ function CustomChatMessages() {
             </div>
           </ChatMessage.Avatar>
           <ChatMessage.Content isLoading={isLoading} append={append}>
-            <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Artifact />
+            <ChatMessage.Content.Markdown
+              annotationRenderers={{
+                // these annotations are rendered inline with the Markdown text
+                artifact: ChatCanvas.Artifact,
+                wiki: WikiCard,
+              }}
+            />
+
+            {/* annotation components under the Markdown text */}
+            <WeatherAnnotation />
             <ChatMessage.Content.Source />
-            <CustomWeatherAnnotation />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>

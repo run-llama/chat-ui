@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { ComponentType } from 'react'
 import {
   ChatAgentEvents,
   ChatEvents,
@@ -14,13 +14,12 @@ import {
   SourceData,
   SourceNode,
 } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
-import { MessageAnnotationType } from './annotations/data.js'
+import { MessageAnnotationType } from './annotations/types.js'
 import { getAnnotationData } from './annotations/annotations.js'
-import { extractArtifactsFromMessage } from './canvas/artifacts.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ArtifactCard } from './canvas/artifact-card.js'
 import { Message } from './chat.interface.js'
+import ChatCanvas from './canvas/index.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
@@ -122,19 +121,9 @@ export function SuggestedQuestionsAnnotations() {
   )
 }
 
-export function ArtifactAnnotations() {
-  const { message } = useChatMessage()
-  const artifacts = useMemo(
-    () => extractArtifactsFromMessage(message),
-    [message]
-  )
-  if (!artifacts?.length) return null
-
-  return (
-    <div className="flex items-center gap-2">
-      {artifacts.map((artifact, index) => (
-        <ArtifactCard key={index} data={artifact} />
-      ))}
-    </div>
-  )
+export const defaultAnnotationRenderers: Record<
+  string,
+  ComponentType<{ data: any }>
+> = {
+  artifact: ChatCanvas.Artifact,
 }

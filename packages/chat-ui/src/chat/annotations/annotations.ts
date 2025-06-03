@@ -1,37 +1,28 @@
 import { Message } from '../chat.interface'
-
-// TODO: add different methods to retrieve annotations from a message - e.g. by parsing its content for inline annotations
-
-export type MessageAnnotation<T = unknown> = {
-  type: string
-  data: T
-}
+import { getInlineAnnotations } from './inline'
+import { isMessageAnnotation, MessageAnnotation } from './types'
+import { getVercelAnnotations } from './vercel'
 
 /**
- * Gets annotation data directly from a message by type
+ * Type for annotation parser functions
+ */
+type AnnotationParser = (message: Message) => unknown[]
+
+/**
+ * Gets all annotation data from a message by type, combining results from multiple parsers
  * @param message - The message to extract annotations from
  * @param type - The annotation type to filter by (can be standard or custom)
- * @returns Array of data from annotations of the specified type, or null if none found
+ * @param parsers - Array of parser functions to use (defaults to Vercel and inline parsers)
+ * @returns Array of data from annotations of the specified type from all parsers
  */
-
 export function getAnnotationData<T = unknown>(
   message: Message,
-  type: string
+  type: string,
+  parsers: AnnotationParser[] = [getVercelAnnotations, getInlineAnnotations]
 ): T[] {
-  const annotations = message.annotations
-  if (!annotations) return []
+  const allAnnotations = parsers
+    .flatMap(parser => parser(message))
+    .filter(a => isMessageAnnotation(a)) as MessageAnnotation<T>[]
 
-  const matchingAnnotations = annotations
-    .filter(
-      a =>
-        a &&
-        typeof a === 'object' &&
-        a !== null &&
-        'type' in a &&
-        a.type === type &&
-        'data' in a
-    )
-    .map(a => (a as { data: T }).data)
-
-  return matchingAnnotations
+  return allAnnotations.filter(a => a.type === type).map(a => a.data) as T[]
 }

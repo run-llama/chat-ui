@@ -5,6 +5,7 @@ import { ChatCanvasActions } from './actions'
 import { CodeArtifactViewer } from './artifacts/code'
 import { useChatCanvas } from './context'
 import { DocumentArtifactViewer } from './artifacts/document'
+import { ArtifactCard } from './artifact-card'
 
 interface ChatCanvasProps {
   children?: React.ReactNode
@@ -40,6 +41,7 @@ function ChatCanvas({ children, className }: ChatCanvasProps) {
 
 ChatCanvas.CodeArtifact = CodeArtifactViewer
 ChatCanvas.DocumentArtifact = DocumentArtifactViewer
+ChatCanvas.Artifact = ArtifactCard
 ChatCanvas.Actions = ChatCanvasActions
 
 export default ChatCanvas

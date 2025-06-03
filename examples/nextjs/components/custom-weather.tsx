@@ -10,20 +10,32 @@ interface WeatherData {
   windSpeed: number
 }
 
-export function CustomWeatherAnnotation() {
+// A custom annotation component that is used to display weather information in a chat message
+// The weather data is extracted from annotations in the message that has type 'weather'
+export function WeatherAnnotation() {
   const { message } = useChatMessage()
-
   const weatherData = getAnnotationData<WeatherData>(message, 'weather')
 
   if (weatherData.length === 0) return null
+  return <WeatherCard data={weatherData[0]} />
+}
 
-  const data = weatherData[0]
+function WeatherCard({ data }: { data: WeatherData }) {
+  const iconMap: Record<string, string> = {
+    sunny: '☀️',
+    cloudy: '☁️',
+    rainy: '🌧️',
+    snowy: '❄️',
+    stormy: '⛈️',
+  }
 
   return (
-    <div className="my-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+    <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-          <WeatherIcon condition={data.condition} />
+          <span className="text-2xl">
+            {iconMap[data.condition.toLowerCase()] || '🌤️'}
+          </span>
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-blue-900">{data.location}</h3>
@@ -44,19 +56,5 @@ export function CustomWeatherAnnotation() {
         </div>
       </div>
     </div>
-  )
-}
-
-function WeatherIcon({ condition }: { condition: string }) {
-  const iconMap: Record<string, string> = {
-    sunny: '☀️',
-    cloudy: '☁️',
-    rainy: '🌧️',
-    snowy: '❄️',
-    stormy: '⛈️',
-  }
-
-  return (
-    <span className="text-2xl">{iconMap[condition.toLowerCase()] || '🌤️'}</span>
   )
 }
