@@ -58,9 +58,7 @@ export function parseInlineAnnotation(
   }
 
   try {
-    console.log({ codeValue })
     const annotation = tryParse(codeValue)
-    // console.log('annotation', annotation)
 
     if (annotation === null || !isMessageAnnotation(annotation)) {
       console.warn(
