@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.1
+
+### Patch Changes
+
+- 4c3834f: fix: dollar sign in code make json parse fail
+
 ## 0.5.0
 
 ### Minor Changes
