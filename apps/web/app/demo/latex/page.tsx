@@ -6,6 +6,7 @@ import { Code } from '@/components/code'
 
 const code = `
 import { ChatSection } from '@llamaindex/chat-ui'
+import '@llamaindex/chat-ui/styles/markdown.css'
 import { useChat } from 'ai/react'
 
 function DemoLatexChat() {
@@ -83,6 +84,7 @@ export default function Page(): JSX.Element {
           LlamaIndex ChatUI
         </h1>
         <h1 className="mb-4 text-2xl font-bold">Latex Chat Demo</h1>
+        <p>ChatUI support LaTeX out of the box</p>
         <Code content={code} language="jsx" />
       </div>
       <div className="w-full md:w-2/3 md:border-l">
