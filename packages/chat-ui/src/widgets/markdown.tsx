@@ -169,7 +169,7 @@ export function Markdown({
               if (annotationRenderers?.[annotation.type]) {
                 const CustomRenderer = annotationRenderers[annotation.type]
                 return (
-                  <div className="my-4 custom-renderer">
+                  <div className="custom-renderer my-4">
                     <CustomRenderer data={annotation.data} />
                   </div>
                 )
