@@ -1,11 +1,11 @@
 import {
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
-  CreateLink,
   MDXEditor,
   UndoRedo,
   headingsPlugin,
   linkPlugin,
+  linkDialogPlugin,
   listsPlugin,
   markdownShortcutPlugin,
   tablePlugin,
@@ -27,6 +27,7 @@ export function DocumentEditor({
     headingsPlugin(),
     listsPlugin(),
     linkPlugin(),
+    linkDialogPlugin(),
     tablePlugin(),
     markdownShortcutPlugin(),
   ]
@@ -39,7 +40,6 @@ export function DocumentEditor({
             <UndoRedo />
             <BoldItalicUnderlineToggles />
             <BlockTypeSelect />
-            <CreateLink />
           </>
         ),
       })
@@ -52,6 +52,7 @@ export function DocumentEditor({
       onChange={onChange}
       markdown={content}
       plugins={plugins}
+      contentEditableClassName="custom-markdown"
     />
   )
 }
