@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.2
+
+### Patch Changes
+
+- f0ec280: Fix: css for markdown shouldn't affect inline components
+
 ## 0.5.1
 
 ### Patch Changes
