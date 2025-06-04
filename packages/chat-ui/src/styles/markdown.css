@@ -1,86 +1,90 @@
 @import 'highlight.js/styles/atom-one-light.css';
 @import 'katex/dist/katex.min.css';
 
-.custom-markdown ul {
+/* 
+* CSS for markdown component
+* they shouldn't affect inline components under custom-renderer class 
+*/
+.custom-markdown ul:not(.custom-renderer *) {
   list-style-type: disc;
   margin-left: 20px;
   margin-top: 20px;
   margin-bottom: 20px;
 }
 
-.custom-markdown ol {
+.custom-markdown ol:not(.custom-renderer *) {
   list-style-type: decimal;
   margin-left: 20px;
   margin-top: 20px;
   margin-bottom: 20px;
 }
 
-.custom-markdown li {
+.custom-markdown li:not(.custom-renderer *) {
   margin-bottom: 5px;
 }
 
-.custom-markdown ol ol {
+.custom-markdown ol ol:not(.custom-renderer *) {
   list-style: lower-alpha;
 }
 
-.custom-markdown ul ul,
-.custom-markdown ol ol {
+.custom-markdown ul ul:not(.custom-renderer *),
+.custom-markdown ol ol:not(.custom-renderer *) {
   margin-left: 20px;
 }
 
-.custom-markdown img {
+.custom-markdown img:not(.custom-renderer *) {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin: 10px 0;
 }
 
-.custom-markdown a {
+.custom-markdown a:not(.custom-renderer *) {
   text-decoration: underline;
   color: #007bff;
 }
 
-.custom-markdown h1,
-.custom-markdown h2,
-.custom-markdown h3,
-.custom-markdown h4,
-.custom-markdown h5,
-.custom-markdown h6 {
+.custom-markdown h1:not(.custom-renderer *),
+.custom-markdown h2:not(.custom-renderer *),
+.custom-markdown h3:not(.custom-renderer *),
+.custom-markdown h4:not(.custom-renderer *),
+.custom-markdown h5:not(.custom-renderer *),
+.custom-markdown h6:not(.custom-renderer *) {
   font-weight: bold;
   margin-bottom: 20px;
   margin-top: 20px;
 }
 
-.custom-markdown h6 {
+.custom-markdown h6:not(.custom-renderer *) {
   font-size: 16px;
 }
 
-.custom-markdown h5 {
+.custom-markdown h5:not(.custom-renderer *) {
   font-size: 18px;
 }
 
-.custom-markdown h4 {
+.custom-markdown h4:not(.custom-renderer *) {
   font-size: 20px;
 }
 
-.custom-markdown h3 {
+.custom-markdown h3:not(.custom-renderer *) {
   font-size: 22px;
 }
 
-.custom-markdown h2 {
+.custom-markdown h2:not(.custom-renderer *) {
   font-size: 24px;
 }
 
-.custom-markdown h1 {
+.custom-markdown h1:not(.custom-renderer *) {
   font-size: 26px;
 }
 
-.custom-markdown hr {
+.custom-markdown hr:not(.custom-renderer *) {
   border: 0;
   border-top: 1px solid #e1e4e8;
   margin: 20px 0;
 }
 
-.custom-markdown table {
+.custom-markdown table:not(.custom-renderer *) {
   width: 100%;
   margin: 20px 0;
   overflow-x: auto;
@@ -89,18 +93,18 @@
   font-size: 14px;
 }
 
-.custom-markdown table caption {
+.custom-markdown table caption:not(.custom-renderer *) {
   margin-top: 16px;
   font-size: 14px;
   color: #666;
   text-align: left;
 }
 
-.custom-markdown thead {
+.custom-markdown thead:not(.custom-renderer *) {
   border-bottom: 1px solid #e1e4e8;
 }
 
-.custom-markdown th {
+.custom-markdown th:not(.custom-renderer *) {
   height: 48px;
   padding: 16px;
   text-align: left;
@@ -109,26 +113,43 @@
   color: #666;
 }
 
-.custom-markdown td {
+.custom-markdown td:not(.custom-renderer *) {
   padding: 16px;
   vertical-align: middle;
   border-bottom: 1px solid #e1e4e8;
 }
 
-.custom-markdown tr {
+.custom-markdown tr:not(.custom-renderer *) {
   transition: background-color 0.2s;
 }
 
-.custom-markdown tr:hover {
+.custom-markdown tr:hover:not(.custom-renderer *) {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.custom-markdown tfoot {
+.custom-markdown tfoot:not(.custom-renderer *) {
   border-top: 1px solid #e1e4e8;
   background-color: rgba(0, 0, 0, 0.03);
   font-weight: 500;
 }
 
+/* 
+* Reset CSS for inline components under custom-renderer class
+*/
+.custom-renderer {
+  white-space: initial;
+  font-family: var(--font-sans);
+}
+pre:has(.custom-renderer) {
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  font-size: inherit;
+}
+
+/* 
+* Custom CSS for code editor
+*/
 .ProseMirror:focus-visible {
   outline: none;
 }
