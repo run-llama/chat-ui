@@ -110,10 +110,11 @@ function InteractiveCode({ initialCode, language, onChange }) {
 
 ### DocumentEditor
 
-Rich text document editor with markdown support.
+Rich text document editor with markdown support. Please import editor styles from `@llamaindex/chat-ui/styles/editor.css` to ensure proper styling.
 
 ```tsx
 import { DocumentEditor } from '@llamaindex/chat-ui/widgets'
+import '@llamaindex/chat-ui/styles/editor.css'
 
 function DocumentEdit({ content, onChange, title }) {
   return (
@@ -132,6 +133,7 @@ function DocumentEdit({ content, onChange, title }) {
 'use client'
 
 import dynamic from 'next/dynamic'
+import '@llamaindex/chat-ui/styles/editor.css'
 
 const DocumentEditor = dynamic(
   () => import('@llamaindex/chat-ui/widgets').then(mod => mod.DocumentEditor),
