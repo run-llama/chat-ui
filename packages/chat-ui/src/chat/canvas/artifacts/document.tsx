@@ -16,8 +16,7 @@ interface DocumentArtifactViewerProps {
   children?: React.ReactNode
 }
 
-// Convert citation with node_id to a link with source number as text and hash + sourceId as link
-// [citation:node_id](javascript:void(0)) -> [1](#node_id)
+// Convert citation with node_id to citation number in markdown
 function processDocument(content: string, nodes: SourceNode[]) {
   if (nodes.length === 0) return content
 
@@ -26,7 +25,7 @@ function processDocument(content: string, nodes: SourceNode[]) {
 
   return content.replace(citationRegex, (match, citationId) => {
     const nodeIndex = nodes.findIndex(node => node.id === citationId)
-    if (nodeIndex !== -1) return ` [${nodeIndex + 1}](#${citationId}) `
+    if (nodeIndex !== -1) return ` \`${nodeIndex + 1}\` `
     return match // return original citation if not found
   })
 }
@@ -48,7 +47,6 @@ export function DocumentArtifactViewer({
   } = documentArtifact
 
   const nodes = messages.flatMap(message => getSourceNodes(message))
-  // const nodes = []
   const transformedContent = processDocument(content, nodes)
 
   const handleDocumentChange = (markdown: string) => {
