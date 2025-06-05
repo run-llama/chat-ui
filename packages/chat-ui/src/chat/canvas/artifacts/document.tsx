@@ -96,7 +96,7 @@ export function DocumentArtifactViewer({
             key={documentArtifact.created_at}
             content={transformedContent}
             onChange={handleDocumentChange}
-            className="h-full overflow-y-auto"
+            className="overflow-y-auto"
           />
         )}
       </div>
