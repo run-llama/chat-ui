@@ -1,4 +1,5 @@
-import { type ChatMessage, Settings, SimpleChatEngine } from 'llamaindex'
+import { Message, LlamaIndexAdapter, StreamData } from 'ai'
+import { ChatMessage, Settings, SimpleChatEngine } from 'llamaindex'
 import { NextResponse, type NextRequest } from 'next/server'
 import { fakeStreamText } from '@/app/utils'
 import { OpenAI } from '@llamaindex/openai'
@@ -10,9 +11,11 @@ Settings.llm = new OpenAI({ model: 'gpt-4o-mini' })
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { messages: ChatMessage[] }
+    const body = (await request.json()) as { messages: Message[] }
     const messages = body.messages
     const lastMessage = messages[messages.length - 1]
+
+    const vercelStreamData = new StreamData()
 
     if (!process.env.OPENAI_API_KEY) {
       // Return fake stream if API key is not set
@@ -28,27 +31,16 @@ export async function POST(request: NextRequest) {
 
     const response = await chatEngine.chat({
       message: lastMessage.content,
-      chatHistory: messages,
+      chatHistory: messages as ChatMessage[],
       stream: true,
     })
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder()
-        for await (const chunk of response) {
-          controller.enqueue(
-            encoder.encode(`0:${JSON.stringify(chunk.delta)}\n`)
-          )
-        }
-        controller.close()
-      },
-    })
-
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-Vercel-AI-Data-Stream': 'v1',
-        Connection: 'keep-alive',
+    return LlamaIndexAdapter.toDataStreamResponse(response, {
+      data: vercelStreamData,
+      callbacks: {
+        onCompletion: async () => {
+          await vercelStreamData.close()
+        },
       },
     })
   } catch (error) {
