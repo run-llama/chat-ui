@@ -110,19 +110,39 @@ function InteractiveCode({ initialCode, language, onChange }) {
 
 ### DocumentEditor
 
-Rich text document editor with markdown support.
+Rich text document editor with markdown support. Please import editor styles from `@llamaindex/chat-ui/styles/editor.css` to ensure proper styling.
 
 ```tsx
 import { DocumentEditor } from '@llamaindex/chat-ui/widgets'
+import '@llamaindex/chat-ui/styles/editor.css'
 
 function DocumentEdit({ content, onChange, title }) {
   return (
     <DocumentEditor
-      value={content}
+      content={content}
       onChange={onChange}
-      title={title}
-      placeholder="Start writing..."
+      className="custom-css-class"
     />
+  )
+}
+```
+
+**Note:** When using Next.js App Router, you need to dynamically import this component to avoid SSR issues:
+
+```tsx
+'use client'
+
+import dynamic from 'next/dynamic'
+import '@llamaindex/chat-ui/styles/editor.css'
+
+const DocumentEditor = dynamic(
+  () => import('@llamaindex/chat-ui/widgets').then(mod => mod.DocumentEditor),
+  { ssr: false }
+)
+
+export default function Home() {
+  return (
+    <DocumentEditor content={"# Hello World"} onChange={console.log} />
   )
 }
 ```

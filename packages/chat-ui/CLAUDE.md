@@ -64,7 +64,7 @@ Located in `src/widgets/` and exported via `/widgets` entry point:
 - **Markdown**: `react-markdown` with math support (`katex`, `remark-math`, `rehype-katex`)
 - **Code Editing**: CodeMirror 6 with language support (JavaScript, Python, CSS, HTML)
 - **Syntax Highlighting**: `highlight.js`
-- **Document Editing**: ProseMirror with markdown support
+- **Document Editing**: Mdxeditor with markdown support
 - **PDF Viewing**: `@llamaindex/pdf-viewer`
 
 ### Styling & UI

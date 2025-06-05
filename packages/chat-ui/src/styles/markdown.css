@@ -146,10 +146,3 @@ pre:has(.custom-renderer) {
   font-variation-settings: inherit;
   font-size: inherit;
 }
-
-/* 
-* Custom CSS for code editor
-*/
-.ProseMirror:focus-visible {
-  outline: none;
-}
