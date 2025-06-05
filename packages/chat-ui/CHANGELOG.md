@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.5
+
+### Patch Changes
+
+- 4973f3a: fix: document editor overflow
+
 ## 0.5.4
 
 ### Patch Changes
