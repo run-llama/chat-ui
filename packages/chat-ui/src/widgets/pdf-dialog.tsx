@@ -27,7 +27,7 @@ export function PdfDialog(props: PdfDialogProps) {
   return (
     <Drawer direction="left">
       <DrawerTrigger asChild>{props.trigger}</DrawerTrigger>
-      <DrawerContent className="mt-24 h-full max-h-[96%] w-full md:w-3/5 ">
+      <DrawerContent className="mt-24 h-full max-h-[96%] w-full md:w-3/5">
         <DrawerHeader className="flex flex-col gap-4 sm:flex-row sm:justify-between">
           <div className="space-y-2">
             <DrawerTitle>PDF Content</DrawerTitle>

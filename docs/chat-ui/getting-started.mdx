@@ -1,0 +1,332 @@
+---
+title: Getting Started
+description: Learn how to install and set up LlamaIndex Chat UI in your project
+---
+
+This guide will help you get started with LlamaIndex Chat UI, from installation to building your first chat interface.
+
+## Installation
+
+### Quick Start with Shadcn CLI
+
+If you're using shadcn, then the fastest way to add a chatbot to your project is using the Shadcn CLI command:
+
+```shell
+npx shadcn@latest add https://ui.llamaindex.ai/r/chat.json
+```
+
+**Note for React 19 users:** Select **"Use --force"** if asked and continue with the installation. This will resolve the peer dependency conflicts and allow the components to install properly.
+
+### Manual Installation
+
+First, install the package using your preferred package manager:
+
+```shell
+npm install @llamaindex/chat-ui react react-dom
+
+yarn add @llamaindex/chat-ui react react-dom
+
+pnpm add @llamaindex/chat-ui react react-dom
+
+bun add @llamaindex/chat-ui react react-dom
+```
+
+Then, you need to configure your styling with the following three steps:
+
+#### 1. Configure Tailwind CSS
+
+**For Tailwind CSS version 4.x**, update `globals.css` to include the chat-ui components (update the relative path to node_modules if necessary):
+
+```css
+@source '../node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}';
+```
+
+**For Tailwind CSS version 3.x**, add the following to your `tailwind.config.ts` file:
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}',
+  ],
+  // ... rest of config
+}
+```
+
+#### 2. Define theme:
+
+Chat UI components use the same theming system as [shadcn/ui](https://ui.shadcn.com/), based on CSS custom properties.
+
+**If you already have shadcn/ui set up with a theme in your project, you can skip this step** - Chat UI will automatically inherit your existing theme configuration.
+
+**If you're not using shadcn/ui**, you need to define theme variables in your `app/globals.css` file to make Chat UI work properly. These CSS custom properties control colors, typography, spacing, and other visual aspects of the components.
+
+##### Theme Generation
+
+We recommend using [Shadcn Studio Theme Editor](https://shadcnstudio.com/theme-editor) to easily generate and customize your theme:
+
+1. Visit [https://shadcnstudio.com/theme-editor](https://shadcnstudio.com/theme-editor)
+2. Select or customize a theme that matches your design
+3. Copy the generated CSS variables
+4. Add them to your `globals.css` file
+
+##### Sample Configuration
+
+Here's a complete example of `globals.css` after configuring Tailwind CSS and adding theme variables:
+
+You can use this [sample globals.css file](./sample-globals.css) as a reference, or copy the following basic structure:
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}';
+
+:root {
+  /* Theme variables - see sample file for complete configuration */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.14 0 285.86);
+  /* ... other theme variables ... */
+}
+
+.dark {
+  /* Dark mode theme variables */
+  --background: oklch(0.14 0 285.86);
+  --foreground: oklch(0.99 0 0);
+  /* ... other dark theme variables ... */
+}
+
+@theme inline {
+  /* Theme mapping for Tailwind CSS */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* ... other color mappings ... */
+}
+```
+
+For a complete configuration with all theme variables, download and use the [full sample globals.css file](./sample-globals.css).
+
+#### 3. Import Styles
+
+Import the CSS styles in your app's root file (e.g., `_app.tsx` or `layout.tsx`):
+
+```tsx
+import '@llamaindex/chat-ui/styles/markdown.css' // code, latex and custom markdown styling
+import '@llamaindex/chat-ui/styles/pdf.css' // pdf styling
+import '@llamaindex/chat-ui/styles/editor.css' // document editor styling
+```
+
+The `markdown.css` file includes styling for code blocks using [highlight.js](https://highlightjs.org/) with the `atom-one-dark` theme by default, [katex](https://katex.org/) for latex, and [pdf-viewer](https://github.com/run-llama/pdf-viewer) for PDF files. You can use any highlight.js theme by copying [their CSS](https://github.com/highlightjs/highlight.js/tree/main/src/styles/) to your project and importing it.
+
+## Basic Usage
+
+### 1. Create a Chat API Route
+
+Set up an API route to handle chat requests. Here's an example using Next.js:
+
+```typescript
+// app/api/chat/route.ts
+import { NextResponse } from 'next/server'
+
+export async function POST(request: Request) {
+  const { messages } = await request.json()
+
+  // Your chat logic here
+  const response = await generateChatResponse(messages)
+
+  return new Response(response, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Vercel-AI-Data-Stream': 'v1',
+    },
+  })
+}
+```
+
+### 2. Create Your Chat Component
+
+The easiest way to get started is to connect the whole `ChatSection` component with `useChat` hook from [vercel/ai](https://github.com/vercel/ai):
+
+```tsx
+'use client'
+
+import { ChatSection } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+export default function Chat() {
+  const handler = useChat({
+    api: '/api/chat',
+  })
+
+  return (
+    <div className="h-screen">
+      <ChatSection handler={handler} />
+    </div>
+  )
+}
+```
+
+## Component Composition
+
+Components are designed to be composable. You can use them as is with the simple `ChatSection`, or extend them with your own children components:
+
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import LlamaCloudSelector from './components/LlamaCloudSelector' // your custom component
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages />
+      <ChatInput>
+        <ChatInput.Form className="bg-lime-500">
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <LlamaCloudSelector /> {/* custom component */}
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
+
+Your custom component can use the `useChatUI` hook to send additional data to the chat API endpoint:
+
+```tsx
+import { useChatUI } from '@llamaindex/chat-ui'
+
+const LlamaCloudSelector = () => {
+  const { requestData, setRequestData } = useChatUI()
+  return (
+    <div>
+      <select
+        value={requestData?.model}
+        onChange={e => setRequestData({ model: e.target.value })}
+      >
+        <option value="llama-3.1-70b-instruct">Pipeline 1</option>
+        <option value="llama-3.1-8b-instruct">Pipeline 2</option>
+      </select>
+    </div>
+  )
+}
+```
+
+## Styling
+
+### Components
+
+`chat-ui` components are based on [shadcn](https://ui.shadcn.com/) components using Tailwind CSS.
+
+You can override the default styles by changing CSS variables in the `globals.css` file of your Tailwind CSS configuration. For example, to change the background and foreground colors:
+
+```css
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+}
+```
+
+For a list of all available CSS variables, please refer to the [Shadcn Theme Config](https://ui.shadcn.com/themes).
+
+Additionally, you can also override each component's styles by setting custom classes in the `className` prop. For example, setting the background color of the `ChatInput.Form` component:
+
+```tsx
+import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+
+const ChatExample = () => {
+  const handler = useChat()
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages />
+      <ChatInput>
+        <ChatInput.Preview />
+        <ChatInput.Form className="bg-lime-500">
+          <ChatInput.Field type="textarea" />
+          <ChatInput.Upload />
+          <ChatInput.Submit />
+        </ChatInput.Form>
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
+
+## Advanced Features
+
+### Custom Layout
+
+For more control over the layout, compose components manually:
+
+```tsx
+import {
+  ChatSection,
+  ChatMessages,
+  ChatInput,
+  ChatCanvas,
+} from '@llamaindex/chat-ui'
+
+function CustomChat() {
+  const handler = useChat({ api: '/api/chat' })
+
+  return (
+    <ChatSection handler={handler} className="flex-row gap-4">
+      <div className="flex-1">
+        <ChatMessages />
+        <ChatInput />
+      </div>
+      <ChatCanvas className="w-1/3" />
+    </ChatSection>
+  )
+}
+```
+
+### With Initial Messages
+
+Provide initial context or welcome messages:
+
+```tsx
+const handler = useChat({
+  api: '/api/chat',
+  initialMessages: [
+    {
+      id: '1',
+      role: 'assistant',
+      content: 'Hello! How can I help you today?',
+    },
+  ],
+})
+```
+
+### Language Renderer Support
+
+For any language that the LLM generates, you can specify a custom renderer to render the output. For example, you can render mermaid code as SVG using a custom renderer.
+
+## Next Steps
+
+Now that you have a basic chat interface running:
+
+1. **Explore Components** - Learn about [Core Components](./core-components.mdx) for customization
+2. **Add Rich Content** - Implement [Annotations](./annotations.mdx) for images, files, and sources
+3. **Enable Artifacts** - Set up [Artifacts](./artifacts.mdx) for interactive code and documents
+4. **Customize Styling** - Read the [Customization](./customization.mdx) guide for theming
+
+## Troubleshooting
+
+### Common Issues
+
+**Styles not loading**: Make sure you've imported the CSS files in your app root and configured Tailwind CSS properly.
+
+**TypeScript errors**: Ensure you have the correct peer dependencies and TypeScript configuration.
+
+**Build errors**: Check that your bundler supports the package's export conditions.
+
+**Chat not working**: Verify your API route is returning the correct response format for the Vercel AI SDK.
+
+### Getting Help
+
+- Check the [Examples](./examples.mdx) for working implementations
+- Review the component documentation for detailed API references
+- Open an issue on GitHub for bugs or feature requests

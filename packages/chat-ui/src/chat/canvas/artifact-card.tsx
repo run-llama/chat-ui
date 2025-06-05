@@ -3,11 +3,11 @@ import { cn } from '../../lib/utils'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
 import {
-  Artifact,
-  CodeArtifact,
   DocumentArtifact,
+  CodeArtifact,
   isEqualArtifact,
-} from '../annotation'
+  Artifact,
+} from './artifacts'
 import { useChatCanvas } from './context'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
@@ -15,19 +15,19 @@ const IconMap: Record<Artifact['type'], LucideIcon> = {
   document: FileText,
 }
 
-export function ArtifactCard({ artifact }: { artifact: Artifact }) {
+export function ArtifactCard({ data }: { data: Artifact }) {
   const {
     openArtifactInCanvas,
     getArtifactVersion,
     restoreArtifact,
     displayedArtifact,
   } = useChatCanvas()
-  const { versionNumber, isLatest } = getArtifactVersion(artifact)
+  const { versionNumber, isLatest } = getArtifactVersion(data)
 
-  const Icon = IconMap[artifact.type]
-  const title = getCardTitle(artifact)
+  const Icon = IconMap[data.type]
+  const title = getCardTitle(data)
   const isDisplayed =
-    displayedArtifact && isEqualArtifact(artifact, displayedArtifact)
+    displayedArtifact && isEqualArtifact(data, displayedArtifact)
 
   return (
     <div
@@ -35,7 +35,7 @@ export function ArtifactCard({ artifact }: { artifact: Artifact }) {
         'border-border flex w-full max-w-72 cursor-pointer items-center justify-between gap-2 rounded-lg border-2 p-2 hover:border-blue-500',
         isDisplayed && 'border-blue-500'
       )}
-      onClick={() => openArtifactInCanvas(artifact)}
+      onClick={() => openArtifactInCanvas(data)}
     >
       <div className="flex flex-1 items-center gap-2">
         <Icon className="size-7 shrink-0 text-blue-500" />
@@ -53,7 +53,7 @@ export function ArtifactCard({ artifact }: { artifact: Artifact }) {
           className="h-8 shrink-0 cursor-pointer text-xs"
           onClick={e => {
             e.stopPropagation()
-            restoreArtifact(artifact)
+            restoreArtifact(data)
           }}
         >
           Restore

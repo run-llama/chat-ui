@@ -7,11 +7,12 @@ import { CodeBlock } from './codeblock'
 import {
   DOCUMENT_FILE_TYPES,
   DocumentFileType,
-  SourceData,
-} from '../chat/annotation'
-import { DocumentInfo } from './document-info'
+  DocumentInfo,
+} from './document-info'
+import { SourceData } from './chat-sources'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
+import { parseInlineAnnotation } from '../chat/annotations/inline'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -20,22 +21,58 @@ const MemoizedReactMarkdown: FC<Options> = memo(
     prevProps.className === nextProps.className
 )
 
+// Inspired by https://github.com/remarkjs/react-markdown/issues/785#issuecomment-2307567823
 const preprocessLaTeX = (content: string) => {
+  // First, we need to protect code blocks and inline code from LaTeX processing
+  const codeBlockPlaceholders: string[] = []
+  const inlineCodePlaceholders: string[] = []
+
+  // Temporarily replace code blocks with placeholders
+  let processedContent = content.replace(/```[\s\S]*?```/g, match => {
+    const placeholder = `__CODE_BLOCK_${codeBlockPlaceholders.length}__`
+    codeBlockPlaceholders.push(match)
+    return placeholder
+  })
+
+  // Temporarily replace inline code with placeholders
+  processedContent = processedContent.replace(/`[^`\n]+`/g, match => {
+    const placeholder = `__INLINE_CODE_${inlineCodePlaceholders.length}__`
+    inlineCodePlaceholders.push(match)
+    return placeholder
+  })
+
   // Escape dollar signs to prevent them from being treated as LaTeX math delimiters
   // For example, in "$10 million and $20 million", the content between the dollar signs might be incorrectly parsed as a math block
   // Replacing $ with \$ avoids this issue
-  const escapedDollarSigns = content.replace(/\$/g, '\\$')
+  const escapedDollarSigns = processedContent.replace(/\$/g, '\\$')
 
   // Replace block-level LaTeX delimiters \[ \] with $$ $$
   const blockProcessedContent = escapedDollarSigns.replace(
     /\\\[([\s\S]*?)\\\]/g,
     (_, equation) => `$$${equation}$$`
   )
+
   // Replace inline LaTeX delimiters \( \) with $ $
-  const inlineProcessedContent = blockProcessedContent.replace(
+  let inlineProcessedContent = blockProcessedContent.replace(
     /\\\(([\s\S]*?)\\\)/g,
     (_, equation) => `$${equation}$`
   )
+
+  // Restore code blocks
+  codeBlockPlaceholders.forEach((codeBlock, index) => {
+    inlineProcessedContent = inlineProcessedContent.replace(
+      `__CODE_BLOCK_${index}__`,
+      codeBlock
+    )
+  })
+
+  // Restore inline code
+  inlineCodePlaceholders.forEach((inlineCode, index) => {
+    inlineProcessedContent = inlineProcessedContent.replace(
+      `__INLINE_CODE_${index}__`,
+      inlineCode
+    )
+  })
 
   return inlineProcessedContent
 }
@@ -73,18 +110,27 @@ const preprocessContent = (content: string) => {
   return preprocessCitations(preprocessLaTeX(preprocessMedia(content)))
 }
 
+export interface LanguageRendererProps {
+  code: string
+  className?: string
+}
+
 export function Markdown({
   content,
   sources,
   backend,
   citationComponent: CitationComponent,
   className: customClassName,
+  languageRenderers,
+  annotationRenderers,
 }: {
   content: string
   sources?: SourceData
   backend?: string
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
+  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
+  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
 }) {
   const processedContent = preprocessContent(content)
 
@@ -113,6 +159,32 @@ export function Markdown({
             }
 
             const match = /language-(\w+)/.exec(className || '')
+            const language = (match && match[1]) || ''
+            const codeValue = String(children).replace(/\n$/, '')
+
+            const annotation = parseInlineAnnotation(language, codeValue)
+
+            if (annotation) {
+              // Check if we have a specific renderer for it
+              if (annotationRenderers?.[annotation.type]) {
+                const CustomRenderer = annotationRenderers[annotation.type]
+                return (
+                  <div className="custom-renderer my-4">
+                    <CustomRenderer data={annotation.data} />
+                  </div>
+                )
+              }
+
+              // If no custom renderer found, render an error message
+              return (
+                <div className="mb-2 max-w-full overflow-hidden rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
+                  <div className="overflow-wrap-anywhere whitespace-pre-wrap break-words text-sm text-red-800 dark:text-red-200">
+                    <strong>Annotation Render Error:</strong> No renderer found
+                    for annotation type &ldquo;{annotation.type}&rdquo;.
+                  </div>
+                </div>
+              )
+            }
 
             if (inline) {
               return (
@@ -122,11 +194,17 @@ export function Markdown({
               )
             }
 
+            // Check for custom language renderer
+            if (languageRenderers?.[language]) {
+              const CustomRenderer = languageRenderers[language]
+              return <CustomRenderer code={codeValue} className="mb-2" />
+            }
+
             return (
               <CodeBlock
                 key={Math.random()}
-                language={(match && match[1]) || ''}
-                value={String(children).replace(/\n$/, '')}
+                language={language}
+                value={codeValue}
                 className="mb-2"
                 {...props}
               />

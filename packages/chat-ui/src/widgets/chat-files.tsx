@@ -1,5 +1,8 @@
-import { DocumentFileData } from '../chat/annotation'
-import { DocumentInfo } from './document-info'
+import { DocumentInfo, DocumentFile } from './document-info'
+
+export type DocumentFileData = {
+  files: DocumentFile[]
+}
 
 export function ChatFiles({ data }: { data: DocumentFileData }) {
   if (!data.files.length) return null

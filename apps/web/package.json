@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "1.0.23",
+  "version": "1.0.34",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,18 +8,22 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "registry:build": "rm -rf public/r && npx shadcn@latest build"
+    "registry:build": "rm -rf public/r && npx shadcn@latest build && npm run registry:post-build",
+    "registry:post-build": "node scripts/add-css-source.js"
   },
   "dependencies": {
+    "framer-motion": "^12.15.0",
     "@faker-js/faker": "^9.4.0",
     "@llamaindex/chat-ui": "workspace:*",
+    "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.1.1",
     "ai": "4.0.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "highlight.js": "^11.10.0",
-    "llamaindex": "0.10.5",
+    "llamaindex": "0.9.3",
     "lucide-react": "^0.453.0",
+    "mermaid": "^11.6.0",
     "next": "15.1.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

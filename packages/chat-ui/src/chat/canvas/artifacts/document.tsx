@@ -3,7 +3,7 @@
 import { FileText } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 import { DocumentEditor } from '../../../widgets'
-import { DocumentArtifact } from '../../annotation'
+import { DocumentArtifact } from '../artifacts'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
 import { useState } from 'react'

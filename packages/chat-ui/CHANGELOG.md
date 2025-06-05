@@ -1,5 +1,66 @@
 # @llamaindex/chat-ui
 
+## 0.5.3
+
+### Patch Changes
+
+- a34688a: feat: use mdxeditor for document editor
+
+## 0.5.2
+
+### Patch Changes
+
+- f0ec280: Fix: css for markdown shouldn't affect inline components
+
+## 0.5.1
+
+### Patch Changes
+
+- 4c3834f: fix: dollar sign in code make json parse fail
+
+## 0.5.0
+
+### Minor Changes
+
+- bdae046: feat: support inline rendering of annotations and use it for artifacts
+
+## 0.4.9
+
+### Patch Changes
+
+- effc6f5: Use isLast from useChatMessage hook in AgentEventAnnotations
+- 8e60c05: Cleaned up internal annotation retrieval
+
+## 0.4.8
+
+### Patch Changes
+
+- 09d6ec6: Improve type-safety of custom annotations
+
+## 0.4.7
+
+### Patch Changes
+
+- 180cc1f: Add language specific renderer to markdown (with mermaid example)
+
+## 0.4.6
+
+### Patch Changes
+
+- ef66c13: fix: use multiple sources per message
+
+## 0.4.5
+
+### Patch Changes
+
+- 2332fa6: fix: send request data when submit suggested questions
+
+## 0.4.4
+
+### Patch Changes
+
+- 623a855: fix: using language props to add editor extensions
+
 ## 0.4.3
 
 ### Patch Changes

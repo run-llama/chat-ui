@@ -32,7 +32,10 @@ jobs:
       - name: Check formatting
         run: pnpm format
 
-      - name: Run Build and Lint
+      - name: Run Build
+        run: pnpm build
+
+      - name: Run Lint
         run: pnpm lint
 
       - name: Type Check

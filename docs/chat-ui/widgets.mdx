@@ -1,0 +1,548 @@
+---
+title: Widgets
+description: Comprehensive guide to specialized content widgets for rich chat experiences
+---
+
+Widgets are specialized components for displaying and interacting with rich content in chat messages. They provide functionality beyond simple text, enabling multimedia, interactive elements, and custom annotations.
+
+This section describes how to use them standalone.
+
+## Content Widgets
+
+### Markdown
+
+Renders rich text with LaTeX math support, syntax highlighting, and citations.
+
+```tsx
+import { Markdown } from '@llamaindex/chat-ui/widgets'
+
+function RichText({ content }) {
+  return <Markdown>{content}</Markdown>
+}
+```
+
+**Features:**
+
+- **LaTeX Math** - Inline and block math rendering with KaTeX
+- **Code Highlighting** - Syntax highlighting with highlight.js
+- **Citations** - Clickable citation links
+- **Custom Renderers** - Extensible rendering pipeline
+
+**Example Content:**
+
+````markdown
+# Mathematical Formula
+
+The quadratic formula is: $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$
+
+## Code Example
+
+```python
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+```
+
+### CodeBlock
+
+Displays syntax-highlighted code with copy functionality.
+
+```tsx
+import { CodeBlock } from '@llamaindex/chat-ui/widgets'
+
+function CodeDisplay({ code, language, filename }) {
+  return (
+    <CodeBlock
+      code={code}
+      language={language}
+      filename={filename}
+      showLineNumbers={true}
+    />
+  )
+}
+```
+````
+
+**Props:**
+
+- `code` - Source code string
+- `language` - Programming language for highlighting
+- `filename` - Optional filename display
+- `showLineNumbers` - Show/hide line numbers
+
+### CodeEditor
+
+Interactive code editor with multiple language support.
+
+```tsx
+import { CodeEditor } from '@llamaindex/chat-ui/widgets'
+
+function InteractiveCode({ initialCode, language, onChange }) {
+  return (
+    <CodeEditor
+      value={initialCode}
+      language={language}
+      onChange={onChange}
+      theme="dark"
+      extensions={['search', 'fold']}
+    />
+  )
+}
+```
+
+**Supported Languages:**
+
+- JavaScript/TypeScript
+- Python
+- CSS/SCSS
+- HTML
+- JSON
+- Markdown
+
+**Features:**
+
+- **Syntax Highlighting** - Real-time highlighting
+- **Auto-completion** - Language-aware suggestions
+- **Code Folding** - Collapse code blocks
+- **Search & Replace** - Built-in search functionality
+- **Multiple Themes** - Light and dark themes
+
+### DocumentEditor
+
+Rich text document editor with markdown support. Please import editor styles from `@llamaindex/chat-ui/styles/editor.css` to ensure proper styling.
+
+```tsx
+import { DocumentEditor } from '@llamaindex/chat-ui/widgets'
+import '@llamaindex/chat-ui/styles/editor.css'
+
+function DocumentEdit({ content, onChange, title }) {
+  return (
+    <DocumentEditor
+      content={content}
+      onChange={onChange}
+      className="custom-css-class"
+    />
+  )
+}
+```
+
+**Note:** When using Next.js App Router, you need to dynamically import this component to avoid SSR issues:
+
+```tsx
+'use client'
+
+import dynamic from 'next/dynamic'
+import '@llamaindex/chat-ui/styles/editor.css'
+
+const DocumentEditor = dynamic(
+  () => import('@llamaindex/chat-ui/widgets').then(mod => mod.DocumentEditor),
+  { ssr: false }
+)
+
+export default function Home() {
+  return (
+    <DocumentEditor content={"# Hello World"} onChange={console.log} />
+  )
+}
+```
+
+**Features:**
+
+- **WYSIWYG Editing** - Visual editing with markdown output
+- **Formatting Tools** - Bold, italic, lists, headers
+- **Link Support** - Insert and edit links
+- **Image Support** - Embed images
+- **Live Preview** - Real-time markdown preview
+
+## Annotation Widgets
+
+Used for rendering additional rich content in a chat message. See [Annotations](./annotations.mdx) for more information on how to add annotations to a message.
+
+### ChatImage
+
+Displays images with preview and zoom functionality.
+
+```tsx
+import { ChatImage } from '@llamaindex/chat-ui/widgets'
+
+function ImageDisplay() {
+  return (
+    <ChatImage
+      data={{
+        url: 'https://example.com/image.jpg',
+        alt: 'Description of the image',
+      }}
+    />
+  )
+}
+```
+
+**Features:**
+
+- **Zoom & Pan** - Interactive image viewing
+- **Lazy Loading** - Performance optimization
+- **Alt Text** - Accessibility support
+- **Error Handling** - Graceful fallback for broken images
+
+### ChatFiles
+
+Displays file attachments with download and preview.
+
+```tsx
+import { ChatFiles } from '@llamaindex/chat-ui/widgets'
+
+function FileDisplay() {
+  return (
+    <ChatFiles
+      data={{
+        files: [
+          {
+            id: '1',
+            name: 'report.pdf',
+            type: 'application/pdf',
+            url: '/files/report.pdf',
+            size: 1024000,
+          },
+        ],
+      }}
+    />
+  )
+}
+```
+
+**Supported File Types:**
+
+- **PDF** - Inline viewer
+- **Images** - Thumbnail preview
+- **Text Files** - Content preview
+- **CSV** - Data table preview
+- **Word Documents** - Document preview
+
+### ChatSources
+
+Displays source citations with document grouping.
+
+```tsx
+import { ChatSources } from '@llamaindex/chat-ui/widgets'
+
+function SourceDisplay() {
+  return (
+    <ChatSources
+      data={{
+        nodes: [
+          {
+            id: '1',
+            url: '/documents/paper.pdf',
+            metadata: {
+              title: 'Research Paper',
+              page_number: 5,
+            },
+          },
+        ],
+      }}
+    />
+  )
+}
+```
+
+**Features:**
+
+- **Document Grouping** - Groups citations by document
+- **Page Numbers** - Shows specific page references
+- **Click to View** - Opens source documents
+- **Metadata Display** - Shows title, author, date
+
+### ChatEvents
+
+Displays collapsible process events and status updates.
+
+```tsx
+import { ChatEvents } from '@llamaindex/chat-ui/widgets'
+
+function EventDisplay() {
+  return (
+    <ChatEvents
+      data={[
+        {
+          type: 'function_call',
+          name: 'search_documents',
+          args: { query: 'machine learning' },
+          result: 'Found 15 relevant documents',
+        },
+      ]}
+      showLoading={false}
+    />
+  )
+}
+```
+
+### ChatAgentEvents
+
+Displays agent-specific events with progress tracking.
+
+```tsx
+import { ChatAgentEvents } from '@llamaindex/chat-ui/widgets'
+
+function AgentEventDisplay() {
+  return (
+    <ChatAgentEvents
+      data={{
+        agent_name: 'Research Assistant',
+        progress: 75,
+        current_step: 'Analyzing documents',
+        events: [
+          { step: 'Searching', status: 'completed' },
+          { step: 'Analyzing', status: 'in_progress' },
+          { step: 'Summarizing', status: 'pending' },
+        ],
+      }}
+      isFinished={true}
+      isLast={false}
+    />
+  )
+}
+```
+
+### SuggestedQuestions
+
+Interactive follow-up question suggestions.
+
+```tsx
+import { SuggestedQuestions } from '@llamaindex/chat-ui/widgets'
+
+function QuestionSuggestions({ append, requestData }) {
+  return (
+    <SuggestedQuestions
+      questions={[
+        'Can you explain this in more detail?',
+        'What are the practical applications?',
+        'How does this compare to other approaches?',
+      ]}
+      append={append}
+      requestData={requestData}
+    />
+  )
+}
+```
+
+### StarterQuestions
+
+Initial conversation starters for empty chat states.
+
+```tsx
+import { StarterQuestions } from '@llamaindex/chat-ui/widgets'
+
+const starterQuestions = [
+  'How can I improve my code?',
+  'Explain machine learning concepts',
+  'Help me debug this error',
+  'What are best practices for React?',
+]
+
+function ChatStarters() {
+  return (
+    <StarterQuestions
+      questions={starterQuestions}
+      onQuestionSelect={handleQuestionSelect}
+    />
+  )
+}
+```
+
+## Utility Widgets
+
+### FileUploader
+
+Drag-and-drop file upload with validation.
+
+```tsx
+import { FileUploader } from '@llamaindex/chat-ui/widgets'
+
+function UploadArea({ onFilesSelected }) {
+  return (
+    <FileUploader
+      accept={{
+        'image/*': ['.png', '.jpg', '.jpeg'],
+        'application/pdf': ['.pdf'],
+        'text/*': ['.txt', '.md'],
+      }}
+      maxSize={10 * 1024 * 1024} // 10MB
+      onFiles={onFilesSelected}
+      multiple={true}
+    >
+      <div className="border-2 border-dashed p-8 text-center">
+        <p>Drag files here or click to upload</p>
+      </div>
+    </FileUploader>
+  )
+}
+```
+
+**Features:**
+
+- **Drag & Drop** - Intuitive file selection
+- **File Validation** - Type and size checking
+- **Multiple Files** - Batch upload support
+- **Progress Tracking** - Upload progress display
+- **Error Handling** - Validation error messages
+
+### ImagePreview
+
+Image preview with zoom and manipulation.
+
+```tsx
+import { ImagePreview } from '@llamaindex/chat-ui/widgets'
+
+function PreviewImage({ src, alt }) {
+  return (
+    <ImagePreview
+      src={src}
+      alt={alt}
+      className="max-w-md"
+      enableZoom={true}
+      showControls={true}
+    />
+  )
+}
+```
+
+### DocumentInfo
+
+Document metadata display with formatting.
+
+```tsx
+import { DocumentInfo } from '@llamaindex/chat-ui/widgets'
+
+function DocInfo({ document }) {
+  return (
+    <DocumentInfo
+      title={document.title}
+      author={document.author}
+      date={document.date}
+      pages={document.pages}
+      size={document.size}
+    />
+  )
+}
+```
+
+### Citation
+
+Individual citation component with linking.
+
+```tsx
+import { Citation } from '@llamaindex/chat-ui/widgets'
+
+function CitationLink({ source, index }) {
+  return (
+    <Citation
+      number={index + 1}
+      title={source.title}
+      url={source.url}
+      metadata={source.metadata}
+      onClick={() => openSource(source)}
+    />
+  )
+}
+```
+
+## Widget Integration
+
+### Automatic Rendering
+
+Annotation widgets render based on message annotations through dedicated annotation components:
+
+```tsx
+import { ChatMessage } from '@llamaindex/chat-ui'
+
+function MessageWithWidgets({ message }) {
+  return (
+    <ChatMessage message={message}>
+      <ChatMessage.Content>
+        <ChatMessage.Content.Markdown />
+        <ChatMessage.Content.Image /> {/* Renders ChatImage */}
+        <ChatMessage.Content.Source /> {/* Renders ChatSources */}
+        <ChatMessage.Content.Event /> {/* Renders ChatEvents */}
+      </ChatMessage.Content>
+    </ChatMessage>
+  )
+}
+```
+
+The `ChatMessage.Content.*` components internally use the annotation pattern described in [Annotations](./annotations.mdx), extracting data with `getAnnotationData` and passing it to the respective widgets.
+
+### Manual Widget Usage
+
+Use widgets independently for custom layouts:
+
+```tsx
+import {
+  Markdown,
+  CodeBlock,
+  ChatImage,
+  SuggestedQuestions,
+} from '@llamaindex/chat-ui/widgets'
+
+function CustomMessageLayout({ message }) {
+  return (
+    <div className="space-y-4">
+      <Markdown>{message.content}</Markdown>
+
+      {message.code && <CodeBlock code={message.code} language="python" />}
+
+      {message.imageUrl && (
+        <ChatImage src={message.imageUrl} alt="Generated image" />
+      )}
+
+      <SuggestedQuestions questions={message.suggestions} />
+    </div>
+  )
+}
+```
+
+### Custom Widget Creation
+
+Create custom widgets by following this pattern:
+
+```tsx
+interface WeatherData {
+  location: string
+  temperature: number
+  condition: string
+  humidity: number
+  windSpeed: number
+}
+
+export function WeatherWidget({ data }: { data: WeatherData }) {
+  return (
+    <div className="rounded-lg bg-blue-50 p-4">
+      <h3 className="font-semibold">{data.location}</h3>
+      <p className="text-2xl">{data.temperature}°C</p>
+      <p className="text-sm text-gray-600">{data.condition}</p>
+    </div>
+  )
+}
+
+// Usage example
+function App() {
+  return (
+    <WeatherWidget
+      data={{
+        location: 'San Francisco',
+        temperature: 22,
+        condition: 'Partly cloudy',
+        humidity: 65,
+        windSpeed: 8,
+      }}
+    />
+  )
+}
+```
+
+## Next Steps
+
+- [Annotations](./annotations.mdx) - Learn how to create and send annotation data
+- [Artifacts](./artifacts.mdx) - Implement interactive code and document artifacts
+- [Hooks](./hooks.mdx) - Understand the widget hook system
+- [Customization](./customization.mdx) - Style and customize widget appearance

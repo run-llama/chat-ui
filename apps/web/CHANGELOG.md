@@ -1,5 +1,83 @@
 # web
 
+## 1.0.34
+
+### Patch Changes
+
+- Updated dependencies [a34688a]
+  - @llamaindex/chat-ui@0.5.3
+
+## 1.0.33
+
+### Patch Changes
+
+- Updated dependencies [f0ec280]
+  - @llamaindex/chat-ui@0.5.2
+
+## 1.0.32
+
+### Patch Changes
+
+- Updated dependencies [4c3834f]
+  - @llamaindex/chat-ui@0.5.1
+
+## 1.0.31
+
+### Patch Changes
+
+- Updated dependencies [bdae046]
+  - @llamaindex/chat-ui@0.5.0
+
+## 1.0.30
+
+### Patch Changes
+
+- Updated dependencies [effc6f5]
+- Updated dependencies [8e60c05]
+  - @llamaindex/chat-ui@0.4.9
+
+## 1.0.29
+
+### Patch Changes
+
+- 3481173: docs: update documentation
+
+## 1.0.28
+
+### Patch Changes
+
+- Updated dependencies [09d6ec6]
+  - @llamaindex/chat-ui@0.4.8
+
+## 1.0.27
+
+### Patch Changes
+
+- 180cc1f: Add language specific renderer to markdown (with mermaid example)
+- Updated dependencies [180cc1f]
+  - @llamaindex/chat-ui@0.4.7
+
+## 1.0.26
+
+### Patch Changes
+
+- Updated dependencies [ef66c13]
+  - @llamaindex/chat-ui@0.4.6
+
+## 1.0.25
+
+### Patch Changes
+
+- Updated dependencies [2332fa6]
+  - @llamaindex/chat-ui@0.4.5
+
+## 1.0.24
+
+### Patch Changes
+
+- Updated dependencies [623a855]
+  - @llamaindex/chat-ui@0.4.4
+
 ## 1.0.23
 
 ### Patch Changes

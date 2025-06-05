@@ -7,13 +7,13 @@ import { cn } from '../../lib/utils'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
+import { useChatCanvas } from './context'
 import {
   Artifact,
-  CodeArtifact,
   DocumentArtifact,
+  CodeArtifact,
   isEqualArtifact,
-} from '../annotation'
-import { useChatCanvas } from './context'
+} from './artifacts'
 
 interface ChatCanvasActionsProps {
   children?: React.ReactNode

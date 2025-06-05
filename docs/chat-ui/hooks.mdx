@@ -1,0 +1,404 @@
+---
+title: Hooks
+description: Understanding the hook system for accessing chat state and functionality
+---
+
+The hook system provides access to chat state (e.g. message content), context, and functionality throughout the component tree without the need to pass props. These hooks enable deep customization and integration with the chat interface.
+
+## Context Hooks
+
+### useChatUI
+
+The primary hook for accessing chat state and handlers to modify the chat state.
+
+```tsx
+import { useChatUI } from '@llamaindex/chat-ui'
+
+function CustomChatComponent() {
+  const {
+    messages,
+    input,
+    setInput,
+    isLoading,
+    error,
+    append,
+    reload,
+    stop,
+    setMessages,
+    requestData,
+    setRequestData,
+  } = useChatUI()
+
+  const handleSendMessage = async () => {
+    await append({
+      role: 'user',
+      content: input,
+    })
+  }
+
+  return (
+    <div>
+      <p>Messages: {messages.length}</p>
+      <p>Loading: {isLoading ? 'Yes' : 'No'}</p>
+      {error && <p>Error: {error.message}</p>}
+    </div>
+  )
+}
+```
+
+**Returned Properties:**
+
+- `messages` - Array of chat messages
+- `input` - Current input value
+- `setInput` - Function to update input
+- `isLoading` - Loading state boolean
+- `error` - Error object if any
+- `append` - Function to add message
+- `reload` - Function to reload last message
+- `stop` - Function to stop current generation
+- `setMessages` - Function to update message array
+- `requestData` - Additional request data
+- `setRequestData` - Function to update request data
+
+### useChatMessage
+
+Access the current message context within message components.
+
+```tsx
+import { useChatMessage } from '@llamaindex/chat-ui'
+
+function CustomMessageContent() {
+  const { message, isLast } = useChatMessage()
+
+  return (
+    <div>
+      <p>Role: {message.role}</p>
+      <p>Content: {message.content}</p>
+      <p>Is last message: {isLast ? 'Yes' : 'No'}</p>
+      {message.annotations && (
+        <p>Has annotations: {message.annotations.length}</p>
+      )}
+    </div>
+  )
+}
+```
+
+**Returned Properties:**
+
+- `message` - Current message object
+- `isLast` - Boolean indicating if this is the last message
+
+### useChatInput
+
+Access input form state and handlers.
+
+```tsx
+import { useChatInput } from '@llamaindex/chat-ui'
+
+function CustomInputField() {
+  const {
+    input,
+    setInput,
+    handleSubmit,
+    isLoading,
+    onFileUpload,
+    uploadedFiles,
+  } = useChatInput()
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <textarea
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        disabled={isLoading}
+        placeholder="Type your message..."
+      />
+      <p>Uploaded files: {uploadedFiles.length}</p>
+    </form>
+  )
+}
+```
+
+**Returned Properties:**
+
+- `input` - Current input value
+- `setInput` - Function to update input
+- `handleSubmit` - Form submit handler
+- `isLoading` - Loading state
+- `onFileUpload` - File upload handler
+- `uploadedFiles` - Array of uploaded files
+
+### useChatMessages
+
+Access messages list state and handlers.
+
+```tsx
+import { useChatMessages } from '@llamaindex/chat-ui'
+
+function CustomMessageList() {
+  const { messages, isLoading, reload, stop, isEmpty, scrollToBottom } =
+    useChatMessages()
+
+  return (
+    <div>
+      <div className="messages">
+        {messages.map((msg, i) => (
+          <div key={i}>{msg.content}</div>
+        ))}
+      </div>
+
+      {isEmpty && <p>No messages yet</p>}
+
+      <button onClick={reload} disabled={isLoading}>
+        Reload
+      </button>
+      <button onClick={stop}>Stop</button>
+      <button onClick={scrollToBottom}>Scroll to Bottom</button>
+    </div>
+  )
+}
+```
+
+**Returned Properties:**
+
+- `messages` - Array of messages
+- `isLoading` - Loading state
+- `reload` - Reload last message
+- `stop` - Stop generation
+- `isEmpty` - Boolean if no messages
+- `scrollToBottom` - Function to scroll to bottom
+
+### useChatCanvas
+
+Access artifact canvas state and handlers.
+
+```tsx
+import { useChatCanvas } from '@llamaindex/chat-ui'
+
+function CustomCanvasControls() {
+  const {
+    currentArtifact,
+    isVisible,
+    showCanvas,
+    hideCanvas,
+    updateArtifact,
+    artifacts,
+  } = useChatCanvas()
+
+  return (
+    <div>
+      <p>Canvas visible: {isVisible ? 'Yes' : 'No'}</p>
+      <p>Current artifact: {currentArtifact?.title || 'None'}</p>
+      <p>Total artifacts: {artifacts.length}</p>
+
+      <button onClick={showCanvas}>Show Canvas</button>
+      <button onClick={hideCanvas}>Hide Canvas</button>
+    </div>
+  )
+}
+```
+
+**Returned Properties:**
+
+- `currentArtifact` - Currently displayed artifact
+- `isVisible` - Canvas visibility state
+- `showCanvas` - Function to show canvas
+- `hideCanvas` - Function to hide canvas
+- `updateArtifact` - Function to update artifact
+- `artifacts` - Array of all artifacts
+
+## Utility Hooks
+
+### useFile
+
+Handle file uploads and processing.
+
+```tsx
+import { useFile } from '@llamaindex/chat-ui'
+
+function FileUploadComponent() {
+  const {
+    uploadFile,
+    uploadFiles,
+    isUploading,
+    uploadedFiles,
+    removeFile,
+    clearFiles,
+  } = useFile({
+    maxSize: 10 * 1024 * 1024, // 10MB
+    accept: ['image/*', 'application/pdf'],
+    multiple: true,
+  })
+
+  const handleFileSelect = async (files: FileList) => {
+    await uploadFiles(Array.from(files))
+  }
+
+  return (
+    <div>
+      <input
+        type="file"
+        multiple
+        onChange={e => handleFileSelect(e.target.files!)}
+      />
+
+      {isUploading && <p>Uploading...</p>}
+
+      <div>
+        {uploadedFiles.map((file, i) => (
+          <div key={i}>
+            <span>{file.name}</span>
+            <button onClick={() => removeFile(i)}>Remove</button>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={clearFiles}>Clear All</button>
+    </div>
+  )
+}
+```
+
+**Options:**
+
+- `maxSize` - Maximum file size in bytes
+- `accept` - Array of accepted MIME types
+- `multiple` - Allow multiple files
+- `onUpload` - Upload completion callback
+- `onError` - Error callback
+
+**Returned Properties:**
+
+- `uploadFile` - Upload single file
+- `uploadFiles` - Upload multiple files
+- `isUploading` - Upload state
+- `uploadedFiles` - Array of uploaded files
+- `removeFile` - Remove file by index
+- `clearFiles` - Clear all files
+
+### useCopyToClipboard
+
+Copy content to clipboard with feedback.
+
+```tsx
+import { useCopyToClipboard } from '@llamaindex/chat-ui'
+
+function CopyButton({ content }) {
+  const { copyToClipboard, isCopied } = useCopyToClipboard({
+    timeout: 2000, // Reset after 2 seconds
+  })
+
+  const handleCopy = () => {
+    copyToClipboard(content)
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={isCopied ? 'text-green-600' : 'text-gray-600'}
+    >
+      {isCopied ? 'Copied!' : 'Copy'}
+    </button>
+  )
+}
+```
+
+**Options:**
+
+- `timeout` - Time before resetting copied state
+
+**Returned Properties:**
+
+- `copyToClipboard` - Function to copy text
+- `isCopied` - Boolean indicating if recently copied
+
+## Hook Composition
+
+### Custom Chat Hook
+
+Create custom hooks by composing existing ones:
+
+```tsx
+import { useChatUI, useChatMessages } from '@llamaindex/chat-ui'
+
+function useCustomChat() {
+  const chatUI = useChatUI()
+  const messages = useChatMessages()
+
+  const sendMessageWithMetadata = async (content: string, metadata: any) => {
+    await chatUI.append(
+      {
+        role: 'user',
+        content,
+      },
+      { data: metadata }
+    )
+  }
+
+  const getLastAssistantMessage = () => {
+    return chatUI.messages.filter(m => m.role === 'assistant').pop()
+  }
+
+  return {
+    ...chatUI,
+    ...messages,
+    sendMessageWithMetadata,
+    getLastAssistantMessage,
+  }
+}
+```
+
+## Hook Context Boundaries
+
+### Context Availability
+
+Different hooks are available in different contexts:
+
+```tsx
+function App() {
+  return (
+    <ChatSection handler={handler}>
+      {/* useChatUI available here */}
+      <ChatMessages>
+        {/* useChatMessages available here */}
+        <ChatMessages.List>
+          {messages.map(message => (
+            <ChatMessage key={message.id} message={message}>
+              {/* useChatMessage available here */}
+              <CustomMessageContent />
+            </ChatMessage>
+          ))}
+        </ChatMessages.List>
+      </ChatMessages>
+
+      <ChatInput>
+        {/* useChatInput available here */}
+        <CustomInputField />
+      </ChatInput>
+    </ChatSection>
+  )
+}
+```
+
+### Error Boundaries
+
+Handle hook errors gracefully:
+
+```tsx
+function SafeHookUsage() {
+  try {
+    const { messages } = useChatUI()
+    return <MessageList messages={messages} />
+  } catch (error) {
+    console.error('Hook error:', error)
+    return <ErrorFallback />
+  }
+}
+```
+
+## Next Steps
+
+- [Annotations](./annotations.mdx) - Learn how hooks work with annotation data
+- [Customization](./customization.mdx) - Use hooks for custom styling and behavior
+- [Examples](./examples.mdx) - See complete examples using hooks
+- [Core Components](./core-components.mdx) - Understand component-hook relationships

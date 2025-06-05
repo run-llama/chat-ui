@@ -1,60 +1,51 @@
-import { useMemo } from 'react'
+import { ComponentType } from 'react'
 import {
   ChatAgentEvents,
   ChatEvents,
   ChatFiles,
   ChatImage,
   ChatSources,
-  SuggestedQuestions,
-} from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
-import {
-  AgentEventData,
-  DocumentFileData,
   EventData,
-  extractArtifactsFromMessage,
-  getChatUIAnnotation,
-  getSourceAnnotationData,
   ImageData,
-  MessageAnnotation,
-  MessageAnnotationType,
+  DocumentFileData,
+  AgentEventData,
   SuggestedQuestionsData,
-} from './annotation'
+  SuggestedQuestions,
+  SourceData,
+  SourceNode,
+} from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
+import { MessageAnnotationType } from './annotations/types.js'
+import { getAnnotationData } from './annotations/annotations.js'
 import { useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ArtifactCard } from './canvas/card.js'
+import { Message } from './chat.interface.js'
+import ChatCanvas from './canvas/index.js'
 
 export function EventAnnotations() {
   const { message, isLast, isLoading } = useChatMessage()
   const showLoading = (isLast && isLoading) ?? false
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  const eventData =
-    annotations && annotations.length > 0
-      ? getChatUIAnnotation<EventData>(
-          annotations,
-          MessageAnnotationType.EVENTS
-        )
-      : null
-  if (!eventData?.length) return null
+  const eventData = getAnnotationData<EventData>(
+    message,
+    MessageAnnotationType.EVENTS
+  )
+  if (eventData.length === 0) return null
   return <ChatEvents data={eventData} showLoading={showLoading} />
 }
 
 export function AgentEventAnnotations() {
-  const { message } = useChatMessage()
+  const { message, isLast } = useChatMessage()
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  const agentEventData =
-    annotations && annotations.length > 0
-      ? getChatUIAnnotation<AgentEventData>(
-          annotations,
-          MessageAnnotationType.AGENT_EVENTS
-        )
-      : null
-  if (!agentEventData?.length) return null
+  const agentEventData = getAnnotationData<AgentEventData>(
+    message,
+    MessageAnnotationType.AGENT_EVENTS
+  )
+  if (agentEventData.length === 0) return null
   return (
     <ChatAgentEvents
       data={agentEventData}
       isFinished={Boolean(message.content)}
+      isLast={isLast}
     />
   )
 }
@@ -62,73 +53,77 @@ export function AgentEventAnnotations() {
 export function ImageAnnotations() {
   const { message } = useChatMessage()
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  const imageData =
-    annotations && annotations.length > 0
-      ? getChatUIAnnotation<ImageData>(annotations, 'image')
-      : null
-  if (!imageData) return null
-  return imageData[0] ? <ChatImage data={imageData[0]} /> : null
+  const imageData = getAnnotationData<ImageData>(message, 'image')
+  if (imageData.length === 0) return null
+  return <ChatImage data={imageData[0]} />
 }
 
 export function DocumentFileAnnotations() {
   const { message } = useChatMessage()
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  const contentFileData =
-    annotations && annotations.length > 0
-      ? getChatUIAnnotation<DocumentFileData>(
-          annotations,
-          MessageAnnotationType.DOCUMENT_FILE
-        )
-      : null
-  if (!contentFileData) return null
-  return contentFileData[0] ? <ChatFiles data={contentFileData[0]} /> : null
+  const contentFileData = getAnnotationData<DocumentFileData>(
+    message,
+    MessageAnnotationType.DOCUMENT_FILE
+  )
+  if (contentFileData.length === 0) return null
+  return <ChatFiles data={contentFileData[0]} />
+}
+
+function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
+  // Filter source nodes has lower score
+  const processedNodes = nodes.map(node => {
+    // remove trailing slash for node url if exists
+    if (node.url) {
+      node.url = node.url.replace(/\/$/, '')
+    }
+    return node
+  })
+  return processedNodes
+}
+
+export function getSourceNodes(message: Message): SourceNode[] {
+  const data = getAnnotationData<SourceData>(
+    message,
+    MessageAnnotationType.SOURCES
+  )
+  return data
+    .map(item => ({
+      ...item,
+      nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
+    }))
+    .flatMap(item => item.nodes)
 }
 
 export function SourceAnnotations() {
   const { message } = useChatMessage()
 
-  const annotations = (message.annotations ?? []) as MessageAnnotation[]
-  const sourceData = getSourceAnnotationData(annotations)
-
-  if (!sourceData?.length) return null
-  const allNodes = sourceData.flatMap(item => item.nodes)
-  return <ChatSources data={{ nodes: allNodes }} />
+  const nodes = getSourceNodes(message)
+  if (nodes.length === 0) return null
+  return <ChatSources data={{ nodes }} />
 }
 
 export function SuggestedQuestionsAnnotations() {
-  const { append } = useChatUI()
+  const { append, requestData } = useChatUI()
   const { message, isLast } = useChatMessage()
   if (!isLast || !append) return null
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  const suggestedQuestionsData =
-    annotations && annotations.length > 0
-      ? getChatUIAnnotation<SuggestedQuestionsData>(
-          annotations,
-          MessageAnnotationType.SUGGESTED_QUESTIONS
-        )
-      : null
-  if (!suggestedQuestionsData?.[0]) return null
+  const suggestedQuestionsData = getAnnotationData<SuggestedQuestionsData>(
+    message,
+    MessageAnnotationType.SUGGESTED_QUESTIONS
+  )
+  if (suggestedQuestionsData.length === 0) return null
   return (
-    <SuggestedQuestions questions={suggestedQuestionsData[0]} append={append} />
+    <SuggestedQuestions
+      questions={suggestedQuestionsData[0]}
+      append={append}
+      requestData={requestData}
+    />
   )
 }
 
-export function ArtifactAnnotations() {
-  const { message } = useChatMessage()
-  const artifacts = useMemo(
-    () => extractArtifactsFromMessage(message),
-    [message]
-  )
-  if (!artifacts?.length) return null
-
-  return (
-    <div className="flex items-center gap-2">
-      {artifacts.map((artifact, index) => (
-        <ArtifactCard key={index} artifact={artifact} />
-      ))}
-    </div>
-  )
+export const defaultAnnotationRenderers: Record<
+  string,
+  ComponentType<{ data: any }>
+> = {
+  artifact: ChatCanvas.Artifact,
 }

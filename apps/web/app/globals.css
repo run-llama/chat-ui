@@ -43,12 +43,35 @@
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-shimmer: shimmer 2s linear infinite;
 
   --background-image-glow-conic:
     radial-gradient(at 21% 11%, rgba(186, 186, 233, 0.53) 0, transparent 50%),
     radial-gradient(at 85% 0, hsla(46, 57%, 78%, 0.52) 0, transparent 50%),
     radial-gradient(at 91% 36%, rgba(194, 213, 255, 0.68) 0, transparent 50%),
     radial-gradient(at 8% 40%, rgba(251, 218, 239, 0.46) 0, transparent 50%);
+
+  --background-mesh-gradient: conic-gradient(
+    from 230.29deg at 51.63% 52.16%,
+    #2400ff 0deg,
+    #b000ff 67.5deg,
+    #ff006e 198.75deg,
+    #ff7d10 251.25deg,
+    #ffaa44 301.88deg,
+    #2400ff 360deg
+  );
+
+  --glass-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+
+  --glass-border: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
 
   @keyframes accordion-down {
     from {
@@ -64,6 +87,14 @@
     }
     to {
       height: 0;
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
     }
   }
 }

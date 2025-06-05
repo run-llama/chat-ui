@@ -1,12 +1,15 @@
-import { SuggestedQuestionsData } from '../chat/annotation'
 import { ChatHandler } from '../chat/chat.interface'
+
+export type SuggestedQuestionsData = string[]
 
 export function SuggestedQuestions({
   questions,
   append,
+  requestData,
 }: {
   questions: SuggestedQuestionsData
   append: ChatHandler['append']
+  requestData?: any
 }) {
   const showQuestions = questions.length > 0
   return (
@@ -16,7 +19,7 @@ export function SuggestedQuestions({
           <a
             key={index}
             onClick={() => {
-              append({ role: 'user', content: question })
+              append({ role: 'user', content: question }, { data: requestData })
             }}
             className="cursor-pointer text-sm italic hover:underline"
           >

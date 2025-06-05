@@ -1,0 +1,435 @@
+---
+title: Annotations
+description: Working with rich content annotations for multimedia and interactive chat experiences
+---
+
+Annotations are the key to creating rich, interactive chat experiences beyond simple text. They allow you to embed images, files, sources, events, and custom content types directly into chat messages.
+
+## Annotation System Overview
+
+Annotations are structured data attached to messages that widgets can render as rich content. The system supports both built-in annotation types and custom annotations for domain-specific content.
+
+### Message Structure with Annotations
+
+```typescript
+interface Message {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  annotations?: JSONValue[]
+}
+```
+
+### Built-in Annotation Types
+
+The library provides several built-in annotation types:
+
+- **IMAGE** - Image data with URLs
+- **DOCUMENT_FILE** - File attachments and metadata
+- **SOURCES** - Citation and source references
+- **EVENTS** - Process events and function calls
+- **AGENT_EVENTS** - Agent-specific events with progress
+- **ARTIFACT** - Interactive code and document artifacts
+- **SUGGESTED_QUESTIONS** - Follow-up question suggestions
+
+## Using Annotations
+
+Annotations automatically render when using the `annotations` property on a message. Here's an example of how to render an image annotation:
+
+```tsx
+const handler = useChat({
+  initialMessages: [
+    {
+    role: 'assistant',
+    content: 'Here is an image',
+    annotations: [
+      {
+        type: 'image',
+        data: {
+          url: '/llama.png',
+        },
+      },
+    ],
+  }
+})
+
+return (
+  <ChatSection
+    handler={handler}
+    className="block h-full flex-row gap-4 p-0 md:flex md:p-5"
+  >
+    <ChatMessage message={message}>
+      <ChatMessage.Content>
+        <ChatMessage.Content.Markdown />
+        <ChatMessage.Content.Image />{' '}
+        {/* Automatically renders IMAGE annotations */}
+      </ChatMessage.Content>
+    </ChatMessage>
+  </ChatSection>
+)
+```
+
+In the example above, the `ChatMessage.Content.Image` component automatically renders the image annotation retrieved from the `annotations` property on the message which is retrieved by the `useChatMessage` hook.
+The annotation is then passed to the `ChatImage` component which renders the image.
+
+## File Annotations
+
+Display file attachments with download links and preview capabilities.
+
+### Document File Annotations
+
+```typescript
+const fileAnnotation = {
+  type: 'DOCUMENT_FILE',
+  data: {
+    files: [
+      {
+        id: 'doc1',
+        name: 'quarterly-report.pdf',
+        type: 'application/pdf',
+        url: '/files/quarterly-report.pdf',
+        size: 2048576, // 2MB in bytes
+        metadata: {
+          title: 'Q4 2024 Quarterly Report',
+          author: 'Finance Team',
+          pages: 25,
+        },
+      },
+      {
+        id: 'doc2',
+        name: 'data-analysis.csv',
+        type: 'text/csv',
+        url: '/files/data-analysis.csv',
+        size: 1024000,
+        metadata: {
+          rows: 5000,
+          columns: 12,
+        },
+      },
+    ],
+  },
+}
+```
+
+## Source Annotations
+
+Display citations and source references with document grouping.
+
+### Creating Source Annotations
+
+```typescript
+const sourceAnnotation = {
+  type: 'sources',
+  data: {
+    nodes: [
+      {
+        id: 'source1',
+        url: '/documents/research-paper.pdf',
+        metadata: {
+          title: 'Machine Learning in Healthcare',
+          author: 'Dr. Jane Smith',
+          page_number: 15,
+          section: 'Methodology',
+          published_date: '2024-01-15',
+        },
+      },
+      {
+        id: 'source2',
+        url: '/documents/clinical-study.pdf',
+        metadata: {
+          title: 'Clinical Trial Results',
+          author: 'Medical Research Institute',
+          page_number: 8,
+          figure: 'Figure 3.2',
+        },
+      },
+    ],
+  },
+}
+```
+
+### Citation in Content
+
+Reference sources directly in your content using citation syntax:
+
+```typescript
+const content = `
+Based on recent research [^1], machine learning shows promising results 
+in medical diagnosis. The clinical trial data [^2] supports these findings 
+with a 95% accuracy rate.
+
+[^1]: Machine Learning in Healthcare, p. 15
+[^2]: Clinical Trial Results, Figure 3.2
+`
+
+return {
+  role: 'assistant',
+  content,
+  annotations: [sourceAnnotation],
+}
+```
+
+## Event Annotations
+
+Display process events, function calls, and system activities.
+
+### Basic Events
+
+```typescript
+const eventAnnotation = {
+  type: 'events',
+  data: [
+    {
+      type: 'function_call',
+      name: 'search_database',
+      args: {
+        query: 'machine learning papers',
+        limit: 10,
+      },
+      result: 'Found 8 relevant papers',
+      timestamp: '2024-01-15T10:30:00Z',
+    },
+    {
+      type: 'tool_use',
+      name: 'calculate_statistics',
+      args: {
+        dataset: 'user_engagement',
+      },
+      result: {
+        mean: 4.2,
+        median: 4.1,
+        std_dev: 0.8,
+      },
+    },
+  ],
+}
+```
+
+### Agent Events with Progress
+
+```typescript
+const agentEventAnnotation = {
+  type: 'agent_events',
+  data: {
+    agent_name: 'Research Assistant',
+    total_steps: 4,
+    current_step: 2,
+    progress: 50,
+    events: [
+      {
+        step: 1,
+        name: 'Search Documents',
+        status: 'completed',
+        result: 'Found 15 relevant documents',
+      },
+      {
+        step: 2,
+        name: 'Analyze Content',
+        status: 'in_progress',
+        progress: 75,
+      },
+      {
+        step: 3,
+        name: 'Generate Summary',
+        status: 'pending',
+      },
+      {
+        step: 4,
+        name: 'Create Recommendations',
+        status: 'pending',
+      },
+    ],
+  },
+}
+```
+
+## Artifact Annotations
+
+Create interactive code and document artifacts that users can edit.
+
+### Code Artifacts
+
+```typescript
+const codeArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'code',
+    data: {
+      title: 'Data Analysis Script',
+      file_name: 'analyze_data.py',
+      language: 'python',
+      code: `
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def analyze_sales_data(file_path):
+    # Load data
+    df = pd.read_csv(file_path)
+    
+    # Calculate monthly totals
+    monthly_sales = df.groupby('month')['sales'].sum()
+    
+    # Create visualization
+    plt.figure(figsize=(10, 6))
+    monthly_sales.plot(kind='bar')
+    plt.title('Monthly Sales Analysis')
+    plt.ylabel('Sales ($)')
+    plt.show()
+    
+    return monthly_sales
+
+# Usage
+sales_data = analyze_sales_data('sales.csv')
+print(sales_data)
+      `,
+    },
+  },
+}
+```
+
+### Document Artifacts
+
+```typescript
+const documentArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'document',
+    data: {
+      title: 'Project Proposal',
+      content: `
+# AI-Powered Analytics Platform
+
+## Executive Summary
+
+This proposal outlines the development of an AI-powered analytics platform 
+designed to help businesses make data-driven decisions.
+
+## Key Features
+
+- **Real-time Data Processing**: Stream analytics with sub-second latency
+- **Machine Learning Models**: Automated insight generation
+- **Interactive Dashboards**: Self-service analytics for business users
+
+## Implementation Timeline
+
+### Phase 1 (Months 1-3)
+- Core platform development
+- Basic ML model integration
+
+### Phase 2 (Months 4-6)  
+- Advanced analytics features
+- Dashboard creation tools
+
+## Budget Estimate
+
+Total project cost: $250,000
+      `,
+    },
+  },
+}
+```
+
+## Suggested Questions
+
+Provide interactive follow-up questions to guide the conversation.
+
+```typescript
+const suggestedQuestionsAnnotation = {
+  type: 'suggested_questions',
+  data: {
+    questions: [
+      'Can you explain the methodology in more detail?',
+      'What are the potential limitations of this approach?',
+      'How does this compare to traditional methods?',
+      'What would be the next steps for implementation?',
+    ],
+  },
+}
+```
+
+## Custom Annotations
+
+Create domain-specific annotations for specialized content.
+
+### Weather Widget Example
+
+```typescript
+// Define custom annotation type
+interface WeatherAnnotation {
+  type: 'weather'
+  data: {
+    location: string
+    temperature: number
+    condition: string
+    humidity: number
+    windSpeed: number
+    forecast?: Array<{
+      day: string
+      high: number
+      low: number
+      condition: string
+    }>
+  }
+}
+
+// Create annotation
+const weatherAnnotation: WeatherAnnotation = {
+  type: 'weather',
+  data: {
+    location: 'San Francisco, CA',
+    temperature: 22,
+    condition: 'sunny',
+    humidity: 65,
+    windSpeed: 12,
+    forecast: [
+      { day: 'Tomorrow', high: 24, low: 18, condition: 'cloudy' },
+      { day: 'Wednesday', high: 26, low: 20, condition: 'sunny' },
+    ],
+  },
+}
+```
+
+### Custom Widget Implementation
+
+```tsx
+import { useChatMessage, getAnnotationData } from '@llamaindex/chat-ui'
+
+interface WeatherData {
+  location: string
+  temperature: number
+  condition: string
+  humidity: number
+  windSpeed: number
+}
+
+function WeatherWidget() {
+  const { message } = useChatMessage()
+
+  const weatherData = getAnnotationData<WeatherData>(message, 'weather')
+
+  if (!weatherData?.[0]) return null
+
+  const data = weatherData[0]
+  // Render weather data...
+}
+```
+
+## Annotation Utilities
+
+### getAnnotationData
+
+Extract annotation data by type from messages:
+
+```tsx
+import { getAnnotationData } from '@llamaindex/chat-ui'
+
+// Usage
+return getAnnotationData<WeatherData>(message, 'weather')
+```
+
+## Next Steps
+
+- [Artifacts](./artifacts.mdx) - Learn about interactive code and document artifacts
+- [Widgets](./widgets.mdx) - Explore widget implementation details
+- [Examples](./examples.mdx) - See complete annotation examples
+- [Customization](./customization.mdx) - Style and customize annotation appearance
