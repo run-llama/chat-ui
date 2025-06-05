@@ -7,7 +7,7 @@ export { default as ChatCanvas } from './chat/canvas'
 export { default as ChatInput } from './chat/chat-input'
 export { default as ChatMessages } from './chat/chat-messages'
 export { default as ChatMessage, ContentPosition } from './chat/chat-message'
-export { defaultAnnotationRenderers } from './chat/chat-annotations'
+export { defaultAnnotationRenderers } from './chat/chat-renderers'
 
 // Context Provider Hooks
 export { useChatUI } from './chat/chat.context'

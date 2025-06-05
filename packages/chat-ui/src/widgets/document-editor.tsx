@@ -10,6 +10,8 @@ import {
   markdownShortcutPlugin,
   tablePlugin,
   toolbarPlugin,
+  thematicBreakPlugin,
+  quotePlugin,
 } from '@mdxeditor/editor'
 
 export function DocumentEditor({
@@ -30,6 +32,8 @@ export function DocumentEditor({
     linkDialogPlugin(),
     tablePlugin(),
     markdownShortcutPlugin(),
+    thematicBreakPlugin(),
+    quotePlugin(),
   ]
 
   if (showToolbar) {
@@ -53,6 +57,12 @@ export function DocumentEditor({
       markdown={content}
       plugins={plugins}
       contentEditableClassName="custom-markdown"
+      onError={error => {
+        console.warn(
+          '[Chat-UI] Error while parsing markdown in DocumentEditor',
+          error
+        )
+      }}
     />
   )
 }
