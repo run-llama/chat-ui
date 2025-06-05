@@ -10,7 +10,6 @@ import {
 } from '../widgets/index.js'
 import {
   AgentEventAnnotations,
-  defaultAnnotationRenderers,
   DocumentFileAnnotations,
   EventAnnotations,
   ImageAnnotations,
@@ -21,6 +20,7 @@ import {
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
 import { ChatHandler, Message } from './chat.interface'
+import { defaultAnnotationRenderers } from './chat-renderers.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message

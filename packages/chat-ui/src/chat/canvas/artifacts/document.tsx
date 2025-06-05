@@ -2,16 +2,33 @@
 
 import { FileText } from 'lucide-react'
 import { cn } from '../../../lib/utils'
-import { DocumentEditor } from '../../../widgets'
+import { DocumentEditor, SourceNode } from '../../../widgets'
 import { DocumentArtifact } from '../artifacts'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
 import { useState } from 'react'
 import { Button } from '../../../ui/button'
+import { useChatUI } from '../../chat.context'
+import { getSourceNodes } from '../../chat-annotations'
 
 interface DocumentArtifactViewerProps {
   className?: string
   children?: React.ReactNode
+}
+
+// Convert citation with node_id to a link with source number as text and hash + sourceId as link
+// [citation:node_id](javascript:void(0)) -> [1](#node_id)
+function processDocument(content: string, nodes: SourceNode[]) {
+  if (nodes.length === 0) return content
+
+  const citationRegex =
+    /\[citation:([a-fA-F0-9\\-]+)\]\(javascript:void\(0\)\)/g
+
+  return content.replace(citationRegex, (match, citationId) => {
+    const nodeIndex = nodes.findIndex(node => node.id === citationId)
+    if (nodeIndex !== -1) return ` [${nodeIndex + 1}](#${citationId}) `
+    return match // return original citation if not found
+  })
 }
 
 export function DocumentArtifactViewer({
@@ -19,6 +36,8 @@ export function DocumentArtifactViewer({
   children,
 }: DocumentArtifactViewerProps) {
   const { displayedArtifact, updateArtifact } = useChatCanvas()
+  const { messages } = useChatUI()
+
   const [updatedContent, setUpdatedContent] = useState<string | undefined>()
 
   if (displayedArtifact?.type !== 'document') return null
@@ -27,6 +46,10 @@ export function DocumentArtifactViewer({
   const {
     data: { content, title, type },
   } = documentArtifact
+
+  const nodes = messages.flatMap(message => getSourceNodes(message))
+  // const nodes = []
+  const transformedContent = processDocument(content, nodes)
 
   const handleDocumentChange = (markdown: string) => {
     setUpdatedContent(markdown)
@@ -73,7 +96,7 @@ export function DocumentArtifactViewer({
         {children ?? (
           <DocumentEditor
             key={documentArtifact.created_at}
-            content={content}
+            content={transformedContent}
             onChange={handleDocumentChange}
             className="h-full overflow-y-auto"
           />
