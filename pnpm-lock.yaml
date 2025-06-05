@@ -35,6 +35,9 @@ importers:
       '@llamaindex/chat-ui':
         specifier: workspace:*
         version: link:../../packages/chat-ui
+      '@llamaindex/openai':
+        specifier: ^0.4.3
+        version: 0.4.3(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30)(zod@3.25.42)
       '@radix-ui/react-slot':
         specifier: ^1.0.2
         version: 1.2.2(@types/react@18.3.21)(react@18.3.1)
@@ -57,8 +60,8 @@ importers:
         specifier: ^11.10.0
         version: 11.11.1
       llamaindex:
-        specifier: 0.9.3
-        version: 0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.42)
+        specifier: 0.11.6
+        version: 0.11.6(@llama-flow/core@0.4.3)(next@15.1.7)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.42)
       lucide-react:
         specifier: ^0.453.0
         version: 0.453.0(react@18.3.1)
@@ -484,6 +487,31 @@ packages:
 
   /@antfu/utils@8.1.1:
     resolution: {integrity: sha512-Mex9nXf9vR6AhcXmMrlz/HVgYYZpVGJ6YlPgwl7UnaFpnshXs6EK/oa5Gpf3CzENMjkvEx2tQtntGnb7UtSTOQ==}
+    dev: false
+
+  /@aws-crypto/sha256-js@5.2.0:
+    resolution: {integrity: sha512-FFQQyu7edu4ufvIZ+OadFpHHOt+eSTBaYaki44c+akjg7qZg9oOQeLlk77F6tSYqjDAFClrHJk9tMf0HdVyOvA==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@aws-crypto/util': 5.2.0
+      '@aws-sdk/types': 3.821.0
+      tslib: 2.8.1
+    dev: false
+
+  /@aws-crypto/util@5.2.0:
+    resolution: {integrity: sha512-4RkU9EsI6ZpBve5fseQlGNUWKMa1RLPQ1dnjnQoe07ldfIzcsGb5hC5W0Dm7u423KWzawlrpbjXBrXCEv9zazQ==}
+    dependencies:
+      '@aws-sdk/types': 3.821.0
+      '@smithy/util-utf8': 2.3.0
+      tslib: 2.8.1
+    dev: false
+
+  /@aws-sdk/types@3.821.0:
+    resolution: {integrity: sha512-Znroqdai1a90TlxGaJ+FK1lwC0fHpo97Xjsp5UKGR5JODYm7f9+/fF17ebO1KdoBr/Rm0UIFiF5VmI8ts9F1eA==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      '@smithy/types': 4.3.1
+      tslib: 2.8.1
     dev: false
 
   /@babel/code-frame@7.27.1:
@@ -2109,86 +2137,102 @@ packages:
       '@lezer/lr': 1.4.2
     dev: false
 
-  /@llamaindex/cloud@3.0.3(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28):
-    resolution: {integrity: sha512-DVTIMiurAUe2WKvkQ8oEZacPpzgxF8L45LzxdjZCZmUYes19dQYQsFkkU/Qfxmt7Bbbui77HNDFRvLxVj4SdVg==}
+  /@llama-flow/core@0.4.3(next@15.1.7)(zod@3.25.42):
+    resolution: {integrity: sha512-fxvuCO0Jpa/WZ/NFk2HCpKwjE4bwpHAIFyW/MC0L+gKGKj8DMYjJla6WVhADU35EUnxdpf9ZYJoN32yPrJUMMQ==}
     peerDependencies:
-      '@llamaindex/core': 0.5.2
-      '@llamaindex/env': 0.1.28
+      '@modelcontextprotocol/sdk': ^1.7.0
+      hono: ^4.7.4
+      next: ^15.2.2
+      p-retry: ^6.2.1
+      rxjs: ^7.8.2
+      zod: ^3.24.2
+    peerDependenciesMeta:
+      '@modelcontextprotocol/sdk':
+        optional: true
+      hono:
+        optional: true
+      next:
+        optional: true
+      p-retry:
+        optional: true
+      rxjs:
+        optional: true
+      zod:
+        optional: true
     dependencies:
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
+      next: 15.1.7(react-dom@18.3.1)(react@18.3.1)
+      zod: 3.25.42
     dev: false
 
-  /@llamaindex/core@0.5.2(gpt-tokenizer@2.9.0):
-    resolution: {integrity: sha512-YCkRNJHc8xHgaDj9qP8sLcughhBumh/qrmwJfY03fuBrCszrVP9tRt3migRvswzb17JqqR9ASsg8biBKwM3E9g==}
+  /@llamaindex/cloud@4.0.13(@llama-flow/core@0.4.3)(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30):
+    resolution: {integrity: sha512-7s/LnBfJaFG/+5zZLJ+7gWJw/p0Afdz21cA5eLXIDDiJXga33ccswoQPvVODO9OvNYPdRtFGuahSnBMatUrxzg==}
+    peerDependencies:
+      '@llama-flow/core': ^0.4.1
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
     dependencies:
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
+      '@llama-flow/core': 0.4.3(next@15.1.7)(zod@3.25.42)
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
+      p-retry: 6.2.1
+      zod: 3.25.42
+    dev: false
+
+  /@llamaindex/core@0.6.9:
+    resolution: {integrity: sha512-w8SMrcj35/mtB9z7n0hnq9idxgmtHBU8ZNFzde/94mysRnqgWjc2io+qIVOrCrWIokLVVcTulYD7EeiewPtC5g==}
+    dependencies:
+      '@llamaindex/env': 0.1.30
       '@types/node': 22.15.23
       magic-bytes.js: 1.12.1
       zod: 3.25.42
       zod-to-json-schema: 3.24.5(zod@3.25.42)
     transitivePeerDependencies:
-      - '@aws-crypto/sha256-js'
       - '@huggingface/transformers'
       - gpt-tokenizer
-      - js-tiktoken
-      - pathe
-      - tiktoken
     dev: false
 
-  /@llamaindex/env@0.1.28(gpt-tokenizer@2.9.0):
-    resolution: {integrity: sha512-ktAS9I2bJprUilBKpNLLGc2uHGyhFTVWaslSCord0PH4pTTs6OenJdtvG+ZaVkJZg6CLUZDF2e7Hcjwn/NzU+A==}
+  /@llamaindex/env@0.1.30:
+    resolution: {integrity: sha512-y6kutMcCevzbmexUgz+HXf7KiZemzAoFEYSjAILfR+cG6FmYSF8XvLbGOB34Kx8mlRi7EI8rZXpezJ5qCqOyZg==}
     peerDependencies:
-      '@aws-crypto/sha256-js': ^5.2.0
-      '@huggingface/transformers': ^3.0.2
+      '@huggingface/transformers': ^3.5.0
       gpt-tokenizer: ^2.5.0
-      js-tiktoken: ^1.0.12
-      pathe: ^1.1.2
-      tiktoken: '*'
     peerDependenciesMeta:
-      '@aws-crypto/sha256-js':
-        optional: true
       '@huggingface/transformers':
         optional: true
-      js-tiktoken:
-        optional: true
-      pathe:
-        optional: true
-      tiktoken:
+      gpt-tokenizer:
         optional: true
     dependencies:
-      gpt-tokenizer: 2.9.0
+      '@aws-crypto/sha256-js': 5.2.0
+      js-tiktoken: 1.0.20
+      pathe: 1.1.2
     dev: false
 
-  /@llamaindex/node-parser@1.0.2(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7):
-    resolution: {integrity: sha512-iOT4IK84NH1Gla+w5ZC3Q9cT8RsjWVEQ+ravFL0oMsaEAnJV3BUXthYKeM9NgRDfj8EqRVIMmSffPtD/jFQahA==}
+  /@llamaindex/node-parser@2.0.9(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7):
+    resolution: {integrity: sha512-MvUiOrZ15VoA+N1jcSY0SjZ92iEAUVfCb3AusmPCzTAYbO91lifa6Oll1KVrQl89SS3GV1yPm1WI/Fe3ViV9Yg==}
     peerDependencies:
-      '@llamaindex/core': 0.5.2
-      '@llamaindex/env': 0.1.28
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
       tree-sitter: ^0.22.0
       web-tree-sitter: ^0.24.3
     dependencies:
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
       html-to-text: 9.0.5
       tree-sitter: 0.22.4
       web-tree-sitter: 0.24.7
     dev: false
 
-  /@llamaindex/openai@0.1.54(gpt-tokenizer@2.9.0)(zod@3.25.42):
-    resolution: {integrity: sha512-C1r5PleKcIihiDQ9mCCVVBwmub/hT4o8Yi97U9KNR2u0oSOVXfuYWuxx9ViYiiYG4GnnwO5DqmEGzlC32TR5oA==}
+  /@llamaindex/openai@0.4.3(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30)(zod@3.25.42):
+    resolution: {integrity: sha512-2RNwf2u4fu0OFYmSCUk2nVijJlTHFvJP50KS/SnSaas7xsK9brfemS51aX4Mc7TavbXoaDKldLzVY3mkpXXgxg==}
+    peerDependencies:
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
     dependencies:
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
-      openai: 4.98.0(zod@3.25.42)
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
+      openai: 4.104.0(zod@3.25.42)
     transitivePeerDependencies:
-      - '@aws-crypto/sha256-js'
-      - '@huggingface/transformers'
       - encoding
-      - gpt-tokenizer
-      - js-tiktoken
-      - pathe
-      - tiktoken
       - ws
       - zod
     dev: false
@@ -2214,6 +2258,25 @@ packages:
       react-intersection-observer: 9.5.1(react@18.3.1)
       react-pdf: 9.2.1(@types/react@18.3.21)(react-dom@18.3.1)(react@18.3.1)
       react-window: 1.8.9(react-dom@18.3.1)(react@18.3.1)
+    dev: false
+
+  /@llamaindex/workflow@1.1.7(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30)(next@15.1.7)(zod@3.25.42):
+    resolution: {integrity: sha512-OcCcaYyqOb0iuPTd+KZtldaUc2mspb3KUrHIgAaH/Jshgm1bIx40fLuskNt/XIi2pf3Lvi0YPgti47ieqzAn6A==}
+    peerDependencies:
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
+      zod: ^3.23.8
+    dependencies:
+      '@llama-flow/core': 0.4.3(next@15.1.7)(zod@3.25.42)
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
+      zod: 3.25.42
+    transitivePeerDependencies:
+      - '@modelcontextprotocol/sdk'
+      - hono
+      - next
+      - p-retry
+      - rxjs
     dev: false
 
   /@manypkg/find-root@1.1.0:
@@ -3825,6 +3888,36 @@ packages:
       selderee: 0.11.0
     dev: false
 
+  /@smithy/is-array-buffer@2.2.0:
+    resolution: {integrity: sha512-GGP3O9QFD24uGeAXYUjwSTXARoqpZykHadOmA8G5vfJPK0/DC67qa//0qvqrJzL1xc8WQWX7/yc7fwudjPHPhA==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
+
+  /@smithy/types@4.3.1:
+    resolution: {integrity: sha512-UqKOQBL2x6+HWl3P+3QqFD4ncKq0I8Nuz9QItGv5WuKuMHuuwlhvqcZCoXGfc+P1QmfJE7VieykoYYmrOoFJxA==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
+
+  /@smithy/util-buffer-from@2.2.0:
+    resolution: {integrity: sha512-IJdWBbTcMQ6DA0gdNhh/BwrLkDR+ADW5Kr1aZmd4k3DIF6ezMV4R2NIAmT08wQJ3yUK82thHWmC/TnK/wpMMIA==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@smithy/is-array-buffer': 2.2.0
+      tslib: 2.8.1
+    dev: false
+
+  /@smithy/util-utf8@2.3.0:
+    resolution: {integrity: sha512-R8Rdn8Hy72KKcebgLiv8jQcQkXoLMOGGv5uI1/k0l+snqkOzQ1R0ChUBCxWMlBsFMekWjq0wRudIweFs7sKT5A==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@smithy/util-buffer-from': 2.2.0
+      tslib: 2.8.1
+    dev: false
+
   /@stitches/core@1.2.8:
     resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}
     dev: false
@@ -4359,8 +4452,8 @@ packages:
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
     dev: true
 
-  /@types/node@18.19.100:
-    resolution: {integrity: sha512-ojmMP8SZBKprc3qGrGk8Ujpo80AXkrP7G2tOT4VWr5jlr5DHjsJF+emXJz+Wm0glmy4Js62oKMdZZ6B9Y+tEcA==}
+  /@types/node@18.19.110:
+    resolution: {integrity: sha512-WW2o4gTmREtSnqKty9nhqF/vA0GKd0V/rbC0OyjSk9Bz6bzlsXKT+i7WDdS/a0z74rfT2PO4dArVCSnapNLA5Q==}
     dependencies:
       undici-types: 5.26.5
     dev: false
@@ -4369,12 +4462,6 @@ packages:
     resolution: {integrity: sha512-0PQHLhZPWOxGW4auogW0eOQAuNIlCYvibIpG67ja0TOJ6/sehu+1en7sfceUn+QQtx4Rk3GxbLNwPh0Cav7TWw==}
     dependencies:
       undici-types: 6.19.8
-
-  /@types/node@22.15.17:
-    resolution: {integrity: sha512-wIX2aSZL5FE+MR0JlvF87BNVrtFWf6AE6rxSE9X7OwnVvoyCQjpzSRJ+M87se/4QCkCiebQAqrJ0y6fwIyi7nw==}
-    dependencies:
-      undici-types: 6.21.0
-    dev: false
 
   /@types/node@22.15.23:
     resolution: {integrity: sha512-7Ec1zaFPF4RJ0eXu1YT/xgiebqwqoJz8rYPDi/O2BcZ++Wpt0Kq9cl0eg6NN6bYbPnR67ZLo7St5Q3UK0SnARw==}
@@ -4405,6 +4492,10 @@ packages:
   /@types/resolve@1.20.2:
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
     dev: true
+
+  /@types/retry@0.12.2:
+    resolution: {integrity: sha512-XISRgDJ2Tc5q4TRqvgJtzsRkFYNJzZrhTdtMoGVBttwzzQJkPnS3WWTFc7kuDRoPtPakl+T+OfdEUjYJj7Jbow==}
+    dev: false
 
   /@types/semver@7.7.0:
     resolution: {integrity: sha512-k107IF4+Xr7UHjwDc7Cfd6PRQfbdkiRabXGRjo07b4WyPahFBZCZ1sE+BNxYIJPPg73UkfOsVOLwqVc/6ETrIA==}
@@ -7264,10 +7355,6 @@ packages:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
 
-  /gpt-tokenizer@2.9.0:
-    resolution: {integrity: sha512-YSpexBL/k4bfliAzMrRqn3M6+it02LutVyhVpDeMKrC/O9+pCe/5s8U2hYKa2vFLD5/vHhsKc8sOn/qGqII8Kg==}
-    dev: false
-
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
     dev: true
@@ -7705,6 +7792,11 @@ packages:
     resolution: {integrity: sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==}
     dev: true
 
+  /is-network-error@1.1.0:
+    resolution: {integrity: sha512-tUdRRAnhT+OtCZR/LxZelH/C7QtjtFrTu5tXCA8pl55eTUElUHT+GPYV8MBMBvea/j+NxQqVt3LbWMRir7Gx9g==}
+    engines: {node: '>=16'}
+    dev: false
+
   /is-number-object@1.1.1:
     resolution: {integrity: sha512-lZhclumE1G6VYD8VHe35wFaIif+CTy5SJIi5+3y4psDgWu4wPDoBhF8NxUOinEc7pHgiTsT6MaBb92rKhhD+Xw==}
     engines: {node: '>= 0.4'}
@@ -7862,6 +7954,12 @@ packages:
   /jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
     dev: true
+
+  /js-tiktoken@1.0.20:
+    resolution: {integrity: sha512-Xlaqhhs8VfCd6Sh7a1cFkZHQbYTLCwVJJWiHVxBYzLPxW0XsoxBy1hitmjkdIjD3Aon5BXLHFwU5O8WUx6HH+A==}
+    dependencies:
+      base64-js: 1.5.1
+    dev: false
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -8190,31 +8288,31 @@ packages:
       wrap-ansi: 9.0.0
     dev: true
 
-  /llamaindex@0.9.3(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.42):
-    resolution: {integrity: sha512-NgMD2eddBxwvrhGsHsma7XxfEda015u4IMzWzUCq94ZnlVfXaRNMe/hWUOkief+huvUV3EkTTSWpSrXhZyiriQ==}
+  /llamaindex@0.11.6(@llama-flow/core@0.4.3)(next@15.1.7)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)(zod@3.25.42):
+    resolution: {integrity: sha512-PQG3Ws+3mgLKGrciGLai2iRfYURd7tVvHtU6GBvVaZ3mZ1i3vwRKT42FuBME2l/i7b8HLz+4QHWA92qQoYc1eA==}
     engines: {node: '>=18.0.0'}
     dependencies:
-      '@llamaindex/cloud': 3.0.3(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28)
-      '@llamaindex/core': 0.5.2(gpt-tokenizer@2.9.0)
-      '@llamaindex/env': 0.1.28(gpt-tokenizer@2.9.0)
-      '@llamaindex/node-parser': 1.0.2(@llamaindex/core@0.5.2)(@llamaindex/env@0.1.28)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
-      '@llamaindex/openai': 0.1.54(gpt-tokenizer@2.9.0)(zod@3.25.42)
+      '@llamaindex/cloud': 4.0.13(@llama-flow/core@0.4.3)(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30)
+      '@llamaindex/core': 0.6.9
+      '@llamaindex/env': 0.1.30
+      '@llamaindex/node-parser': 2.0.9(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
+      '@llamaindex/workflow': 1.1.7(@llamaindex/core@0.6.9)(@llamaindex/env@0.1.30)(next@15.1.7)(zod@3.25.42)
       '@types/lodash': 4.17.16
-      '@types/node': 22.15.17
+      '@types/node': 22.15.23
       ajv: 8.17.1
-      gpt-tokenizer: 2.9.0
       lodash: 4.17.21
       magic-bytes.js: 1.12.1
     transitivePeerDependencies:
-      - '@aws-crypto/sha256-js'
       - '@huggingface/transformers'
-      - encoding
-      - js-tiktoken
-      - pathe
-      - tiktoken
+      - '@llama-flow/core'
+      - '@modelcontextprotocol/sdk'
+      - gpt-tokenizer
+      - hono
+      - next
+      - p-retry
+      - rxjs
       - tree-sitter
       - web-tree-sitter
-      - ws
       - zod
     dev: false
 
@@ -9629,8 +9727,8 @@ packages:
       mimic-function: 5.0.1
     dev: true
 
-  /openai@4.98.0(zod@3.25.42):
-    resolution: {integrity: sha512-TmDKur1WjxxMPQAtLG5sgBSCJmX7ynTsGmewKzoDwl1fRxtbLOsiR0FA/AOAAtYUmP6azal+MYQuOENfdU+7yg==}
+  /openai@4.104.0(zod@3.25.42):
+    resolution: {integrity: sha512-p99EFNsA/yX6UhVO93f5kJsDRLAg+CTA2RBqdHK4RtK8u5IJw32Hyb2dTGKbnnFmnuoBv5r7Z2CURI9sGZpSuA==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
@@ -9641,7 +9739,7 @@ packages:
       zod:
         optional: true
     dependencies:
-      '@types/node': 18.19.100
+      '@types/node': 18.19.110
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
@@ -9742,6 +9840,15 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /p-retry@6.2.1:
+    resolution: {integrity: sha512-hEt02O4hUct5wtwg4H4KcWgDdm+l1bOaEy/hWzd8xtXB9BqxTWBBhb+2ImAtH4Cv4rPjV76xN3Zumqk3k3AhhQ==}
+    engines: {node: '>=16.17'}
+    dependencies:
+      '@types/retry': 0.12.2
+      is-network-error: 1.1.0
+      retry: 0.13.1
+    dev: false
+
   /p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
@@ -9841,6 +9948,10 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
+
+  /pathe@1.1.2:
+    resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
+    dev: false
 
   /pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
@@ -10596,6 +10707,11 @@ packages:
       onetime: 7.0.0
       signal-exit: 4.1.0
     dev: true
+
+  /retry@0.13.1:
+    resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
+    engines: {node: '>= 4'}
+    dev: false
 
   /reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}

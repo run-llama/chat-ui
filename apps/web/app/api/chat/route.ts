@@ -1,15 +1,10 @@
 import { Message, LlamaIndexAdapter, StreamData } from 'ai'
-import {
-  ChatMessage,
-  OpenAI,
-  OpenAIEmbedding,
-  Settings,
-  SimpleChatEngine,
-} from 'llamaindex'
+import { ChatMessage, Settings, SimpleChatEngine } from 'llamaindex'
 import { NextResponse, type NextRequest } from 'next/server'
 import { fakeStreamText } from '@/app/utils'
+import { OpenAI, OpenAIEmbedding } from '@llamaindex/openai'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 Settings.llm = new OpenAI({ model: 'gpt-4o-mini' })
