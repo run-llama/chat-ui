@@ -1,15 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DocumentFileType, DocumentFile } from '../widgets'
-
-const docMineTypeMap: Record<string, DocumentFileType> = {
-  'text/csv': 'csv',
-  'application/pdf': 'pdf',
-  'text/plain': 'txt',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-    'docx',
-}
+import { DocumentFile } from '../widgets'
 
 export function useFile({ uploadAPI }: { uploadAPI: string }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -94,8 +86,7 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
       return setImageUrl(base64)
     }
 
-    const filetype = docMineTypeMap[file.type]
-    if (!filetype) throw new Error('Unsupported document type.')
+    // Upload any non-image file as a document
     const newDoc = await uploadContent(file, requestParams)
     return addDoc(newDoc)
   }

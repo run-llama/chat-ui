@@ -56,7 +56,6 @@ export function CustomChat() {
         <ChatInput.Form>
           <ChatInput.Field />
           <ChatInput.Upload
-            allowedExtensions={['jpg', 'png', 'jpeg']}
             onUpload={handleUpload}
           />
           <ChatInput.Submit />
@@ -204,7 +203,6 @@ function CustomChat() {
         <ChatInput.Form>
           <ChatInput.Field />
           <ChatInput.Upload
-            allowedExtensions={['jpg', 'png', 'jpeg']}
             onUpload={handleUpload}
           />
           <ChatInput.Submit />
