@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.4
+
+### Patch Changes
+
+- 77620ee: feat: document editor with citations
+
 ## 0.5.3
 
 ### Patch Changes
