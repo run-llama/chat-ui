@@ -1,10 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/*.js": {
-      "memory": 3000,
-      "maxDuration": 60
-    },
     "api/*.ts": {
       "memory": 3000,
       "maxDuration": 60
