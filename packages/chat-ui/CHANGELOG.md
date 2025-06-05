@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.3
+
+### Patch Changes
+
+- a34688a: feat: use mdxeditor for document editor
+
 ## 0.5.2
 
 ### Patch Changes
