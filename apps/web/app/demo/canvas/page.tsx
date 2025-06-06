@@ -8,6 +8,8 @@ import {
   ChatSection,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
+import { ArrowRightIcon } from 'lucide-react'
+import Link from 'next/link'
 
 const code = `
 import {
@@ -745,17 +747,27 @@ function CustomChat() {
               Try click to a version to see how it works
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              copyToClipboard(code)
-            }}
-            className={`flex h-10 items-center gap-2 rounded-lg bg-zinc-700 px-2 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-600 ${
-              isCopied ? 'bg-green-600 hover:bg-green-500' : ''
-            }`}
-          >
-            {isCopied ? 'Copied!' : 'Copy Code'}
-          </button>
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                copyToClipboard(code)
+              }}
+              className={`flex h-10 items-center gap-2 rounded-lg bg-zinc-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-600 ${
+                isCopied ? 'bg-green-600 hover:bg-green-500' : ''
+              }`}
+            >
+              {isCopied ? 'Copied!' : 'Copy Code'}
+            </button>
+            <Link href="/demo/canvas/custom">
+              <button
+                type="button"
+                className="flex h-10 items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
+              >
+                Custom Viewer <ArrowRightIcon className="h-4 w-4" />
+              </button>
+            </Link>
+          </div>
         </div>
         <ChatMessages />
         <ChatInput />

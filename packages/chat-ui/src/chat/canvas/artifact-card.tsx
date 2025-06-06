@@ -1,4 +1,4 @@
-import { FileCode, FileText, LucideIcon } from 'lucide-react'
+import { FileCode, FileText, LucideIcon, Paperclip } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
@@ -24,7 +24,7 @@ export function ArtifactCard({ data }: { data: Artifact }) {
   } = useChatCanvas()
   const { versionNumber, isLatest } = getArtifactVersion(data)
 
-  const Icon = IconMap[data.type]
+  const Icon = IconMap[data.type] || Paperclip
   const title = getCardTitle(data)
   const isDisplayed =
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
@@ -72,5 +72,5 @@ const getCardTitle = (artifact: Artifact) => {
     const { title } = artifact.data as DocumentArtifact['data']
     return title
   }
-  return ''
+  return 'Generated Artifact'
 }
