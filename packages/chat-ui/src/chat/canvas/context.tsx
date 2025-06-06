@@ -145,6 +145,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
           content,
           title: documentArtifact.data.title,
           type: documentArtifact.data.type,
+          sources: documentArtifact.data.sources,
         },
       }
     }

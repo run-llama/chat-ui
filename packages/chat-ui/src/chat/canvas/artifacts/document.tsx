@@ -8,8 +8,6 @@ import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
 import { useState } from 'react'
 import { Button } from '../../../ui/button'
-import { useChatUI } from '../../chat.context'
-import { getSourceNodes } from '../../chat-annotations'
 
 interface DocumentArtifactViewerProps {
   className?: string
@@ -35,7 +33,6 @@ export function DocumentArtifactViewer({
   children,
 }: DocumentArtifactViewerProps) {
   const { displayedArtifact, updateArtifact } = useChatCanvas()
-  const { messages } = useChatUI()
 
   const [updatedContent, setUpdatedContent] = useState<string | undefined>()
 
@@ -46,8 +43,12 @@ export function DocumentArtifactViewer({
     data: { content, title, type },
   } = documentArtifact
 
-  const nodes = messages.flatMap(message => getSourceNodes(message))
-  const transformedContent = processDocument(content, nodes)
+  const transformedContent = processDocument(
+    content,
+    documentArtifact.data.sources ?? []
+  )
+
+  console.log({ transformedContent, sources: documentArtifact.data.sources })
 
   const handleDocumentChange = (markdown: string) => {
     setUpdatedContent(markdown)
