@@ -25,7 +25,7 @@ interface ChatInputFieldProps {
 interface ChatInputUploadProps {
   className?: string
   onUpload?: (file: File) => Promise<void> | undefined
-  checkExtension?: (extension: string) => string | null
+  allowedExtensions?: string[]
   multiple?: boolean
 }
 
@@ -182,7 +182,7 @@ function ChatInputUpload(props: ChatInputUploadProps) {
       config={{
         disabled: isLoading,
         multiple: props.multiple ?? true,
-        checkExtension: props.checkExtension,
+        allowedExtensions: props.allowedExtensions,
       }}
       className={cn(
         'hover:bg-primary absolute bottom-2 left-2 rounded-full',

@@ -2,4 +2,4 @@
 '@llamaindex/chat-ui': patch
 ---
 
-Remove default file extension checker
+Remove default allowed extensions and checkExtension from FileUploader
