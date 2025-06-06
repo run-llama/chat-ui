@@ -8,6 +8,7 @@ import {
   DOCUMENT_FILE_TYPES,
   DocumentFileType,
   DocumentInfo,
+  SourceNode,
 } from './document-info'
 import { SourceData } from './chat-sources'
 import { Citation, CitationComponentProps } from './citation'
@@ -130,7 +131,10 @@ export function Markdown({
   citationComponent?: ComponentType<CitationComponentProps>
   className?: string
   languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
-  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
+  annotationRenderers?: Record<
+    string,
+    ComponentType<{ data: any; nodes?: SourceNode[] }>
+  >
 }) {
   const processedContent = preprocessContent(content)
 
@@ -170,7 +174,10 @@ export function Markdown({
                 const CustomRenderer = annotationRenderers[annotation.type]
                 return (
                   <div className="custom-renderer my-4">
-                    <CustomRenderer data={annotation.data} />
+                    <CustomRenderer
+                      data={annotation.data}
+                      nodes={sources?.nodes}
+                    />
                   </div>
                 )
               }

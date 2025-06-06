@@ -1,17 +1,9 @@
 'use client'
 
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react'
 import {
   Artifact,
   CodeArtifact,
-  extractArtifactsFromMessage,
   CodeArtifactError,
   extractArtifactsFromAllMessages,
   isEqualArtifact,
@@ -20,13 +12,14 @@ import {
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'
 import { toInlineAnnotation } from '../annotations'
+import { SourceNode } from '../../widgets/document-info'
 
 interface ChatCanvasContextType {
   allArtifacts: Artifact[]
   getArtifactsByType: (type: Artifact['type']) => Artifact[]
   displayedArtifact: Artifact | undefined
   isCanvasOpen: boolean
-  openArtifactInCanvas: (artifact: Artifact) => void
+  openArtifactInCanvas: (artifact: Artifact, nodes?: SourceNode[]) => void
   closeCanvas: () => void
   appendErrors: (artifact: CodeArtifact, errors: string[]) => void
   clearCodeErrors: (artifact: CodeArtifact) => void
@@ -38,6 +31,8 @@ interface ChatCanvasContextType {
   }
   restoreArtifact: (artifact: Artifact) => void
   updateArtifact: (artifact: Artifact, content: string) => void
+  currentNodes: SourceNode[]
+  setCurrentNodes: (nodes: SourceNode[]) => void
 }
 
 const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
@@ -45,38 +40,22 @@ const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
 )
 
 export function ChatCanvasProvider({ children }: { children: ReactNode }) {
-  const { messages, isLoading, append, requestData, setMessages } = useChatUI()
+  const { messages, append, requestData, setMessages } = useChatUI()
 
   const [isCanvasOpen, setIsCanvasOpen] = useState(false) // whether the canvas is open
   const [displayedArtifact, setDisplayedArtifact] = useState<Artifact>() // the artifact currently displayed in the canvas
   const [codeErrors, setCodeErrors] = useState<CodeArtifactError[]>([]) // contain all errors when compiling with Babel and runtime
+  const [currentNodes, setCurrentNodes] = useState<SourceNode[]>([])
 
   const allArtifacts = useMemo(
     () => extractArtifactsFromAllMessages(messages),
     [messages]
   )
 
-  // get all artifacts from the last message, this may not be the latest artifact in case last message doesn't have any artifact
-  const artifactsFromLastMessage = useMemo(() => {
-    const lastMessage = messages[messages.length - 1]
-    if (!lastMessage) return []
-    const artifacts = extractArtifactsFromMessage(lastMessage)
-    return artifacts
-  }, [messages])
-
-  useEffect(() => {
-    // when stream is loading and last message has a artifact, open the canvas with that artifact
-    if (artifactsFromLastMessage.length > 0 && isLoading) {
-      setIsCanvasOpen(true)
-      setDisplayedArtifact(
-        artifactsFromLastMessage[artifactsFromLastMessage.length - 1]
-      )
-    }
-  }, [artifactsFromLastMessage, isCanvasOpen, isLoading])
-
-  const openArtifactInCanvas = (artifact: Artifact) => {
+  const openArtifactInCanvas = (artifact: Artifact, nodes?: SourceNode[]) => {
     setDisplayedArtifact(artifact)
     setIsCanvasOpen(true)
+    setCurrentNodes(nodes ?? [])
   }
 
   const getArtifactsByType = (type: Artifact['type']) => {
@@ -145,7 +124,6 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
           content,
           title: documentArtifact.data.title,
           type: documentArtifact.data.type,
-          sources: documentArtifact.data.sources,
         },
       }
     }
@@ -220,6 +198,8 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
         getArtifactVersion,
         restoreArtifact,
         updateArtifact,
+        currentNodes,
+        setCurrentNodes,
       }}
     >
       {children}

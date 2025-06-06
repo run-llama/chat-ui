@@ -21,18 +21,23 @@ function processDocument(content: string, nodes: SourceNode[]) {
   const citationRegex =
     /\[citation:([a-fA-F0-9\\-]+)\]\(javascript:void\(0\)\)/g
 
-  return content.replace(citationRegex, (match, citationId) => {
+  let processedContent = content.replace(citationRegex, (match, citationId) => {
     const nodeIndex = nodes.findIndex(node => node.id === citationId)
     if (nodeIndex !== -1) return ` \`${nodeIndex + 1}\` `
     return match // return original citation if not found
   })
+
+  // MdxEditor does not support <br> tags
+  processedContent = processedContent.replace(/<br\s*\/?>/gi, ' ')
+
+  return processedContent
 }
 
 export function DocumentArtifactViewer({
   className,
   children,
 }: DocumentArtifactViewerProps) {
-  const { displayedArtifact, updateArtifact } = useChatCanvas()
+  const { displayedArtifact, updateArtifact, currentNodes } = useChatCanvas()
 
   const [updatedContent, setUpdatedContent] = useState<string | undefined>()
 
@@ -43,12 +48,7 @@ export function DocumentArtifactViewer({
     data: { content, title, type },
   } = documentArtifact
 
-  const transformedContent = processDocument(
-    content,
-    documentArtifact.data.sources ?? []
-  )
-
-  console.log({ transformedContent, sources: documentArtifact.data.sources })
+  const transformedContent = processDocument(content, currentNodes)
 
   const handleDocumentChange = (markdown: string) => {
     setUpdatedContent(markdown)
