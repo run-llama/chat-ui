@@ -33,32 +33,91 @@ export function CustomChat() {
         <ChatMessages />
         <ChatInput />
       </div>
-      <ChatCanvas className="w-full md:w-2/3" />
+      <ChatCanvas>
+        <ChatCanvas.CodeArtifact />
+        <ChatCanvas.DocumentArtifact />
+        <ImageArtifactViewer />
+      </ChatCanvas>
     </ChatSection>
   )
 }
+
+
+function ImageArtifactViewer() {
+  const { displayedArtifact } = useChatCanvas()
+  const {
+    data: { imageUrl, caption },
+  } = displayedArtifact as Artifact<{ imageUrl: string; caption: string }>
+
+  if (!imageUrl || !caption) return null
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex items-center justify-between border-b p-4">
+        <h3 className="flex items-center gap-3 text-gray-600">
+          <Image className="size-8 text-blue-500" />
+          <div className="text font-semibold">{caption}</div>
+        </h3>
+        <ChatCanvas.Actions>
+          <ChatCanvas.Actions.History />
+          <ChatCanvas.Actions.Close />
+        </ChatCanvas.Actions>
+      </div>
+      <div className="flex flex-1 items-center justify-center p-4">
+        <img
+          src={imageUrl}
+          alt={caption}
+          className="h-[70%] rounded-2xl shadow-2xl"
+        />
+      </div>
+    </div>
+  )
+}
+
 `
 
 const initialMessages: Message[] = [
   {
+    id: '1',
     role: 'user',
     content: 'Generate an image of a cat',
-    id: 'aeJ4ZOWlhUA2R4vg',
   },
   {
-    id: 'Yqc9VoIR3ANyzTj3',
+    id: '2',
     role: 'assistant',
     content:
-      'The artifact is a cat image.' +
+      'Here is a cat image named Millie.' +
       `\n\`\`\`annotation\n${JSON.stringify({
         type: 'artifact',
         data: {
           type: 'image',
           data: {
-            imageUrl: 'https://placecats.com/300/200',
-            caption: 'A cat',
+            imageUrl: 'https://placecats.com/millie/700/500',
+            caption: 'A cute cat image named Millie',
           },
           created_at: 1745480281756,
+        },
+      })}
+      \n\`\`\`\n`,
+  },
+  {
+    id: '3',
+    role: 'user',
+    content: 'Please generate a black cat image',
+  },
+  {
+    id: '4',
+    role: 'assistant',
+    content:
+      'Here is a black cat image named Poppy.' +
+      `\n\`\`\`annotation\n${JSON.stringify({
+        type: 'artifact',
+        data: {
+          type: 'image',
+          data: {
+            imageUrl: 'https://placecats.com/poppy/700/500',
+            caption: 'A black cat image named Poppy',
+          },
+          created_at: 1745480281999,
         },
       })}
       \n\`\`\`\n`,
@@ -112,38 +171,31 @@ function CustomChat() {
   )
 }
 
-interface ImageArtifactData {
-  imageUrl: string
-  caption: string
-}
-type ImageArtifact = Artifact<ImageArtifactData>
-
 function ImageArtifactViewer() {
   const { displayedArtifact } = useChatCanvas()
-
-  if (displayedArtifact?.type.toString() !== 'image') return null // TODO: type string for easily custom
-
-  const imageArtifact = displayedArtifact as ImageArtifact
   const {
     data: { imageUrl, caption },
-  } = imageArtifact
+  } = displayedArtifact as Artifact<{ imageUrl: string; caption: string }>
 
+  if (!imageUrl || !caption) return null
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex items-center justify-between border-b p-4">
         <h3 className="flex items-center gap-3 text-gray-600">
-          <Image className="size-8 text-red-400" />
+          <Image className="size-8 text-blue-500" />
           <div className="text font-semibold">{caption}</div>
         </h3>
         <ChatCanvas.Actions>
-          <ChatCanvas.Actions.Close />
           <ChatCanvas.Actions.History />
-          <ChatCanvas.Actions.Copy />
-          <ChatCanvas.Actions.Download />
+          <ChatCanvas.Actions.Close />
         </ChatCanvas.Actions>
       </div>
       <div className="flex flex-1 items-center justify-center p-4">
-        <img src={imageUrl} alt={caption} className="w-full" />
+        <img
+          src={imageUrl}
+          alt={caption}
+          className="h-[70%] rounded-2xl shadow-2xl"
+        />
       </div>
     </div>
   )
