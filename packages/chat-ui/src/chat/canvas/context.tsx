@@ -19,7 +19,7 @@ interface ChatCanvasContextType {
   getArtifactsByType: (type: Artifact['type']) => Artifact[]
   displayedArtifact: Artifact | undefined
   isCanvasOpen: boolean
-  openArtifactInCanvas: (artifact: Artifact, nodes?: SourceNode[]) => void
+  openArtifactInCanvas: (artifact: Artifact) => void
   closeCanvas: () => void
   appendErrors: (artifact: CodeArtifact, errors: string[]) => void
   clearCodeErrors: (artifact: CodeArtifact) => void
@@ -52,10 +52,9 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     [messages]
   )
 
-  const openArtifactInCanvas = (artifact: Artifact, nodes?: SourceNode[]) => {
+  const openArtifactInCanvas = (artifact: Artifact) => {
     setDisplayedArtifact(artifact)
     setIsCanvasOpen(true)
-    setCurrentNodes(nodes ?? [])
   }
 
   const getArtifactsByType = (type: Artifact['type']) => {

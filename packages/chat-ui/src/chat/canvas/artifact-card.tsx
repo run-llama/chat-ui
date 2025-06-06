@@ -32,6 +32,7 @@ export function ArtifactCard({
     restoreArtifact,
     displayedArtifact,
     isCanvasOpen,
+    setCurrentNodes,
   } = useChatCanvas()
   const { versionNumber, isLatest } = getArtifactVersion(data)
   const { isLoading } = useChatUI()
@@ -43,8 +44,9 @@ export function ArtifactCard({
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
 
   const handleOpenArtifact = useCallback(() => {
-    openArtifactInCanvas(data, nodes)
-  }, [data, nodes, openArtifactInCanvas])
+    openArtifactInCanvas(data)
+    setCurrentNodes(nodes ?? [])
+  }, [data, nodes, openArtifactInCanvas, setCurrentNodes])
 
   useEffect(() => {
     if (!isCanvasOpen && isLoading && isLast) {
