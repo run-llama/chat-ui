@@ -2,7 +2,7 @@
 
 import { FileText } from 'lucide-react'
 import { cn } from '../../../lib/utils'
-import { DocumentEditor, SourceNode } from '../../../widgets'
+import { DocumentEditor } from '../../../widgets'
 import { DocumentArtifact } from '../artifacts'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
@@ -15,14 +15,14 @@ interface DocumentArtifactViewerProps {
 }
 
 // Convert citation with node_id to citation number in markdown
-function processDocument(content: string, nodes: SourceNode[]) {
-  if (nodes.length === 0) return content
+function processDocument(content: string, nodeIds: string[]) {
+  if (nodeIds.length === 0) return content
 
   const citationRegex =
     /\[citation:([a-fA-F0-9\\-]+)\]\(javascript:void\(0\)\)/g
 
   let processedContent = content.replace(citationRegex, (match, citationId) => {
-    const nodeIndex = nodes.findIndex(node => node.id === citationId)
+    const nodeIndex = nodeIds.findIndex(nodeId => nodeId === citationId)
     if (nodeIndex !== -1) return ` \`${nodeIndex + 1}\` `
     return match // return original citation if not found
   })
@@ -50,7 +50,7 @@ export function DocumentArtifactViewer({
 
   const transformedContent = processDocument(
     content,
-    documentArtifact.data.sources ?? []
+    documentArtifact.data.sources?.map(source => source.id) ?? []
   )
 
   const handleDocumentChange = (markdown: string) => {
