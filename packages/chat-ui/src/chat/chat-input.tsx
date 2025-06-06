@@ -7,7 +7,6 @@ import { FileUploader } from '../widgets/index.js' // this import needs the file
 import { useChatUI } from './chat.context'
 import { Message } from './chat.interface'
 
-
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
   resetUploadedFiles?: () => void

@@ -202,9 +202,7 @@ function CustomChat() {
         </div>
         <ChatInput.Form>
           <ChatInput.Field />
-          <ChatInput.Upload
-            onUpload={handleUpload}
-          />
+          <ChatInput.Upload onUpload={handleUpload} />
           <ChatInput.Submit />
         </ChatInput.Form>
       </ChatInput>

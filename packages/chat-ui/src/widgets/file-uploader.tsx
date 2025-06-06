@@ -68,7 +68,7 @@ export function FileUploader({
     for (const file of files) {
       const fileExtension = file.name.split('.').pop() || ''
       if (checkExtension) {
-        const extensionFileError = checkExtension(fileExtension);
+        const extensionFileError = checkExtension(fileExtension)
         if (extensionFileError) {
           onFileUploadError(extensionFileError)
           return
