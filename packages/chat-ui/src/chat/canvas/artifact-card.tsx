@@ -9,27 +9,18 @@ import {
   Artifact,
 } from './artifacts'
 import { useChatCanvas } from './context'
-import { SourceNode } from '../../widgets/document-info'
-import { useEffect } from 'react'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
   code: FileCode,
   document: FileText,
 }
 
-export function ArtifactCard({
-  data,
-  nodes,
-}: {
-  data: Artifact
-  nodes?: SourceNode[]
-}) {
+export function ArtifactCard({ data }: { data: Artifact }) {
   const {
     openArtifactInCanvas,
     getArtifactVersion,
     restoreArtifact,
     displayedArtifact,
-    setCurrentNodes,
   } = useChatCanvas()
   const { versionNumber, isLatest } = getArtifactVersion(data)
 
@@ -37,16 +28,6 @@ export function ArtifactCard({
   const title = getCardTitle(data)
   const isDisplayed =
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
-
-  useEffect(() => {
-    if (isLatest && nodes?.length) {
-      // if this artifact is isLatest, initialize current nodes for canvas
-      setCurrentNodes(prev => {
-        if (prev.length > 0) return prev // if current nodes are already set, don't override them
-        return nodes
-      })
-    }
-  }, [isLatest, nodes, setCurrentNodes])
 
   return (
     <div

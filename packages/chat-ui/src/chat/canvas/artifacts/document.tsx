@@ -37,7 +37,7 @@ export function DocumentArtifactViewer({
   className,
   children,
 }: DocumentArtifactViewerProps) {
-  const { displayedArtifact, updateArtifact, currentNodes } = useChatCanvas()
+  const { displayedArtifact, updateArtifact } = useChatCanvas()
 
   const [updatedContent, setUpdatedContent] = useState<string | undefined>()
 
@@ -48,7 +48,10 @@ export function DocumentArtifactViewer({
     data: { content, title, type },
   } = documentArtifact
 
-  const transformedContent = processDocument(content, currentNodes)
+  const transformedContent = processDocument(
+    content,
+    documentArtifact.data.sources ?? []
+  )
 
   const handleDocumentChange = (markdown: string) => {
     setUpdatedContent(markdown)

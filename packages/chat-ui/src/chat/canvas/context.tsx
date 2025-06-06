@@ -2,9 +2,7 @@
 
 import {
   createContext,
-  Dispatch,
   ReactNode,
-  SetStateAction,
   useContext,
   useEffect,
   useMemo,
@@ -22,7 +20,6 @@ import {
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'
 import { toInlineAnnotation } from '../annotations'
-import { SourceNode } from '../../widgets/document-info'
 
 interface ChatCanvasContextType {
   allArtifacts: Artifact[]
@@ -41,8 +38,6 @@ interface ChatCanvasContextType {
   }
   restoreArtifact: (artifact: Artifact) => void
   updateArtifact: (artifact: Artifact, content: string) => void
-  currentNodes: SourceNode[]
-  setCurrentNodes: Dispatch<SetStateAction<SourceNode[]>>
 }
 
 const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
@@ -55,7 +50,6 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
   const [isCanvasOpen, setIsCanvasOpen] = useState(false) // whether the canvas is open
   const [displayedArtifact, setDisplayedArtifact] = useState<Artifact>() // the artifact currently displayed in the canvas
   const [codeErrors, setCodeErrors] = useState<CodeArtifactError[]>([]) // contain all errors when compiling with Babel and runtime
-  const [currentNodes, setCurrentNodes] = useState<SourceNode[]>([])
 
   const allArtifacts = useMemo(
     () => extractArtifactsFromAllMessages(messages),
@@ -151,6 +145,7 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
           content,
           title: documentArtifact.data.title,
           type: documentArtifact.data.type,
+          sources: documentArtifact.data.sources,
         },
       }
     }
@@ -225,8 +220,6 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
         getArtifactVersion,
         restoreArtifact,
         updateArtifact,
-        currentNodes,
-        setCurrentNodes,
       }}
     >
       {children}
