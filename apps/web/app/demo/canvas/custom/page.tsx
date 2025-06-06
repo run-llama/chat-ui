@@ -14,12 +14,15 @@ import { Image } from 'lucide-react'
 
 const code = `
 import {
+  Artifact,
   ChatCanvas,
   ChatInput,
   ChatMessages,
   ChatSection,
+  useChatCanvas,
 } from '@llamaindex/chat-ui'
 import { useChat } from 'ai/react'
+import { Image } from 'lucide-react'
 
 export function CustomChat() {
   const handler = useChat({ initialMessages: [] })
@@ -41,7 +44,6 @@ export function CustomChat() {
     </ChatSection>
   )
 }
-
 
 function ImageArtifactViewer() {
   const { displayedArtifact } = useChatCanvas()
@@ -72,7 +74,6 @@ function ImageArtifactViewer() {
     </div>
   )
 }
-
 `
 
 const initialMessages: Message[] = [
