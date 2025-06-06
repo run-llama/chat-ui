@@ -51,11 +51,11 @@ export function DocumentInfo({
   const { url, sources } = document
   const urlParts = url.split('/')
   const fileName = urlParts.length > 0 ? urlParts[urlParts.length - 1] : url
-  const fileExt = fileName?.split('.').pop() as string | undefined
+  const fileExt = fileName?.split('.').pop() ?? ''
 
   const previewFile = {
     name: fileName,
-    type: fileExt as string,
+    type: fileExt,
   }
 
   const DocumentDetail = (

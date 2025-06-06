@@ -202,7 +202,10 @@ function CustomChat() {
         </div>
         <ChatInput.Form>
           <ChatInput.Field />
-          <ChatInput.Upload onUpload={handleUpload} />
+          <ChatInput.Upload
+            allowedExtensions={['jpg', 'png', 'jpeg']}
+            onUpload={handleUpload}
+          />
           <ChatInput.Submit />
         </ChatInput.Form>
       </ChatInput>

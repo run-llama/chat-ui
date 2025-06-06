@@ -1,4 +1,5 @@
 import { DocumentInfo, DocumentFile } from './document-info'
+import { cn } from '../lib/utils'
 
 export type DocumentFileData = {
   files: DocumentFile[]
@@ -13,7 +14,7 @@ export function ChatFiles({
 }) {
   if (!data.files.length) return null
   return (
-    <div className={`flex items-center gap-2 ${className || ''}`}>
+    <div className={cn('flex items-center gap-2', className)}>
       {data.files.map(file => (
         <DocumentInfo
           key={file.id}
