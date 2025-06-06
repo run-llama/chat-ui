@@ -4,11 +4,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { CodeBlock } from './codeblock'
-import {
-  DOCUMENT_FILE_TYPES,
-  DocumentFileType,
-  DocumentInfo,
-} from './document-info'
+import { DocumentInfo } from './document-info'
 import { SourceData } from './chat-sources'
 import { Citation, CitationComponentProps } from './citation'
 import { cn } from '../lib/utils'
@@ -211,15 +207,12 @@ export function Markdown({
             )
           },
           a({ href, children }) {
-            // If href starts with `{backend}/api/files`, then it's a local document and we use DocumenInfo for rendering
+            // If href starts with `{backend}/api/files`, then it's a local document and we use DocumentInfo for rendering
             if (href?.startsWith(`${backend}/api/files`)) {
               // Check if the file is document file type
               const fileExtension = href.split('.').pop()?.toLowerCase()
 
-              if (
-                fileExtension &&
-                DOCUMENT_FILE_TYPES.includes(fileExtension as DocumentFileType)
-              ) {
+              if (fileExtension) {
                 return (
                   <DocumentInfo
                     document={{

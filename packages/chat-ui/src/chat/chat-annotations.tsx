@@ -64,7 +64,9 @@ export function DocumentFileAnnotations() {
     MessageAnnotationType.DOCUMENT_FILE
   )
   if (contentFileData.length === 0) return null
-  return <ChatFiles data={contentFileData[0]} />
+
+  const alignmentClass = message.role === 'user' ? 'ml-auto' : 'mr-auto'
+  return <ChatFiles data={contentFileData[0]} className={alignmentClass} />
 }
 
 function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {

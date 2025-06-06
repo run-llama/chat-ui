@@ -15,18 +15,11 @@ import { PDFIcon } from '../ui/icons/pdf'
 import { SheetIcon } from '../ui/icons/sheet'
 import { TxtIcon } from '../ui/icons/txt'
 
-export type DocumentFileType = 'csv' | 'pdf' | 'txt' | 'docx'
-export const DOCUMENT_FILE_TYPES: DocumentFileType[] = [
-  'csv',
-  'pdf',
-  'txt',
-  'docx',
-]
 export type DocumentFile = {
   id: string
   name: string // The uploaded file name in the backend
   size: number // The file size in bytes
-  type: DocumentFileType
+  type: string // File extension
   url: string // The URL of the uploaded file in the backend
   refs?: string[] // DocumentIDs of the uploaded file in the vector index
 }
@@ -58,11 +51,11 @@ export function DocumentInfo({
   const { url, sources } = document
   const urlParts = url.split('/')
   const fileName = urlParts.length > 0 ? urlParts[urlParts.length - 1] : url
-  const fileExt = fileName?.split('.').pop() as DocumentFileType | undefined
+  const fileExt = fileName?.split('.').pop() ?? ''
 
   const previewFile = {
     name: fileName,
-    type: fileExt as DocumentFileType,
+    type: fileExt,
   }
 
   const DocumentDetail = (
@@ -156,7 +149,7 @@ function NodeInfo({ nodeInfo }: { nodeInfo: SourceNode }) {
   )
 }
 
-const FileIconMap: Record<DocumentFileType, React.ReactNode> = {
+const FileIconMap: Record<string, React.ReactNode> = {
   csv: <SheetIcon />,
   pdf: <PDFIcon />,
   docx: <DocxIcon />,
@@ -167,7 +160,7 @@ function DocumentPreviewCard(props: {
   file: {
     name: string
     size?: number
-    type: DocumentFileType
+    type: string
   }
   onRemove?: () => void
   className?: string

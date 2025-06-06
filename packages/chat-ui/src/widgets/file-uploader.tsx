@@ -8,7 +8,6 @@ export interface FileUploaderProps {
     inputId?: string
     fileSizeLimit?: number
     allowedExtensions?: string[]
-    checkExtension?: (extension: string) => string | null
     disabled: boolean
     multiple?: boolean
   }
@@ -32,15 +31,6 @@ export function FileUploader({
   const inputId = config?.inputId || DEFAULT_INPUT_ID
   const fileSizeLimit = config?.fileSizeLimit || DEFAULT_FILE_SIZE_LIMIT
   const allowedExtensions = config?.allowedExtensions
-  const defaultCheckExtension = (extension: string) => {
-    if (allowedExtensions && !allowedExtensions.includes(extension)) {
-      return `Invalid file type. Please select a file with one of these formats: ${allowedExtensions.join(
-        ','
-      )}`
-    }
-    return null
-  }
-  const checkExtension = config?.checkExtension ?? defaultCheckExtension
 
   const isFileSizeExceeded = (file: File) => {
     return file.size > fileSizeLimit
@@ -77,9 +67,12 @@ export function FileUploader({
 
     for (const file of files) {
       const fileExtension = file.name.split('.').pop() || ''
-      const extensionFileError = checkExtension(fileExtension)
-      if (extensionFileError) {
-        onFileUploadError(extensionFileError)
+      if (allowedExtensions && !allowedExtensions.includes(fileExtension)) {
+        onFileUploadError(
+          `Invalid file type. Please select a file with one of these formats: ${allowedExtensions.join(
+            ','
+          )}`
+        )
         return
       }
 
@@ -103,10 +96,10 @@ export function FileUploader({
     <div className={cn('self-stretch', className)}>
       <input
         type="file"
+        accept={allowedExtensions ? allowedExtensions.join(',') : undefined}
         id={inputId}
         style={{ display: 'none' }}
         onChange={onFileChange}
-        accept={allowedExtensions?.join(',')}
         disabled={config?.disabled || uploading}
         multiple={config?.multiple}
       />

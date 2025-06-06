@@ -7,8 +7,6 @@ import { FileUploader } from '../widgets/index.js' // this import needs the file
 import { useChatUI } from './chat.context'
 import { Message } from './chat.interface'
 
-const ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'csv', 'pdf', 'txt', 'docx']
-
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
   resetUploadedFiles?: () => void
@@ -183,8 +181,8 @@ function ChatInputUpload(props: ChatInputUploadProps) {
       onFileUpload={onFileUpload}
       config={{
         disabled: isLoading,
-        allowedExtensions: props.allowedExtensions ?? ALLOWED_EXTENSIONS,
         multiple: props.multiple ?? true,
+        allowedExtensions: props.allowedExtensions,
       }}
       className={cn(
         'hover:bg-primary absolute bottom-2 left-2 rounded-full',
