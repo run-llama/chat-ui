@@ -1,5 +1,13 @@
 # @llamaindex/chat-ui
 
+## 0.5.6
+
+### Patch Changes
+
+- 3c477d5: fix: source nodes should from document artifact
+- c782810: Remove default allowed extensions and checkExtension from FileUploader
+- dad784b: fix: document citation regex
+
 ## 0.5.5
 
 ### Patch Changes
