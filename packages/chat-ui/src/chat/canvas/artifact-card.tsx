@@ -10,8 +10,9 @@ import {
 } from './artifacts'
 import { useChatCanvas } from './context'
 import { SourceNode } from '../../widgets/document-info'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useChatUI } from '../chat.context'
+import { useChatMessage } from '../chat-message.context'
 
 const IconMap: Record<Artifact['type'], LucideIcon> = {
   code: FileCode,
@@ -34,18 +35,23 @@ export function ArtifactCard({
   } = useChatCanvas()
   const { versionNumber, isLatest } = getArtifactVersion(data)
   const { isLoading } = useChatUI()
+  const { isLast } = useChatMessage()
 
   const Icon = IconMap[data.type]
   const title = getCardTitle(data)
   const isDisplayed =
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
 
+  const handleOpenArtifact = useCallback(() => {
+    openArtifactInCanvas(data, nodes)
+  }, [data, nodes, openArtifactInCanvas])
+
   useEffect(() => {
-    if (!isCanvasOpen && isLoading) {
-      // auto open the canvas if it has not been opened when streaming
-      openArtifactInCanvas(data, nodes)
+    if (!isCanvasOpen && isLoading && isLast) {
+      // when stream is loading and last message has a artifact, open the canvas with that artifact
+      handleOpenArtifact()
     }
-  }, [isCanvasOpen, openArtifactInCanvas, data, nodes, isLoading])
+  }, [isCanvasOpen, handleOpenArtifact, isLoading, isLast])
 
   return (
     <div
@@ -53,7 +59,7 @@ export function ArtifactCard({
         'border-border flex w-full max-w-72 cursor-pointer items-center justify-between gap-2 rounded-lg border-2 p-2 hover:border-blue-500',
         isDisplayed && 'border-blue-500'
       )}
-      onClick={() => openArtifactInCanvas(data, nodes)}
+      onClick={handleOpenArtifact}
     >
       <div className="flex flex-1 items-center gap-2">
         <Icon className="size-7 shrink-0 text-blue-500" />
