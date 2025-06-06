@@ -1,9 +1,19 @@
 'use client'
 
-import { createContext, ReactNode, useContext, useMemo, useState } from 'react'
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import {
   Artifact,
   CodeArtifact,
+  extractArtifactsFromMessage,
   CodeArtifactError,
   extractArtifactsFromAllMessages,
   isEqualArtifact,
@@ -32,7 +42,7 @@ interface ChatCanvasContextType {
   restoreArtifact: (artifact: Artifact) => void
   updateArtifact: (artifact: Artifact, content: string) => void
   currentNodes: SourceNode[]
-  setCurrentNodes: (nodes: SourceNode[]) => void
+  setCurrentNodes: Dispatch<SetStateAction<SourceNode[]>>
 }
 
 const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
@@ -40,7 +50,7 @@ const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
 )
 
 export function ChatCanvasProvider({ children }: { children: ReactNode }) {
-  const { messages, append, requestData, setMessages } = useChatUI()
+  const { messages, isLoading, append, requestData, setMessages } = useChatUI()
 
   const [isCanvasOpen, setIsCanvasOpen] = useState(false) // whether the canvas is open
   const [displayedArtifact, setDisplayedArtifact] = useState<Artifact>() // the artifact currently displayed in the canvas
@@ -51,6 +61,24 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
     () => extractArtifactsFromAllMessages(messages),
     [messages]
   )
+
+  // get all artifacts from the last message, this may not be the latest artifact in case last message doesn't have any artifact
+  const artifactsFromLastMessage = useMemo(() => {
+    const lastMessage = messages[messages.length - 1]
+    if (!lastMessage) return []
+    const artifacts = extractArtifactsFromMessage(lastMessage)
+    return artifacts
+  }, [messages])
+
+  useEffect(() => {
+    // when stream is loading and last message has a artifact, open the canvas with that artifact
+    if (artifactsFromLastMessage.length > 0 && isLoading) {
+      setIsCanvasOpen(true)
+      setDisplayedArtifact(
+        artifactsFromLastMessage[artifactsFromLastMessage.length - 1]
+      )
+    }
+  }, [artifactsFromLastMessage, isCanvasOpen, isLoading])
 
   const openArtifactInCanvas = (artifact: Artifact) => {
     setDisplayedArtifact(artifact)
