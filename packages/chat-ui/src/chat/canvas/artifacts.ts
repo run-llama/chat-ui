@@ -38,4 +38,5 @@ export type DocumentArtifact = Artifact<{
   title: string
   content: string
   type: string
+  sources?: { id: string }[] // we can add more source info here if needed
 }>

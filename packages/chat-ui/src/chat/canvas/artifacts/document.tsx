@@ -2,14 +2,12 @@
 
 import { FileText } from 'lucide-react'
 import { cn } from '../../../lib/utils'
-import { DocumentEditor, SourceNode } from '../../../widgets'
+import { DocumentEditor } from '../../../widgets'
 import { DocumentArtifact } from '../artifacts'
 import { ChatCanvasActions } from '../actions'
 import { useChatCanvas } from '../context'
 import { useState } from 'react'
 import { Button } from '../../../ui/button'
-import { useChatUI } from '../../chat.context'
-import { getSourceNodes } from '../../chat-annotations'
 
 interface DocumentArtifactViewerProps {
   className?: string
@@ -17,17 +15,22 @@ interface DocumentArtifactViewerProps {
 }
 
 // Convert citation with node_id to citation number in markdown
-function processDocument(content: string, nodes: SourceNode[]) {
-  if (nodes.length === 0) return content
+function processDocument(content: string, nodeIds: string[]) {
+  if (nodeIds.length === 0) return content
 
   const citationRegex =
     /\[citation:([a-fA-F0-9\\-]+)\]\(javascript:void\(0\)\)/g
 
-  return content.replace(citationRegex, (match, citationId) => {
-    const nodeIndex = nodes.findIndex(node => node.id === citationId)
+  let processedContent = content.replace(citationRegex, (match, citationId) => {
+    const nodeIndex = nodeIds.findIndex(nodeId => nodeId === citationId)
     if (nodeIndex !== -1) return ` \`${nodeIndex + 1}\` `
     return match // return original citation if not found
   })
+
+  // MdxEditor does not support <br> tags
+  processedContent = processedContent.replace(/<br\s*\/?>/gi, ' ')
+
+  return processedContent
 }
 
 export function DocumentArtifactViewer({
@@ -35,7 +38,6 @@ export function DocumentArtifactViewer({
   children,
 }: DocumentArtifactViewerProps) {
   const { displayedArtifact, updateArtifact } = useChatCanvas()
-  const { messages } = useChatUI()
 
   const [updatedContent, setUpdatedContent] = useState<string | undefined>()
 
@@ -46,8 +48,10 @@ export function DocumentArtifactViewer({
     data: { content, title, type },
   } = documentArtifact
 
-  const nodes = messages.flatMap(message => getSourceNodes(message))
-  const transformedContent = processDocument(content, nodes)
+  const transformedContent = processDocument(
+    content,
+    documentArtifact.data.sources?.map(source => source.id) ?? []
+  )
 
   const handleDocumentChange = (markdown: string) => {
     setUpdatedContent(markdown)

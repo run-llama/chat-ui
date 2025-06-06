@@ -57,6 +57,7 @@ export function DocumentEditor({
       markdown={content}
       plugins={plugins}
       contentEditableClassName="custom-markdown"
+      suppressHtmlProcessing
       onError={error => {
         console.warn(
           '[Chat-UI] Error while parsing markdown in DocumentEditor',
