@@ -19,7 +19,7 @@ function processDocument(content: string, nodeIds: string[]) {
   if (nodeIds.length === 0) return content
 
   const citationRegex =
-    /\[citation:([a-fA-F0-9\\-]+)\]\(javascript:void\(0\)\)/g
+    /\[citation:([a-fA-F0-9\\-]+)\](?:\(javascript:void\(0\)\))?/g
 
   let processedContent = content.replace(citationRegex, (match, citationId) => {
     const nodeIndex = nodeIds.findIndex(nodeId => nodeId === citationId)
