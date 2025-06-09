@@ -172,13 +172,23 @@ function CustomChat() {
   )
 }
 
+type ImageArtifact = Artifact<
+  {
+    imageUrl: string
+    caption: string
+  },
+  'image'
+>
+
 function ImageArtifactViewer() {
   const { displayedArtifact } = useChatCanvas()
+
+  if (displayedArtifact?.type !== 'image') return null
+
   const {
     data: { imageUrl, caption },
-  } = displayedArtifact as Artifact<{ imageUrl: string; caption: string }>
+  } = displayedArtifact as ImageArtifact
 
-  if (!imageUrl || !caption) return null
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex items-center justify-between border-b p-4">
