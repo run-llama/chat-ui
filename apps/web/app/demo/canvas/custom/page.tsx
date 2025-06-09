@@ -5,9 +5,11 @@ import {
   Artifact,
   ChatCanvas,
   ChatInput,
+  ChatMessage,
   ChatMessages,
   ChatSection,
   useChatCanvas,
+  useChatUI,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
 import { Image } from 'lucide-react'
@@ -17,9 +19,11 @@ import {
   Artifact,
   ChatCanvas,
   ChatInput,
+  ChatMessage,
   ChatMessages,
   ChatSection,
   useChatCanvas,
+  useChatUI,
 } from '@llamaindex/chat-ui'
 import { useChat } from 'ai/react'
 import { Image } from 'lucide-react'
@@ -33,7 +37,7 @@ export function CustomChat() {
       className="block h-screen flex-row gap-4 p-0 md:flex md:p-5"
     >
       <div className="md:max-w-1/2 mx-auto flex h-full min-w-0 max-w-full flex-1 flex-col gap-4">
-        <ChatMessages />
+        <CustomChatMessages />
         <ChatInput />
       </div>
       <ChatCanvas>
@@ -85,6 +89,48 @@ function ImageArtifactViewer() {
   )
 }
 
+function CustomChatMessages() {
+  const { messages } = useChatUI()
+  return (
+    <ChatMessages>
+      <ChatMessages.List className="px-0 md:px-16">
+        {messages.map((message, index) => (
+          <ChatMessage
+            key={index}
+            message={message}
+            isLast={index === messages.length - 1}
+            className="items-start"
+          >
+            <ChatMessage.Avatar />
+            <ChatMessage.Content>
+              <ChatMessage.Content.Markdown
+                annotationRenderers={{
+                  artifact: CustomArtifactCard,
+                }}
+              />
+            </ChatMessage.Content>
+            <ChatMessage.Actions />
+          </ChatMessage>
+        ))}
+      </ChatMessages.List>
+    </ChatMessages>
+  )
+}
+
+function CustomArtifactCard({ data }: { data: Artifact }) {
+  return (
+    <ChatCanvas.Artifact
+      data={data}
+      getTitle={artifact => {
+        const { caption } = (artifact as ImageArtifact).data
+        return caption as string
+      }}
+      iconMap={{
+        image: Image,
+      }}
+    />
+  )
+}
 `
 
 const initialMessages: Message[] = [
@@ -171,7 +217,7 @@ function CustomChat() {
             {isCopied ? 'Copied!' : 'Copy Code'}
           </button>
         </div>
-        <ChatMessages />
+        <CustomChatMessages />
         <ChatInput />
       </div>
       <ChatCanvas>
@@ -220,5 +266,49 @@ function ImageArtifactViewer() {
         />
       </div>
     </div>
+  )
+}
+
+function CustomChatMessages() {
+  const { messages } = useChatUI()
+  return (
+    <ChatMessages>
+      <ChatMessages.List className="px-0 md:px-16">
+        {messages.map((message, index) => (
+          <ChatMessage
+            key={index}
+            message={message}
+            isLast={index === messages.length - 1}
+            className="items-start"
+          >
+            <ChatMessage.Avatar />
+            <ChatMessage.Content>
+              <ChatMessage.Content.Markdown
+                annotationRenderers={{
+                  artifact: CustomArtifactCard,
+                }}
+              />
+            </ChatMessage.Content>
+            <ChatMessage.Actions />
+          </ChatMessage>
+        ))}
+      </ChatMessages.List>
+    </ChatMessages>
+  )
+}
+
+// custom artifact card for image artifacts
+function CustomArtifactCard({ data }: { data: Artifact }) {
+  return (
+    <ChatCanvas.Artifact
+      data={data}
+      getTitle={artifact => {
+        const { caption } = (artifact as ImageArtifact).data
+        return caption as string
+      }}
+      iconMap={{
+        image: Image,
+      }}
+    />
   )
 }

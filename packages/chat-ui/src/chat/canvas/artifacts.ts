@@ -30,7 +30,7 @@ export type CodeArtifactError = {
  * @typeParam T - The type of the data payload (e.g., \{ imageUrl: string, caption: string \})
  * @typeParam K - The artifact type identifier string (e.g., 'image', 'code', 'document')
  */
-export type Artifact<T = unknown, K extends string = string> = {
+export type Artifact<T = unknown, K = string> = {
   created_at: number
   type: K
   data: T
