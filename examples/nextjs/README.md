@@ -51,7 +51,7 @@ This project includes multiple examples to demonstrate different approaches:
 
 The standard implementation using client-side components with the `useChat` hook from Vercel AI SDK
 
-### 2. Advanced Example
+### 2. Rendering Inline Annotations Example
 
 **Enable:** Uncomment the advanced API route in `app/page.tsx`
 

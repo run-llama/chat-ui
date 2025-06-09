@@ -471,92 +471,19 @@ ${JSON.stringify({
 `
 ```
 
-### Multiple Custom Artifact Types
-
 You can create multiple custom artifact viewers for different content types:
 
 ```tsx
-// Custom PDF viewer
-function PDFArtifactViewer() {
-  const { displayedArtifact } = useChatCanvas()
+<ChatCanvas>
+  {/* Built-in viewers */}
+  <ChatCanvas.CodeArtifact />
+  <ChatCanvas.DocumentArtifact />
   
-  if (displayedArtifact?.type !== 'pdf') return null
-  
-  const { data } = displayedArtifact as Artifact<{ pdfUrl: string }, 'pdf'>
-  
-  return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between border-b p-4">
-        <h3 className="flex items-center gap-3">
-          <FileText className="size-8 text-red-500" />
-          <span>PDF Document</span>
-        </h3>
-        <ChatCanvas.Actions>
-          <ChatCanvas.Actions.History />
-          <ChatCanvas.Actions.Close />
-        </ChatCanvas.Actions>
-      </div>
-      <iframe
-        src={data.pdfUrl}
-        className="flex-1 border-none"
-        title="PDF Document"
-      />
-    </div>
-  )
-}
-
-// Custom chart viewer
-function ChartArtifactViewer() {
-  const { displayedArtifact } = useChatCanvas()
-  
-  if (displayedArtifact?.type !== 'chart') return null
-  
-  const { data } = displayedArtifact as Artifact<{
-    chartData: any[]
-    chartType: 'bar' | 'line' | 'pie'
-  }, 'chart'>
-  
-  return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between border-b p-4">
-        <h3 className="flex items-center gap-3">
-          <BarChart className="size-8 text-green-500" />
-          <span>Data Visualization</span>
-        </h3>
-        <ChatCanvas.Actions>
-          <ChatCanvas.Actions.History />
-          <ChatCanvas.Actions.Close />
-        </ChatCanvas.Actions>
-      </div>
-      <div className="flex-1 p-4">
-        <CustomChart data={data.chartData} type={data.chartType} />
-      </div>
-    </div>
-  )
-}
-
-// Include all viewers in your canvas
-function AdvancedChat() {
-  return (
-    <ChatSection handler={handler}>
-      <div className="flex h-full flex-col">
-        <ChatMessages />
-        <ChatInput />
-      </div>
-      
-      <ChatCanvas>
-        {/* Built-in viewers */}
-        <ChatCanvas.CodeArtifact />
-        <ChatCanvas.DocumentArtifact />
-        
-        {/* Custom viewers */}
-        <ImageArtifactViewer />
-        <PDFArtifactViewer />
-        <ChartArtifactViewer />
-      </ChatCanvas>
-    </ChatSection>
-  )
-}
+  {/* Custom viewers */}
+  <ImageArtifactViewer /> {/* for image artifacts */}
+  <PDFArtifactViewer /> {/* for pdf artifacts */}
+  <ChartArtifactViewer /> {/* for chart artifacts */}
+</ChatCanvas>
 ```
 
 ### See Demo Implementation
