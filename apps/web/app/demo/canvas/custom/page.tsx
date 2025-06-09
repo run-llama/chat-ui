@@ -117,17 +117,13 @@ function CustomChatMessages() {
   )
 }
 
+// custom artifact card for image artifacts
 function CustomArtifactCard({ data }: { data: Artifact }) {
   return (
     <ChatCanvas.Artifact
       data={data}
-      getTitle={artifact => {
-        const { caption } = (artifact as ImageArtifact).data
-        return caption as string
-      }}
-      iconMap={{
-        image: Image,
-      }}
+      getTitle={artifact => (artifact as ImageArtifact).data.caption}
+      iconMap={{ image: Image }}
     />
   )
 }
