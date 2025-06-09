@@ -366,6 +366,208 @@ function CustomCanvas() {
 }
 ```
 
+### Adding Custom Artifact Viewers
+
+You can extend the canvas with custom artifact viewers to handle different types of content. Here's an example of creating a custom image artifact viewer:
+
+```tsx
+import { 
+  Artifact, 
+  ChatCanvas, 
+  useChatCanvas 
+} from '@llamaindex/chat-ui'
+import { Image } from 'lucide-react'
+
+// Define your custom artifact type
+type ImageArtifact = Artifact<
+  {
+    imageUrl: string
+    caption: string
+  },
+  'image'
+>
+
+function ImageArtifactViewer() {
+  const { displayedArtifact } = useChatCanvas()
+
+  // Only render for image artifacts
+  if (displayedArtifact?.type !== 'image') return null
+
+  const {
+    data: { imageUrl, caption },
+  } = displayedArtifact as ImageArtifact
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Custom header with icon and title */}
+      <div className="flex items-center justify-between border-b p-4">
+        <h3 className="flex items-center gap-3 text-gray-600">
+          <Image className="size-8 text-blue-500" />
+          <div className="font-semibold">{caption}</div>
+        </h3>
+        
+        {/* Use built-in canvas actions */}
+        <ChatCanvas.Actions>
+          <ChatCanvas.Actions.History />
+          <ChatCanvas.Actions.Close />
+        </ChatCanvas.Actions>
+      </div>
+      
+      {/* Custom content area */}
+      <div className="flex flex-1 items-center justify-center p-4">
+        <img
+          src={imageUrl}
+          alt={caption}
+          className="h-[70%] rounded-2xl shadow-2xl"
+        />
+      </div>
+    </div>
+  )
+}
+
+// Use the custom viewer in your chat
+function CustomChat() {
+  const handler = useChat({ initialMessages: [] })
+
+  return (
+    <ChatSection handler={handler}>
+      <div className="flex h-full flex-col">
+        <ChatMessages />
+        <ChatInput />
+      </div>
+      
+      <ChatCanvas>
+        {/* Built-in artifact viewers */}
+        <ChatCanvas.CodeArtifact />
+        <ChatCanvas.DocumentArtifact />
+        
+        {/* Your custom artifact viewer */}
+        <ImageArtifactViewer />
+      </ChatCanvas>
+    </ChatSection>
+  )
+}
+```
+
+To trigger your custom artifact viewer, the AI response should include an annotation with the matching artifact type:
+
+```tsx
+// Example of how to create an artifact in AI response
+const response = `Here is your image!
+
+\`\`\`annotation
+${JSON.stringify({
+  type: 'artifact',
+  data: {
+    type: 'image', // This matches your viewer's check
+    data: {
+      imageUrl: 'https://example.com/image.jpg',
+      caption: 'A beautiful landscape'
+    },
+    created_at: Date.now(),
+  },
+})}
+\`\`\`
+`
+```
+
+### Multiple Custom Artifact Types
+
+You can create multiple custom artifact viewers for different content types:
+
+```tsx
+// Custom PDF viewer
+function PDFArtifactViewer() {
+  const { displayedArtifact } = useChatCanvas()
+  
+  if (displayedArtifact?.type !== 'pdf') return null
+  
+  const { data } = displayedArtifact as Artifact<{ pdfUrl: string }, 'pdf'>
+  
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex items-center justify-between border-b p-4">
+        <h3 className="flex items-center gap-3">
+          <FileText className="size-8 text-red-500" />
+          <span>PDF Document</span>
+        </h3>
+        <ChatCanvas.Actions>
+          <ChatCanvas.Actions.History />
+          <ChatCanvas.Actions.Close />
+        </ChatCanvas.Actions>
+      </div>
+      <iframe
+        src={data.pdfUrl}
+        className="flex-1 border-none"
+        title="PDF Document"
+      />
+    </div>
+  )
+}
+
+// Custom chart viewer
+function ChartArtifactViewer() {
+  const { displayedArtifact } = useChatCanvas()
+  
+  if (displayedArtifact?.type !== 'chart') return null
+  
+  const { data } = displayedArtifact as Artifact<{
+    chartData: any[]
+    chartType: 'bar' | 'line' | 'pie'
+  }, 'chart'>
+  
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex items-center justify-between border-b p-4">
+        <h3 className="flex items-center gap-3">
+          <BarChart className="size-8 text-green-500" />
+          <span>Data Visualization</span>
+        </h3>
+        <ChatCanvas.Actions>
+          <ChatCanvas.Actions.History />
+          <ChatCanvas.Actions.Close />
+        </ChatCanvas.Actions>
+      </div>
+      <div className="flex-1 p-4">
+        <CustomChart data={data.chartData} type={data.chartType} />
+      </div>
+    </div>
+  )
+}
+
+// Include all viewers in your canvas
+function AdvancedChat() {
+  return (
+    <ChatSection handler={handler}>
+      <div className="flex h-full flex-col">
+        <ChatMessages />
+        <ChatInput />
+      </div>
+      
+      <ChatCanvas>
+        {/* Built-in viewers */}
+        <ChatCanvas.CodeArtifact />
+        <ChatCanvas.DocumentArtifact />
+        
+        {/* Custom viewers */}
+        <ImageArtifactViewer />
+        <PDFArtifactViewer />
+        <ChartArtifactViewer />
+      </ChatCanvas>
+    </ChatSection>
+  )
+}
+```
+
+### See Demo Implementation
+
+For a complete working example of custom artifact viewers, check out the demo implementation in [`apps/web/app/demo/canvas/custom/page.tsx`](https://github.com/run-llama/chat-ui/blob/main/apps/web/app/demo/canvas/custom/page.tsx). This demo shows:
+
+- Custom `ImageArtifactViewer` implementation
+- Integration with existing chat components
+- Sample messages with artifact annotations
+- Copy-to-clipboard functionality for the code
+
 ## Widget Styling
 
 ### Custom Markdown Styling
