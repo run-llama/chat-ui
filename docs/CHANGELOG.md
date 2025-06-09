@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui-docs
 
+## 0.0.6
+
+### Patch Changes
+
+- 23093ed: docs: add more chatui examples
+
 ## 0.0.5
 
 ### Patch Changes

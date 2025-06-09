@@ -1,6 +1,6 @@
 {
   "name": "@llamaindex/chat-ui",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "types": "./dist/chat/index.d.ts",
   "type": "module",
   "sideEffects": [

@@ -1,5 +1,13 @@
 # web
 
+## 1.0.38
+
+### Patch Changes
+
+- 23093ed: docs: add more chatui examples
+- Updated dependencies [23093ed]
+  - @llamaindex/chat-ui@0.5.7
+
 ## 1.0.37
 
 ### Patch Changes
