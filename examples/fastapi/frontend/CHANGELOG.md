@@ -1,5 +1,12 @@
 # fastapi-chat-ui-example
 
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies [23093ed]
+  - @llamaindex/chat-ui@0.5.7
+
 ## 0.1.9
 
 ### Patch Changes
