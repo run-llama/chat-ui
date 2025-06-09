@@ -24,19 +24,32 @@ export type CodeArtifactError = {
   artifact: CodeArtifact
   errors: string[]
 }
-export type Artifact<T = unknown> = {
+
+/**
+ * Generic artifact type definition
+ * @typeParam T - The type of the data payload (e.g., \{ imageUrl: string, caption: string \})
+ * @typeParam K - The artifact type identifier string (e.g., 'image', 'code', 'document')
+ */
+export type Artifact<T = unknown, K = string> = {
   created_at: number
-  type: 'code' | 'document'
+  type: K
   data: T
 }
-export type CodeArtifact = Artifact<{
-  file_name: string
-  code: string
-  language: string
-}>
-export type DocumentArtifact = Artifact<{
-  title: string
-  content: string
-  type: string
-  sources?: { id: string }[] // we can add more source info here if needed
-}>
+export type CodeArtifact = Artifact<
+  {
+    file_name: string
+    code: string
+    language: string
+  },
+  'code'
+>
+
+export type DocumentArtifact = Artifact<
+  {
+    title: string
+    content: string
+    type: string
+    sources?: { id: string }[] // we can add more source info here if needed
+  },
+  'document'
+>

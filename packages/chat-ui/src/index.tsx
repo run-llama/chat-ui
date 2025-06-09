@@ -1,3 +1,5 @@
+'use client'
+
 // Chat components
 export * from './chat/chat.interface'
 export * from './chat/annotations'

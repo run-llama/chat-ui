@@ -1,3 +1,5 @@
+'use client'
+
 // Other useful components
 export * from './chat-agent-events'
 export * from './chat-events'

@@ -1,4 +1,4 @@
-import { FileCode, FileText, LucideIcon } from 'lucide-react'
+import { FileCode, FileText, LucideIcon, Paperclip } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
@@ -15,7 +15,15 @@ const IconMap: Record<Artifact['type'], LucideIcon> = {
   document: FileText,
 }
 
-export function ArtifactCard({ data }: { data: Artifact }) {
+export function ArtifactCard({
+  data,
+  getTitle = getCardTitle,
+  iconMap = IconMap,
+}: {
+  data: Artifact
+  getTitle?: (data: Artifact) => string
+  iconMap?: Record<Artifact['type'], LucideIcon>
+}) {
   const {
     openArtifactInCanvas,
     getArtifactVersion,
@@ -24,8 +32,8 @@ export function ArtifactCard({ data }: { data: Artifact }) {
   } = useChatCanvas()
   const { versionNumber, isLatest } = getArtifactVersion(data)
 
-  const Icon = IconMap[data.type]
-  const title = getCardTitle(data)
+  const Icon = iconMap[data.type] || Paperclip
+  const title = getTitle(data)
   const isDisplayed =
     displayedArtifact && isEqualArtifact(data, displayedArtifact)
 
@@ -41,7 +49,7 @@ export function ArtifactCard({ data }: { data: Artifact }) {
         <Icon className="size-7 shrink-0 text-blue-500" />
         <div className="flex flex-col">
           <div className="text-sm font-semibold">Version {versionNumber}</div>
-          {title && <div className="text-xs text-gray-600">{title}</div>}
+          <div className="text-xs text-gray-600">{title}</div>
         </div>
       </div>
       {isLatest ? (
@@ -72,5 +80,5 @@ const getCardTitle = (artifact: Artifact) => {
     const { title } = artifact.data as DocumentArtifact['data']
     return title
   }
-  return ''
+  return 'Generated Artifact'
 }
