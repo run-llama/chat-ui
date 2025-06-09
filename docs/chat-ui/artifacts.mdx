@@ -469,6 +469,32 @@ function CustomChat() {
 }
 ```
 
+You can also custom ArtifactCard for your artifact type.
+
+```tsx
+import { Image } from 'lucide-react'
+
+// custom artifact card for image artifacts with title is the caption and icon is the image icon
+function CustomArtifactCard({ data }: { data: Artifact }) {
+  return (
+    <ChatCanvas.Artifact
+      data={data}
+      getTitle={artifact => (artifact as ImageArtifact).data.caption}
+      iconMap={{ image: Image }}
+    />
+  )
+}
+
+// update markdown annotation renderers to use your custom artifact card
+<ChatMessage.Content>
+  <ChatMessage.Content.Markdown
+    annotationRenderers={{
+      artifact: CustomArtifactCard,
+    }}
+  />
+</ChatMessage.Content>
+```
+
 To trigger your custom artifact viewer, the AI response should include an annotation with the matching artifact type:
 
 ```tsx
