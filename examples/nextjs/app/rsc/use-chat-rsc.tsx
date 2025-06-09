@@ -24,14 +24,20 @@ export function useChatRSC(): ChatHandler {
         ...prev,
         {
           ...newMsg,
-          display: <div>{message.content}</div>,
+          display: (
+            <div className="bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2">
+              {message.content}
+            </div>
+          ),
         },
       ])
       const assistantMsg = await chatAction(newMsg.content)
       setMessages(prev => [
         ...prev,
         {
-          ...newMsg,
+          id: generateId(),
+          role: 'assistant',
+          content: '',
           display: assistantMsg,
         },
       ])

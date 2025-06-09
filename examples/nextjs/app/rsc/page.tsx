@@ -70,7 +70,7 @@ function CustomChatMessages() {
             isLast={index === messages.length - 1}
           >
             <ChatMessage.Avatar />
-            <ChatMessage.Content>{message.display}</ChatMessage.Content>
+            {message.display}
             <ChatMessage.Actions />
           </ChatMessage>
         ))}
