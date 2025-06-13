@@ -1,3 +1,5 @@
+/* eslint-disable no-constant-condition -- disable */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition -- disable */
 /* eslint-disable jsx-a11y/label-has-associated-control -- disable */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- disable */
 /* eslint-disable @typescript-eslint/no-misused-promises -- disable */
@@ -108,9 +110,48 @@ export default function Home() {
       setResponse('Please enter deployment name, task ID, and session ID')
       return
     }
-    await makeApiCall(
-      `${baseUrl}/deployments/${deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
-    )
+
+    setLoading(true)
+    setResponse('') // Clear previous response
+
+    try {
+      const res = await fetch(
+        `${baseUrl}/deployments/${deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`)
+      }
+
+      const reader = res.body?.getReader()
+      if (!reader) {
+        throw new Error('No reader available')
+      }
+
+      const decoder = new TextDecoder()
+      let accumulatedData = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        accumulatedData += chunk
+
+        // Update the response with accumulated data
+        setResponse(accumulatedData)
+      }
+    } catch (error) {
+      setResponse(`Error: ${error as string}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const getTaskResult = async () => {
