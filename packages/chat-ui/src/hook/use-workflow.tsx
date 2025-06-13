@@ -144,7 +144,8 @@ export function useWorkflow<
 
       try {
         const eventDefinition = {
-          service_id: workflow, // Using workflow/deployment name as service_id
+          // TODO: should get service_id when creating the task
+          service_id: workflow,
           event_obj_str: JSON.stringify(event),
         }
 
