@@ -3,35 +3,30 @@ import { WorkflowSDK } from './sdk'
 
 export interface WorkflowEvent {
   name: string
-}
-
-export interface AnyWorkflowEvent extends WorkflowEvent {
   [key: string]: any
 }
 
-export type WorkflowStatus = 'idle' | 'running' | 'complete' | 'error'
+export type TaskStatus = 'idle' | 'running' | 'complete' | 'error'
 
-export interface WorkflowHookParams<
-  O extends WorkflowEvent = AnyWorkflowEvent,
-> {
+export interface WorkflowHookParams<O extends WorkflowEvent> {
   baseUrl?: string // Optional base URL for the workflow API
   workflow: string // Name of the registered deployment
   sessionId?: string // Optional session ID for resuming a workflow session
   taskId?: string // Optional task ID for resuming a workflow task
-  onStop?: (event: O[], taskId: string) => void // Callback when finished streaming events
+  onStopEvents?: (event: O, taskId: string) => void // Callback when finished streaming events
   onError?: (error: any, taskId: string) => void // Callback for errors
 }
 
 /** Return value from the hook */
 export interface WorkflowHookHandler<
-  I extends WorkflowEvent = AnyWorkflowEvent,
-  O extends WorkflowEvent = AnyWorkflowEvent,
+  I extends WorkflowEvent,
+  O extends WorkflowEvent,
 > {
   taskId?: string // Current Task ID (initiated by sendEvent)
   sessionId?: string // Session ID once the workflow session starts
   events: (I | O)[] // List of all events (input and output) for the current task
   eventsByTaskId: Record<string, (I | O)[]>
-  status: WorkflowStatus // Status of the workflow
+  status: TaskStatus // Status of the workflow
   sendEvent: (event: I, taskId?: string) => Promise<string> // Function to send an event, returns the task id - if taskId is provided, it will will send the event to the task, otherwise it will create a new task
 }
 
@@ -39,15 +34,15 @@ export interface WorkflowHookHandler<
  * useWorkflow hook for consuming llama-deploy workflows
  */
 export function useWorkflow<
-  I extends WorkflowEvent = AnyWorkflowEvent,
-  O extends WorkflowEvent = AnyWorkflowEvent,
+  I extends WorkflowEvent = WorkflowEvent,
+  O extends WorkflowEvent = WorkflowEvent,
 >(params: WorkflowHookParams<O>): WorkflowHookHandler<I, O> {
   const {
     baseUrl,
     workflow: deploymentName,
     taskId: initialTaskId,
     sessionId: initialSessionId,
-    onStop,
+    onStopEvents,
     onError,
   } = params
 
@@ -59,11 +54,15 @@ export function useWorkflow<
   const [isInitialized, setIsInitialized] = useState(false)
   const [sessionId, setSessionId] = useState<string>()
   const [taskId, setTaskId] = useState<string>()
-  const [events, setEvents] = useState<(I | O)[]>([])
   const [eventsByTaskId, setEventsByTaskId] = useState<
     Record<string, (I | O)[]>
   >({})
-  const [status, setStatus] = useState<WorkflowStatus>('idle')
+  const [status, setStatus] = useState<TaskStatus>('idle')
+
+  const events = useMemo(() => {
+    if (!taskId) return []
+    return eventsByTaskId[taskId] ?? []
+  }, [eventsByTaskId, taskId])
 
   // stream events from the task
   const streamTaskEvents = useCallback(
@@ -74,7 +73,6 @@ export function useWorkflow<
       const allEvents = await sdk.streamTaskEvents(taskId, sessionId, {
         onData: (data: string) => {
           const event = JSON.parse(data)
-          setEvents(prev => [...prev, event])
           setEventsByTaskId(prev => ({
             ...prev,
             [taskId]: [...(prev[taskId] || []), event],
@@ -84,8 +82,11 @@ export function useWorkflow<
           setStatus('error')
           onError?.(error, taskId)
         },
-        onStop: (result: string[]) => {
-          onStop?.(result.map(item => JSON.parse(item)) as O[], taskId)
+        onFinish: (events: string[]) => {
+          const stopEventStr = events[events.length - 1] // TODO: better check by type StopEvent
+          if (stopEventStr && onStopEvents) {
+            onStopEvents(JSON.parse(stopEventStr) as O, taskId)
+          }
         },
       })
 
@@ -93,7 +94,7 @@ export function useWorkflow<
 
       return allEvents.map(item => JSON.parse(item))
     },
-    [sdk, onError, onStop]
+    [sdk, onError, onStopEvents]
   )
 
   // initialize workflow, create session and stream events if task id is provided

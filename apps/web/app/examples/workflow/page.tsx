@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useWorkflow } from '@llamaindex/chat-ui'
+import { useWorkflow, WorkflowEvent } from '@llamaindex/chat-ui'
 
 const BASE_URL = 'http://127.0.0.1:4501'
-const DEPLOYMENT_NAME = 'LlamaIndexServer'
+const DEPLOYMENT_NAME = 'QuickStart'
 
-interface ChatStartEvent {
+interface ChatStartEvent extends WorkflowEvent {
   name: 'ChatStartEvent'
   chat_request: {
     id: string
