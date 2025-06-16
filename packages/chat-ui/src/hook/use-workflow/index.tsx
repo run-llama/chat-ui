@@ -26,7 +26,7 @@ export interface WorkflowHookHandler<
   sessionId?: string // Session ID once the workflow session starts
   events: (I | O)[] // List of all events (input and output) for the current task
   eventsByTaskId: Record<string, (I | O)[]>
-  status: TaskStatus // Status of the workflow
+  taskStatuses: Record<string, TaskStatus> // Status of the workflow by task
   sendEvent: (event: I, taskId?: string) => Promise<string> // Function to send an event, returns the task id - if taskId is provided, it will will send the event to the task, otherwise it will create a new task
 }
 
@@ -57,7 +57,9 @@ export function useWorkflow<
   const [eventsByTaskId, setEventsByTaskId] = useState<
     Record<string, (I | O)[]>
   >({})
-  const [status, setStatus] = useState<TaskStatus>('idle')
+  const [taskStatuses, setTaskStatuses] = useState<Record<string, TaskStatus>>(
+    {}
+  )
 
   const events = useMemo(() => {
     if (!taskId) return []
@@ -67,7 +69,7 @@ export function useWorkflow<
   // stream events from the task
   const streamTaskEvents = useCallback(
     async (taskId: string, sessionId: string) => {
-      setStatus('running')
+      setTaskStatuses(prev => ({ ...prev, [taskId]: 'running' }))
 
       // stream events from the task
       const allEvents = await sdk.streamTaskEvents(taskId, sessionId, {
@@ -79,7 +81,7 @@ export function useWorkflow<
           }))
         },
         onError: (error: Error) => {
-          setStatus('error')
+          setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
           onError?.(error, taskId)
         },
         onFinish: (events: string[]) => {
@@ -90,7 +92,7 @@ export function useWorkflow<
         },
       })
 
-      setStatus('complete')
+      setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
 
       return allEvents.map(item => JSON.parse(item))
     },
@@ -130,11 +132,11 @@ export function useWorkflow<
         throw new Error('Cannot send event: No active session')
       }
 
-      setStatus('running')
-
       let runTaskId = targetTaskId
       try {
         if (runTaskId) {
+          const taskIdForStatus = runTaskId
+          setTaskStatuses(prev => ({ ...prev, [taskIdForStatus]: 'running' }))
           // if task id is provided, resume the workflow
           await sdk.sendEventToTask(
             runTaskId,
@@ -151,6 +153,8 @@ export function useWorkflow<
             sessionId
           )
           runTaskId = taskData.task_id
+          const taskIdForStatus = runTaskId
+          setTaskStatuses(prev => ({ ...prev, [taskIdForStatus]: 'running' }))
         }
         setTaskId(runTaskId)
 
@@ -158,7 +162,10 @@ export function useWorkflow<
         await streamTaskEvents(runTaskId, sessionId)
         return runTaskId
       } catch (error) {
-        setStatus('error')
+        if (runTaskId) {
+          const taskIdForStatus = runTaskId
+          setTaskStatuses(prev => ({ ...prev, [taskIdForStatus]: 'error' }))
+        }
         onError?.(error, runTaskId || '')
         throw error
       }
@@ -171,7 +178,7 @@ export function useWorkflow<
     taskId,
     events,
     eventsByTaskId,
-    status,
+    taskStatuses,
     sendEvent,
   }
 }
