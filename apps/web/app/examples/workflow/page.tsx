@@ -20,8 +20,8 @@ export default function Home() {
   const workflow = useWorkflow<ChatStartEvent>({
     baseUrl: BASE_URL,
     workflow: DEPLOYMENT_NAME,
-    onStopEvent: event => {
-      console.log('Workflow completed:', event)
+    onStop: events => {
+      console.log('Workflow completed:', events)
     },
     onError: error => {
       console.error('Workflow error:', error)

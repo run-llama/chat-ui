@@ -22,7 +22,7 @@ export interface SendEventRequest {
 export interface StreamingEventCallback {
   onData?: (data: string) => void
   onError?: (error: Error) => void
-  onComplete?: () => void
+  onStop?: (data: string[]) => void
 }
 
 export class WorkflowSDK {
@@ -187,7 +187,7 @@ export class WorkflowSDK {
         callback?.onData?.(chunk)
       }
 
-      callback?.onComplete?.()
+      callback?.onStop?.(accumulatedData)
       return accumulatedData
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error))

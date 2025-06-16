@@ -16,10 +16,10 @@ export interface WorkflowHookParams<
 > {
   baseUrl?: string // Optional base URL for the workflow API
   workflow: string // Name of the registered deployment
-  taskId?: string // Optional task ID for resuming a workflow
   sessionId?: string // Optional session ID for resuming a session
+  taskId?: string // Optional task ID for resuming a workflow
+  onStop?: (event: O[]) => void // Callback when finished streaming events
   onError?: (error: any) => void // Callback for errors
-  onStopEvent?: (event: O) => void // Callback for StopEvent
 }
 
 /** Return value from the hook */
@@ -46,7 +46,7 @@ export function useWorkflow<
     workflow: deploymentName,
     taskId: initialTaskId,
     sessionId: initialSessionId,
-    onStopEvent,
+    onStop,
     onError,
   } = params
 
@@ -61,7 +61,33 @@ export function useWorkflow<
   const [events, setEvents] = useState<(I | O)[]>([])
   const [status, setStatus] = useState<WorkflowStatus>('idle')
 
-  // initialize workflow, create session and get events if task id is provided
+  // stream events from the task
+  const streamTaskEvents = useCallback(
+    async (taskId: string, sessionId: string) => {
+      setStatus('running')
+
+      // stream events from the task
+      const allEvents = await sdk.streamTaskEvents(taskId, sessionId, {
+        onData: (data: string) => {
+          setEvents(prev => [...prev, JSON.parse(data)])
+        },
+        onError: (error: Error) => {
+          setStatus('error')
+          onError?.(error)
+        },
+        onStop: (result: string[]) => {
+          onStop?.(result.map(item => JSON.parse(item)) as O[])
+        },
+      })
+
+      setStatus('complete')
+
+      return allEvents.map(item => JSON.parse(item))
+    },
+    [sdk, onError, onStop]
+  )
+
+  // initialize workflow, create session and stream events if task id is provided
   useEffect(() => {
     const initWorkflow = async () => {
       let startSessionId = initialSessionId
@@ -75,12 +101,8 @@ export function useWorkflow<
 
       // if task id is provided, initialize events
       if (initialTaskId) {
-        const allEvents = await sdk.streamTaskEvents(
-          initialTaskId,
-          startSessionId
-        )
-        setEvents(allEvents.map(event => JSON.parse(event)))
         setTaskId(initialTaskId)
+        await streamTaskEvents(initialTaskId, startSessionId)
       }
 
       setIsInitialized(true)
@@ -89,9 +111,9 @@ export function useWorkflow<
     if (!isInitialized) {
       initWorkflow()
     }
-  }, [initialSessionId, initialTaskId, sdk, isInitialized])
+  }, [initialSessionId, initialTaskId, sdk, isInitialized, streamTaskEvents])
 
-  // Function to send an event to the server
+  // Send an event to create new task or resume existing task
   const sendEvent = useCallback(
     async (event: I): Promise<void> => {
       if (!sessionId) {
@@ -122,33 +144,18 @@ export function useWorkflow<
           setTaskId(taskData.task_id)
         }
 
-        // get events from the task
-        const allEvents = await sdk.streamTaskEvents(runTaskId, sessionId, {
-          onData: (data: string) => {
-            setEvents(prev => [...prev, JSON.parse(data)])
-          },
-          onError: (error: Error) => {
-            setStatus('error')
-            onError?.(error)
-          },
-          onComplete: () => {
-            setStatus('complete')
-            onStopEvent?.(events[events.length - 1] as O)
-          },
-        })
-        setEvents(allEvents.map(item => JSON.parse(item)))
-        setStatus('complete')
+        // stream events from the task
+        await streamTaskEvents(runTaskId, sessionId)
       } catch (error) {
         setStatus('error')
-        onError?.(error)
       }
     },
-    [sessionId, taskId, sdk, deploymentName, onError, onStopEvent, events]
+    [sessionId, taskId, sdk, deploymentName, streamTaskEvents]
   )
 
   return {
-    taskId,
     sessionId,
+    taskId,
     events,
     status,
     sendEvent,
