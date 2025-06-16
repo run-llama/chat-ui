@@ -9,7 +9,7 @@
 import { useState } from 'react'
 
 const BASE_URL = 'http://127.0.0.1:4501'
-const DEPLOYMENT_NAME = 'QuickStart'
+const DEPLOYMENT_NAME = 'LlamaIndexServer'
 const SERVICE_ID = 'echo_workflow'
 
 export default function Home() {

@@ -11,7 +11,7 @@ import { useState } from 'react'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
 const BASE_URL = 'http://127.0.0.1:4501'
-const DEPLOYMENT_NAME = 'QuickStart'
+const DEPLOYMENT_NAME = 'LlamaIndexServer'
 
 interface HumanResponseEvent {
   name: 'HumanResponseEvent'
