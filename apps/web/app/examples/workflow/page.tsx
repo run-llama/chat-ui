@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary -- disable */
-/* eslint-disable @typescript-eslint/no-unsafe-call -- disable */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression -- disable */
 /* eslint-disable @typescript-eslint/no-misused-promises -- disable */
 
@@ -67,21 +65,17 @@ export default function Home() {
         <h2 className="mb-2 text-lg font-semibold">Workflow Status</h2>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <strong>Task ID:</strong> {workflow.taskId || 'Not started'}
+            <strong>Session ID:</strong> {workflow.sessionId || 'Not created'}
           </div>
           <div>
-            <strong>Session ID:</strong> {workflow.sessionId || 'Not started'}
+            <strong>Task ID:</strong> {workflow.taskId || 'Not created'}
           </div>
+
           <div>
             <strong>Events Count:</strong> {workflow.events.length}
           </div>
           <div>
-            <strong>Status:</strong>{' '}
-            {workflow.isError
-              ? 'Error'
-              : workflow.isComplete
-                ? 'Complete'
-                : 'Running'}
+            <strong>Status:</strong> {workflow.status}
           </div>
         </div>
       </div>
@@ -107,16 +101,20 @@ export default function Home() {
           type="text"
           value={userInput}
           onChange={e => setUserInput(e.target.value)}
-          onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
+          onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
           className="flex-1 rounded border border-gray-300 p-2"
           placeholder="Type your message..."
-          disabled={workflow.isComplete || workflow.isError}
+          disabled={
+            workflow.status === 'complete' || workflow.status === 'error'
+          }
         />
         <button
           type="button"
           onClick={handleSendMessage}
           disabled={
-            workflow.isComplete || workflow.isError || !userInput.trim()
+            workflow.status === 'complete' ||
+            workflow.status === 'error' ||
+            !userInput.trim()
           }
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
         >
@@ -134,9 +132,7 @@ export default function Home() {
                 taskId: workflow.taskId,
                 sessionId: workflow.sessionId,
                 events: workflow.events,
-                backfillIndex: workflow.backfillIndex,
-                isComplete: workflow.isComplete,
-                isError: workflow.isError,
+                status: workflow.status,
               },
               null,
               2
