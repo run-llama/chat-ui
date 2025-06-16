@@ -1,16 +1,17 @@
 export interface WorkflowConfig {
-  baseUrl: string
+  baseUrl?: string
   deploymentName: string
-}
-
-export interface TaskResponse {
-  task_id?: string
-  session_id?: string
-  [key: string]: any
 }
 
 export interface CreateTaskRequest {
   input: string
+}
+
+export interface TaskResponse {
+  input: string
+  task_id: string
+  session_id: string
+  service_id: string
 }
 
 export interface SendEventRequest {
@@ -19,7 +20,7 @@ export interface SendEventRequest {
 }
 
 export interface StreamingEventCallback {
-  onData: (data: string) => void
+  onData: (data: string[]) => void
   onError: (error: Error) => void
   onComplete: () => void
 }
@@ -30,7 +31,7 @@ export class WorkflowSDK {
   private defaultServiceId = 'echo_workflow'
 
   constructor(config: WorkflowConfig) {
-    this.baseUrl = config.baseUrl
+    this.baseUrl = config.baseUrl || ''
     this.deploymentName = config.deploymentName
   }
 
@@ -72,7 +73,7 @@ export class WorkflowSDK {
   /**
    * Create a new session
    */
-  async createSession(): Promise<TaskResponse> {
+  async createSession(): Promise<{ session_id: string }> {
     return this.makeRequest(
       `/deployments/${this.deploymentName}/sessions/create`,
       {
@@ -87,7 +88,7 @@ export class WorkflowSDK {
   async createDeploymentTask(
     request: CreateTaskRequest,
     sessionId?: string
-  ): Promise<TaskResponse> {
+  ): Promise<string> {
     const queryParams = sessionId ? `?session_id=${sessionId}` : ''
     return this.makeRequest(
       `/deployments/${this.deploymentName}/tasks/run${queryParams}`,
@@ -99,7 +100,7 @@ export class WorkflowSDK {
   }
 
   /**
-   * Create a deployment task without waiting for completion
+   * Create a deployment task without waiting for completion (stream events)
    */
   async createDeploymentTaskNoWait(
     request: CreateTaskRequest,
@@ -145,7 +146,7 @@ export class WorkflowSDK {
     taskId: string,
     sessionId: string,
     callback?: StreamingEventCallback
-  ): Promise<string> {
+  ): Promise<string[]> {
     const url = `${this.baseUrl}/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
 
     const response = await fetch(url, {
@@ -168,7 +169,7 @@ export class WorkflowSDK {
     }
 
     const decoder = new TextDecoder()
-    let accumulatedData = ''
+    const accumulatedData: string[] = []
 
     try {
       while (true) {
@@ -177,7 +178,7 @@ export class WorkflowSDK {
         if (done) break
 
         const chunk = decoder.decode(value, { stream: true })
-        accumulatedData += chunk
+        accumulatedData.push(chunk)
 
         // Call the callback with new data if provided
         callback?.onData(accumulatedData)
@@ -201,34 +202,22 @@ export class WorkflowSDK {
     )
   }
 
-  /**
-   * Update configuration
-   */
-  updateConfig(config: Partial<WorkflowConfig>) {
-    if (config.baseUrl !== undefined) {
-      this.baseUrl = config.baseUrl
-    }
-    if (config.deploymentName !== undefined) {
-      this.deploymentName = config.deploymentName
-    }
-  }
+  // /**
+  //  * Update configuration
+  //  */
+  // updateConfig(config: Partial<WorkflowConfig>) {
+  //   if (config.baseUrl !== undefined) {
+  //     this.baseUrl = config.baseUrl
+  //   }
+  //   if (config.deploymentName !== undefined) {
+  //     this.deploymentName = config.deploymentName
+  //   }
+  // }
 
-  /**
-   * Set default service ID for events
-   */
-  setDefaultServiceId(serviceId: string) {
-    this.defaultServiceId = serviceId
-  }
+  // /**
+  //  * Set default service ID for events
+  //  */
+  // setDefaultServiceId(serviceId: string) {
+  //   this.defaultServiceId = serviceId
+  // }
 }
-
-// Helper function to create SDK instance
-export function createWorkflowSDK(config: WorkflowConfig): WorkflowSDK {
-  return new WorkflowSDK(config)
-}
-
-// Default configuration constants
-export const DEFAULT_CONFIG = {
-  BASE_URL: 'http://127.0.0.1:4501',
-  DEPLOYMENT_NAME: 'LlamaIndexServer',
-  SERVICE_ID: 'echo_workflow',
-} as const
