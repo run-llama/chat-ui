@@ -1,3 +1,5 @@
+import { readDeploymentsDeploymentsGet } from '@llamaindex/llama-deploy'
+
 export interface WorkflowConfig {
   baseUrl?: string
   deploymentName: string
@@ -58,6 +60,7 @@ export class WorkflowSDK {
    * Get all deployments
    */
   async getDeployments(): Promise<any> {
+    const deployments = await readDeploymentsDeploymentsGet()
     return this.makeRequest('/deployments/')
   }
 

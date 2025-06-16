@@ -6,22 +6,21 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "generate": "openapi-ts",
-    "build": "npm run generate && tsc",
+    "build": "npm run generate && bunchee",
     "clean": "rm -rf dist src/generated",
-    "dev": "npm run generate && tsc --watch"
-  },
-  "dependencies": {
-    "@hey-api/client-fetch": "^0.1.0"
+    "dev": "bunchee --watch"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.45.0",
+    "@llamaindex/typescript-config": "workspace:*",
+    "@hey-api/openapi-ts": "^0.73.0",
+    "bunchee": "^6.5.2",
     "typescript": "^5.0.0"
   },
   "files": [
-    "dist/**/*"
+    "dist"
   ],
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   }
-} 
+}
