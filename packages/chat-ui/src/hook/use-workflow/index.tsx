@@ -42,12 +42,12 @@ export function useWorkflow<
   O extends WorkflowEvent = AnyWorkflowEvent,
 >(params: WorkflowHookParams<O>): WorkflowHookHandler<I, O> {
   const {
+    baseUrl,
     workflow: deploymentName,
     taskId: initialTaskId,
     sessionId: initialSessionId,
-    onStopEvent: _onStopEvent, // TODO: fix this
+    onStopEvent,
     onError,
-    baseUrl = '',
   } = params
 
   const sdk = useMemo(
@@ -55,40 +55,41 @@ export function useWorkflow<
     [baseUrl, deploymentName]
   )
 
-  const [taskId, setTaskId] = useState<string>()
+  const [isInitialized, setIsInitialized] = useState(false)
   const [sessionId, setSessionId] = useState<string>()
+  const [taskId, setTaskId] = useState<string>()
   const [events, setEvents] = useState<(I | O)[]>([])
   const [status, setStatus] = useState<WorkflowStatus>('idle')
 
+  // initialize workflow, create session and get events if task id is provided
   useEffect(() => {
-    const startWorkflow = async () => {
-      try {
-        let startSessionId = initialSessionId
+    const initWorkflow = async () => {
+      let startSessionId = initialSessionId
 
-        // create session if not provided
-        if (!startSessionId) {
-          const sessionData = await sdk.createSession()
-          startSessionId = sessionData.session_id
-        }
-
-        // if task id is provided, initialize events
-        if (initialTaskId) {
-          const allEvents = await sdk.getTaskEvents(
-            initialTaskId,
-            startSessionId
-          )
-          setEvents(allEvents.map(event => JSON.parse(event)))
-        }
-
-        setSessionId(startSessionId)
-        setTaskId(initialTaskId)
-      } catch (error) {
-        console.error(error)
+      // create session if not provided
+      if (!startSessionId) {
+        const sessionData = await sdk.createSession()
+        startSessionId = sessionData.session_id
       }
+      setSessionId(startSessionId)
+
+      // if task id is provided, initialize events
+      if (initialTaskId) {
+        const allEvents = await sdk.streamTaskEvents(
+          initialTaskId,
+          startSessionId
+        )
+        setEvents(allEvents.map(event => JSON.parse(event)))
+        setTaskId(initialTaskId)
+      }
+
+      setIsInitialized(true)
     }
 
-    startWorkflow()
-  }, [initialSessionId, initialTaskId, sdk])
+    if (!isInitialized) {
+      initWorkflow()
+    }
+  }, [initialSessionId, initialTaskId, sdk, isInitialized])
 
   // Function to send an event to the server
   const sendEvent = useCallback(
@@ -100,30 +101,41 @@ export function useWorkflow<
       setStatus('running')
 
       try {
-        let eventTaskId = taskId
-
-        // if not task id, create a new task with event as input to start the workflow
-        if (!eventTaskId) {
+        let runTaskId = taskId
+        if (runTaskId) {
+          // if task id is provided, resume the workflow
+          await sdk.sendEventToTask(
+            runTaskId,
+            sessionId,
+            JSON.stringify({
+              service_id: deploymentName,
+              event_obj_str: JSON.stringify(event),
+            })
+          )
+        } else {
+          // if not task id, create a new task with input event to start the workflow
           const taskData = await sdk.createDeploymentTaskNoWait(
             { input: JSON.stringify(event) },
             sessionId
           )
-          eventTaskId = taskData.task_id
-          setTaskId(eventTaskId)
+          runTaskId = taskData.task_id
+          setTaskId(taskData.task_id)
         }
 
-        // if task id is provided, resume the workflow
-        await sdk.sendEventToTask(
-          eventTaskId,
-          sessionId,
-          JSON.stringify({
-            service_id: deploymentName,
-            event_obj_str: JSON.stringify(event),
-          })
-        )
-
         // get events from the task
-        const allEvents = await sdk.getTaskEvents(eventTaskId, sessionId)
+        const allEvents = await sdk.streamTaskEvents(runTaskId, sessionId, {
+          onData: (data: string) => {
+            setEvents(prev => [...prev, JSON.parse(data)])
+          },
+          onError: (error: Error) => {
+            setStatus('error')
+            onError?.(error)
+          },
+          onComplete: () => {
+            setStatus('complete')
+            onStopEvent?.(events[events.length - 1] as O)
+          },
+        })
         setEvents(allEvents.map(item => JSON.parse(item)))
         setStatus('complete')
       } catch (error) {
@@ -131,7 +143,7 @@ export function useWorkflow<
         onError?.(error)
       }
     },
-    [sessionId, taskId, sdk, deploymentName, onError]
+    [sessionId, taskId, sdk, deploymentName, onError, onStopEvent, events]
   )
 
   return {

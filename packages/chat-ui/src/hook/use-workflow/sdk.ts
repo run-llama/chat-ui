@@ -20,9 +20,9 @@ export interface SendEventRequest {
 }
 
 export interface StreamingEventCallback {
-  onData: (data: string[]) => void
-  onError: (error: Error) => void
-  onComplete: () => void
+  onData?: (data: string) => void
+  onError?: (error: Error) => void
+  onComplete?: () => void
 }
 
 export class WorkflowSDK {
@@ -143,9 +143,9 @@ export class WorkflowSDK {
   }
 
   /**
-   * Get task events with streaming support
+   * Stream task events
    */
-  async getTaskEvents(
+  async streamTaskEvents(
     taskId: string,
     sessionId: string,
     callback?: StreamingEventCallback
@@ -160,14 +160,14 @@ export class WorkflowSDK {
 
     if (!response.ok) {
       const error = new Error(`HTTP error! status: ${response.status}`)
-      callback?.onError(error)
+      callback?.onError?.(error)
       throw error
     }
 
     const reader = response.body?.getReader()
     if (!reader) {
       const error = new Error('No reader available')
-      callback?.onError(error)
+      callback?.onError?.(error)
       throw error
     }
 
@@ -184,14 +184,14 @@ export class WorkflowSDK {
         accumulatedData.push(chunk)
 
         // Call the callback with new data if provided
-        callback?.onData(accumulatedData)
+        callback?.onData?.(chunk)
       }
 
-      callback?.onComplete()
+      callback?.onComplete?.()
       return accumulatedData
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error))
-      callback?.onError(err)
+      callback?.onError?.(err)
       throw err
     }
   }
@@ -204,23 +204,4 @@ export class WorkflowSDK {
       `/deployments/${this.deploymentName}/tasks/${taskId}/results?session_id=${sessionId}`
     )
   }
-
-  // /**
-  //  * Update configuration
-  //  */
-  // updateConfig(config: Partial<WorkflowConfig>) {
-  //   if (config.baseUrl !== undefined) {
-  //     this.baseUrl = config.baseUrl
-  //   }
-  //   if (config.deploymentName !== undefined) {
-  //     this.deploymentName = config.deploymentName
-  //   }
-  // }
-
-  // /**
-  //  * Set default service ID for events
-  //  */
-  // setDefaultServiceId(serviceId: string) {
-  //   this.defaultServiceId = serviceId
-  // }
 }

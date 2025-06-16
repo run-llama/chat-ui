@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-confusing-void-expression -- disable */
-/* eslint-disable @typescript-eslint/no-misused-promises -- disable */
-
-// TODO: fix eslint
-
 'use client'
 
 import { useState } from 'react'
@@ -11,47 +6,36 @@ import { useWorkflow } from '@llamaindex/chat-ui'
 const BASE_URL = 'http://127.0.0.1:4501'
 const DEPLOYMENT_NAME = 'LlamaIndexServer'
 
-interface HumanResponseEvent {
-  name: 'HumanResponseEvent'
-  response: string
-}
-
-interface StopEvent {
-  name: 'StopEvent'
-  [key: string]: any
+interface ChatStartEvent {
+  name: 'ChatStartEvent'
+  chat_request: {
+    id: string
+    messages: { role: string; content: string }[]
+  }
 }
 
 export default function Home() {
   const [userInput, setUserInput] = useState('')
-  const [messages, setMessages] = useState<string[]>([])
 
-  const workflow = useWorkflow<HumanResponseEvent, StopEvent>({
-    workflow: DEPLOYMENT_NAME,
+  const workflow = useWorkflow<ChatStartEvent>({
     baseUrl: BASE_URL,
+    workflow: DEPLOYMENT_NAME,
     onStopEvent: event => {
-      setMessages(prev => [
-        ...prev,
-        `Workflow completed: ${JSON.stringify(event)}`,
-      ])
+      console.log('Workflow completed:', event)
     },
     onError: error => {
-      setMessages(prev => [...prev, `Error: ${error}`])
+      console.error('Workflow error:', error)
     },
   })
 
   const handleSendMessage = async () => {
-    if (!userInput.trim()) return
-
-    try {
-      await workflow.sendEvent({
-        name: 'HumanResponseEvent',
-        response: userInput,
-      })
-      setMessages(prev => [...prev, `You: ${userInput}`])
-      setUserInput('')
-    } catch (error) {
-      setMessages(prev => [...prev, `Failed to send: ${error as string}`])
-    }
+    await workflow.sendEvent({
+      name: 'ChatStartEvent',
+      chat_request: {
+        id: new Date().getTime().toString(),
+        messages: [{ role: 'user', content: userInput }],
+      },
+    })
   }
 
   return (
@@ -80,14 +64,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Chat Interface */}
+      {/* Events Interface */}
       <div className="mb-4 h-96 overflow-auto rounded border bg-white p-4">
-        <h3 className="mb-2 font-semibold">Messages & Events</h3>
-        {messages.map((message, index) => (
-          <div key={index} className="mb-2 text-sm">
-            {message}
-          </div>
-        ))}
+        <h3 className="mb-2 font-semibold">Events</h3>
         {workflow.events.map((event, index) => (
           <div key={index} className="mb-2 text-sm text-blue-600">
             Event {index + 1}: {JSON.stringify(event)}
@@ -104,41 +83,16 @@ export default function Home() {
           onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
           className="flex-1 rounded border border-gray-300 p-2"
           placeholder="Type your message..."
-          disabled={
-            workflow.status === 'complete' || workflow.status === 'error'
-          }
+          disabled={workflow.status === 'running'}
         />
         <button
           type="button"
           onClick={handleSendMessage}
-          disabled={
-            workflow.status === 'complete' ||
-            workflow.status === 'error' ||
-            !userInput.trim()
-          }
+          disabled={workflow.status === 'running'}
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
         >
           Send
         </button>
-      </div>
-
-      {/* Debug Panel */}
-      <div className="mt-6">
-        <details>
-          <summary className="cursor-pointer font-semibold">Debug Info</summary>
-          <pre className="mt-2 max-h-48 overflow-auto rounded bg-gray-100 p-2 text-xs">
-            {JSON.stringify(
-              {
-                taskId: workflow.taskId,
-                sessionId: workflow.sessionId,
-                events: workflow.events,
-                status: workflow.status,
-              },
-              null,
-              2
-            )}
-          </pre>
-        </details>
       </div>
     </div>
   )
