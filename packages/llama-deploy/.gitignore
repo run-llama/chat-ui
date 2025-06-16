@@ -1,0 +1,23 @@
+# Generated API client files
+src/generated/
+
+# Build output
+dist/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage
+coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db 
