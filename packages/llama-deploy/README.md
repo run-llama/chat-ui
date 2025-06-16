@@ -1,11 +1,11 @@
-# @llamaindex/api-client
+# @llamaindex/llama-deploy
 
 This package provides a TypeScript API client generated from the OpenAPI specification using `@hey-api/openapi-ts`.
 
 ## Installation
 
 ```bash
-npm install @llamaindex/api-client
+npm install @llamaindex/llama-deploy
 ```
 
 ## Development
@@ -41,7 +41,7 @@ npm run clean
 ## Usage
 
 ```typescript
-import { client, DeploymentsService } from '@llamaindex/api-client';
+import { client, DeploymentsService } from '@llamaindex/llama-deploy';
 
 // Configure the client
 client.setConfig({

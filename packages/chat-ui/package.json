@@ -39,7 +39,7 @@
     "postbuild": "pnpm run copy"
   },
   "devDependencies": {
-    "@llamaindex/deploy-client": "workspace:*",
+    "@llamaindex/llama-deploy": "workspace:*",
     "@llamaindex/eslint-config": "workspace:*",
     "@llamaindex/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "4.0.7",

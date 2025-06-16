@@ -314,12 +314,12 @@ importers:
         specifier: ^0.9.1
         version: 0.9.9(@types/react@18.3.21)(react-dom@18.3.1)(react@18.3.1)
     devDependencies:
-      '@llamaindex/deploy-client':
-        specifier: workspace:*
-        version: link:../deploy-client
       '@llamaindex/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
+      '@llamaindex/llama-deploy':
+        specifier: workspace:*
+        version: link:../llama-deploy
       '@llamaindex/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
@@ -356,7 +356,7 @@ importers:
 
   packages/config-typescript: {}
 
-  packages/deploy-client:
+  packages/llama-deploy:
     dependencies:
       '@hey-api/client-fetch':
         specifier: ^0.1.0

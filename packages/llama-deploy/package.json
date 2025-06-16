@@ -1,5 +1,5 @@
 {
-  "name": "@llamaindex/deploy-client",
+  "name": "@llamaindex/llama-deploy",
   "version": "0.0.1",
   "description": "Generated API client from OpenAPI specification",
   "main": "dist/index.js",
