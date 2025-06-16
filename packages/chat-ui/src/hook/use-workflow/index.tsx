@@ -8,19 +8,33 @@ export interface WorkflowEvent {
 
 export type TaskStatus = 'idle' | 'running' | 'complete' | 'error'
 
-export interface WorkflowHookParams<O extends WorkflowEvent> {
+export interface WorkflowHookParams<O extends WorkflowEvent = WorkflowEvent> {
   baseUrl?: string // Optional base URL for the workflow API
   workflow: string // Name of the registered deployment
   sessionId?: string // Optional session ID for resuming a workflow session
   taskId?: string // Optional task ID for resuming a workflow task
-  onStopEvents?: (event: O, taskId: string) => void // Callback when finished streaming events
-  onError?: (error: any, taskId: string) => void // Callback for errors
+  initialTaskCallbacks?: TaskCallbacks<O> // Optional callbacks for the initial task if taskId is provided
+}
+
+export interface TaskCallbacks<O extends WorkflowEvent = WorkflowEvent> {
+  onStop?: (events: O[]) => void
+  onError?: (error: any) => void
+}
+
+export interface Task<
+  I extends WorkflowEvent = WorkflowEvent,
+  O extends WorkflowEvent = WorkflowEvent,
+> {
+  id: string
+  events: (I | O)[]
+  status: TaskStatus
+  sendEvent: (event: I, callbacks?: TaskCallbacks<O>) => Promise<void>
 }
 
 /** Return value from the hook */
 export interface WorkflowHookHandler<
-  I extends WorkflowEvent,
-  O extends WorkflowEvent,
+  I extends WorkflowEvent = WorkflowEvent,
+  O extends WorkflowEvent = WorkflowEvent,
 > {
   sessionId?: string // Session ID once the workflow session starts
   currentTask?: Task<I, O>
@@ -40,8 +54,7 @@ export function useWorkflow<
     workflow: deploymentName,
     taskId: initialTaskId,
     sessionId: initialSessionId,
-    onStopEvents,
-    onError,
+    initialTaskCallbacks,
   } = params
 
   const sdk = useMemo(
@@ -51,7 +64,7 @@ export function useWorkflow<
 
   const [isInitialized, setIsInitialized] = useState(false)
   const [sessionId, setSessionId] = useState<string>()
-  const [taskId, setTaskId] = useState<string>()
+  const [currentTaskId, setCurrentTaskId] = useState<string>()
   const [eventsByTaskId, setEventsByTaskId] = useState<
     Record<string, (I | O)[]>
   >({})
@@ -59,11 +72,6 @@ export function useWorkflow<
     {}
   )
   const taskCallbacksRef = useRef<Record<string, TaskCallbacks<O>>>({})
-
-  const events = useMemo(() => {
-    if (!taskId) return []
-    return eventsByTaskId[taskId] ?? []
-  }, [eventsByTaskId, taskId])
 
   // stream events from the task
   const streamTaskEvents = useCallback(
@@ -83,8 +91,10 @@ export function useWorkflow<
         },
         onFinish: (events: string[]) => {
           const stopEventStr = events[events.length - 1] // TODO: better check by type StopEvent
-          if (stopEventStr && onStopEvents) {
-            onStopEvents(JSON.parse(stopEventStr) as O, taskId)
+          if (stopEventStr && taskCallbacksRef.current[taskId]?.onStop) {
+            taskCallbacksRef.current[taskId]?.onStop(
+              events.map(item => JSON.parse(item)) as O[]
+            )
           }
         },
       })
@@ -94,7 +104,7 @@ export function useWorkflow<
         [taskId]: allEvents.map(item => JSON.parse(item)),
       }))
     },
-    [sdk, onError, onStopEvents]
+    [sdk]
   )
 
   // initialize workflow, create session and stream events if task id is provided
