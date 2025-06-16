@@ -15,7 +15,6 @@ export interface TaskResponse {
 }
 
 export interface SendEventRequest {
-  service_id: string
   event_obj_str: string
 }
 
@@ -28,7 +27,6 @@ export interface StreamingEventCallback {
 export class WorkflowSDK {
   private baseUrl: string
   private deploymentName: string
-  private defaultServiceId = 'echo_workflow'
 
   constructor(config: WorkflowConfig) {
     this.baseUrl = config.baseUrl || ''
@@ -122,14 +120,12 @@ export class WorkflowSDK {
   async sendEventToTask(
     taskId: string,
     sessionId: string,
-    eventData: string,
-    serviceId?: string
+    eventData: string
   ): Promise<{
     service_id: string
     event_obj_str: string
   }> {
     const event: SendEventRequest = {
-      service_id: serviceId || this.defaultServiceId,
       event_obj_str: eventData,
     }
 
