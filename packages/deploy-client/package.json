@@ -1,0 +1,27 @@
+{
+  "name": "@llamaindex/deploy-client",
+  "version": "0.0.1",
+  "description": "Generated API client from OpenAPI specification",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "generate": "openapi-ts",
+    "build": "npm run generate && tsc",
+    "clean": "rm -rf dist src/generated",
+    "dev": "npm run generate && tsc --watch"
+  },
+  "dependencies": {
+    "@hey-api/client-fetch": "^0.1.0"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.45.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+} 

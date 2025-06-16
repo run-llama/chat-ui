@@ -3,43 +3,24 @@ import { WorkflowSDK } from './sdk'
 
 export interface WorkflowEvent {
   name: string
-}
-
-export interface AnyWorkflowEvent extends WorkflowEvent {
   [key: string]: any
 }
 
 export type TaskStatus = 'idle' | 'running' | 'complete' | 'error'
 
-export interface WorkflowHookParams<
-  O extends WorkflowEvent = AnyWorkflowEvent,
-> {
+export interface WorkflowHookParams<O extends WorkflowEvent> {
   baseUrl?: string // Optional base URL for the workflow API
   workflow: string // Name of the registered deployment
   sessionId?: string // Optional session ID for resuming a workflow session
   taskId?: string // Optional task ID for resuming a workflow task
-  initialTaskCallbacks?: TaskCallbacks<O> // Optional callbacks for the initial task if taskId is provided
-}
-
-export interface TaskCallbacks<O extends WorkflowEvent = AnyWorkflowEvent> {
-  onStop?: (events: O[]) => void
-  onError?: (error: any) => void
-}
-
-export interface Task<
-  I extends WorkflowEvent = AnyWorkflowEvent,
-  O extends WorkflowEvent = AnyWorkflowEvent,
-> {
-  id: string
-  events: (I | O)[]
-  status: TaskStatus
-  sendEvent: (event: I, callbacks?: TaskCallbacks<O>) => Promise<void>
+  onStopEvents?: (event: O, taskId: string) => void // Callback when finished streaming events
+  onError?: (error: any, taskId: string) => void // Callback for errors
 }
 
 /** Return value from the hook */
 export interface WorkflowHookHandler<
-  I extends WorkflowEvent = AnyWorkflowEvent,
-  O extends WorkflowEvent = AnyWorkflowEvent,
+  I extends WorkflowEvent,
+  O extends WorkflowEvent,
 > {
   sessionId?: string // Session ID once the workflow session starts
   currentTask?: Task<I, O>
@@ -51,15 +32,16 @@ export interface WorkflowHookHandler<
  * useWorkflow hook for consuming llama-deploy workflows
  */
 export function useWorkflow<
-  I extends WorkflowEvent = AnyWorkflowEvent,
-  O extends WorkflowEvent = AnyWorkflowEvent,
+  I extends WorkflowEvent = WorkflowEvent,
+  O extends WorkflowEvent = WorkflowEvent,
 >(params: WorkflowHookParams<O>): WorkflowHookHandler<I, O> {
   const {
     baseUrl,
     workflow: deploymentName,
     taskId: initialTaskId,
     sessionId: initialSessionId,
-    initialTaskCallbacks,
+    onStopEvents,
+    onError,
   } = params
 
   const sdk = useMemo(
@@ -69,7 +51,7 @@ export function useWorkflow<
 
   const [isInitialized, setIsInitialized] = useState(false)
   const [sessionId, setSessionId] = useState<string>()
-  const [currentTaskId, setCurrentTaskId] = useState<string>()
+  const [taskId, setTaskId] = useState<string>()
   const [eventsByTaskId, setEventsByTaskId] = useState<
     Record<string, (I | O)[]>
   >({})
@@ -77,6 +59,11 @@ export function useWorkflow<
     {}
   )
   const taskCallbacksRef = useRef<Record<string, TaskCallbacks<O>>>({})
+
+  const events = useMemo(() => {
+    if (!taskId) return []
+    return eventsByTaskId[taskId] ?? []
+  }, [eventsByTaskId, taskId])
 
   // stream events from the task
   const streamTaskEvents = useCallback(
@@ -94,10 +81,11 @@ export function useWorkflow<
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
           taskCallbacksRef.current[taskId]?.onError?.(error)
         },
-        onStop: (result: string[]) => {
-          taskCallbacksRef.current[taskId]?.onStop?.(
-            result.map(item => JSON.parse(item)) as O[]
-          )
+        onFinish: (events: string[]) => {
+          const stopEventStr = events[events.length - 1] // TODO: better check by type StopEvent
+          if (stopEventStr && onStopEvents) {
+            onStopEvents(JSON.parse(stopEventStr) as O, taskId)
+          }
         },
       })
 
@@ -106,7 +94,7 @@ export function useWorkflow<
         [taskId]: allEvents.map(item => JSON.parse(item)),
       }))
     },
-    [sdk]
+    [sdk, onError, onStopEvents]
   )
 
   // initialize workflow, create session and stream events if task id is provided
