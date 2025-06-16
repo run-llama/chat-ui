@@ -1,46 +1,13 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { WorkflowSDK } from './sdk'
-
-export interface WorkflowEvent {
-  name: string
-  [key: string]: any
-}
-
-export type TaskStatus = 'idle' | 'running' | 'complete' | 'error'
-
-export interface WorkflowHookParams<O extends WorkflowEvent = WorkflowEvent> {
-  baseUrl?: string // Optional base URL for the workflow API
-  workflow: string // Name of the registered deployment
-  sessionId?: string // Optional session ID for resuming a workflow session
-  taskId?: string // Optional task ID for resuming a workflow task
-  initialTaskCallbacks?: TaskCallbacks<O> // Optional callbacks for the initial task if taskId is provided
-}
-
-export interface TaskCallbacks<O extends WorkflowEvent = WorkflowEvent> {
-  onStop?: (events: O[]) => void
-  onError?: (error: any) => void
-}
-
-export interface Task<
-  I extends WorkflowEvent = WorkflowEvent,
-  O extends WorkflowEvent = WorkflowEvent,
-> {
-  id: string
-  events: (I | O)[]
-  status: TaskStatus
-  sendEvent: (event: I, callbacks?: TaskCallbacks<O>) => Promise<void>
-}
-
-/** Return value from the hook */
-export interface WorkflowHookHandler<
-  I extends WorkflowEvent = WorkflowEvent,
-  O extends WorkflowEvent = WorkflowEvent,
-> {
-  sessionId?: string // Session ID once the workflow session starts
-  currentTask?: Task<I, O>
-  createTask: (event: I, callbacks?: TaskCallbacks<O>) => Promise<string> // Function to create a new task with an event, returns the task id
-  tasks: Record<string, Task<I, O>>
-}
+import {
+  WorkflowEvent,
+  Task,
+  TaskCallbacks,
+  WorkflowHookParams,
+  TaskStatus,
+  WorkflowHookHandler,
+} from './types'
 
 /**
  * useWorkflow hook for consuming llama-deploy workflows
@@ -52,18 +19,18 @@ export function useWorkflow<
   const {
     baseUrl,
     workflow: deploymentName,
-    taskId: initialTaskId,
     sessionId: initialSessionId,
+    taskId: initialTaskId,
     initialTaskCallbacks,
   } = params
 
   const sdk = useMemo(
-    () => new WorkflowSDK({ baseUrl, deploymentName }),
-    [baseUrl, deploymentName]
+    () =>
+      new WorkflowSDK({ baseUrl, deploymentName, sessionId: initialSessionId }),
+    [baseUrl, deploymentName, initialSessionId]
   )
 
   const [isInitialized, setIsInitialized] = useState(false)
-  const [sessionId, setSessionId] = useState<string>()
   const [currentTaskId, setCurrentTaskId] = useState<string>()
   const [eventsByTaskId, setEventsByTaskId] = useState<
     Record<string, (I | O)[]>
@@ -75,33 +42,29 @@ export function useWorkflow<
 
   // stream events from the task
   const streamTaskEvents = useCallback(
-    async (taskId: string, sessionId: string) => {
-      // stream events from the task
-      const allEvents = await sdk.streamTaskEvents(taskId, sessionId, {
-        onData: (data: string) => {
-          const event = JSON.parse(data)
+    async (taskId: string) => {
+      const allEvents = await sdk.streamTaskEvents(taskId, {
+        onData: event => {
           setEventsByTaskId(prev => ({
             ...prev,
-            [taskId]: [...(prev[taskId] || []), event],
+            [taskId]: [...(prev[taskId] || []), event as O],
           }))
         },
         onError: (error: Error) => {
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
           taskCallbacksRef.current[taskId]?.onError?.(error)
         },
-        onFinish: (events: string[]) => {
+        onFinish: events => {
           const stopEventStr = events[events.length - 1] // TODO: better check by type StopEvent
           if (stopEventStr && taskCallbacksRef.current[taskId]?.onStop) {
-            taskCallbacksRef.current[taskId]?.onStop(
-              events.map(item => JSON.parse(item)) as O[]
-            )
+            taskCallbacksRef.current[taskId]?.onStop(events as O[])
           }
         },
       })
 
       setEventsByTaskId(prev => ({
         ...prev,
-        [taskId]: allEvents.map(item => JSON.parse(item)),
+        [taskId]: allEvents as O[],
       }))
     },
     [sdk]
@@ -110,15 +73,6 @@ export function useWorkflow<
   // initialize workflow, create session and stream events if task id is provided
   useEffect(() => {
     const initWorkflow = async () => {
-      let startSessionId = initialSessionId
-
-      // create session if not provided
-      if (!startSessionId) {
-        const sessionData = await sdk.createSession()
-        startSessionId = sessionData.session_id
-      }
-      setSessionId(startSessionId)
-
       // if task id is provided, initialize events
       if (initialTaskId) {
         if (initialTaskCallbacks) {
@@ -126,7 +80,7 @@ export function useWorkflow<
         }
         setCurrentTaskId(initialTaskId)
         setTaskStatuses(prev => ({ ...prev, [initialTaskId]: 'running' }))
-        await streamTaskEvents(initialTaskId, startSessionId)
+        await streamTaskEvents(initialTaskId)
         setTaskStatuses(prev => ({ ...prev, [initialTaskId]: 'complete' }))
       }
 
@@ -147,10 +101,6 @@ export function useWorkflow<
 
   const sendEventToTask = useCallback(
     async (event: I, taskId: string, callbacks?: TaskCallbacks<O>) => {
-      if (!sessionId) {
-        throw new Error('Cannot send event: No active session')
-      }
-
       if (callbacks) {
         taskCallbacksRef.current[taskId] = callbacks
       }
@@ -160,7 +110,6 @@ export function useWorkflow<
         // if task id is provided, resume the workflow
         await sdk.sendEventToTask(
           taskId,
-          sessionId,
           JSON.stringify({
             service_id: deploymentName,
             event_obj_str: JSON.stringify(event),
@@ -168,7 +117,7 @@ export function useWorkflow<
         )
 
         // stream events from the task
-        await streamTaskEvents(taskId, sessionId)
+        await streamTaskEvents(taskId)
         setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
       } catch (error) {
         setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
@@ -176,23 +125,21 @@ export function useWorkflow<
         throw error
       }
     },
-    [deploymentName, sdk, sessionId, streamTaskEvents]
+    [deploymentName, sdk, streamTaskEvents]
   )
 
   const createTask = useCallback(
     async (event: I, callbacks?: TaskCallbacks<O>): Promise<string> => {
-      if (!sessionId) {
-        throw new Error('Cannot send event: No active session')
-      }
-
       let runTaskId: string | undefined
       try {
         // if not task id, create a new task with input event to start the workflow
-        const taskData = await sdk.createDeploymentTaskNoWait(
-          { input: JSON.stringify(event) },
-          sessionId
-        )
-        runTaskId = taskData.task_id
+        const taskData = await sdk.createTask(JSON.stringify(event))
+        runTaskId = taskData.data?.task_id
+
+        if (!runTaskId) {
+          throw new Error('Failed to create task')
+        }
+
         if (callbacks) {
           taskCallbacksRef.current[runTaskId] = callbacks
         }
@@ -202,7 +149,7 @@ export function useWorkflow<
         setEventsByTaskId(prev => ({ ...prev, [taskIdForStatus]: [] }))
 
         // stream events from the task
-        await streamTaskEvents(runTaskId, sessionId)
+        await streamTaskEvents(runTaskId)
         setTaskStatuses(prev => ({ ...prev, [taskIdForStatus]: 'complete' }))
 
         return runTaskId
@@ -215,7 +162,7 @@ export function useWorkflow<
         throw error
       }
     },
-    [sessionId, sdk, streamTaskEvents]
+    [sdk, streamTaskEvents]
   )
 
   const tasks = useMemo(() => {
@@ -232,7 +179,7 @@ export function useWorkflow<
   }, [eventsByTaskId, taskStatuses, sendEventToTask])
 
   return {
-    sessionId,
+    sessionId: sdk.sessionId,
     currentTask: currentTaskId ? tasks[currentTaskId] : undefined,
     createTask,
     tasks,

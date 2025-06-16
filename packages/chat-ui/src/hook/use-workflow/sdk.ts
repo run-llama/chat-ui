@@ -1,155 +1,60 @@
-import { readDeploymentsDeploymentsGet } from '@llamaindex/llama-deploy'
-
-export interface WorkflowConfig {
-  baseUrl?: string
-  deploymentName: string
-}
-
-export interface CreateTaskRequest {
-  input: string
-}
-
-export interface TaskResponse {
-  input: string
-  task_id: string
-  session_id: string
-  service_id: string
-}
-
-export interface SendEventRequest {
-  event_obj_str: string
-}
+import {
+  Client,
+  createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost,
+  createSessionDeploymentsDeploymentNameSessionsCreatePost,
+  sendEventDeploymentsDeploymentNameTasksTaskIdEventsPost,
+  createClient,
+  createConfig,
+} from '@llamaindex/llama-deploy'
+import { WorkflowEvent } from './types'
 
 export interface StreamingEventCallback {
-  onData?: (data: string) => void
+  onData?: (event: WorkflowEvent) => void
   onError?: (error: Error) => void
-  onFinish?: (data: string[]) => void
+  onFinish?: (allEvents: WorkflowEvent[]) => void
 }
 
 export class WorkflowSDK {
-  private baseUrl: string
-  private deploymentName: string
+  client: Client
+  deploymentName: string
+  sessionId?: string
 
-  constructor(config: WorkflowConfig) {
-    this.baseUrl = config.baseUrl || ''
-    this.deploymentName = config.deploymentName
+  constructor(input: {
+    baseUrl?: string
+    deploymentName: string
+    sessionId?: string
+  }) {
+    this.client = createClient(createConfig({ baseUrl: input.baseUrl }))
+    this.deploymentName = input.deploymentName
+    this.sessionId = input.sessionId
   }
 
-  private async makeRequest<T = any>(
-    endpoint: string,
-    options?: RequestInit
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`
-
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-      ...options,
+  async createTask(input: string) {
+    const sessionId = await this.ensureSession()
+    return createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
+      client: this.client,
+      path: { deployment_name: this.deploymentName },
+      query: { session_id: sessionId },
+      body: { input },
     })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    return response.json()
   }
 
-  /**
-   * Get all deployments
-   */
-  async getDeployments(): Promise<any> {
-    const deployments = await readDeploymentsDeploymentsGet()
-    return this.makeRequest('/deployments/')
+  async sendEventToTask(taskId: string, eventData: string) {
+    const sessionId = await this.ensureSession()
+    return sendEventDeploymentsDeploymentNameTasksTaskIdEventsPost({
+      client: this.client,
+      path: { deployment_name: this.deploymentName, task_id: taskId },
+      query: { session_id: sessionId },
+      body: { event_obj_str: eventData, agent_id: this.deploymentName },
+    })
   }
 
-  /**
-   * Get all tasks for the deployment
-   */
-  async getAllTasks(): Promise<any> {
-    return this.makeRequest(`/deployments/${this.deploymentName}/tasks`)
-  }
-
-  /**
-   * Create a new session
-   */
-  async createSession(): Promise<{ session_id: string }> {
-    return this.makeRequest(
-      `/deployments/${this.deploymentName}/sessions/create`,
-      {
-        method: 'POST',
-      }
-    )
-  }
-
-  /**
-   * Create and run a deployment task (waits for completion)
-   */
-  async createDeploymentTask(
-    request: CreateTaskRequest,
-    sessionId?: string
-  ): Promise<string> {
-    const queryParams = sessionId ? `?session_id=${sessionId}` : ''
-    return this.makeRequest(
-      `/deployments/${this.deploymentName}/tasks/run${queryParams}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      }
-    )
-  }
-
-  /**
-   * Create a deployment task without waiting for completion (stream events)
-   */
-  async createDeploymentTaskNoWait(
-    request: CreateTaskRequest,
-    sessionId?: string
-  ): Promise<TaskResponse> {
-    const queryParams = sessionId ? `?session_id=${sessionId}` : ''
-    return this.makeRequest(
-      `/deployments/${this.deploymentName}/tasks/create${queryParams}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      }
-    )
-  }
-
-  /**
-   * Send an event to a specific task
-   */
-  async sendEventToTask(
-    taskId: string,
-    sessionId: string,
-    eventData: string
-  ): Promise<{
-    service_id: string
-    event_obj_str: string
-  }> {
-    const event: SendEventRequest = {
-      event_obj_str: eventData,
-    }
-
-    return this.makeRequest(
-      `/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(event),
-      }
-    )
-  }
-
-  /**
-   * Stream task events
-   */
   async streamTaskEvents(
     taskId: string,
-    sessionId: string,
     callback?: StreamingEventCallback
-  ): Promise<string[]> {
-    const url = `${this.baseUrl}/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
+  ): Promise<WorkflowEvent[]> {
+    const sessionId = await this.ensureSession()
+    const url = `/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
 
     const response = await fetch(url, {
       headers: {
@@ -171,23 +76,21 @@ export class WorkflowSDK {
     }
 
     const decoder = new TextDecoder()
-    const accumulatedData: string[] = []
+    const accumulatedEvents: WorkflowEvent[] = []
 
     try {
       while (true) {
         const { done, value } = await reader.read()
-
         if (done) break
 
         const chunk = decoder.decode(value, { stream: true })
-        accumulatedData.push(chunk)
-
-        // Call the callback with new data if provided
-        callback?.onData?.(chunk)
+        const event = typeof chunk === 'string' ? JSON.parse(chunk) : chunk
+        accumulatedEvents.push(event as WorkflowEvent)
+        callback?.onData?.(event as WorkflowEvent)
       }
 
-      callback?.onFinish?.(accumulatedData)
-      return accumulatedData
+      callback?.onFinish?.(accumulatedEvents)
+      return accumulatedEvents
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error))
       callback?.onError?.(err)
@@ -195,12 +98,19 @@ export class WorkflowSDK {
     }
   }
 
-  /**
-   * Get task result
-   */
-  async getTaskResult(taskId: string, sessionId: string): Promise<any> {
-    return this.makeRequest(
-      `/deployments/${this.deploymentName}/tasks/${taskId}/results?session_id=${sessionId}`
-    )
+  private async ensureSession(): Promise<string> {
+    if (!this.sessionId) {
+      const session =
+        await createSessionDeploymentsDeploymentNameSessionsCreatePost({
+          client: this.client,
+          path: { deployment_name: this.deploymentName },
+        })
+      const sessionId = session.data?.session_id
+      if (!sessionId) {
+        throw new Error('Failed to create session')
+      }
+      this.sessionId = sessionId
+    }
+    return this.sessionId
   }
 }
