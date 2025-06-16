@@ -9,6 +9,7 @@ import {
 import { WorkflowEvent } from './types'
 
 export interface StreamingEventCallback {
+  onStart?: () => void
   onData?: (event: WorkflowEvent) => void
   onError?: (error: Error) => void
   onFinish?: (allEvents: WorkflowEvent[]) => void
@@ -30,22 +31,32 @@ export class WorkflowSDK {
   }
 
   async createTask(input: string) {
-    const sessionId = await this.ensureSession()
-    return createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
-      client: this.client,
-      path: { deployment_name: this.deploymentName },
-      query: { session_id: sessionId },
-      body: { input },
-    })
+    const sessionId = await this.getSession()
+    const data =
+      await createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
+        client: this.client,
+        path: { deployment_name: this.deploymentName },
+        query: { session_id: sessionId },
+        body: { input },
+      })
+
+    const newTaskId = data.data?.task_id
+    if (!newTaskId) {
+      throw new Error('Failed to create task')
+    }
+    return newTaskId
   }
 
-  async sendEventToTask(taskId: string, eventData: string) {
-    const sessionId = await this.ensureSession()
+  async sendEventToTask(taskId: string, event: WorkflowEvent) {
+    const sessionId = await this.getSession()
     return sendEventDeploymentsDeploymentNameTasksTaskIdEventsPost({
       client: this.client,
       path: { deployment_name: this.deploymentName, task_id: taskId },
       query: { session_id: sessionId },
-      body: { event_obj_str: eventData, agent_id: this.deploymentName },
+      body: {
+        event_obj_str: JSON.stringify(event),
+        agent_id: this.deploymentName,
+      },
     })
   }
 
@@ -53,7 +64,7 @@ export class WorkflowSDK {
     taskId: string,
     callback?: StreamingEventCallback
   ): Promise<WorkflowEvent[]> {
-    const sessionId = await this.ensureSession()
+    const sessionId = await this.getSession()
     const url = `/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
 
     const response = await fetch(url, {
@@ -79,6 +90,8 @@ export class WorkflowSDK {
     const accumulatedEvents: WorkflowEvent[] = []
 
     try {
+      callback?.onStart?.()
+
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
@@ -98,8 +111,9 @@ export class WorkflowSDK {
     }
   }
 
-  private async ensureSession(): Promise<string> {
+  private async getSession(): Promise<string> {
     if (!this.sessionId) {
+      // if no session id, create a new session
       const session =
         await createSessionDeploymentsDeploymentNameSessionsCreatePost({
           client: this.client,

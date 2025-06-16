@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { WorkflowSDK } from './sdk'
 import {
   WorkflowEvent,
@@ -38,12 +38,13 @@ export function useWorkflow<
   const [taskStatuses, setTaskStatuses] = useState<Record<string, TaskStatus>>(
     {}
   )
-  const taskCallbacksRef = useRef<Record<string, TaskCallbacks<O>>>({})
 
-  // stream events from the task
   const streamTaskEvents = useCallback(
-    async (taskId: string) => {
+    async (taskId: string, callbacks?: TaskCallbacks<O>) => {
       const allEvents = await sdk.streamTaskEvents(taskId, {
+        onStart: () => {
+          setTaskStatuses(prev => ({ ...prev, [taskId]: 'running' }))
+        },
         onData: event => {
           setEventsByTaskId(prev => ({
             ...prev,
@@ -52,12 +53,13 @@ export function useWorkflow<
         },
         onError: (error: Error) => {
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
-          taskCallbacksRef.current[taskId]?.onError?.(error)
+          callbacks?.onError?.(error)
         },
         onFinish: events => {
-          const stopEventStr = events[events.length - 1] // TODO: better check by type StopEvent
-          if (stopEventStr && taskCallbacksRef.current[taskId]?.onStop) {
-            taskCallbacksRef.current[taskId]?.onStop(events as O[])
+          setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
+          const stopEvents = events.filter(event => event.name === 'StopEvent')
+          if (stopEvents.length > 0 && callbacks?.onStop) {
+            callbacks.onStop(stopEvents as O[])
           }
         },
       })
@@ -73,94 +75,29 @@ export function useWorkflow<
   // initialize workflow, create session and stream events if task id is provided
   useEffect(() => {
     const initWorkflow = async () => {
-      // if task id is provided, initialize events
-      if (initialTaskId) {
-        if (initialTaskCallbacks) {
-          taskCallbacksRef.current[initialTaskId] = initialTaskCallbacks
-        }
-        setCurrentTaskId(initialTaskId)
-        setTaskStatuses(prev => ({ ...prev, [initialTaskId]: 'running' }))
-        await streamTaskEvents(initialTaskId)
-        setTaskStatuses(prev => ({ ...prev, [initialTaskId]: 'complete' }))
-      }
-
+      if (isInitialized || !initialTaskId) return
+      setCurrentTaskId(initialTaskId)
+      await streamTaskEvents(initialTaskId, initialTaskCallbacks)
       setIsInitialized(true)
     }
 
-    if (!isInitialized) {
-      initWorkflow()
-    }
-  }, [
-    initialSessionId,
-    initialTaskId,
-    sdk,
-    isInitialized,
-    streamTaskEvents,
-    initialTaskCallbacks,
-  ])
+    initWorkflow()
+  }, [initialTaskCallbacks, initialTaskId, isInitialized, streamTaskEvents])
 
   const sendEventToTask = useCallback(
     async (event: I, taskId: string, callbacks?: TaskCallbacks<O>) => {
-      if (callbacks) {
-        taskCallbacksRef.current[taskId] = callbacks
-      }
-
-      setTaskStatuses(prev => ({ ...prev, [taskId]: 'running' }))
-      try {
-        // if task id is provided, resume the workflow
-        await sdk.sendEventToTask(
-          taskId,
-          JSON.stringify({
-            service_id: deploymentName,
-            event_obj_str: JSON.stringify(event),
-          })
-        )
-
-        // stream events from the task
-        await streamTaskEvents(taskId)
-        setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
-      } catch (error) {
-        setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
-        taskCallbacksRef.current[taskId]?.onError?.(error)
-        throw error
-      }
+      await sdk.sendEventToTask(taskId, event)
+      await streamTaskEvents(taskId, callbacks)
     },
-    [deploymentName, sdk, streamTaskEvents]
+    [sdk, streamTaskEvents]
   )
 
   const createTask = useCallback(
     async (event: I, callbacks?: TaskCallbacks<O>): Promise<string> => {
-      let runTaskId: string | undefined
-      try {
-        // if not task id, create a new task with input event to start the workflow
-        const taskData = await sdk.createTask(JSON.stringify(event))
-        runTaskId = taskData.data?.task_id
-
-        if (!runTaskId) {
-          throw new Error('Failed to create task')
-        }
-
-        if (callbacks) {
-          taskCallbacksRef.current[runTaskId] = callbacks
-        }
-        const taskIdForStatus = runTaskId
-        setCurrentTaskId(taskIdForStatus)
-        setTaskStatuses(prev => ({ ...prev, [taskIdForStatus]: 'running' }))
-        setEventsByTaskId(prev => ({ ...prev, [taskIdForStatus]: [] }))
-
-        // stream events from the task
-        await streamTaskEvents(runTaskId)
-        setTaskStatuses(prev => ({ ...prev, [taskIdForStatus]: 'complete' }))
-
-        return runTaskId
-      } catch (error) {
-        if (runTaskId) {
-          const taskIdForStatus = runTaskId
-          setTaskStatuses(prev => ({ ...prev, [taskIdForStatus]: 'error' }))
-          taskCallbacksRef.current[taskIdForStatus]?.onError?.(error)
-        }
-        throw error
-      }
+      const newTaskId = await sdk.createTask(JSON.stringify(event))
+      await streamTaskEvents(newTaskId, callbacks)
+      setCurrentTaskId(newTaskId)
+      return newTaskId
     },
     [sdk, streamTaskEvents]
   )
