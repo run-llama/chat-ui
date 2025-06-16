@@ -95,41 +95,38 @@ export function useWorkflow<
   // Function to send an event to the server
   const sendEvent = useCallback(
     async (event: I): Promise<void> => {
-      if (!taskId || !sessionId || isError) {
-        throw new Error(
-          'Cannot send event: No active task/session or workflow in error state'
-        )
+      if (!sessionId) {
+        throw new Error('Cannot send event: No active session')
       }
 
-      try {
-        const eventDefinition = {
-          // TODO: should get service_id when creating the task
-          service_id: workflow,
+      let eventTaskId = taskId
+
+      // if not task id, create a new task with event as input to start the workflow
+      if (!eventTaskId) {
+        const taskData = await sdk.createDeploymentTaskNoWait(
+          { input: JSON.stringify(event) },
+          sessionId
+        )
+        eventTaskId = taskData.task_id
+        setTaskId(eventTaskId)
+      }
+
+      // if task id is provided, resume the workflow
+      await sdk.sendEventToTask(
+        eventTaskId,
+        sessionId,
+        JSON.stringify({
+          service_id: deploymentName,
           event_obj_str: JSON.stringify(event),
-        }
+        })
+      )
 
-        const response = await fetch(
-          `${baseUrl}/deployments/${workflow}/tasks/${taskId}/events?session_id=${sessionId}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(eventDefinition),
-          }
-        )
-
-        if (!response.ok) {
-          throw new Error('Failed to send event')
-        }
-
-        setEvents(prev => [...prev, event])
-        setIsComplete(false) // Reset isComplete on new event
-      } catch (error) {
-        setIsError(true)
-        onError?.(error)
-        throw error
-      }
+      // get events from the task
+      const allEvents = await sdk.getTaskEvents(eventTaskId, sessionId)
+      setEvents(allEvents.map(item => JSON.parse(item)))
+      setIsComplete(true)
     },
-    [taskId, sessionId, baseUrl, onError, isError]
+    [sessionId, taskId, sdk, deploymentName]
   )
 
   return {

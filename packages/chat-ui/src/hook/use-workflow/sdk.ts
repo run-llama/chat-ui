@@ -124,7 +124,10 @@ export class WorkflowSDK {
     sessionId: string,
     eventData: string,
     serviceId?: string
-  ): Promise<any> {
+  ): Promise<{
+    service_id: string
+    event_obj_str: string
+  }> {
     const event: SendEventRequest = {
       service_id: serviceId || this.defaultServiceId,
       event_obj_str: eventData,
