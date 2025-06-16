@@ -16,26 +16,34 @@ interface ChatStartEvent {
 
 export default function Home() {
   const [userInput, setUserInput] = useState('')
+  const [isMultiTask, setIsMultiTask] = useState(true)
 
   const workflow = useWorkflow<ChatStartEvent>({
     baseUrl: BASE_URL,
     workflow: DEPLOYMENT_NAME,
-    onStopEvents: (events, taskId) => {
-      console.log('Workflow completed:', events, taskId)
+    onStop: events => {
+      console.log('Workflow completed:', events)
     },
-    onError: (error, taskId) => {
-      console.error('Workflow error:', error, taskId)
+    onError: error => {
+      console.error('Workflow error:', error)
     },
   })
 
   const handleSendMessage = async () => {
-    await workflow.sendEvent({
+    const eventPayload: ChatStartEvent = {
       name: 'ChatStartEvent',
       chat_request: {
         id: new Date().getTime().toString(),
         messages: [{ role: 'user', content: userInput }],
       },
-    })
+    }
+    if (isMultiTask) {
+      const taskId = await workflow.sendEvent(eventPayload)
+      console.log(`Started new task ${taskId}`)
+    } else {
+      const taskId = await workflow.sendEvent(eventPayload, workflow.taskId)
+      console.log(`Sent event to task ${taskId}`)
+    }
   }
 
   return (
@@ -52,11 +60,12 @@ export default function Home() {
             <strong>Session ID:</strong> {workflow.sessionId || 'Not created'}
           </div>
           <div>
-            <strong>Current Task ID:</strong> {workflow.taskId || 'Not created'}
+            <strong>Task ID:</strong> {workflow.taskId || 'Not created'}
           </div>
 
           <div>
-            <strong>Total Events Count:</strong> {workflow.events.length}
+            <strong>Event Count of current task:</strong>{' '}
+            {workflow.events.length}
           </div>
           <div>
             <strong>Status:</strong> {workflow.status}
@@ -67,16 +76,22 @@ export default function Home() {
       {/* Events Interface */}
       <div className="mb-4 h-96 overflow-auto rounded border bg-white p-4">
         <h3 className="mb-2 font-semibold">Events</h3>
-        {/* workflow.events contains events of all tasks */}
-        {workflow.events.map((event, index) => (
-          <div key={index} className="mb-2 text-sm text-blue-600">
-            Event {index + 1}: {JSON.stringify(event)}
+        {Object.entries(workflow.eventsByTaskId).map(([taskId, events]) => (
+          <div key={taskId} className="mb-2 text-sm text-blue-600">
+            <div className="mb-4">
+              <div className="font-medium text-gray-700">Task {taskId}</div>
+              {events.map((event, index) => (
+                <div key={index} className="ml-4 mt-1 text-sm">
+                  Event {index + 1}: {JSON.stringify(event)}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Input */}
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <input
           type="text"
           value={userInput}
@@ -94,6 +109,21 @@ export default function Home() {
         >
           Send
         </button>
+      </div>
+      <div className="mt-2 flex items-center">
+        <input
+          id="multi-task-checkbox"
+          type="checkbox"
+          checked={isMultiTask}
+          onChange={e => setIsMultiTask(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label
+          htmlFor="multi-task-checkbox"
+          className="ml-2 block text-sm text-gray-900"
+        >
+          Multi-Task (creates a new task for each message)
+        </label>
       </div>
     </div>
   )

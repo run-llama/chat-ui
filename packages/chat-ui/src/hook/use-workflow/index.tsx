@@ -16,10 +16,10 @@ export interface WorkflowHookParams<
 > {
   baseUrl?: string // Optional base URL for the workflow API
   workflow: string // Name of the registered deployment
-  sessionId?: string // Optional session ID for resuming a session
-  taskId?: string // Optional task ID for resuming a workflow
-  onStop?: (event: O[]) => void // Callback when finished streaming events
-  onError?: (error: any) => void // Callback for errors
+  sessionId?: string // Optional session ID for resuming a workflow session
+  taskId?: string // Optional task ID for resuming a workflow task
+  onStop?: (event: O[], taskId: string) => void // Callback when finished streaming events
+  onError?: (error: any, taskId: string) => void // Callback for errors
 }
 
 /** Return value from the hook */
@@ -27,11 +27,12 @@ export interface WorkflowHookHandler<
   I extends WorkflowEvent = AnyWorkflowEvent,
   O extends WorkflowEvent = AnyWorkflowEvent,
 > {
-  taskId?: string // Task ID once the workflow session starts
+  taskId?: string // Current Task ID (initiated by sendEvent)
   sessionId?: string // Session ID once the workflow session starts
-  events: (I | O)[] // List of all events (input and output)
+  events: (I | O)[] // List of all events (input and output) for the current task
+  eventsByTaskId: Record<string, (I | O)[]>
   status: WorkflowStatus // Status of the workflow
-  sendEvent: (event: I) => Promise<void> // Function to send an event
+  sendEvent: (event: I, taskId?: string) => Promise<string> // Function to send an event, returns the task id - if taskId is provided, it will will send the event to the task, otherwise it will create a new task
 }
 
 /**
@@ -59,6 +60,9 @@ export function useWorkflow<
   const [sessionId, setSessionId] = useState<string>()
   const [taskId, setTaskId] = useState<string>()
   const [events, setEvents] = useState<(I | O)[]>([])
+  const [eventsByTaskId, setEventsByTaskId] = useState<
+    Record<string, (I | O)[]>
+  >({})
   const [status, setStatus] = useState<WorkflowStatus>('idle')
 
   // stream events from the task
@@ -69,14 +73,19 @@ export function useWorkflow<
       // stream events from the task
       const allEvents = await sdk.streamTaskEvents(taskId, sessionId, {
         onData: (data: string) => {
-          setEvents(prev => [...prev, JSON.parse(data)])
+          const event = JSON.parse(data)
+          setEvents(prev => [...prev, event])
+          setEventsByTaskId(prev => ({
+            ...prev,
+            [taskId]: [...(prev[taskId] || []), event],
+          }))
         },
         onError: (error: Error) => {
           setStatus('error')
-          onError?.(error)
+          onError?.(error, taskId)
         },
         onStop: (result: string[]) => {
-          onStop?.(result.map(item => JSON.parse(item)) as O[])
+          onStop?.(result.map(item => JSON.parse(item)) as O[], taskId)
         },
       })
 
@@ -115,15 +124,15 @@ export function useWorkflow<
 
   // Send an event to create new task or resume existing task
   const sendEvent = useCallback(
-    async (event: I): Promise<void> => {
+    async (event: I, targetTaskId?: string): Promise<string> => {
       if (!sessionId) {
         throw new Error('Cannot send event: No active session')
       }
 
       setStatus('running')
 
+      let runTaskId = targetTaskId
       try {
-        let runTaskId = taskId
         if (runTaskId) {
           // if task id is provided, resume the workflow
           await sdk.sendEventToTask(
@@ -141,22 +150,26 @@ export function useWorkflow<
             sessionId
           )
           runTaskId = taskData.task_id
-          setTaskId(taskData.task_id)
         }
+        setTaskId(runTaskId)
 
         // stream events from the task
         await streamTaskEvents(runTaskId, sessionId)
+        return runTaskId
       } catch (error) {
         setStatus('error')
+        onError?.(error, runTaskId || '')
+        throw error
       }
     },
-    [sessionId, taskId, sdk, deploymentName, streamTaskEvents]
+    [sessionId, sdk, deploymentName, streamTaskEvents, onError]
   )
 
   return {
     sessionId,
     taskId,
     events,
+    eventsByTaskId,
     status,
     sendEvent,
   }
