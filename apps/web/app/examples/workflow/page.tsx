@@ -1,16 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { useWorkflow } from '@llamaindex/chat-ui'
+import {
+  EVENT_QUALIFIED_NAMES,
+  useWorkflow,
+  WorkflowEvent,
+} from '@llamaindex/chat-ui'
 import { cn } from '@/lib/utils'
+
+interface StartEvent extends WorkflowEvent {
+  value: {
+    userInput: string
+  }
+}
 
 export default function Home() {
   const [userInput, setUserInput] = useState('')
 
-  const { createTask, sessionId, tasks, currentTask } = useWorkflow({
-    baseUrl: 'http://127.0.0.1:4501',
-    workflow: 'QuickStart',
-  })
+  const { createTask, sessionId, tasks, currentTask } = useWorkflow<StartEvent>(
+    {
+      baseUrl: 'http://127.0.0.1:4501',
+      workflow: 'QuickStart',
+    }
+  )
 
   const handleSendMessage = async () => {
     const taskId = await createTask(
@@ -22,6 +34,21 @@ export default function Home() {
       }
     )
     console.log('Task created:', taskId)
+  }
+
+  const handleSendEvent = async () => {
+    await currentTask?.sendEvent(
+      {
+        value: { userInput },
+        _is_pydantic: true,
+        qualified_name: EVENT_QUALIFIED_NAMES.STOP,
+      },
+      {
+        onStopEvent: event => {
+          console.log('Stop event:', event)
+        },
+      }
+    )
   }
 
   return (
@@ -92,6 +119,14 @@ export default function Home() {
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
         >
           Create Task
+        </button>
+        <button
+          type="button"
+          onClick={handleSendEvent}
+          disabled={!currentTask}
+          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
+        >
+          Stop Event
         </button>
       </div>
     </div>

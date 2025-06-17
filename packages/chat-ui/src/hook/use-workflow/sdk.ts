@@ -89,12 +89,8 @@ export class WorkflowSDK {
         if (done) break
 
         const chunk = decoder.decode(value, { stream: true })
-        const event = typeof chunk === 'string' ? JSON.parse(chunk) : chunk
-
-        if (!isWorkflowEvent(event)) {
-          console.warn('Received non-workflow event:', event)
-          continue
-        }
+        const event = this.parseChunk(chunk)
+        if (!event) continue
 
         accumulatedEvents.push(event)
         callback?.onData?.(event)
@@ -143,5 +139,21 @@ export class WorkflowSDK {
     if (this.sessionId) return this.sessionId
     this.sessionId = await this.createSession()
     return this.sessionId
+  }
+
+  private parseChunk(chunk: string): WorkflowEvent | null {
+    if (typeof chunk !== 'string') return chunk
+
+    try {
+      const event = JSON.parse(chunk)
+      if (!isWorkflowEvent(event)) {
+        console.warn('Received non-workflow event:', event)
+        return null
+      }
+      return event
+    } catch (error) {
+      console.warn('Failed to parse chunk:', error)
+      return null
+    }
   }
 }

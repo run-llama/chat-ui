@@ -1,6 +1,6 @@
 import { WorkflowEvent } from './types'
 
-const EVENT_QUALIFIED_NAMES = {
+export const EVENT_QUALIFIED_NAMES = {
   START: 'llama_index.core.workflow.events.StartEvent',
   STOP: 'llama_index.core.workflow.events.StopEvent',
 }
