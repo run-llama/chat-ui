@@ -22,7 +22,7 @@ export interface WorkflowHookHandler<
 }
 
 export interface TaskCallbacks<O extends WorkflowEvent = WorkflowEvent> {
-  onStop?: (stopEvents: O[]) => void
+  onStopEvent?: (events: O[]) => void
   onError?: (error: any) => void
 }
 
