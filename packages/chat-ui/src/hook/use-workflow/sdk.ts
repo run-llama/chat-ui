@@ -61,7 +61,7 @@ export class WorkflowSDK {
     callback?: StreamingEventCallback
   ): Promise<WorkflowEvent[]> {
     const sessionId = await this.getSession()
-    const url = `${this.baseUrl}/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
+    const url = `${this.baseUrl}/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}&raw_event=true`
 
     const response = await fetch(url, {
       headers: {
@@ -114,8 +114,8 @@ export class WorkflowSDK {
       path: { deployment_name: this.deploymentName, task_id: taskId },
       query: { session_id: sessionId },
       body: {
+        service_id: this.deploymentName, // TODO: check this
         event_obj_str: JSON.stringify(event),
-        agent_id: this.deploymentName,
       },
     })
   }
