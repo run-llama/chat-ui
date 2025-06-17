@@ -55,15 +55,11 @@ export function useWorkflow<
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
           callbacks?.onError?.(error)
         },
-        onFinish: events => {
+        onStopEvent: event => {
+          callbacks?.onStopEvent?.(event as O)
+        },
+        onFinish: () => {
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
-
-          // TODO: get StopEvent from qualified_name
-          // {"__is_pydantic": true, "value": {}, "qualified_name": "llama_index.core.workflow.events.StopEvent"}
-          const stopEvent = events.find(event => event.name === 'StopEvent')
-          if (stopEvent && callbacks?.onStopEvent) {
-            callbacks.onStopEvent(stopEvent as O)
-          }
         },
       })
     },
@@ -92,8 +88,8 @@ export function useWorkflow<
   )
 
   const createTask = useCallback(
-    async (event: I, callbacks?: TaskCallbacks<O>): Promise<string> => {
-      const newTaskId = await sdk.createTask(JSON.stringify(event))
+    async (data: any, callbacks?: TaskCallbacks<O>): Promise<string> => {
+      const newTaskId = await sdk.createTask(data)
       setCurrentTaskId(newTaskId)
       await streamTaskEvents(newTaskId, callbacks)
       return newTaskId

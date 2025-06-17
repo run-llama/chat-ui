@@ -7,11 +7,13 @@ import {
   createConfig,
 } from '@llamaindex/llama-deploy'
 import { WorkflowEvent } from './types'
+import { isStopEvent, isWorkflowEvent } from './utils'
 
 export interface StreamingEventCallback {
   onStart?: () => void
   onData?: (event: WorkflowEvent) => void
   onError?: (error: Error) => void
+  onStopEvent?: (event: WorkflowEvent) => void
   onFinish?: (allEvents: WorkflowEvent[]) => void
 }
 
@@ -38,13 +40,13 @@ export class WorkflowSDK {
   // case 2: if we provide a session id, the task will be created in the existing session
   // for case 2, task events will be streamed from the existing session and have the same result as other tasks in the same session.
   // this can be useful for multi-task workflows where we want to keep the same session for all tasks.
-  async createTask(input: string, sessionId?: string) {
+  async createTask(eventData: any, sessionId?: string) {
     const data =
       await createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
         client: this.client,
         path: { deployment_name: this.deploymentName },
         query: { session_id: sessionId },
-        body: { input },
+        body: { input: JSON.stringify(eventData) },
       })
 
     const { task_id, session_id } = data.data ?? {}
@@ -94,8 +96,18 @@ export class WorkflowSDK {
 
         const chunk = decoder.decode(value, { stream: true })
         const event = typeof chunk === 'string' ? JSON.parse(chunk) : chunk
-        accumulatedEvents.push(event as WorkflowEvent)
-        callback?.onData?.(event as WorkflowEvent)
+
+        if (!isWorkflowEvent(event)) {
+          console.warn('Received non-workflow event:', event)
+          continue
+        }
+
+        accumulatedEvents.push(event)
+        callback?.onData?.(event)
+
+        if (isStopEvent(event)) {
+          callback?.onStopEvent?.(event)
+        }
       }
 
       callback?.onFinish?.(accumulatedEvents)

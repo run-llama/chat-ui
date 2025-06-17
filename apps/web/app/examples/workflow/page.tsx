@@ -7,11 +7,13 @@ import { cn } from '@/lib/utils'
 const BASE_URL = 'http://127.0.0.1:4501'
 const DEPLOYMENT_NAME = 'QuickStart'
 
+// TODO: update example to send a event
 interface ChatStartEvent extends WorkflowEvent {
-  name: 'ChatStartEvent'
-  chat_request: {
-    id: string
-    messages: { role: string; content: string }[]
+  value: {
+    chat_request: {
+      id: string
+      messages: { role: string; content: string }[]
+    }
   }
 }
 
@@ -25,11 +27,7 @@ export default function Home() {
 
   const handleSendMessage = async () => {
     const taskId = await createTask({
-      name: 'ChatStartEvent',
-      chat_request: {
-        id: new Date().getTime().toString(),
-        messages: [{ role: 'user', content: userInput }],
-      },
+      text: userInput,
     })
     console.log('Task created:', taskId)
   }

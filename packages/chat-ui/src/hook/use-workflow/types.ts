@@ -1,6 +1,10 @@
 export interface WorkflowEvent {
-  name: string
+  _is_pydantic: boolean
+  value: any
+  qualified_name: string // llama_index.core.workflow.events.StopEvent
 }
+
+
 
 export interface WorkflowHookParams<O extends WorkflowEvent = WorkflowEvent> {
   baseUrl?: string // Optional base URL for the workflow API
@@ -17,7 +21,7 @@ export interface WorkflowHookHandler<
 > {
   sessionId?: string // Session ID once the workflow session starts
   currentTask?: Task<I, O>
-  createTask: (event: I, callbacks?: TaskCallbacks<O>) => Promise<string> // Function to create a new task with an event, returns the task id
+  createTask: (input: any, callbacks?: TaskCallbacks<O>) => Promise<string> // Function to create a new task with an event, returns the task id
   tasks: Record<string, Task<I, O>>
 }
 
