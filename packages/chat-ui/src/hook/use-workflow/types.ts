@@ -1,6 +1,5 @@
 export interface WorkflowEvent {
   name: string
-  [key: string]: any
 }
 
 export interface WorkflowHookParams<O extends WorkflowEvent = WorkflowEvent> {
