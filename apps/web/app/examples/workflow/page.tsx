@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useWorkflow, WorkflowEvent } from '@llamaindex/chat-ui'
+import { cn } from '@/lib/utils'
 
 const BASE_URL = 'http://127.0.0.1:4501'
 const DEPLOYMENT_NAME = 'QuickStart'
@@ -17,25 +18,20 @@ interface ChatStartEvent extends WorkflowEvent {
 export default function Home() {
   const [userInput, setUserInput] = useState('')
 
-  const workflow = useWorkflow<ChatStartEvent>({
+  const { currentTask, createTask, sessionId } = useWorkflow<ChatStartEvent>({
     baseUrl: BASE_URL,
     workflow: DEPLOYMENT_NAME,
-    onStopEvents: (events, taskId) => {
-      console.log('Workflow completed:', events, taskId)
-    },
-    onError: (error, taskId) => {
-      console.error('Workflow error:', error, taskId)
-    },
   })
 
   const handleSendMessage = async () => {
-    await workflow.sendEvent({
+    const taskId = await createTask({
       name: 'ChatStartEvent',
       chat_request: {
         id: new Date().getTime().toString(),
         messages: [{ role: 'user', content: userInput }],
       },
     })
+    console.log('Task created:', taskId)
   }
 
   return (
@@ -49,17 +45,28 @@ export default function Home() {
         <h2 className="mb-2 text-lg font-semibold">Workflow Status</h2>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <strong>Session ID:</strong> {workflow.sessionId || 'Not created'}
+            <strong>Session ID:</strong> {sessionId || 'Not created'}
           </div>
           <div>
-            <strong>Current Task ID:</strong> {workflow.taskId || 'Not created'}
+            <strong>Current Task ID:</strong> {currentTask?.id || 'Not created'}
           </div>
 
           <div>
-            <strong>Total Events Count:</strong> {workflow.events.length}
+            <strong>Task Events:</strong> {currentTask?.events.length}
           </div>
           <div>
-            <strong>Status:</strong> {workflow.status}
+            <strong>Task Status:</strong>{' '}
+            <span
+              className={cn('text-sm', {
+                'text-gray-500':
+                  currentTask?.status === 'idle' || !currentTask?.status,
+                'text-green-500': currentTask?.status === 'complete',
+                'text-red-500': currentTask?.status === 'error',
+                'text-yellow-500': currentTask?.status === 'running',
+              })}
+            >
+              {currentTask?.status}
+            </span>
           </div>
         </div>
       </div>
@@ -67,8 +74,7 @@ export default function Home() {
       {/* Events Interface */}
       <div className="mb-4 h-96 overflow-auto rounded border bg-white p-4">
         <h3 className="mb-2 font-semibold">Events</h3>
-        {/* workflow.events contains events of all tasks */}
-        {workflow.events.map((event, index) => (
+        {currentTask?.events.map((event, index) => (
           <div key={index} className="mb-2 text-sm text-blue-600">
             Event {index + 1}: {JSON.stringify(event)}
           </div>
@@ -84,12 +90,12 @@ export default function Home() {
           onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
           className="flex-1 rounded border border-gray-300 p-2"
           placeholder="Type your message..."
-          disabled={workflow.status === 'running'}
+          disabled={currentTask?.status === 'running'}
         />
         <button
           type="button"
           onClick={handleSendMessage}
-          disabled={workflow.status === 'running'}
+          disabled={currentTask?.status === 'running'}
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
         >
           Send

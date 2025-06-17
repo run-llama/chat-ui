@@ -15,8 +15,10 @@ export interface StreamingEventCallback {
   onFinish?: (allEvents: WorkflowEvent[]) => void
 }
 
+// extend llama-deploy client with custom hook logic
 export class WorkflowSDK {
   client: Client
+  baseUrl: string
   deploymentName: string
   sessionId?: string
 
@@ -26,6 +28,7 @@ export class WorkflowSDK {
     sessionId?: string
   }) {
     this.client = createClient(createConfig({ baseUrl: input.baseUrl }))
+    this.baseUrl = input.baseUrl || ''
     this.deploymentName = input.deploymentName
     this.sessionId = input.sessionId
   }
@@ -65,7 +68,7 @@ export class WorkflowSDK {
     callback?: StreamingEventCallback
   ): Promise<WorkflowEvent[]> {
     const sessionId = await this.getSession()
-    const url = `/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
+    const url = `${this.baseUrl}/deployments/${this.deploymentName}/tasks/${taskId}/events?session_id=${sessionId}`
 
     const response = await fetch(url, {
       headers: {
