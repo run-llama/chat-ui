@@ -1,6 +1,6 @@
 # @llamaindex/llama-deploy
 
-This package provides a TypeScript API client generated from the OpenAPI specification using `@hey-api/openapi-ts`.
+This package provides a TypeScript llama-deploy API client generated from the OpenAPI specification using `@hey-api/openapi-ts`.
 
 ## Installation
 
@@ -10,9 +10,9 @@ npm install @llamaindex/llama-deploy
 
 ## Development
 
-### Generate API Client
+### Generate llama-deploy API client
 
-To generate the API client from the OpenAPI specification:
+To generate the llama-deploy API client from the OpenAPI specification:
 
 ```bash
 npm run generate
