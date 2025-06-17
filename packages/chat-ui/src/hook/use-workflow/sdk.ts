@@ -33,8 +33,12 @@ export class WorkflowSDK {
     this.sessionId = input.sessionId
   }
 
-  async createTask(input: string) {
-    const sessionId = await this.getSession()
+  // we can create a task with or without a session id
+  // case 1: if we don't provide a session id, a new session will be created
+  // case 2: if we provide a session id, the task will be created in the existing session
+  // for case 2, task events will be streamed from the existing session and have the same result as other tasks in the same session.
+  // this can be useful for multi-task workflows where we want to keep the same session for all tasks.
+  async createTask(input: string, sessionId?: string) {
     const data =
       await createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
         client: this.client,
@@ -43,24 +47,13 @@ export class WorkflowSDK {
         body: { input },
       })
 
-    const newTaskId = data.data?.task_id
-    if (!newTaskId) {
+    const { task_id, session_id } = data.data ?? {}
+    if (!task_id || !session_id) {
       throw new Error('Failed to create task')
     }
-    return newTaskId
-  }
 
-  async sendEventToTask(taskId: string, event: WorkflowEvent) {
-    const sessionId = await this.getSession()
-    return sendEventDeploymentsDeploymentNameTasksTaskIdEventsPost({
-      client: this.client,
-      path: { deployment_name: this.deploymentName, task_id: taskId },
-      query: { session_id: sessionId },
-      body: {
-        event_obj_str: JSON.stringify(event),
-        agent_id: this.deploymentName,
-      },
-    })
+    this.sessionId = session_id
+    return task_id
   }
 
   async streamTaskEvents(
@@ -114,20 +107,33 @@ export class WorkflowSDK {
     }
   }
 
-  private async getSession(): Promise<string> {
-    if (!this.sessionId) {
-      // if no session id, create a new session
-      const session =
-        await createSessionDeploymentsDeploymentNameSessionsCreatePost({
-          client: this.client,
-          path: { deployment_name: this.deploymentName },
-        })
-      const sessionId = session.data?.session_id
-      if (!sessionId) {
-        throw new Error('Failed to create session')
-      }
-      this.sessionId = sessionId
+  async sendEventToTask(taskId: string, event: WorkflowEvent) {
+    const sessionId = await this.getSession()
+    return sendEventDeploymentsDeploymentNameTasksTaskIdEventsPost({
+      client: this.client,
+      path: { deployment_name: this.deploymentName, task_id: taskId },
+      query: { session_id: sessionId },
+      body: {
+        event_obj_str: JSON.stringify(event),
+        agent_id: this.deploymentName,
+      },
+    })
+  }
+
+  async createSession() {
+    const session =
+      await createSessionDeploymentsDeploymentNameSessionsCreatePost({
+        client: this.client,
+        path: { deployment_name: this.deploymentName },
+      })
+    const sessionId = session.data?.session_id
+    if (!sessionId) {
+      throw new Error('Failed to create session')
     }
-    return this.sessionId
+    return sessionId
+  }
+
+  private async getSession(): Promise<string> {
+    return this.sessionId ? this.sessionId : this.createSession()
   }
 }
