@@ -1,42 +1,32 @@
 'use client'
 
 import { useState } from 'react'
-import { useWorkflow, WorkflowEvent } from '@llamaindex/chat-ui'
+import { useWorkflow } from '@llamaindex/chat-ui'
 import { cn } from '@/lib/utils'
-
-const BASE_URL = 'http://127.0.0.1:4501'
-const DEPLOYMENT_NAME = 'QuickStart'
-
-// TODO: update example to send a event
-interface ChatStartEvent extends WorkflowEvent {
-  value: {
-    chat_request: {
-      id: string
-      messages: { role: string; content: string }[]
-    }
-  }
-}
 
 export default function Home() {
   const [userInput, setUserInput] = useState('')
 
-  const { currentTask, createTask, sessionId } = useWorkflow<ChatStartEvent>({
-    baseUrl: BASE_URL,
-    workflow: DEPLOYMENT_NAME,
+  const { createTask, sessionId, tasks, currentTask } = useWorkflow({
+    baseUrl: 'http://127.0.0.1:4501',
+    workflow: 'QuickStart',
   })
 
   const handleSendMessage = async () => {
-    const taskId = await createTask({
-      text: userInput,
-    })
+    const taskId = await createTask(
+      { userInput },
+      {
+        onStopEvent: event => {
+          console.log('Stop event:', event)
+        },
+      }
+    )
     console.log('Task created:', taskId)
   }
 
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
-      <h1 className="mb-6 text-2xl font-bold">
-        Workflow Chat Example - {DEPLOYMENT_NAME}
-      </h1>
+      <h1 className="mb-6 text-2xl font-bold">Workflow Chat Example</h1>
 
       {/* Status Panel */}
       <div className="mb-6 rounded-lg bg-gray-100 p-4">
@@ -72,9 +62,14 @@ export default function Home() {
       {/* Events Interface */}
       <div className="mb-4 h-96 overflow-auto rounded border bg-white p-4">
         <h3 className="mb-2 font-semibold">Events</h3>
-        {currentTask?.events.map((event, index) => (
-          <div key={index} className="mb-2 text-sm text-blue-600">
-            Event {index + 1}: {JSON.stringify(event)}
+        {Object.entries(tasks).map(([taskId, task]) => (
+          <div key={taskId} className="mb-4">
+            <h4 className="mb-2 text-sm font-medium">Task: {taskId}</h4>
+            {task.events.map((event, index) => (
+              <div key={index} className="mb-2 ml-4 text-sm text-blue-600">
+                Event {index + 1}: {JSON.stringify(event)}
+              </div>
+            ))}
           </div>
         ))}
       </div>
@@ -96,7 +91,7 @@ export default function Home() {
           disabled={currentTask?.status === 'running'}
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
         >
-          Send
+          Create Task
         </button>
       </div>
     </div>

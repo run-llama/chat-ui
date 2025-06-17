@@ -35,12 +35,8 @@ export class WorkflowSDK {
     this.sessionId = input.sessionId
   }
 
-  // we can create a task with or without a session id
-  // case 1: if we don't provide a session id, a new session will be created
-  // case 2: if we provide a session id, the task will be created in the existing session
-  // for case 2, task events will be streamed from the existing session and have the same result as other tasks in the same session.
-  // this can be useful for multi-task workflows where we want to keep the same session for all tasks.
-  async createTask(eventData: any, sessionId?: string) {
+  async createTask(eventData: any) {
+    const sessionId = await this.getSession()
     const data =
       await createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
         client: this.client,
@@ -49,12 +45,10 @@ export class WorkflowSDK {
         body: { input: JSON.stringify(eventData) },
       })
 
-    const { task_id, session_id } = data.data ?? {}
-    if (!task_id || !session_id) {
+    const { task_id } = data.data ?? {}
+    if (!task_id) {
       throw new Error('Failed to create task')
     }
-
-    this.sessionId = session_id
     return task_id
   }
 
@@ -146,6 +140,8 @@ export class WorkflowSDK {
   }
 
   private async getSession(): Promise<string> {
-    return this.sessionId ? this.sessionId : this.createSession()
+    if (this.sessionId) return this.sessionId
+    this.sessionId = await this.createSession()
+    return this.sessionId
   }
 }
