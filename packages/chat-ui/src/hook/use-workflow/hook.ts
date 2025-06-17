@@ -84,6 +84,7 @@ export function useWorkflow<
 
   const sendEventToTask = useCallback(
     async (event: I, taskId: string, callbacks?: TaskCallbacks<O>) => {
+      setCurrentTaskId(taskId)
       await sdk.sendEventToTask(taskId, event)
       await streamTaskEvents(taskId, callbacks)
     },
