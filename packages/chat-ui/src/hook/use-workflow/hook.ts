@@ -41,7 +41,7 @@ export function useWorkflow<
 
   const streamTaskEvents = useCallback(
     async (taskId: string, callbacks?: TaskCallbacks<O>) => {
-      const allEvents = await sdk.streamTaskEvents(taskId, {
+      await sdk.streamTaskEvents(taskId, {
         onStart: () => {
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'running' }))
         },
@@ -57,17 +57,15 @@ export function useWorkflow<
         },
         onFinish: events => {
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
+
+          // TODO: get StopEvent from qualified_name
+          // {"__is_pydantic": true, "value": {}, "qualified_name": "llama_index.core.workflow.events.StopEvent"}
           const stopEvent = events.find(event => event.name === 'StopEvent')
           if (stopEvent && callbacks?.onStopEvent) {
             callbacks.onStopEvent(stopEvent as O)
           }
         },
       })
-
-      setEventsByTaskId(prev => ({
-        ...prev,
-        [taskId]: allEvents as O[],
-      }))
     },
     [sdk]
   )
@@ -95,8 +93,8 @@ export function useWorkflow<
   const createTask = useCallback(
     async (event: I, callbacks?: TaskCallbacks<O>): Promise<string> => {
       const newTaskId = await sdk.createTask(JSON.stringify(event))
-      await streamTaskEvents(newTaskId, callbacks)
       setCurrentTaskId(newTaskId)
+      await streamTaskEvents(newTaskId, callbacks)
       return newTaskId
     },
     [sdk, streamTaskEvents]
@@ -115,9 +113,13 @@ export function useWorkflow<
     }, {})
   }, [eventsByTaskId, taskStatuses, sendEventToTask])
 
+  const currentTask = useMemo(() => {
+    return currentTaskId ? tasks[currentTaskId] : undefined
+  }, [currentTaskId, tasks])
+
   return {
     sessionId: sdk.sessionId,
-    currentTask: currentTaskId ? tasks[currentTaskId] : undefined,
+    currentTask,
     createTask,
     tasks,
   }
