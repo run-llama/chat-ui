@@ -57,9 +57,9 @@ export function useWorkflow<
         },
         onFinish: events => {
           setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
-          const stopEvents = events.filter(event => event.name === 'StopEvent')
-          if (stopEvents.length > 0 && callbacks?.onStopEvent) {
-            callbacks.onStopEvent(stopEvents as O[])
+          const stopEvent = events.find(event => event.name === 'StopEvent')
+          if (stopEvent && callbacks?.onStopEvent) {
+            callbacks.onStopEvent(stopEvent as O)
           }
         },
       })
