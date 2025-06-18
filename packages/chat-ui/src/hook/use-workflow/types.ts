@@ -1,8 +1,9 @@
 import { TaskDefinition } from '@llamaindex/llama-deploy'
+import { JSONValue } from '../../chat/chat.interface'
 
 export interface WorkflowEvent {
   type: string
-  data?: any
+  data?: JSONValue | undefined
 }
 
 export type WorkflowStatus = 'idle' | 'running' | 'complete' | 'error'
@@ -50,6 +51,6 @@ export interface StreamingEventCallback<
 
 export type RawEvent = {
   __is_pydantic: boolean
-  value: any
+  value: JSONValue
   qualified_name: string
 }
