@@ -71,8 +71,6 @@ module.exports = {
     'no-await-in-loop': 'off',
     '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     '@typescript-eslint/unbound-method': 'off',
-    'no-constant-condition': 'off',
-    '@typescript-eslint/no-shadow': 'off',
     camelcase: 'off',
   },
   overrides: [
