@@ -4,15 +4,13 @@ import {
   getTasksDeploymentsDeploymentNameTasksGet,
   sendEventDeploymentsDeploymentNameTasksTaskIdEventsPost,
 } from '@llamaindex/llama-deploy'
-import { WorkflowEvent, WorkflowTask } from './types'
-
-interface StreamingEventCallback<E extends WorkflowEvent = WorkflowEvent> {
-  onStart?: () => void
-  onData?: (event: E) => void
-  onError?: (error: Error) => void
-  onStopEvent?: (event: E) => void
-  onFinish?: (allEvents: E[]) => void
-}
+import {
+  RawEvent,
+  StreamingEventCallback,
+  WorkflowEvent,
+  WorkflowEventType,
+  WorkflowTask,
+} from './types'
 
 export async function getExistingTask(params: {
   client: Client
@@ -43,13 +41,13 @@ export async function getExistingTask(params: {
 export async function createTask<E extends WorkflowEvent>(params: {
   client: Client
   deploymentName: string
-  event: E
+  eventData: E['data']
 }): Promise<WorkflowTask> {
   const data =
     await createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
       client: params.client,
       path: { deployment_name: params.deploymentName },
-      body: { input: JSON.stringify(params.event) },
+      body: { input: JSON.stringify(params.eventData ?? {}) },
     })
 
   const { task_id, session_id, service_id, input } = data.data ?? {}
@@ -107,14 +105,17 @@ export async function fetchTaskEvents<E extends WorkflowEvent>(
       if (done) break
 
       const chunk = decoder.decode(value, { stream: true })
-      const event = parseChunk<E>(chunk)
-      if (!event) continue
+      const events = toWorkflowEvents<E>(chunk)
+      if (!events.length) continue
 
-      accumulatedEvents.push(event)
-      callback?.onData?.(event)
+      accumulatedEvents.push(...events)
+      events.forEach(event => callback?.onData?.(event))
 
-      if (isStopEvent(event)) {
-        callback?.onStopEvent?.(event)
+      const stopEvent = events.find(
+        event => event.type === WorkflowEventType.StopEvent.toString()
+      )
+      if (stopEvent) {
+        callback?.onStopEvent?.(stopEvent)
       }
     }
 
@@ -135,17 +136,55 @@ export async function sendEventToTask<E extends WorkflowEvent>(params: {
 }) {
   const { task_id, session_id, service_id } = params.task
 
+  const rawEvent = toRawEvent(params.event) // convert to raw event before sending
+
   const data = await sendEventDeploymentsDeploymentNameTasksTaskIdEventsPost({
     client: params.client,
     path: { deployment_name: params.deploymentName, task_id },
     query: { session_id },
     body: {
       service_id,
-      event_obj_str: JSON.stringify(params.event),
+      event_obj_str: JSON.stringify(rawEvent),
     },
   })
 
   return data.data
+}
+
+function toWorkflowEvents<E extends WorkflowEvent>(chunk: string): E[] {
+  if (typeof chunk !== 'string') {
+    console.warn('Skipping non-string chunk:', chunk)
+    return []
+  }
+
+  // One chunk can contain multiple events, so we need to parse each line
+  const lines = chunk
+    .trim()
+    .split('\n')
+    .filter(line => line.trim() !== '')
+  return lines.map(parseChunkLine<E>).filter(Boolean) as E[]
+}
+
+function parseChunkLine<E extends WorkflowEvent>(line: string): E | null {
+  try {
+    const event = JSON.parse(line) as RawEvent
+    if (!isRawEvent(event)) {
+      console.warn('Skipping invalid raw event:', event)
+      return null
+    }
+    return { type: event.qualified_name, data: event.value } as E
+  } catch (error) {
+    console.warn(`Failed to parse chunk in line: ${line}`, error)
+    return null
+  }
+}
+
+function toRawEvent(event: WorkflowEvent): RawEvent {
+  return {
+    __is_pydantic: true,
+    value: event.data ?? {},
+    qualified_name: event.type,
+  }
 }
 
 function isRawEvent(event: any): event is RawEvent {
@@ -157,34 +196,4 @@ function isRawEvent(event: any): event is RawEvent {
     'qualified_name' in event &&
     typeof event.qualified_name === 'string'
   )
-}
-
-function isStopEvent(event: WorkflowEvent): boolean {
-  return event.type === 'StopEvent'
-}
-
-type RawEvent = {
-  __is_pydantic: boolean
-  value: any
-  qualified_name: string
-}
-
-// TODO: parse chunk can return multiple events
-function parseChunk<E extends WorkflowEvent>(chunk: string): E | null {
-  if (typeof chunk !== 'string') return chunk
-
-  try {
-    const event = JSON.parse(chunk) as RawEvent
-    if (!isRawEvent(event)) {
-      console.warn('Received non-workflow event:', event)
-      return null
-    }
-    return {
-      type: event.qualified_name,
-      value: event.value,
-    } as unknown as E
-  } catch (error) {
-    console.warn('Failed to parse chunk:', error)
-    return null
-  }
 }

@@ -8,6 +8,7 @@ import {
 } from './helper'
 import {
   WorkflowEvent,
+  WorkflowEventType,
   WorkflowHookHandler,
   WorkflowHookParams,
   WorkflowStatus,
@@ -82,7 +83,11 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
 
   const sendStartEvent = useCallback(
     async (event: E): Promise<void> => {
-      const newTask = await createTask({ client, deploymentName, event })
+      const newTask = await createTask({
+        client,
+        deploymentName,
+        eventData: event.data,
+      })
       setTask(newTask) // update new task with new session when trigger start event
       await streamTaskEvents(newTask)
     },
@@ -95,9 +100,29 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
         throw new Error('Task is not initialized')
       }
       await sendEventToTask<E>({ client, deploymentName, task, event })
-      await streamTaskEvents(task)
+      if (status !== 'running') {
+        // if task is not running, trigger streaming events
+        await streamTaskEvents(task)
+      }
     },
-    [client, deploymentName, streamTaskEvents, task]
+    [client, deploymentName, streamTaskEvents, status, task]
+  )
+
+  const start = useCallback(
+    async (eventData: E['data']) => {
+      const newTask = await createTask({ client, deploymentName, eventData })
+      setTask(newTask) // update new task with new session when trigger start event
+      await streamTaskEvents(newTask)
+    },
+    [client, deploymentName, streamTaskEvents]
+  )
+
+  const stop = useCallback(
+    async (data?: E['data']): Promise<void> => {
+      const stopEvent = { type: WorkflowEventType.StopEvent, data } as E
+      await sendEvent(stopEvent)
+    },
+    [sendEvent]
   )
 
   return {
@@ -105,6 +130,8 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
     taskId: task?.task_id,
     sendEvent,
     sendStartEvent,
+    start,
+    stop,
     events,
     status,
   }

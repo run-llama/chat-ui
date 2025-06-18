@@ -1,18 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call -- TODO: fix this */
+/* eslint-disable @typescript-eslint/no-unsafe-return -- TODO: fix this */
+
 'use client'
 
 import { useState } from 'react'
-import { useWorkflow, WorkflowEvent } from '@llamaindex/chat-ui'
+import { useWorkflow } from '@llamaindex/chat-ui'
 import { cn } from '@/lib/utils'
-
-interface CustomEvent extends WorkflowEvent {
-  value?: { message: string }
-}
 
 export default function Home() {
   const [userInput, setUserInput] = useState('')
 
-  const { sessionId, taskId, sendStartEvent, sendEvent, events, status } =
-    useWorkflow<CustomEvent>({
+  const { sessionId, taskId, start, stop, sendEvent, events, status } =
+    useWorkflow({
       baseUrl: 'http://127.0.0.1:4501',
       workflow: 'QuickStart',
       onStopEvent: event => {
@@ -23,19 +22,9 @@ export default function Home() {
       },
     })
 
-  const run = async () => {
-    await sendStartEvent({
-      type: 'InputRequiredEvent',
-      value: { message: userInput },
-    })
-  }
-
   const retrieve = async () => {
-    await sendEvent({ type: 'AdhocEvent' })
-  }
-
-  const stop = async () => {
-    await sendEvent({ type: 'StopEvent' })
+    // AdhocEvent is defined in workflow definition
+    await sendEvent({ type: 'workflow.AdhocEvent' })
   }
 
   return (
@@ -94,11 +83,11 @@ export default function Home() {
         />
         <button
           type="button"
-          onClick={run}
+          onClick={() => start({ message: userInput })}
           disabled={status === 'running'}
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
         >
-          Create Task
+          Start
         </button>
         <button
           type="button"
@@ -110,7 +99,7 @@ export default function Home() {
         </button>
         <button
           type="button"
-          onClick={stop}
+          onClick={() => stop()}
           disabled={!taskId}
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
         >
