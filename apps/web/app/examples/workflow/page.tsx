@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call -- TODO: fix this */
-/* eslint-disable @typescript-eslint/no-unsafe-return -- TODO: fix this */
-
 'use client'
 
 import { useState } from 'react'
