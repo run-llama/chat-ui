@@ -36,9 +36,9 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
   }, [baseUrl])
 
   const streamTaskEvents = useCallback(
-    async (task: WorkflowTask) => {
+    async (inputTask: WorkflowTask) => {
       await fetchTaskEvents<E>(
-        { client, deploymentName, task },
+        { client, deploymentName, task: inputTask },
         {
           onStart: () => {
             setStatus('running')
@@ -67,15 +67,15 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
     const initWorkflow = async () => {
       if (!initialTaskId || isInitialized) return
 
-      const task = await getExistingTask({
+      const existingTask = await getExistingTask({
         client,
         deploymentName,
         taskId: initialTaskId,
       })
 
-      setTask(task)
+      setTask(existingTask)
       setIsInitialized(true)
-      await streamTaskEvents(task)
+      await streamTaskEvents(existingTask)
     }
 
     initWorkflow()

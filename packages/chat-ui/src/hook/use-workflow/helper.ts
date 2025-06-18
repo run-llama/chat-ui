@@ -22,7 +22,7 @@ export async function getExistingTask(params: {
     path: { deployment_name: params.deploymentName },
   })
   const allTasks = data.data ?? []
-  const task = allTasks.find(task => task.task_id === params.taskId)
+  const task = allTasks.find(t => t.task_id === params.taskId)
 
   if (!task) {
     throw new Error(`Task ${params.taskId} not found`)
@@ -100,6 +100,7 @@ export async function fetchTaskEvents<E extends WorkflowEvent>(
   try {
     callback?.onStart?.()
 
+    // eslint-disable-next-line no-constant-condition -- needed
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
