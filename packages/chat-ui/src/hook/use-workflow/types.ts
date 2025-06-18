@@ -1,43 +1,31 @@
+import { TaskDefinition } from '@llamaindex/llama-deploy'
+
 export interface WorkflowEvent {
-  _is_pydantic: boolean
-  value: any
-  qualified_name: string // llama_index.core.workflow.events.StopEvent
+  type: string
 }
 
+export type WorkflowStatus = 'idle' | 'running' | 'complete' | 'error'
 
-
-export interface WorkflowHookParams<O extends WorkflowEvent = WorkflowEvent> {
+export interface WorkflowHookParams<E extends WorkflowEvent = WorkflowEvent> {
   baseUrl?: string // Optional base URL for the workflow API
   workflow: string // Name of the registered deployment
-  sessionId?: string // Optional session ID for resuming a workflow session
   taskId?: string // Optional task ID for resuming a workflow task
-  initialTaskCallbacks?: TaskCallbacks<O> // Optional callbacks for the initial task if taskId is provided
-}
-
-/** Return value from the hook */
-export interface WorkflowHookHandler<
-  I extends WorkflowEvent = WorkflowEvent,
-  O extends WorkflowEvent = WorkflowEvent,
-> {
-  sessionId?: string // Session ID once the workflow session starts
-  currentTask?: Task<I, O>
-  createTask: (input: any, callbacks?: TaskCallbacks<O>) => Promise<string> // Function to create a new task with an event, returns the task id
-  tasks: Record<string, Task<I, O>>
-}
-
-export interface TaskCallbacks<O extends WorkflowEvent = WorkflowEvent> {
-  onStopEvent?: (event: O) => void
+  onStopEvent?: (event: E) => void
   onError?: (error: any) => void
 }
 
-export type TaskStatus = 'idle' | 'running' | 'complete' | 'error'
+export interface WorkflowHookHandler<E extends WorkflowEvent = WorkflowEvent> {
+  sessionId?: string // Session ID once the workflow session starts
+  taskId?: string // Task ID used internally, will be the same for the whole session
+  sendEvent: (event: E) => Promise<void> // Function to send a new event to the current session, throws error if session is not created yet
+  sendStartEvent: (event: E) => Promise<void> // Function to create a new session by sending a new event, updates sessionId
+  events: E[]
+  status: WorkflowStatus
+}
 
-export interface Task<
-  I extends WorkflowEvent = WorkflowEvent,
-  O extends WorkflowEvent = WorkflowEvent,
-> {
-  id: string
-  events: (I | O)[]
-  status: TaskStatus
-  sendEvent: (event: I, callbacks?: TaskCallbacks<O>) => Promise<void>
+// extend TaskDefinition with sessionId, taskId, serviceId are required
+export type WorkflowTask = TaskDefinition & {
+  session_id: string
+  task_id: string
+  service_id: string
 }

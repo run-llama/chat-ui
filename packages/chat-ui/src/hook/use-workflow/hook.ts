@@ -1,123 +1,111 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { WorkflowSDK } from './sdk'
+import { createClient, createConfig } from '@llamaindex/llama-deploy'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  createTask,
+  fetchTaskEvents,
+  getExistingTask,
+  sendEventToTask,
+} from './helper'
 import {
   WorkflowEvent,
-  Task,
-  TaskCallbacks,
-  WorkflowHookParams,
-  TaskStatus,
   WorkflowHookHandler,
+  WorkflowHookParams,
+  WorkflowStatus,
+  WorkflowTask,
 } from './types'
 
-/**
- * useWorkflow hook for consuming llama-deploy workflows
- */
-export function useWorkflow<
-  I extends WorkflowEvent = WorkflowEvent,
-  O extends WorkflowEvent = WorkflowEvent,
->(params: WorkflowHookParams<O>): WorkflowHookHandler<I, O> {
+export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
+  params: WorkflowHookParams<E>
+): WorkflowHookHandler<E> {
   const {
     baseUrl,
     workflow: deploymentName,
-    sessionId: initialSessionId,
     taskId: initialTaskId,
-    initialTaskCallbacks,
+    onStopEvent,
+    onError,
   } = params
 
-  const sdk = useMemo(
-    () =>
-      new WorkflowSDK({ baseUrl, deploymentName, sessionId: initialSessionId }),
-    [baseUrl, deploymentName, initialSessionId]
-  )
-
   const [isInitialized, setIsInitialized] = useState(false)
-  const [currentTaskId, setCurrentTaskId] = useState<string>()
-  const [eventsByTaskId, setEventsByTaskId] = useState<
-    Record<string, (I | O)[]>
-  >({})
-  const [taskStatuses, setTaskStatuses] = useState<Record<string, TaskStatus>>(
-    {}
-  )
+  const [task, setTask] = useState<WorkflowTask>()
+  const [events, setEvents] = useState<E[]>([])
+  const [status, setStatus] = useState<WorkflowStatus>('idle')
+
+  const client = useMemo(() => {
+    return createClient(createConfig({ baseUrl }))
+  }, [baseUrl])
 
   const streamTaskEvents = useCallback(
-    async (taskId: string, callbacks?: TaskCallbacks<O>) => {
-      await sdk.streamTaskEvents(taskId, {
-        onStart: () => {
-          setTaskStatuses(prev => ({ ...prev, [taskId]: 'running' }))
-        },
-        onData: event => {
-          setEventsByTaskId(prev => ({
-            ...prev,
-            [taskId]: [...(prev[taskId] || []), event as O],
-          }))
-        },
-        onError: (error: Error) => {
-          setTaskStatuses(prev => ({ ...prev, [taskId]: 'error' }))
-          callbacks?.onError?.(error)
-        },
-        onStopEvent: event => {
-          callbacks?.onStopEvent?.(event as O)
-        },
-        onFinish: () => {
-          setTaskStatuses(prev => ({ ...prev, [taskId]: 'complete' }))
-        },
-      })
+    async (task: WorkflowTask) => {
+      await fetchTaskEvents<E>(
+        { client, deploymentName, task },
+        {
+          onStart: () => {
+            setStatus('running')
+          },
+          onData: event => {
+            setEvents(prev => [...prev, event])
+          },
+          onError: (error: Error) => {
+            setStatus('error')
+            onError?.(error)
+          },
+          onStopEvent: event => {
+            onStopEvent?.(event)
+          },
+          onFinish: () => {
+            setStatus('complete')
+          },
+        }
+      )
     },
-    [sdk]
+    [client, deploymentName, onError, onStopEvent]
   )
 
-  // initialize workflow, create session and stream events if task id is provided
+  // if task id is provided, get existing task and restore its events
   useEffect(() => {
     const initWorkflow = async () => {
-      if (isInitialized || !initialTaskId) return
-      setCurrentTaskId(initialTaskId)
-      await streamTaskEvents(initialTaskId, initialTaskCallbacks)
+      if (!initialTaskId || isInitialized) return
+
+      const task = await getExistingTask({
+        client,
+        deploymentName,
+        taskId: initialTaskId,
+      })
+
+      setTask(task)
       setIsInitialized(true)
+      await streamTaskEvents(task)
     }
 
     initWorkflow()
-  }, [initialTaskCallbacks, initialTaskId, isInitialized, streamTaskEvents])
+  }, [client, deploymentName, initialTaskId, isInitialized, streamTaskEvents])
 
-  const sendEventToTask = useCallback(
-    async (event: I, taskId: string, callbacks?: TaskCallbacks<O>) => {
-      setCurrentTaskId(taskId)
-      await sdk.sendEventToTask(taskId, event)
-      await streamTaskEvents(taskId, callbacks)
+  const sendStartEvent = useCallback(
+    async (event: E): Promise<void> => {
+      const newTask = await createTask({ client, deploymentName, event })
+      setTask(newTask) // update new task with new session when trigger start event
+      await streamTaskEvents(newTask)
     },
-    [sdk, streamTaskEvents]
+    [client, deploymentName, streamTaskEvents]
   )
 
-  const createTask = useCallback(
-    async (data: any, callbacks?: TaskCallbacks<O>): Promise<string> => {
-      const newTaskId = await sdk.createTask(data)
-      setCurrentTaskId(newTaskId)
-      await streamTaskEvents(newTaskId, callbacks)
-      return newTaskId
-    },
-    [sdk, streamTaskEvents]
-  )
-
-  const tasks = useMemo(() => {
-    const taskIds = Object.keys(eventsByTaskId)
-    return taskIds.reduce<Record<string, Task<I, O>>>((acc, taskId) => {
-      acc[taskId] = {
-        id: taskId,
-        events: eventsByTaskId[taskId],
-        status: taskStatuses[taskId] || 'idle',
-        sendEvent: (e: I, c) => sendEventToTask(e, taskId, c),
+  const sendEvent = useCallback(
+    async (event: E) => {
+      if (!task) {
+        throw new Error('Task is not initialized')
       }
-      return acc
-    }, {})
-  }, [eventsByTaskId, taskStatuses, sendEventToTask])
-
-  const currentTask = useMemo(() => {
-    return currentTaskId ? tasks[currentTaskId] : undefined
-  }, [currentTaskId, tasks])
+      await sendEventToTask<E>({ client, deploymentName, task, event })
+      await streamTaskEvents(task)
+    },
+    [client, deploymentName, streamTaskEvents, task]
+  )
 
   return {
-    sessionId: sdk.sessionId,
-    currentTask,
-    createTask,
-    tasks,
+    sessionId: task?.session_id,
+    taskId: task?.task_id,
+    sendEvent,
+    sendStartEvent,
+    events,
+    status,
   }
 }
