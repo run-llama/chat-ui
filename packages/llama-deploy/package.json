@@ -1,0 +1,26 @@
+{
+  "name": "@llamaindex/llama-deploy",
+  "version": "0.0.1",
+  "description": "Generated llama-deploy API client from OpenAPI specification",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "generate": "openapi-ts",
+    "build": "npm run generate && bunchee",
+    "clean": "rm -rf dist src/generated",
+    "dev": "bunchee --watch"
+  },
+  "devDependencies": {
+    "@llamaindex/typescript-config": "workspace:*",
+    "@hey-api/openapi-ts": "^0.73.0",
+    "bunchee": "^6.5.2",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

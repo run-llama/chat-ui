@@ -1,0 +1,21 @@
+name: QuickStart
+
+control-plane:
+  port: 8000
+
+default-service: echo_workflow
+
+services:
+  echo_workflow:
+    name: Echo Workflow
+    source:
+      type: local
+      name: src
+    path: src/workflow:echo_workflow
+
+ui:
+  name: My Nextjs App
+  port: 3000
+  source:
+    type: local
+    name: ui
