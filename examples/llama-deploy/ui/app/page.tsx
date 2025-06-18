@@ -3,9 +3,8 @@
 import { useState } from 'react'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || 'http://127.0.0.1:4501'
-const workflow =
-  process.env.NEXT_PUBLIC_LLAMA_DEPLOY_NEXTJS_DEPLOYMENT_NAME || 'QuickStart'
+const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+const workflow = process.env.NEXT_PUBLIC_DEPLOYMENT_NAME || 'QuickStart'
 
 export default function Home() {
   const [userInput, setUserInput] = useState('Please run task')
@@ -37,7 +36,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
-      <h1 className="mb-6 text-2xl font-bold">Llama Deploy Example</h1>
+      <h1 className="mb-6 text-2xl font-bold">Llama Deploy with Chat UI</h1>
 
       {/* Status Panel */}
       <div className="mb-6 rounded-lg bg-gray-100 p-4">
