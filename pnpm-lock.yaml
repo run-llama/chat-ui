@@ -35,9 +35,6 @@ importers:
       '@llamaindex/chat-ui':
         specifier: workspace:*
         version: link:../../packages/chat-ui
-      '@llamaindex/llama-deploy':
-        specifier: workspace:*
-        version: link:../../packages/llama-deploy
       '@radix-ui/react-slot':
         specifier: ^1.0.2
         version: 1.2.2(@types/react@18.3.21)(react@18.3.1)

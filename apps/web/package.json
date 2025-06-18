@@ -12,7 +12,6 @@
     "registry:post-build": "node scripts/add-css-source.js"
   },
   "dependencies": {
-    "@llamaindex/llama-deploy": "workspace:*",
     "framer-motion": "^12.15.0",
     "@faker-js/faker": "^9.4.0",
     "@llamaindex/chat-ui": "workspace:*",
