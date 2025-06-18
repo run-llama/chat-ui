@@ -37,7 +37,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
-      <h1 className="mb-6 text-2xl font-bold">Workflow Chat Example</h1>
+      <h1 className="mb-6 text-2xl font-bold">Llama Deploy Example</h1>
 
       {/* Status Panel */}
       <div className="mb-6 rounded-lg bg-gray-100 p-4">
@@ -47,7 +47,7 @@ export default function Home() {
             <strong>Session ID:</strong> {sessionId || 'Not created'}
           </div>
           <div>
-            <strong>Current Task ID:</strong> {taskId || 'Not created'}
+            <strong>Task ID:</strong> {taskId || 'Not created'}
           </div>
 
           <div>
