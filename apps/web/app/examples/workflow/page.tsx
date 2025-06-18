@@ -5,7 +5,7 @@ import { useWorkflow } from '@llamaindex/chat-ui'
 import { cn } from '@/lib/utils'
 
 export default function Home() {
-  const [userInput, setUserInput] = useState('')
+  const [userInput, setUserInput] = useState('Please run task')
 
   const { sessionId, taskId, start, stop, sendEvent, events, status } =
     useWorkflow({
@@ -82,23 +82,23 @@ export default function Home() {
           type="button"
           onClick={() => start({ message: userInput })}
           disabled={status === 'running'}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
+          className="rounded-full bg-green-500 px-6 py-2 text-white shadow-2xl hover:bg-green-600 disabled:opacity-50"
         >
           Start
         </button>
         <button
           type="button"
           onClick={retrieve}
-          disabled={!taskId}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
+          disabled={status !== 'running'}
+          className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
         >
-          Retrieve Status
+          Retrieve
         </button>
         <button
           type="button"
           onClick={() => stop()}
-          disabled={!taskId}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
+          disabled={status !== 'running'}
+          className="rounded-full bg-red-500 px-6 py-2 text-white shadow-2xl hover:bg-red-600 disabled:opacity-50"
         >
           Stop
         </button>

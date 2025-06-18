@@ -23,7 +23,7 @@ export interface WorkflowHookHandler<E extends WorkflowEvent = WorkflowEvent> {
   start: (eventData: E['data']) => Promise<void> // Create new task with start event data, updates sessionId
   stop: (data?: E['data']) => Promise<void> // Send stop event to stop current task
   events: E[]
-  status: WorkflowStatus
+  status?: WorkflowStatus
 }
 
 // extend TaskDefinition with sessionId, taskId, serviceId are required

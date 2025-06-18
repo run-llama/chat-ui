@@ -29,7 +29,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
   const [isInitialized, setIsInitialized] = useState(false)
   const [task, setTask] = useState<WorkflowTask>()
   const [events, setEvents] = useState<E[]>([])
-  const [status, setStatus] = useState<WorkflowStatus>('idle')
+  const [status, setStatus] = useState<WorkflowStatus>()
 
   const client = useMemo(() => {
     return createClient(createConfig({ baseUrl }))
@@ -110,6 +110,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
 
   const start = useCallback(
     async (eventData: E['data']) => {
+      setEvents([]) // reset events when start a new task
       const newTask = await createTask({ client, deploymentName, eventData })
       setTask(newTask) // update new task with new session when trigger start event
       await streamTaskEvents(newTask)
