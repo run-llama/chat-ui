@@ -87,12 +87,8 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
         throw new Error('Task is not initialized')
       }
       await sendEventToTask<E>({ client, deploymentName, task, event })
-      if (status !== 'running') {
-        // if task is not running, trigger streaming events
-        await streamTaskEvents(task)
-      }
     },
-    [client, deploymentName, streamTaskEvents, status, task]
+    [client, deploymentName, task]
   )
 
   const start = useCallback(
