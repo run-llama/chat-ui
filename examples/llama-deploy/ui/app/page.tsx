@@ -18,9 +18,17 @@ export default function Home() {
       },
     })
 
-  const retrieve = async () => {
+  const handleStart = async () => {
+    await start({ message: userInput })
+  }
+
+  const handleRetrieve = async () => {
     // AdhocEvent is defined in workflow definition
     await sendEvent({ type: 'workflow.AdhocEvent' })
+  }
+
+  const handleStop = async () => {
+    await stop()
   }
 
   return (
@@ -84,7 +92,7 @@ export default function Home() {
         />
         <button
           type="button"
-          onClick={() => start({ message: userInput })}
+          onClick={handleStart}
           disabled={status === 'running'}
           className="rounded-full bg-green-500 px-6 py-2 text-white shadow-2xl hover:bg-green-600 disabled:opacity-50"
         >
@@ -92,7 +100,7 @@ export default function Home() {
         </button>
         <button
           type="button"
-          onClick={retrieve}
+          onClick={handleRetrieve}
           disabled={status !== 'running'}
           className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
         >
@@ -100,7 +108,7 @@ export default function Home() {
         </button>
         <button
           type="button"
-          onClick={() => stop()}
+          onClick={handleStop}
           disabled={status !== 'running'}
           className="rounded-full bg-red-500 px-6 py-2 text-white shadow-2xl hover:bg-red-600 disabled:opacity-50"
         >
