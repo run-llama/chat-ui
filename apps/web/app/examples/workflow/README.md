@@ -1,4 +1,0 @@
-- move to examples/
-- describe how to setup the backend
-- add multitasks example
-- add a send event example (maybe human response example)

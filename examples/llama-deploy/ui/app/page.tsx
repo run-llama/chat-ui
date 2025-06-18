@@ -1,146 +1,112 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react'
+import { useWorkflow } from '@llamaindex/chat-ui'
 
 export default function Home() {
-  const [inputText, setInputText] = useState("");
-  const [result, setResult] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [userInput, setUserInput] = useState('Please run task')
 
-  // Get deployment name from environment variable or use "default" as fallback
-  const deploymentName =
-    process.env.NEXT_PUBLIC_LLAMA_DEPLOY_NEXTJS_DEPLOYMENT_NAME || "default";
-  const [error, setError] = useState("");
+  const { sessionId, taskId, start, stop, sendEvent, events, status } =
+    useWorkflow({
+      baseUrl: 'http://127.0.0.1:4501',
+      workflow: 'QuickStart',
+      onStopEvent: event => {
+        console.log('Stop event:', event)
+      },
+      onError: error => {
+        console.error('Error:', error)
+      },
+    })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:4501/deployments/${deploymentName}/tasks/run`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            service_id: null, // Using default service
-            input: JSON.stringify({ message: inputText }),
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-
-      const data = await response.json();
-      setResult(JSON.stringify(data, null, 2));
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  const retrieve = async () => {
+    // AdhocEvent is defined in workflow definition
+    await sendEvent({ type: 'workflow.AdhocEvent' })
+  }
 
   return (
-    <div className="flex flex-col min-h-screen p-6 sm:p-8 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex-1 flex flex-col gap-8 items-center justify-center max-w-2xl mx-auto w-full">
-        <button
-          onClick={() => router.push("/confetti")}
-          className="hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg cursor-pointer"
-        >
-          <Image
-            className="w-full max-w-lg p-6"
-            src={`${process.env.NEXT_PUBLIC_BASE_PATH}/logo-dark-light.svg`}
-            alt="LlamaIndex logo - Click for confetti!"
-            width={180}
-            height={180}
-            priority
-          />
-        </button>
+    <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
+      <h1 className="mb-6 text-2xl font-bold">Workflow Chat Example</h1>
 
-        {/* API Form */}
-        <div className="w-full max-w-lg p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-4">Workflow Test</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="deployment"
-                className="block text-sm font-medium mb-1"
-              >
-                Deployment Name
-              </label>
-              <div className="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700">
-                {deploymentName}
-              </div>
-            </div>
-            <div>
-              <label
-                htmlFor="inputText"
-                className="block text-sm font-medium mb-1"
-              >
-                Message
-              </label>
-              <textarea
-                id="inputText"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                className="w-full p-2 border rounded text-black"
-                rows={4}
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 px-4 bg-foreground text-background rounded-md hover:bg-[#383838] dark:hover:bg-[#ccc] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      {/* Status Panel */}
+      <div className="mb-6 rounded-lg bg-gray-100 p-4">
+        <h2 className="mb-2 text-lg font-semibold">Workflow Status</h2>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <strong>Session ID:</strong> {sessionId || 'Not created'}
+          </div>
+          <div>
+            <strong>Current Task ID:</strong> {taskId || 'Not created'}
+          </div>
+
+          <div>
+            <strong>Task Events:</strong> {events.length}
+          </div>
+          <div>
+            <strong>Task Status:</strong>{' '}
+            <span
+              className={`text-sm ${
+                status === 'idle' || !status
+                  ? 'text-gray-500'
+                  : status === 'complete'
+                    ? 'text-green-500'
+                    : status === 'error'
+                      ? 'text-red-500'
+                      : status === 'running'
+                        ? 'text-yellow-500'
+                        : ''
+              }`}
             >
-              {loading ? "Processing..." : "Run workflow"}
-            </button>
-          </form>
-
-          {error && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
-
-          {result && (
-            <div className="mt-4">
-              <h3 className="text-lg font-medium mb-2">Result:</h3>
-              <pre className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md overflow-auto text-sm max-h-64">
-                {result}
-              </pre>
-            </div>
-          )}
+              {status}
+            </span>
+          </div>
         </div>
-      </main>
+      </div>
 
-      <footer className="flex gap-6 flex-wrap items-center justify-center py-4 mt-8">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://docs.llamaindex.ai/en/stable/"
-          target="_blank"
-          rel="noopener noreferrer"
+      {/* Events Interface */}
+      <div className="mb-4 h-96 overflow-auto rounded border bg-white p-4">
+        <h3 className="mb-2 font-semibold">Events</h3>
+        {events.map((event, index) => (
+          <div key={index} className="mb-2 ml-4 text-sm text-blue-600">
+            Event {index + 1}: {JSON.stringify(event)}
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={userInput}
+          onChange={e => setUserInput(e.target.value)}
+          className="flex-1 rounded border border-gray-300 p-2"
+          placeholder="Type your message..."
+          disabled={status === 'running'}
+        />
+        <button
+          type="button"
+          onClick={() => start({ message: userInput })}
+          disabled={status === 'running'}
+          className="rounded-full bg-green-500 px-6 py-2 text-white shadow-2xl hover:bg-green-600 disabled:opacity-50"
         >
-          <Image
-            aria-hidden
-            src={`${process.env.NEXT_PUBLIC_BASE_PATH}/file.svg`}
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-      </footer>
+          Start
+        </button>
+        <button
+          type="button"
+          onClick={retrieve}
+          disabled={status !== 'running'}
+          className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
+        >
+          Retrieve
+        </button>
+        <button
+          type="button"
+          onClick={() => stop()}
+          disabled={status !== 'running'}
+          className="rounded-full bg-red-500 px-6 py-2 text-white shadow-2xl hover:bg-red-600 disabled:opacity-50"
+        >
+          Stop
+        </button>
+      </div>
     </div>
-  );
+  )
 }

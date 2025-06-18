@@ -9,8 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/canvas-confetti": "^1.9.0",
-    "canvas-confetti": "^1.9.3",
+    "@llamaindex/chat-ui": "workspace:*",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
