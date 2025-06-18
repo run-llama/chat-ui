@@ -3,13 +3,17 @@
 import { useState } from 'react'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || 'http://127.0.0.1:4501'
+const workflow =
+  process.env.NEXT_PUBLIC_LLAMA_DEPLOY_NEXTJS_DEPLOYMENT_NAME || 'QuickStart'
+
 export default function Home() {
   const [userInput, setUserInput] = useState('Please run task')
 
   const { sessionId, taskId, start, stop, sendEvent, events, status } =
     useWorkflow({
-      baseUrl: 'http://127.0.0.1:4501',
-      workflow: 'QuickStart',
+      baseUrl,
+      workflow,
       onStopEvent: event => {
         console.log('Stop event:', event)
       },
