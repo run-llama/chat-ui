@@ -41,15 +41,15 @@ npm run clean
 ## Usage
 
 ```typescript
-import { client, DeploymentsService } from '@llamaindex/llama-deploy';
+import { client, DeploymentsService } from '@llamaindex/llama-deploy'
 
 // Configure the client
 client.setConfig({
-  baseUrl: 'https://your-api-base-url.com'
-});
+  baseUrl: 'https://your-api-base-url.com',
+})
 
 // Use the API services
-const deployments = await DeploymentsService.readDeploymentsDeploymentsGet();
+const deployments = await DeploymentsService.readDeploymentsDeploymentsGet()
 ```
 
 ## API Services
@@ -77,4 +77,4 @@ The generation is configured in `openapi-ts.config.ts`. Key settings:
 - **Input**: `../chat-ui/src/hook/openapi.json`
 - **Output**: `./src/generated`
 - **Client**: `@hey-api/client-fetch`
-- **Format**: Prettier formatting applied 
+- **Format**: Prettier formatting applied
