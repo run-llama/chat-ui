@@ -6,19 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "lint": "next lint"
   },
   "dependencies": {
-    "@llamaindex/chat-ui": "workspace:*",
+    "@llamaindex/chat-ui": "latest",
     "ai": "^4.3.16",
     "next": "^15.3.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@llamaindex/eslint-config": "workspace:*",
-    "@llamaindex/typescript-config": "workspace:*",
+    "@vercel/style-guide": "^5.2.0",
+    "eslint-config-turbo": "^2.0.0",
     "@next/eslint-plugin-next": "^14.2.3",
     "@tailwindcss/postcss": "^4.0.7",
     "@types/node": "^20.11.24",
