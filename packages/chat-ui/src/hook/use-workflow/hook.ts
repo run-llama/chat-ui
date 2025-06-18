@@ -81,19 +81,6 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
     initWorkflow()
   }, [client, deploymentName, initialTaskId, isInitialized, streamTaskEvents])
 
-  const sendStartEvent = useCallback(
-    async (event: E): Promise<void> => {
-      const newTask = await createTask({
-        client,
-        deploymentName,
-        eventData: event.data,
-      })
-      setTask(newTask) // update new task with new session when trigger start event
-      await streamTaskEvents(newTask)
-    },
-    [client, deploymentName, streamTaskEvents]
-  )
-
   const sendEvent = useCallback(
     async (event: E) => {
       if (!task) {
@@ -130,7 +117,6 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
     sessionId: task?.session_id,
     taskId: task?.task_id,
     sendEvent,
-    sendStartEvent,
     start,
     stop,
     events,
