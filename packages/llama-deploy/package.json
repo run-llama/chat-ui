@@ -1,6 +1,6 @@
 {
   "name": "@llamaindex/llama-deploy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generated llama-deploy API client from OpenAPI specification",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
