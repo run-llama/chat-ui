@@ -36,7 +36,10 @@
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "copy": "cp -r ../../README.md ../../LICENSE .",
-    "postbuild": "pnpm run copy"
+    "postbuild": "pnpm run copy",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui"
   },
   "devDependencies": {
     "@llamaindex/eslint-config": "workspace:*",
@@ -47,7 +50,15 @@
     "postcss-cli": "^11.0.0",
     "tailwindcss": "^4.0.7",
     "bunchee": "^6.5.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@vitejs/plugin-react": "^4.5.2",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "msw": "^2.10.2"
   },
   "dependencies": {
     "@llamaindex/llama-deploy": "workspace:*",
