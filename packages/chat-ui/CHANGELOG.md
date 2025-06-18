@@ -1,5 +1,14 @@
 # @llamaindex/chat-ui
 
+## 0.5.7
+
+### Patch Changes
+
+- 23093ed: docs: add more chatui examples
+- 0c929c4: feat: useWorkflow
+- Updated dependencies [0c929c4]
+  - @llamaindex/llama-deploy@0.0.2
+
 ## 0.5.6
 
 ### Patch Changes
