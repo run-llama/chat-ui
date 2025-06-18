@@ -6,7 +6,5 @@ module.exports = {
     'no-promise-executor-return': 'off',
     '@typescript-eslint/no-loop-func': 'off',
     'turbo/no-undeclared-env-vars': 'off',
-    '@typescript-eslint/no-confusing-void-expression': 'off',
-    '@typescript-eslint/no-misused-promises': 'off',
   },
 }
