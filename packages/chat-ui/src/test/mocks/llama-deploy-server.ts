@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import { RawEvent } from '../../hook/use-workflow/types'
 
 const BASE_URL = 'http://127.0.0.1:4501'
 
@@ -19,6 +20,12 @@ const mockExistingTask = {
 
 const mockTasks = [mockExistingTask, mockTask]
 
+const welcomeEvent = {
+  __is_pydantic: true,
+  value: { data: { request: 'Welcome to the workflow' } },
+  qualified_name: 'workflow.UIEvent',
+}
+
 // Mock event data
 const mockEvents = [
   // Mock an UIEvent after task is created
@@ -29,23 +36,7 @@ const mockEvents = [
   },
 
   // Mock some events for counter
-  ...Array.from({ length: 5 }, (_, index) => ({
-    __is_pydantic: true,
-    value: { data: { counter: index } },
-    qualified_name: 'workflow.UIEvent',
-  })),
-
-  // Mock an event for AdHocEvent
-  {
-    __is_pydantic: true,
-    value: {
-      data: { request: 'User want to retrieve counter. Current value: 4' },
-    },
-    qualified_name: 'workflow.UIEvent',
-  },
-
-  // Mock more events for counter
-  ...Array.from({ length: 5 }, (_, index) => ({
+  ...Array.from({ length: 9 }, (_, index) => ({
     __is_pydantic: true,
     value: { data: { counter: index } },
     qualified_name: 'workflow.UIEvent',
@@ -59,6 +50,10 @@ const mockEvents = [
   },
 ]
 
+// Global state to simulate events queue
+const eventsQueue: RawEvent[] = []
+let delayAfterStart = 10 // delay in ms
+
 export const mockLlamaDeployServer = [
   // GET /deployments/{deployment_name}/tasks - Get existing tasks
   http.get(`${BASE_URL}/deployments/:deploymentName/tasks`, () => {
@@ -66,9 +61,17 @@ export const mockLlamaDeployServer = [
   }),
 
   // POST /deployments/{deployment_name}/tasks/create - Create new task
-  http.post(`${BASE_URL}/deployments/:deploymentName/tasks/create`, () => {
-    return HttpResponse.json(mockTask)
-  }),
+  http.post(
+    `${BASE_URL}/deployments/:deploymentName/tasks/create`,
+    async ({ request }) => {
+      const { input } = (await request.json()) as { input: string }
+      const delay = JSON.parse(input).delay
+      if (delay) {
+        delayAfterStart = 100
+      }
+      return HttpResponse.json(mockTask)
+    }
+  ),
 
   // GET /deployments/{deployment_name}/tasks/{task_id}/events - Stream events
   http.get(
@@ -78,14 +81,50 @@ export const mockLlamaDeployServer = [
       const encoder = new TextEncoder()
       const stream = new ReadableStream({
         start(controller) {
-          mockEvents.forEach((event, index) => {
-            setTimeout(() => {
-              controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`))
-              if (index === mockEvents.length - 1) {
+          controller.enqueue(
+            encoder.encode(`${JSON.stringify(welcomeEvent)}\n`)
+          )
+
+          let eventIndex = 0
+
+          const sendNextEvent = () => {
+            if (eventIndex >= mockEvents.length) {
+              controller.close()
+              return
+            }
+
+            const event = mockEvents[eventIndex]
+            controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`))
+            eventIndex++
+
+            if (eventsQueue.length > 0) {
+              // continuously consume events from the queue
+              const nextEvent = eventsQueue.shift()
+              controller.enqueue(
+                encoder.encode(`${JSON.stringify(nextEvent)}\n`)
+              )
+              if (
+                nextEvent?.qualified_name ===
+                'llama_index.core.workflow.events.StopEvent'
+              ) {
                 controller.close()
+                return
               }
-            }, index * 10) // Simulate streaming with delays
-          })
+            }
+
+            if (
+              event.qualified_name ===
+              'llama_index.core.workflow.events.StopEvent'
+            ) {
+              controller.close()
+              return
+            }
+
+            setTimeout(sendNextEvent, delayAfterStart)
+          }
+
+          // Start sending events
+          sendNextEvent()
         },
       })
 
@@ -100,7 +139,12 @@ export const mockLlamaDeployServer = [
   // POST /deployments/{deployment_name}/tasks/{task_id}/events - Send event
   http.post(
     `${BASE_URL}/deployments/:deploymentName/tasks/:taskId/events`,
-    () => {
+    async ({ request }) => {
+      const event = (await request.json()) as { event_obj_str: string }
+      if (event) {
+        // simulate an event queue
+        eventsQueue.push(JSON.parse(event.event_obj_str) as RawEvent)
+      }
       return HttpResponse.json({ data: { success: true } })
     }
   ),

@@ -65,14 +65,13 @@ describe('useWorkflow', () => {
       await waitFor(() => {
         expect(result.current.taskId).toBe('test-task-id')
         expect(result.current.sessionId).toBe('test-session-id')
-        expect(result.current.events).toHaveLength(13)
+        expect(result.current.events).toHaveLength(12)
         expect(result.current.status).toBe('complete')
       })
 
       // First event should be a UIEvent
       const firstEvent = result.current.events[0]
       expect(firstEvent.type).toBe('workflow.UIEvent')
-      expect(firstEvent.data.data.request).toBe('Please run task')
 
       // Last event should be a StopEvent
       const lastEvent = result.current.events[result.current.events.length - 1]
@@ -89,7 +88,7 @@ describe('useWorkflow', () => {
         await result.current.start({ message: 'first task' })
       })
       await waitFor(() => {
-        expect(result.current.events).toHaveLength(13)
+        expect(result.current.events).toHaveLength(12)
         expect(result.current.status).toBe('complete')
       })
 
@@ -98,7 +97,7 @@ describe('useWorkflow', () => {
         await result.current.start({ message: 'second task' })
       })
       await waitFor(() => {
-        expect(result.current.events).toHaveLength(13) // New set of events
+        expect(result.current.events).toHaveLength(12) // New set of events
         expect(result.current.status).toBe('complete')
       })
     })
@@ -117,7 +116,7 @@ describe('useWorkflow', () => {
 
       // Then check for the full expected state
       await waitFor(() => {
-        expect(result.current.events).toHaveLength(13)
+        expect(result.current.events).toHaveLength(12)
         expect(result.current.taskId).toBe('test-existing-task-id')
         expect(result.current.sessionId).toBe('test-existing-session-id')
         expect(result.current.status).toBe('complete')
@@ -171,9 +170,11 @@ describe('useWorkflow', () => {
 
       const customEvent: TestEvent = { type: 'custom.AdHocEvent' }
 
-      await expect(result.current.sendEvent(customEvent)).rejects.toThrow(
-        'Task is not initialized'
-      )
+      await expect(
+        act(async () => {
+          await result.current.sendEvent(customEvent)
+        })
+      ).rejects.toThrow('Task is not initialized')
     })
 
     it('should send events to existing task', async () => {
@@ -182,15 +183,27 @@ describe('useWorkflow', () => {
       )
 
       // Start a task first
+      // eslint-disable-next-line @typescript-eslint/require-await -- no wait to test long running task
       await act(async () => {
-        await result.current.start({ message: 'test start' })
+        result.current.start({
+          message: 'test long running task',
+          delay: true, // flag to make task long running
+        })
       })
-      await waitFor(() => expect(result.current.taskId).toBeDefined())
 
       // Send a custom event
-      const customEvent: TestEvent = { type: 'custom.AdHocEvent' }
+      await act(async () => {
+        await result.current.sendEvent({ type: 'custom.AdHocEvent1' })
+      })
 
-      await expect(result.current.sendEvent(customEvent)).resolves.not.toThrow()
+      // wait for 3 seconds to make sure stream is complete
+      await act(async () => {
+        await new Promise(resolve => {
+          setTimeout(resolve, 3000)
+        })
+      })
+
+      await waitFor(() => expect(result.current.events).toHaveLength(13))
     })
 
     it('should send stop event', async () => {
@@ -199,17 +212,35 @@ describe('useWorkflow', () => {
       )
 
       // Start a task first
+      // eslint-disable-next-line @typescript-eslint/require-await -- no wait to test long running task
       await act(async () => {
-        await result.current.start({ message: 'test start' })
-      })
-      await waitFor(() => expect(result.current.taskId).toBeDefined())
-
-      // Stop the task
-      await expect(
-        act(async () => {
-          await result.current.stop({ reason: 'user requested' })
+        result.current.start({
+          message: 'test long running task',
+          delay: true, // flag to make task long running
         })
-      ).resolves.not.toThrow()
+      })
+
+      // wait for 100ms to have some events in the stream
+      await act(async () => {
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+      })
+
+      // Send a stop event
+      await act(async () => {
+        await result.current.stop()
+      })
+
+      // wait for 3 seconds to make sure stream is complete
+      await act(async () => {
+        await new Promise(resolve => {
+          setTimeout(resolve, 2000)
+        })
+      })
+
+      // events list should not be completed
+      await waitFor(() => expect(result.current.events.length).toBeLessThan(13))
     })
   })
 })
