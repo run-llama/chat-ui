@@ -3,19 +3,16 @@
 import { useState } from 'react'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-const deployment = process.env.NEXT_PUBLIC_DEPLOYMENT_NAME || 'QuickStart'
-const defaultWorkflow =
-  process.env.NEXT_PUBLIC_WORKFLOW_NAME || 'adhoc_workflow'
+const DEPLOYMENT_NAME = 'QuickStart'
+const DEFAULT_WORKFLOW = 'adhoc_workflow'
 
 export default function Home() {
   const [userInput, setUserInput] = useState('Please run task')
-  const [workflow, setWorkflow] = useState(defaultWorkflow)
+  const [workflow, setWorkflow] = useState(DEFAULT_WORKFLOW)
 
   const { runId, start, stop, sendEvent, events, status } = useWorkflow({
-    baseUrl,
-    deployment,
-    workflow,
+    deployment: DEPLOYMENT_NAME,
+    workflow: DEFAULT_WORKFLOW,
     onStopEvent: event => {
       console.log('Stop event:', event)
     },

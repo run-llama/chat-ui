@@ -72,11 +72,7 @@ export async function fetchTaskEvents<E extends WorkflowEvent>(
   },
   callback?: StreamingEventCallback<E>
 ): Promise<E[]> {
-  const baseUrl = params.client.getConfig().baseUrl
-  if (!baseUrl) {
-    throw new Error('Base URL is missing in client config')
-  }
-
+  const baseUrl = params.client.getConfig().baseUrl || ''
   const { task_id, session_id } = params.task
   const url = `${baseUrl}/deployments/${params.deploymentName}/tasks/${task_id}/events?session_id=${session_id}&raw_event=true`
   const response = await fetch(url, {
