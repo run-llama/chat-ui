@@ -5,13 +5,17 @@ import { useWorkflow } from '@llamaindex/chat-ui'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 const deployment = process.env.NEXT_PUBLIC_DEPLOYMENT_NAME || 'QuickStart'
+const defaultWorkflow =
+  process.env.NEXT_PUBLIC_WORKFLOW_NAME || 'adhoc_workflow'
 
 export default function Home() {
   const [userInput, setUserInput] = useState('Please run task')
+  const [workflow, setWorkflow] = useState(defaultWorkflow)
 
   const { runId, start, stop, sendEvent, events, status } = useWorkflow({
     baseUrl,
     deployment,
+    workflow,
     onStopEvent: event => {
       console.log('Stop event:', event)
     },
@@ -26,20 +30,43 @@ export default function Home() {
 
   const handleRetrieve = async () => {
     // AdhocEvent is defined in workflow definition
-    await sendEvent({ type: 'workflow.AdhocEvent' })
+    await sendEvent({ type: 'adhoc_workflow.AdhocEvent' })
   }
 
   const handleStop = async () => {
     await stop()
   }
 
+  const handleWorkflowSwitch = () => {
+    const newWorkflow =
+      workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'
+    setWorkflow(newWorkflow)
+  }
+
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
       <h1 className="mb-6 text-2xl font-bold">Llama Deploy with Chat UI</h1>
 
+      {/* Workflow Switcher */}
+      <div className="mb-4 flex items-center gap-4">
+        <button
+          type="button"
+          onClick={handleWorkflowSwitch}
+          disabled={status === 'running'}
+          className="ml-auto rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-lg hover:bg-blue-600 disabled:opacity-50"
+        >
+          Switch to{' '}
+          {workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'}
+        </button>
+      </div>
+
       {/* Status Panel */}
       <div className="mb-6 rounded-lg bg-gray-100 p-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <strong>Workflow:</strong> {workflow}
+          </div>
+
           <div>
             <strong>Run ID:</strong> {runId || 'Not created'}
           </div>
@@ -98,14 +125,16 @@ export default function Home() {
         >
           Start
         </button>
-        <button
-          type="button"
-          onClick={handleRetrieve}
-          disabled={status !== 'running'}
-          className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
-        >
-          Retrieve
-        </button>
+        {workflow === 'adhoc_workflow' && (
+          <button
+            type="button"
+            onClick={handleRetrieve}
+            disabled={status !== 'running'}
+            className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
+          >
+            Retrieve
+          </button>
+        )}
         <button
           type="button"
           onClick={handleStop}
