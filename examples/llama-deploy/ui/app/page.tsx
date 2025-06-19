@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-misused-promises -- TODO: fix this */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition -- TODO: fix this */
+/* eslint-disable no-nested-ternary -- TODO: fix this */
+
 'use client'
 
 import { useState } from 'react'
@@ -12,7 +16,7 @@ export default function Home() {
 
   const { runId, start, stop, sendEvent, events, status } = useWorkflow({
     deployment: DEPLOYMENT_NAME,
-    workflow: DEFAULT_WORKFLOW,
+    workflow,
     onStopEvent: event => {
       console.log('Stop event:', event)
     },
@@ -34,10 +38,10 @@ export default function Home() {
     await stop()
   }
 
-  const handleWorkflowSwitch = () => {
-    const newWorkflow =
-      workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'
-    setWorkflow(newWorkflow)
+  const handleWorkflowSwitch = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setWorkflow(event.target.value)
   }
 
   return (
@@ -46,15 +50,36 @@ export default function Home() {
 
       {/* Workflow Switcher */}
       <div className="mb-4 flex items-center gap-4">
-        <button
-          type="button"
-          onClick={handleWorkflowSwitch}
-          disabled={status === 'running'}
-          className="ml-auto rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-lg hover:bg-blue-600 disabled:opacity-50"
-        >
-          Switch to{' '}
-          {workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'}
-        </button>
+        <label htmlFor="workflow-select" className="font-medium">
+          Workflow:
+        </label>
+        <div className="relative ml-auto">
+          <select
+            id="workflow-select"
+            value={workflow}
+            onChange={handleWorkflowSwitch}
+            disabled={status === 'running'}
+            className="appearance-none rounded border border-gray-300 bg-white px-3 py-1.5 pr-10 shadow-sm hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="adhoc_workflow">Adhoc Workflow</option>
+            <option value="echo_workflow">Echo Workflow</option>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <svg
+              className="h-4 w-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
 
       {/* Status Panel */}
