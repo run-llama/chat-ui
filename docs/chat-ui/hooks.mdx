@@ -412,8 +412,7 @@ import { useWorkflow } from '@llamaindex/chat-ui'
 
 function WorkflowComponent() {
   const {
-    sessionId,
-    taskId,
+    runId,
     start,
     stop,
     sendEvent,
@@ -421,6 +420,7 @@ function WorkflowComponent() {
     status,
   } = useWorkflow({
     baseUrl: 'http://localhost:8000',
+    deployment: 'my-deployment',
     workflow: 'my-workflow',
     onStopEvent: (event) => {
       console.log('Workflow stopped:', event)
@@ -447,15 +447,14 @@ function WorkflowComponent() {
 
   return (
     <div>
-      <p>Session ID: {sessionId}</p>
-      <p>Task ID: {taskId}</p>
+      <p>Run ID: {runId}</p>
       <p>Status: {status}</p>
       <p>Events received: {events.length}</p>
 
       <button onClick={handleStartWorkflow} disabled={status === 'running'}>
         Start Workflow
       </button>
-      <button onClick={handleSendCustomEvent} disabled={!sessionId}>
+      <button onClick={handleSendCustomEvent} disabled={!runId}>
         Send Event
       </button>
       <button onClick={handleStopWorkflow} disabled={status !== 'running'}>
@@ -478,20 +477,20 @@ function WorkflowComponent() {
 **Options:**
 
 - `baseUrl` - Base URL for the workflow API (optional)
-- `workflow` - Name of the registered deployment
-- `taskId` - Optional task ID for resuming an existing workflow task
+- `deployment` - Name of the registered deployment
+- `runId` - Optional run ID for resuming an existing workflow task
+- `workflow` - Set the default service to run (optional)
 - `onStopEvent` - Callback when workflow receives a stop event
 - `onError` - Error callback for workflow errors
 
 **Returned Properties:**
 
-- `sessionId` - Current workflow session ID
-- `taskId` - Current workflow task ID
+- `runId` - Current workflow run ID
 - `start` - Function to start a new workflow with initial event data
 - `stop` - Function to send stop event to current workflow
 - `sendEvent` - Function to send custom events to the workflow
 - `events` - Array of all received workflow events
-- `status` - Current workflow status ('idle' | 'running' | 'complete' | 'error')
+- `status` - Current workflow run status ('idle' | 'running' | 'complete' | 'error')
 
 **Workflow Event Types:**
 
@@ -515,8 +514,8 @@ Resume an existing workflow task:
 ```tsx
 function ResumeWorkflowComponent() {
   const workflow = useWorkflow({
-    workflow: 'my-workflow',
-    taskId: 'existing-task-id', // Resume existing task
+    deployment: 'my-deployment',
+    runId: 'existing-run-id', // Resume existing task
     onStopEvent: (event) => {
       console.log('Workflow completed:', event)
     },
@@ -529,7 +528,7 @@ function ResumeWorkflowComponent() {
 
   return (
     <div>
-      <p>Resumed task: {workflow.taskId}</p>
+      <p>Resumed run: {workflow.runId}</p>
       <p>Events: {workflow.events.length}</p>
     </div>
   )
@@ -550,6 +549,7 @@ interface CustomWorkflowEvent extends WorkflowEvent {
 
 function CustomWorkflowComponent() {
   const workflow = useWorkflow<CustomWorkflowEvent>({
+    deployment: 'progress-deployment',
     workflow: 'progress-workflow',
     onStopEvent: (event) => {
       if (event.type === 'workflow.ResultEvent') {
