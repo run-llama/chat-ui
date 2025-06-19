@@ -198,3 +198,18 @@ function isRawEvent(event: any): event is RawEvent {
     typeof event.qualified_name === 'string'
   )
 }
+
+export function extractStreamEventDelta(event: WorkflowEvent): string {
+  if (
+    typeof event === 'object' &&
+    event !== null &&
+    'data' in event &&
+    typeof event.data === 'object' &&
+    event.data !== null &&
+    'delta' in event.data &&
+    typeof event.data.delta === 'string'
+  ) {
+    return event.data.delta
+  }
+  return ''
+}

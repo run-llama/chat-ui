@@ -18,7 +18,15 @@ services:
       type: local
       name: src
     path: src/adhoc_workflow:workflow
-
+  chat_workflow:
+    name: Chat Workflow
+    source:
+      type: local
+      name: src
+    path: src/chat_workflow:workflow
+    python-dependencies:
+      - llama-index-llms-openai>=0.4.5
+      
 ui:
   name: My Nextjs App
   port: 3000
