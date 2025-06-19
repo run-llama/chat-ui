@@ -37,6 +37,7 @@ export type WorkflowTask = TaskDefinition & {
 export enum WorkflowEventType {
   StartEvent = 'llama_index.core.workflow.events.StartEvent',
   StopEvent = 'llama_index.core.workflow.events.StopEvent',
+  StreamEvent = 'llama_index.core.workflow.events.StreamEvent',
 }
 
 export interface StreamingEventCallback<
