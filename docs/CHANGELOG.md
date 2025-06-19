@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui-docs
 
+## 0.0.7
+
+### Patch Changes
+
+- d544d57: feat: specify workflow to run of the given deployment
+
 ## 0.0.6
 
 ### Patch Changes
