@@ -4,22 +4,21 @@ import { useState } from 'react'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-const workflow = process.env.NEXT_PUBLIC_DEPLOYMENT_NAME || 'QuickStart'
+const deployment = process.env.NEXT_PUBLIC_DEPLOYMENT_NAME || 'QuickStart'
 
 export default function Home() {
   const [userInput, setUserInput] = useState('Please run task')
 
-  const { sessionId, taskId, start, stop, sendEvent, events, status } =
-    useWorkflow({
-      baseUrl,
-      workflow,
-      onStopEvent: event => {
-        console.log('Stop event:', event)
-      },
-      onError: error => {
-        console.error('Error:', error)
-      },
-    })
+  const { runId, start, stop, sendEvent, events, status } = useWorkflow({
+    baseUrl,
+    deployment,
+    onStopEvent: event => {
+      console.log('Stop event:', event)
+    },
+    onError: error => {
+      console.error('Error:', error)
+    },
+  })
 
   const handleStart = async () => {
     await start({ message: userInput })
@@ -40,20 +39,16 @@ export default function Home() {
 
       {/* Status Panel */}
       <div className="mb-6 rounded-lg bg-gray-100 p-4">
-        <h2 className="mb-2 text-lg font-semibold">Workflow Status</h2>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <strong>Session ID:</strong> {sessionId || 'Not created'}
-          </div>
-          <div>
-            <strong>Task ID:</strong> {taskId || 'Not created'}
+            <strong>Run ID:</strong> {runId || 'Not created'}
           </div>
 
           <div>
-            <strong>Task Events:</strong> {events.length}
+            <strong>Event Count:</strong> {events.length}
           </div>
           <div>
-            <strong>Task Status:</strong>{' '}
+            <strong>Run Status:</strong>{' '}
             <span
               className={`text-sm ${
                 status === 'idle' || !status
@@ -88,7 +83,9 @@ export default function Home() {
         <input
           type="text"
           value={userInput}
-          onChange={e => setUserInput(e.target.value)}
+          onChange={e => {
+            setUserInput(e.target.value)
+          }}
           className="flex-1 rounded border border-gray-300 p-2"
           placeholder="Type your message..."
           disabled={status === 'running'}

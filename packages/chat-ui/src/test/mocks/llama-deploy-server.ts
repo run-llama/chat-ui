@@ -5,14 +5,14 @@ const BASE_URL = 'http://127.0.0.1:4501'
 
 // Mock task data
 const mockTask = {
-  task_id: 'test-task-id',
+  task_id: 'test-run-id',
   session_id: 'test-session-id',
   service_id: 'echo_workflow',
   input: '{"message": "Please run task"}',
 }
 
 const mockExistingTask = {
-  task_id: 'test-existing-task-id',
+  task_id: 'test-existing-run-id',
   session_id: 'test-existing-session-id',
   service_id: 'echo_workflow',
   input: '{"message": "Please run existing task"}',

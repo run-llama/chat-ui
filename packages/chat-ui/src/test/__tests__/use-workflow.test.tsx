@@ -12,7 +12,7 @@ interface TestEvent extends WorkflowEvent {
 
 const mockWorkflowParams = {
   baseUrl: 'http://127.0.0.1:4501',
-  workflow: 'test-workflow',
+  deployment: 'test-workflow',
 }
 
 describe('useWorkflow', () => {
@@ -26,8 +26,7 @@ describe('useWorkflow', () => {
         useWorkflow<TestEvent>(mockWorkflowParams)
       )
 
-      expect(result.current.sessionId).toBeUndefined()
-      expect(result.current.taskId).toBeUndefined()
+      expect(result.current.runId).toBeUndefined()
       expect(result.current.events).toEqual([])
       expect(result.current.status).toBeUndefined()
       expect(typeof result.current.start).toBe('function')
@@ -63,8 +62,7 @@ describe('useWorkflow', () => {
 
       // Should have received all mock events
       await waitFor(() => {
-        expect(result.current.taskId).toBe('test-task-id')
-        expect(result.current.sessionId).toBe('test-session-id')
+        expect(result.current.runId).toBe('test-run-id')
         expect(result.current.events).toHaveLength(12)
         expect(result.current.status).toBe('complete')
       })
@@ -105,20 +103,19 @@ describe('useWorkflow', () => {
 
   describe('Existing task initialization', () => {
     it('should initialize with existing task ID', async () => {
-      const paramsWithTaskId = {
+      const paramsWithRunId = {
         ...mockWorkflowParams,
-        taskId: 'test-existing-task-id',
+        runId: 'test-existing-run-id',
       }
 
       const { result } = renderHook(() =>
-        useWorkflow<TestEvent>(paramsWithTaskId)
+        useWorkflow<TestEvent>(paramsWithRunId)
       )
 
       // Then check for the full expected state
       await waitFor(() => {
         expect(result.current.events).toHaveLength(12)
-        expect(result.current.taskId).toBe('test-existing-task-id')
-        expect(result.current.sessionId).toBe('test-existing-session-id')
+        expect(result.current.runId).toBe('test-existing-run-id')
         expect(result.current.status).toBe('complete')
       })
     })
@@ -135,7 +132,7 @@ describe('useWorkflow', () => {
       // Mock streaming error
       server.use(
         http.get(
-          'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-task-id/events',
+          'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-run-id/events',
           () => {
             return HttpResponse.json(
               { error: 'Streaming failed' },

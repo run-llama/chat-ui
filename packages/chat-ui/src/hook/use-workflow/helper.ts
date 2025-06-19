@@ -42,12 +42,16 @@ export async function createTask<E extends WorkflowEvent>(params: {
   client: Client
   deploymentName: string
   eventData: E['data']
+  workflow?: string // create task in default service if not provided
 }): Promise<WorkflowTask> {
   const data =
     await createDeploymentTaskNowaitDeploymentsDeploymentNameTasksCreatePost({
       client: params.client,
       path: { deployment_name: params.deploymentName },
-      body: { input: JSON.stringify(params.eventData ?? {}) },
+      body: {
+        input: JSON.stringify(params.eventData ?? {}),
+        service_id: params.workflow,
+      },
     })
 
   const { task_id, session_id, service_id, input } = data.data ?? {}

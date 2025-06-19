@@ -11,7 +11,7 @@ import {
   WorkflowEventType,
   WorkflowHookHandler,
   WorkflowHookParams,
-  WorkflowStatus,
+  RunStatus,
   WorkflowTask,
 } from './types'
 
@@ -20,8 +20,9 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
 ): WorkflowHookHandler<E> {
   const {
     baseUrl,
-    workflow: deploymentName,
-    taskId: initialTaskId,
+    deployment: deploymentName,
+    workflow,
+    runId: initialTaskId,
     onStopEvent,
     onError,
   } = params
@@ -29,7 +30,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
   const [isInitialized, setIsInitialized] = useState(false)
   const [task, setTask] = useState<WorkflowTask>()
   const [events, setEvents] = useState<E[]>([])
-  const [status, setStatus] = useState<WorkflowStatus>()
+  const [status, setStatus] = useState<RunStatus>()
 
   const client = useMemo(() => {
     return createClient(createConfig({ baseUrl }))
@@ -94,11 +95,16 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
   const start = useCallback(
     async (eventData: E['data']) => {
       setEvents([]) // reset events when start a new task
-      const newTask = await createTask({ client, deploymentName, eventData })
+      const newTask = await createTask({
+        client,
+        deploymentName,
+        eventData,
+        workflow,
+      })
       setTask(newTask) // update new task with new session when trigger start event
       await streamTaskEvents(newTask)
     },
-    [client, deploymentName, streamTaskEvents]
+    [client, deploymentName, streamTaskEvents, workflow]
   )
 
   const stop = useCallback(
@@ -110,8 +116,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
   )
 
   return {
-    sessionId: task?.session_id,
-    taskId: task?.task_id,
+    runId: task?.task_id,
     sendEvent,
     start,
     stop,
