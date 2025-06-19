@@ -478,8 +478,8 @@ function WorkflowComponent() {
 
 - `baseUrl` - Base URL for the workflow API (optional)
 - `deployment` - Name of the registered deployment
-- `runId` - Optional run ID for resuming an existing workflow task
-- `workflow` - Set the default service to run (optional)
+- `workflow` - Set the service to run - if not set uses the default workflow (optional)
+- `runId` - Optional run ID for resuming a previous workflow run
 - `onStopEvent` - Callback when workflow receives a stop event
 - `onError` - Error callback for workflow errors
 
