@@ -6,24 +6,24 @@ export interface WorkflowEvent {
   data?: JSONValue | undefined
 }
 
-export type WorkflowStatus = 'idle' | 'running' | 'complete' | 'error'
+export type RunStatus = 'idle' | 'running' | 'complete' | 'error'
 
 export interface WorkflowHookParams<E extends WorkflowEvent = WorkflowEvent> {
   baseUrl?: string // Optional base URL for the workflow API
-  workflow: string // Name of the registered deployment
-  taskId?: string // Optional task ID for resuming a workflow task
+  deployment: string // Name of the registered deployment
+  runId?: string // Optional task ID for resuming a workflow task
+  workflow?: string // Set the default service to run
   onStopEvent?: (event: E) => void
   onError?: (error: any) => void
 }
 
 export interface WorkflowHookHandler<E extends WorkflowEvent = WorkflowEvent> {
-  sessionId?: string // Session ID once the workflow session starts
-  taskId?: string // Task ID used internally, will be the same for the whole session
+  runId?: string // Task ID used internally, will be the same for the whole session
   start: (eventData: E['data']) => Promise<void> // Create new task with start event data, updates sessionId
   stop: (data?: E['data']) => Promise<void> // Send stop event to stop current task
   sendEvent: (event: E) => Promise<void> // Function to send a new event to the current session, throws error if session is not created yet
-  events: E[]
-  status?: WorkflowStatus
+  events: E[] // events of the current run
+  status?: RunStatus // status of the current run
 }
 
 // extend TaskDefinition with sessionId, taskId, serviceId are required

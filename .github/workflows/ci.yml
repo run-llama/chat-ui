@@ -40,3 +40,7 @@ jobs:
 
       - name: Type Check
         run: pnpm type-check
+
+      - name: Run Unit Tests
+        run: pnpm test
+        working-directory: packages/chat-ui

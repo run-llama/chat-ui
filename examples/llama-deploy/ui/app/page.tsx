@@ -4,22 +4,25 @@ import { useState } from 'react'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-const workflow = process.env.NEXT_PUBLIC_DEPLOYMENT_NAME || 'QuickStart'
+const deployment = process.env.NEXT_PUBLIC_DEPLOYMENT_NAME || 'QuickStart'
+const defaultWorkflow =
+  process.env.NEXT_PUBLIC_WORKFLOW_NAME || 'adhoc_workflow'
 
 export default function Home() {
   const [userInput, setUserInput] = useState('Please run task')
+  const [workflow, setWorkflow] = useState(defaultWorkflow)
 
-  const { sessionId, taskId, start, stop, sendEvent, events, status } =
-    useWorkflow({
-      baseUrl,
-      workflow,
-      onStopEvent: event => {
-        console.log('Stop event:', event)
-      },
-      onError: error => {
-        console.error('Error:', error)
-      },
-    })
+  const { runId, start, stop, sendEvent, events, status } = useWorkflow({
+    baseUrl,
+    deployment,
+    workflow,
+    onStopEvent: event => {
+      console.log('Stop event:', event)
+    },
+    onError: error => {
+      console.error('Error:', error)
+    },
+  })
 
   const handleStart = async () => {
     await start({ message: userInput })
@@ -27,33 +30,52 @@ export default function Home() {
 
   const handleRetrieve = async () => {
     // AdhocEvent is defined in workflow definition
-    await sendEvent({ type: 'workflow.AdhocEvent' })
+    await sendEvent({ type: 'adhoc_workflow.AdhocEvent' })
   }
 
   const handleStop = async () => {
     await stop()
   }
 
+  const handleWorkflowSwitch = () => {
+    const newWorkflow =
+      workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'
+    setWorkflow(newWorkflow)
+  }
+
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
       <h1 className="mb-6 text-2xl font-bold">Llama Deploy with Chat UI</h1>
 
+      {/* Workflow Switcher */}
+      <div className="mb-4 flex items-center gap-4">
+        <button
+          type="button"
+          onClick={handleWorkflowSwitch}
+          disabled={status === 'running'}
+          className="ml-auto rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-lg hover:bg-blue-600 disabled:opacity-50"
+        >
+          Switch to{' '}
+          {workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'}
+        </button>
+      </div>
+
       {/* Status Panel */}
       <div className="mb-6 rounded-lg bg-gray-100 p-4">
-        <h2 className="mb-2 text-lg font-semibold">Workflow Status</h2>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <strong>Session ID:</strong> {sessionId || 'Not created'}
-          </div>
-          <div>
-            <strong>Task ID:</strong> {taskId || 'Not created'}
+            <strong>Workflow:</strong> {workflow}
           </div>
 
           <div>
-            <strong>Task Events:</strong> {events.length}
+            <strong>Run ID:</strong> {runId || 'Not created'}
+          </div>
+
+          <div>
+            <strong>Event Count:</strong> {events.length}
           </div>
           <div>
-            <strong>Task Status:</strong>{' '}
+            <strong>Run Status:</strong>{' '}
             <span
               className={`text-sm ${
                 status === 'idle' || !status
@@ -88,7 +110,9 @@ export default function Home() {
         <input
           type="text"
           value={userInput}
-          onChange={e => setUserInput(e.target.value)}
+          onChange={e => {
+            setUserInput(e.target.value)
+          }}
           className="flex-1 rounded border border-gray-300 p-2"
           placeholder="Type your message..."
           disabled={status === 'running'}
@@ -101,14 +125,16 @@ export default function Home() {
         >
           Start
         </button>
-        <button
-          type="button"
-          onClick={handleRetrieve}
-          disabled={status !== 'running'}
-          className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
-        >
-          Retrieve
-        </button>
+        {workflow === 'adhoc_workflow' && (
+          <button
+            type="button"
+            onClick={handleRetrieve}
+            disabled={status !== 'running'}
+            className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
+          >
+            Retrieve
+          </button>
+        )}
         <button
           type="button"
           onClick={handleStop}

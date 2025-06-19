@@ -18,7 +18,7 @@ class AdhocEvent(Event):
     pass
 
 
-class EchoWorkflow(Workflow):
+class AdhocWorkflow(Workflow):
     """A dummy workflow with only one step sending back the input given."""
 
     def __init__(self, **kwargs):
@@ -62,4 +62,4 @@ class EchoWorkflow(Workflow):
         )
 
 
-echo_workflow = EchoWorkflow()
+workflow = AdhocWorkflow()
