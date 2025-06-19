@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.9
+
+### Patch Changes
+
+- fe679c4: fix: baseUrl should be optional for llama deploy
+
 ## 0.5.8
 
 ### Patch Changes
