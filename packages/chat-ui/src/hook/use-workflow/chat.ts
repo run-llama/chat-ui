@@ -50,8 +50,7 @@ export function useChatWorkflow({
     },
   })
 
-  const append = async (message: Message) => {
-    const newMessage: Message = { content: input, role: 'user' }
+  const append = async (newMessage: Message) => {
     const inputMessages: Message[] = [...(messages ?? []), newMessage]
 
     try {
@@ -61,17 +60,36 @@ export function useChatWorkflow({
       onError?.(error)
     }
 
-    return message.content
+    return newMessage.content
   }
+
+  const handleStop = async () => {
+    await stop()
+  }
+
+  const handleReload = async () => {
+    const lastUserMessage = [...messages]
+      .reverse()
+      .find(message => message.role === 'user')
+
+    if (!lastUserMessage) return
+
+    const inputMessages: Message[] = [...messages.slice(0, -2), lastUserMessage]
+
+    setMessages(inputMessages)
+    await start({ messages: inputMessages })
+  }
+
+  const isLoading = status === 'running'
 
   return {
     input,
     setInput,
-    isLoading: status === 'running',
+    isLoading,
     append,
     messages,
     setMessages,
-    stop: () => stop(),
-    reload: undefined, // TODO
+    stop: handleStop,
+    reload: handleReload,
   }
 }
