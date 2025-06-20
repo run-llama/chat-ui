@@ -38,6 +38,7 @@ export type WorkflowTask = TaskDefinition & {
 export enum WorkflowEventType {
   StartEvent = 'llama_index.core.workflow.events.StartEvent',
   StopEvent = 'llama_index.core.workflow.events.StopEvent',
+  AgentStream = 'llama_index.core.agent.workflow.workflow_events.AgentStream',
 }
 
 export interface StreamingEventCallback<
@@ -54,4 +55,11 @@ export type RawEvent = {
   __is_pydantic: boolean
   value: JSONValue
   qualified_name: string
+}
+
+export interface AgentStreamEvent extends WorkflowEvent {
+  type: WorkflowEventType.AgentStream
+  data: {
+    delta: string
+  }
 }

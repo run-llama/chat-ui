@@ -3,8 +3,13 @@
 import { useState } from 'react'
 import { ChatHandler, Message } from '../../chat/chat.interface'
 import { useWorkflow } from './hook'
-import { WorkflowEvent, WorkflowEventType, WorkflowHookParams } from './types'
-import { extractStreamEventDelta } from './helper'
+import {
+  AgentStreamEvent,
+  WorkflowEvent,
+  WorkflowEventType,
+  WorkflowHookParams,
+} from './types'
+import { isAgentStreamEvent } from './helper'
 
 type ChatWorkflowHookParams = Pick<
   WorkflowHookParams,
@@ -32,8 +37,8 @@ export function useChatWorkflow({
     workflow,
     baseUrl,
     onData: event => {
-      const delta = extractStreamEventDelta(event)
-      if (delta) {
+      if (isAgentStreamEvent(event)) {
+        const delta = (event as AgentStreamEvent).data.delta
         setMessages(prev => {
           const lastMessage = prev[prev.length - 1]
           // if last message is assistant message, update its content
