@@ -19,7 +19,8 @@ type ChatWorkflowHookParams = Pick<
 interface ChatEvent extends WorkflowEvent {
   type: WorkflowEventType.StartEvent
   data: {
-    messages: Omit<Message, 'annotations'>[]
+    user_msg: string
+    chat_history: Omit<Message, 'annotations'>[]
   }
 }
 
@@ -56,11 +57,10 @@ export function useChatWorkflow({
   })
 
   const append = async (newMessage: Message) => {
-    const inputMessages: Message[] = [...(messages ?? []), newMessage]
+    setMessages(prev => [...prev, newMessage])
 
     try {
-      setMessages(prev => [...prev, newMessage])
-      await start({ messages: inputMessages })
+      await start({ user_msg: newMessage.content, chat_history: messages })
     } catch (error) {
       onError?.(error)
     }
@@ -79,10 +79,17 @@ export function useChatWorkflow({
 
     if (!lastUserMessage) return
 
-    const inputMessages: Message[] = [...messages.slice(0, -2), lastUserMessage]
+    const chatHistory = messages.slice(0, -2)
+    setMessages([...chatHistory, lastUserMessage])
 
-    setMessages(inputMessages)
-    await start({ messages: inputMessages })
+    try {
+      await start({
+        user_msg: lastUserMessage.content,
+        chat_history: chatHistory,
+      })
+    } catch (error) {
+      onError?.(error)
+    }
   }
 
   const isLoading = status === 'running'
