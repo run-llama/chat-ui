@@ -6,18 +6,17 @@ from llama_index.core.workflow import (
     Context,
     Event,
 )
+from llama_index.core.schema import (
+    NodeWithScore,
+)
 from llama_index.llms.openai import OpenAI
 from llama_index.core.agent.workflow.workflow_events import AgentStream
 from llama_index.core.llms import ChatMessage
 from typing import Any, List, Optional, Union
-
-
-# You can render any information in the UI by sending a UIEvent
-# ui_type is to identify the type of the annotation and render corresponding component
-# data is the props of that UI component
-class UIEvent(Event):
-    ui_type: str
-    data: Any
+from llama_index.server.models import (
+    SourceNodesEvent,
+)
+from llama_index.core.data_structs import Node
 
 
 class ChatWorkflow(Workflow):
@@ -60,30 +59,12 @@ class ChatWorkflow(Workflow):
             )
         )
 
-        # render sources on chat-ui
         ctx.write_event_to_stream(
-            UIEvent(
-                ui_type="sources",
-                data={
-                    "nodes": [
-                        {"id": "1", "url": "/demo-source1.pdf"},
-                        {"id": "2", "url": "/demo-source2.pdf"},
-                    ],
-                },
-            )
-        )
-
-        # render weather on chat-ui
-        ctx.write_event_to_stream(
-            UIEvent(
-                ui_type="weather",
-                data={
-                    "location": "San Francisco, CA",
-                    "temperature": 22,
-                    "condition": "sunny",
-                    "humidity": 65,
-                    "windSpeed": 12,
-                },
+            SourceNodesEvent(
+                nodes=[
+                    NodeWithScore(node=Node(text="text1"), score=0.7),
+                    NodeWithScore(node=Node(text="text2"), score=0.8),
+                ],
             )
         )
 

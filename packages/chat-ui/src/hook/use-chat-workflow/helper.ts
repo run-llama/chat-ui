@@ -1,5 +1,10 @@
+import {
+  MessageAnnotation,
+  MessageAnnotationType,
+} from '../../chat/annotations'
+import { JSONValue } from '../../chat/chat.interface'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
-import { AgentStreamEvent, UIEvent } from './types'
+import { AgentStreamEvent } from './types'
 
 export function isAgentStreamEvent(
   event: WorkflowEvent
@@ -16,15 +21,16 @@ export function isAgentStreamEvent(
   )
 }
 
-export function isUIEvent(event: WorkflowEvent): event is UIEvent {
-  return (
-    typeof event === 'object' &&
-    event !== null &&
-    'type' in event &&
-    'data' in event &&
-    typeof event.data === 'object' &&
-    event.data !== null &&
-    'ui_type' in event.data &&
-    typeof event.data.ui_type === 'string'
-  )
+export function toAnnotation(
+  event: WorkflowEvent
+): MessageAnnotation<JSONValue> | null {
+  switch (event.type) {
+    case WorkflowEventType.SourceNodesEvent.toString():
+      return {
+        type: MessageAnnotationType.SOURCES,
+        data: event.data as JSONValue,
+      }
+  }
+
+  return null
 }

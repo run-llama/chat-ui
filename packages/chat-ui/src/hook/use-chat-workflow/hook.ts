@@ -3,13 +3,8 @@
 import { useState } from 'react'
 import { ChatHandler, Message } from '../../chat/chat.interface'
 import { useWorkflow } from '../use-workflow'
-import { isAgentStreamEvent, isUIEvent } from './helper'
-import {
-  AgentStreamEvent,
-  ChatEvent,
-  ChatWorkflowHookParams,
-  UIEvent,
-} from './types'
+import { isAgentStreamEvent, toAnnotation } from './helper'
+import { AgentStreamEvent, ChatEvent, ChatWorkflowHookParams } from './types'
 
 export function useChatWorkflow({
   deployment,
@@ -41,10 +36,9 @@ export function useChatWorkflow({
         })
       }
 
-      if (isUIEvent(event)) {
-        const { ui_type, data } = (event as UIEvent).data
-        const annotation = { type: ui_type, data }
-
+      const annotation = toAnnotation(event)
+      console.log('annotation', annotation)
+      if (annotation) {
         setMessages(prev => {
           const lastMessage = prev[prev.length - 1]
           // if last message is assistant message, add annotation to it
