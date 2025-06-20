@@ -9,10 +9,13 @@ export default function Home() {
   const handler = useChatWorkflow({
     deployment: DEPLOYMENT_NAME,
     workflow: DEFAULT_WORKFLOW,
+    onError: error => {
+      console.error(error)
+    },
   })
 
   return (
-    <main className="h-screen w-1/2 mx-auto">
+    <main className="mx-auto h-screen w-1/2">
       <ChatSection handler={handler} />
     </main>
   )
