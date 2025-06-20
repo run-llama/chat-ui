@@ -199,6 +199,7 @@ function ChatInputSubmit(props: ChatInputSubmitProps) {
   if (stop && isLoading) {
     return (
       <Button
+        type="button"
         size="icon"
         onClick={stop}
         className="absolute bottom-2 right-2 rounded-full"

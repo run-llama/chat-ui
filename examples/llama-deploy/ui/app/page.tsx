@@ -1,7 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useWorkflow } from '@llamaindex/chat-ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const DEPLOYMENT_NAME = 'QuickStart'
 const DEFAULT_WORKFLOW = 'adhoc_workflow'
@@ -12,7 +20,7 @@ export default function Home() {
 
   const { runId, start, stop, sendEvent, events, status } = useWorkflow({
     deployment: DEPLOYMENT_NAME,
-    workflow: DEFAULT_WORKFLOW,
+    workflow,
     onStopEvent: event => {
       console.log('Stop event:', event)
     },
@@ -34,27 +42,42 @@ export default function Home() {
     await stop()
   }
 
-  const handleWorkflowSwitch = () => {
-    const newWorkflow =
-      workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'
-    setWorkflow(newWorkflow)
+  const handleWorkflowSwitch = (value: string) => {
+    setWorkflow(value)
   }
 
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
-      <h1 className="mb-6 text-2xl font-bold">Llama Deploy with Chat UI</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Llama Deploy with Chat UI</h1>
+        <Link
+          href="/chat"
+          className="rounded bg-blue-500 px-4 py-1 text-white hover:bg-blue-600"
+        >
+          Go to Chat Demo
+        </Link>
+      </div>
 
       {/* Workflow Switcher */}
       <div className="mb-4 flex items-center gap-4">
-        <button
-          type="button"
-          onClick={handleWorkflowSwitch}
-          disabled={status === 'running'}
-          className="ml-auto rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-lg hover:bg-blue-600 disabled:opacity-50"
-        >
-          Switch to{' '}
-          {workflow === 'adhoc_workflow' ? 'echo_workflow' : 'adhoc_workflow'}
-        </button>
+        <label htmlFor="workflow-select" className="font-medium">
+          Workflow:
+        </label>
+        <div className="ml-auto">
+          <Select
+            value={workflow}
+            onValueChange={handleWorkflowSwitch}
+            disabled={status === 'running'}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select workflow" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="adhoc_workflow">Adhoc Workflow</SelectItem>
+              <SelectItem value="echo_workflow">Echo Workflow</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Status Panel */}

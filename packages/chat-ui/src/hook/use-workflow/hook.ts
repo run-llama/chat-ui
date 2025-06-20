@@ -23,6 +23,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
     deployment: deploymentName,
     workflow,
     runId: initialTaskId,
+    onData,
     onStopEvent,
     onError,
   } = params
@@ -46,6 +47,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
           },
           onData: event => {
             setEvents(prev => [...prev, event])
+            onData?.(event)
           },
           onError: (error: Error) => {
             setStatus('error')
@@ -60,7 +62,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
         }
       )
     },
-    [client, deploymentName, onError, onStopEvent]
+    [client, deploymentName, onData, onError, onStopEvent]
   )
 
   // if task id is provided, get existing task and restore its events
