@@ -26,6 +26,14 @@ services:
     path: src/chat_workflow:workflow
     python-dependencies:
       - llama-index-llms-openai>=0.4.5
+  agent_workflow:
+    name: Agent Workflow
+    source:
+      type: local
+      name: src
+    path: src/agent_workflow:workflow
+    python-dependencies:
+      - llama-index-llms-openai>=0.4.5
       
 ui:
   name: My Nextjs App
