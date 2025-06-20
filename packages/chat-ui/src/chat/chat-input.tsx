@@ -159,7 +159,9 @@ function ChatInputField(props: ChatInputFieldProps) {
       onChange={handleInputChange}
       onKeyDown={handleKeyDown}
       onCompositionStart={() => setIsComposing(true)}
-      onCompositionEnd={() => setIsComposing(false)}
+      onCompositionEnd={() => {
+        setTimeout(() => setIsComposing(false), 100)
+      }}
       spellCheck={false}
     />
   )
