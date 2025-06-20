@@ -29,13 +29,13 @@ class ChatWorkflow(Workflow):
         user_msg: str = ev.get("user_msg")
         chat_history: Optional[List[ChatMessage]] = ev.get("chat_history", [])
 
-        messages = [*chat_history, {"role": "user", "content": user_msg}]
+        messages = [*chat_history, ChatMessage(role="user", content=user_msg)]
 
         # check messages length is 0
         if len(messages) == 0:
             return StopEvent(result="No messages provided")
 
-        res = await self.llm.astream_chat(messages=[ChatMessage(**x) for x in messages])
+        res = await self.llm.astream_chat(messages=messages)
 
         final_response = ""
         async for chunk in res:

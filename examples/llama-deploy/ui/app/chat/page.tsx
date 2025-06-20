@@ -23,7 +23,7 @@ export default function Page(): JSX.Element {
   })
 
   return (
-    <div className="mx-auto h-screen w-2/3 flex-1">
+    <div className="mx-auto h-screen w-1/2 flex-1">
       <ChatSection handler={handler}>
         <CustomChatMessages />
         <ChatInput />
