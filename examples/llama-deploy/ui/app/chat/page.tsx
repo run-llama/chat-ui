@@ -24,18 +24,11 @@ export default function Page(): JSX.Element {
   })
 
   return (
-    <div className="flex h-screen flex-col">
-      <header className="w-full border-b p-4 text-center">
-        <h1 className="text-2xl font-bold">
-          LlamaIndex Chat UI - Next.js Example
-        </h1>
-      </header>
-      <div className="mx-auto min-h-0 w-2/3 flex-1">
-        <ChatSection handler={handler}>
-          <CustomChatMessages />
-          <ChatInput />
-        </ChatSection>
-      </div>
+    <div className="mx-auto h-screen w-2/3 flex-1">
+      <ChatSection handler={handler}>
+        <CustomChatMessages />
+        <ChatInput />
+      </ChatSection>
     </div>
   )
 }
@@ -57,11 +50,15 @@ function CustomChatMessages() {
               <ChatMessage.Content.Markdown />
               <WeatherAnnotation />
               <ChatMessage.Content.Source />
-              {/* You can add more components to render in the UI here */}
             </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>
         ))}
+        <ChatMessages.Empty
+          heading="LlamaDeploy with Chat UI Example"
+          subheading="Demo using useChatWorkflow hook"
+        />
+        <ChatMessages.Loading />
       </ChatMessages.List>
     </ChatMessages>
   )
