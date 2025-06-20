@@ -3,6 +3,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useWorkflow } from '@llamaindex/chat-ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const DEPLOYMENT_NAME = 'QuickStart'
 const DEFAULT_WORKFLOW = 'adhoc_workflow'
@@ -35,10 +42,8 @@ export default function Home() {
     await stop()
   }
 
-  const handleWorkflowSwitch = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setWorkflow(event.target.value)
+  const handleWorkflowSwitch = (value: string) => {
+    setWorkflow(value)
   }
 
   return (
@@ -58,32 +63,20 @@ export default function Home() {
         <label htmlFor="workflow-select" className="font-medium">
           Workflow:
         </label>
-        <div className="relative ml-auto">
-          <select
-            id="workflow-select"
+        <div className="ml-auto">
+          <Select
             value={workflow}
-            onChange={handleWorkflowSwitch}
+            onValueChange={handleWorkflowSwitch}
             disabled={status === 'running'}
-            className="appearance-none rounded border border-gray-300 bg-white px-3 py-1.5 pr-10 shadow-sm hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <option value="adhoc_workflow">Adhoc Workflow</option>
-            <option value="echo_workflow">Echo Workflow</option>
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <svg
-              className="h-4 w-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select workflow" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="adhoc_workflow">Adhoc Workflow</SelectItem>
+              <SelectItem value="echo_workflow">Echo Workflow</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
