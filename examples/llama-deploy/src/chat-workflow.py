@@ -1,17 +1,8 @@
-from llama_index.core.workflow import (
-    Workflow,
-    StartEvent,
-    StopEvent,
-    step,
-    Context,
-    Event,
-)
+from llama_index.core.workflow import Workflow, StartEvent, StopEvent, step, Context
 from llama_index.llms.openai import OpenAI
+from llama_index.core.agent.workflow.workflow_events import AgentStream
 from llama_index.core.llms import ChatMessage
-
-
-class StreamEvent(Event):
-    delta: str
+from typing import List, Optional, Union
 
 
 class ChatWorkflow(Workflow):
@@ -20,7 +11,10 @@ class ChatWorkflow(Workflow):
 
     @step()
     async def run_step(self, ctx: Context, ev: StartEvent) -> StopEvent:
-        messages = ev.get("messages", [])
+        user_msg: str = ev.get("user_msg")
+        chat_history: Optional[List[ChatMessage]] = ev.get("chat_history", [])
+
+        messages = [*chat_history, {"role": "user", "content": user_msg}]
 
         # check messages length is 0
         if len(messages) == 0:
@@ -31,8 +25,12 @@ class ChatWorkflow(Workflow):
         final_response = ""
         async for chunk in res:
             ctx.write_event_to_stream(
-                StreamEvent(
+                AgentStream(
                     delta=chunk.delta or "",
+                    response=final_response,
+                    current_agent_name="assistant",
+                    tool_calls=[],
+                    raw=chunk.delta or "",
                 )
             )
             final_response += chunk.delta or ""
