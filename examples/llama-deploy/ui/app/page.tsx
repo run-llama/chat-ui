@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
 const DEPLOYMENT_NAME = 'QuickStart'
@@ -42,7 +43,15 @@ export default function Home() {
 
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
-      <h1 className="mb-6 text-2xl font-bold">Llama Deploy with Chat UI</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Llama Deploy with Chat UI</h1>
+        <Link
+          href="/chat"
+          className="rounded bg-blue-500 px-4 py-1 text-white hover:bg-blue-600"
+        >
+          Go to Chat Demo
+        </Link>
+      </div>
 
       {/* Workflow Switcher */}
       <div className="mb-4 flex items-center gap-4">

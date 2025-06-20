@@ -15,7 +15,6 @@ const DEFAULT_WORKFLOW = 'chat_workflow'
 
 export default function Page(): JSX.Element {
   const handler = useChatWorkflow({
-    baseUrl: 'http://localhost:4501',
     deployment: DEPLOYMENT_NAME,
     workflow: DEFAULT_WORKFLOW,
     onError: error => {
