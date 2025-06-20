@@ -63,3 +63,11 @@ export interface AgentStreamEvent extends WorkflowEvent {
     delta: string
   }
 }
+
+export interface UIEvent extends WorkflowEvent {
+  type: string // the qualified name of the UI event can be found in the workflow definition
+  data: {
+    ui_type: string // annotation type to identify the type of the annotation and render corresponding component
+    data: JSONValue // props of that UI component
+  }
+}

@@ -11,6 +11,7 @@ import {
   WorkflowEvent,
   WorkflowEventType,
   WorkflowTask,
+  UIEvent,
 } from './types'
 
 export async function getExistingTask(params: {
@@ -212,5 +213,18 @@ export function isAgentStreamEvent(
     typeof event.data === 'object' &&
     event.data !== null &&
     'delta' in event.data
+  )
+}
+
+export function isUIEvent(event: WorkflowEvent): event is UIEvent {
+  return (
+    typeof event === 'object' &&
+    event !== null &&
+    'type' in event &&
+    'data' in event &&
+    typeof event.data === 'object' &&
+    event.data !== null &&
+    'ui_type' in event.data &&
+    typeof event.data.ui_type === 'string'
   )
 }

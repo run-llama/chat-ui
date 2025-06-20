@@ -1,12 +1,21 @@
 'use client'
 
-import { ChatSection, useChatWorkflow } from '@llamaindex/chat-ui'
+import {
+  ChatInput,
+  ChatMessage,
+  ChatMessages,
+  ChatSection,
+  useChatUI,
+  useChatWorkflow,
+} from '@llamaindex/chat-ui'
+import { WeatherAnnotation } from '../components/custom-weather'
 
 const DEPLOYMENT_NAME = 'QuickStart'
 const DEFAULT_WORKFLOW = 'chat_workflow'
 
-export default function Home() {
+export default function Page(): JSX.Element {
   const handler = useChatWorkflow({
+    baseUrl: 'http://localhost:4501',
     deployment: DEPLOYMENT_NAME,
     workflow: DEFAULT_WORKFLOW,
     onError: error => {
@@ -15,8 +24,45 @@ export default function Home() {
   })
 
   return (
-    <main className="mx-auto h-screen w-1/2">
-      <ChatSection handler={handler} />
-    </main>
+    <div className="flex h-screen flex-col">
+      <header className="w-full border-b p-4 text-center">
+        <h1 className="text-2xl font-bold">
+          LlamaIndex Chat UI - Next.js Example
+        </h1>
+      </header>
+      <div className="mx-auto min-h-0 w-2/3 flex-1">
+        <ChatSection handler={handler}>
+          <CustomChatMessages />
+          <ChatInput />
+        </ChatSection>
+      </div>
+    </div>
+  )
+}
+
+function CustomChatMessages() {
+  const { messages, isLoading, append } = useChatUI()
+  return (
+    <ChatMessages>
+      <ChatMessages.List className="px-4 py-6">
+        {messages.map((message, index) => (
+          <ChatMessage
+            key={index}
+            message={message}
+            isLast={index === messages.length - 1}
+            className="mb-4"
+          >
+            <ChatMessage.Avatar />
+            <ChatMessage.Content isLoading={isLoading} append={append}>
+              <ChatMessage.Content.Markdown />
+              <WeatherAnnotation />
+              <ChatMessage.Content.Source />
+              {/* You can add more components to render in the UI here */}
+            </ChatMessage.Content>
+            <ChatMessage.Actions />
+          </ChatMessage>
+        ))}
+      </ChatMessages.List>
+    </ChatMessages>
   )
 }

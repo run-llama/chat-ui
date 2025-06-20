@@ -8,8 +8,9 @@ import {
   WorkflowEvent,
   WorkflowEventType,
   WorkflowHookParams,
+  UIEvent,
 } from './types'
-import { isAgentStreamEvent } from './helper'
+import { isAgentStreamEvent, isUIEvent } from './helper'
 
 type ChatWorkflowHookParams = Pick<
   WorkflowHookParams,
@@ -51,6 +52,34 @@ export function useChatWorkflow({
           }
           // if last message is user message, add a new assistant message
           return [...prev, { content: delta, role: 'assistant' }]
+        })
+      }
+
+      if (isUIEvent(event)) {
+        const { ui_type, data } = (event as UIEvent).data
+        const annotation = { type: ui_type, data }
+
+        setMessages(prev => {
+          const lastMessage = prev[prev.length - 1]
+          // if last message is assistant message, add annotation to it
+          if (lastMessage?.role === 'assistant') {
+            return [
+              ...prev.slice(0, -1),
+              {
+                ...lastMessage,
+                annotations: [...(lastMessage.annotations || []), annotation],
+              },
+            ]
+          }
+          // if last message is user message, add a new assistant message with annotation
+          return [
+            ...prev,
+            {
+              content: '',
+              role: 'assistant',
+              annotations: [annotation],
+            },
+          ]
         })
       }
     },
