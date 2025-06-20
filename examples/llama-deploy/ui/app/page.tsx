@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises -- TODO: fix this */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition -- TODO: fix this */
-/* eslint-disable no-nested-ternary -- TODO: fix this */
-
 'use client'
 
 import { useState } from 'react'
