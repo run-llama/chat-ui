@@ -13,7 +13,7 @@ export interface WorkflowHookParams<E extends WorkflowEvent = WorkflowEvent> {
   deployment: string // Name of the registered deployment
   runId?: string // Optional task ID for resuming a workflow task
   workflow?: string // Set the default service to run
-  onData?: (event: E) => void
+  onData?: (event: WorkflowEvent) => void
   onStopEvent?: (event: E) => void
   onError?: (error: any) => void
 }
@@ -55,19 +55,4 @@ export type RawEvent = {
   __is_pydantic: boolean
   value: JSONValue
   qualified_name: string
-}
-
-export interface AgentStreamEvent extends WorkflowEvent {
-  type: WorkflowEventType.AgentStream
-  data: {
-    delta: string
-  }
-}
-
-export interface UIEvent extends WorkflowEvent {
-  type: string // the qualified name of the UI event can be found in the workflow definition
-  data: {
-    ui_type: string // annotation type to identify the type of the annotation and render corresponding component
-    data: JSONValue // props of that UI component
-  }
 }

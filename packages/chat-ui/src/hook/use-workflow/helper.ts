@@ -6,12 +6,10 @@ import {
 } from '@llamaindex/llama-deploy'
 import {
   RawEvent,
-  AgentStreamEvent,
   StreamingEventCallback,
   WorkflowEvent,
   WorkflowEventType,
   WorkflowTask,
-  UIEvent,
 } from './types'
 
 export async function getExistingTask(params: {
@@ -198,33 +196,5 @@ function isRawEvent(event: any): event is RawEvent {
     'value' in event &&
     'qualified_name' in event &&
     typeof event.qualified_name === 'string'
-  )
-}
-
-export function isAgentStreamEvent(
-  event: WorkflowEvent
-): event is AgentStreamEvent {
-  return (
-    typeof event === 'object' &&
-    event !== null &&
-    'type' in event &&
-    'data' in event &&
-    event.type === WorkflowEventType.AgentStream.toString() &&
-    typeof event.data === 'object' &&
-    event.data !== null &&
-    'delta' in event.data
-  )
-}
-
-export function isUIEvent(event: WorkflowEvent): event is UIEvent {
-  return (
-    typeof event === 'object' &&
-    event !== null &&
-    'type' in event &&
-    'data' in event &&
-    typeof event.data === 'object' &&
-    event.data !== null &&
-    'ui_type' in event.data &&
-    typeof event.data.ui_type === 'string'
   )
 }

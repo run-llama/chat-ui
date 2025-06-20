@@ -2,28 +2,14 @@
 
 import { useState } from 'react'
 import { ChatHandler, Message } from '../../chat/chat.interface'
-import { useWorkflow } from './hook'
+import { useWorkflow } from '../use-workflow'
+import { isAgentStreamEvent, isUIEvent } from './helper'
 import {
   AgentStreamEvent,
-  WorkflowEvent,
-  WorkflowEventType,
-  WorkflowHookParams,
+  ChatEvent,
+  ChatWorkflowHookParams,
   UIEvent,
 } from './types'
-import { isAgentStreamEvent, isUIEvent } from './helper'
-
-type ChatWorkflowHookParams = Pick<
-  WorkflowHookParams,
-  'deployment' | 'workflow' | 'baseUrl' | 'onError'
->
-
-interface ChatEvent extends WorkflowEvent {
-  type: WorkflowEventType.StartEvent
-  data: {
-    user_msg: string
-    chat_history: Omit<Message, 'annotations'>[]
-  }
-}
 
 export function useChatWorkflow({
   deployment,
