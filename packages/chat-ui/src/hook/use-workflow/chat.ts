@@ -8,7 +8,7 @@ import { extractStreamEventDelta } from './helper'
 
 type ChatWorkflowHookParams = Pick<
   WorkflowHookParams,
-  'deployment' | 'workflow'
+  'deployment' | 'workflow' | 'baseUrl' | 'onError'
 >
 
 interface ChatEvent extends WorkflowEvent {
@@ -18,18 +18,19 @@ interface ChatEvent extends WorkflowEvent {
   }
 }
 
-export function useChatWorkflow(params: ChatWorkflowHookParams): ChatHandler {
+export function useChatWorkflow({
+  deployment,
+  workflow,
+  baseUrl,
+  onError,
+}: ChatWorkflowHookParams): ChatHandler {
   const [input, setInput] = useState<string>('')
   const [messages, setMessages] = useState<Message[]>([])
 
   const { start, stop, status } = useWorkflow<ChatEvent>({
-    ...params,
-    onStopEvent: event => {
-      console.log('onStopEvent', event)
-    },
-    onError: error => {
-      console.error('onError', error)
-    },
+    deployment,
+    workflow,
+    baseUrl,
     onData: event => {
       const delta = extractStreamEventDelta(event)
       if (delta) {
@@ -57,11 +58,8 @@ export function useChatWorkflow(params: ChatWorkflowHookParams): ChatHandler {
       setMessages(prev => [...prev, newMessage])
       await start({ messages: inputMessages })
     } catch (error) {
-      console.error('onError', error)
+      onError?.(error)
     }
-
-    // reset input
-    setInput('')
 
     return message.content
   }
@@ -73,7 +71,7 @@ export function useChatWorkflow(params: ChatWorkflowHookParams): ChatHandler {
     append,
     messages,
     setMessages,
-    stop,
+    stop: () => stop(),
     reload: undefined, // TODO
   }
 }
