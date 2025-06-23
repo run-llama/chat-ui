@@ -35,10 +35,10 @@ export interface SourceNodesEvent extends WorkflowEvent {
 }
 
 export interface UIEvent extends WorkflowEvent {
-  type: string // the qualified name of the UI event can be found in the workflow definition
+  type: WorkflowEventType.UIEvent
   data: {
-    ui_type: string // annotation type to identify the type of the annotation and render corresponding component
-    data: JSONValue // props of that UI component
+    type: string
+    data: JSONValue
   }
 }
 

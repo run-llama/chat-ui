@@ -6,7 +6,7 @@ import {
 import { JSONValue } from '../../chat/chat.interface'
 import { SourceNode } from '../../widgets'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
-import { AgentStreamEvent, SourceNodesEvent } from './types'
+import { AgentStreamEvent, SourceNodesEvent, UIEvent } from './types'
 
 /**
  * Transform a workflow event to message parts
@@ -33,7 +33,8 @@ export function transformEventToMessageParts(event: WorkflowEvent): {
     }
   }
 
-  return { delta: '', annotations: toVercelAnnotations(event) }
+  const annotations = toVercelAnnotations(event)
+  return { delta: '', annotations }
 }
 
 function isAgentStreamEvent(event: WorkflowEvent): event is AgentStreamEvent {
@@ -76,6 +77,15 @@ function toVercelAnnotations(event: WorkflowEvent) {
         {
           type: MessageAnnotationType.SOURCES,
           data: { nodes: sources },
+        },
+      ]
+    }
+    case WorkflowEventType.UIEvent.toString(): {
+      const uiEvent = event as UIEvent
+      return [
+        {
+          type: uiEvent.data.type,
+          data: uiEvent.data.data,
         },
       ]
     }

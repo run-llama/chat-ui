@@ -12,13 +12,19 @@ from llama_index.core.schema import (
 from llama_index.llms.openai import OpenAI
 from llama_index.core.agent.workflow.workflow_events import AgentStream
 from llama_index.core.llms import ChatMessage
-from typing import Any, List, Optional, Union
+from typing import List, Optional
 from llama_index.server.models import (
     SourceNodesEvent,
     ArtifactEvent,
+    UIEvent,
 )
 from llama_index.core.data_structs import Node
 import time
+
+
+class UIEvent(Event):
+    type: str
+    data: dict
 
 
 class ChatWorkflow(Workflow):
@@ -51,6 +57,7 @@ class ChatWorkflow(Workflow):
             )
             final_response += chunk.delta or ""
 
+        # send a sample source nodes event
         ctx.write_event_to_stream(
             SourceNodesEvent(
                 nodes=[
@@ -72,6 +79,7 @@ class ChatWorkflow(Workflow):
             )
         )
 
+        # send a sample artifact event
         ctx.write_event_to_stream(
             ArtifactEvent(
                 data={
@@ -83,6 +91,20 @@ class ChatWorkflow(Workflow):
                         "code": 'console.log("Hello, world!");',
                     },
                 }
+            )
+        )
+
+        # send a sample UI event with weather data
+        ctx.write_event_to_stream(
+            UIEvent(
+                type="weather",
+                data={
+                    "location": "San Francisco, CA",
+                    "temperature": 22,
+                    "condition": "sunny",
+                    "humidity": 65,
+                    "windSpeed": 12,
+                },
             )
         )
 
