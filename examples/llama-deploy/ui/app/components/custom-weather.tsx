@@ -33,9 +33,7 @@ function WeatherCard({ data }: { data: WeatherData }) {
     <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-          <span className="text-2xl">
-            {iconMap[data.condition.toLowerCase()] || '🌤️'}
-          </span>
+          <span className="text-2xl">{iconMap[data.condition] || '🌤️'}</span>
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-blue-900">{data.location}</h3>
