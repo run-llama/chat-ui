@@ -4,7 +4,6 @@ from llama_index.core.workflow import (
     StopEvent,
     step,
     Context,
-    Event,
 )
 from llama_index.core.schema import (
     NodeWithScore,
@@ -19,12 +18,16 @@ from llama_index.server.models import (
     UIEvent,
 )
 from llama_index.core.data_structs import Node
+from pydantic import BaseModel
 import time
 
 
-class UIEvent(Event):
-    type: str
-    data: dict
+class WeatherData(BaseModel):
+    location: str
+    temperature: float
+    condition: str
+    humidity: int
+    windSpeed: int
 
 
 class ChatWorkflow(Workflow):
@@ -95,18 +98,14 @@ class ChatWorkflow(Workflow):
         )
 
         # send a sample UI event with weather data
-        ctx.write_event_to_stream(
-            UIEvent(
-                type="weather",
-                data={
-                    "location": "San Francisco, CA",
-                    "temperature": 22,
-                    "condition": "sunny",
-                    "humidity": 65,
-                    "windSpeed": 12,
-                },
-            )
+        weather_data = WeatherData(
+            location="San Francisco, CA",
+            temperature=22,
+            condition="sunny",
+            humidity=65,
+            windSpeed=12,
         )
+        ctx.write_event_to_stream(UIEvent(type="weather", data=weather_data))
 
         return StopEvent(result=final_response)
 
