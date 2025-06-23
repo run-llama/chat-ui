@@ -20,8 +20,6 @@ export function transformEventToMessageParts(event: WorkflowEvent): {
   delta: string
   annotations: MessageAnnotation<JSONValue>[]
 } {
-  // TODO: add unit tests
-
   if (isAgentStreamEvent(event)) {
     return { delta: event.data.delta, annotations: [] }
   }
