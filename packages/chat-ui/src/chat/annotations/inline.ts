@@ -39,7 +39,7 @@ export function getInlineAnnotations(message: Message): unknown[] {
 
 // convert annotation to inline markdown
 export function toInlineAnnotation(annotation: MessageAnnotation) {
-  return `\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(annotation)}\n\`\`\``
+  return `\n\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(annotation)}\n\`\`\`\n`
 }
 
 /**
