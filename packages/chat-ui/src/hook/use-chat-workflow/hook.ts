@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { ChatHandler, Message } from '../../chat/chat.interface'
+import { ChatHandler, JSONValue, Message } from '../../chat/chat.interface'
 import { useWorkflow } from '../use-workflow'
-import { isAgentStreamEvent, toAnnotation } from './helper'
-import { AgentStreamEvent, ChatEvent, ChatWorkflowHookParams } from './types'
+import { transformEventToMessageParts } from './helper'
+import { ChatEvent, ChatWorkflowHookParams } from './types'
 
 export function useChatWorkflow({
   deployment,
@@ -15,53 +15,40 @@ export function useChatWorkflow({
   const [input, setInput] = useState<string>('')
   const [messages, setMessages] = useState<Message[]>([])
 
+  const updateLastMessage = ({
+    delta = '',
+    annotations = [],
+  }: {
+    delta?: string // render events inline in markdown
+    annotations?: JSONValue[] // render events in annotations components
+  }) => {
+    setMessages(prev => {
+      const lastMessage = prev[prev.length - 1]
+
+      // if last message is assistant message, update its content
+      if (lastMessage?.role === 'assistant') {
+        return [
+          ...prev.slice(0, -1),
+          {
+            ...lastMessage,
+            content: (lastMessage.content || '') + delta,
+            annotations: [...(lastMessage.annotations || []), ...annotations],
+          },
+        ]
+      }
+
+      // if last message is user message, add a new assistant message
+      return [...prev, { content: delta, role: 'assistant', annotations }]
+    })
+  }
+
   const { start, stop, status } = useWorkflow<ChatEvent>({
     deployment,
     workflow,
     baseUrl,
     onData: event => {
-      if (isAgentStreamEvent(event)) {
-        const delta = (event as AgentStreamEvent).data.delta
-        setMessages(prev => {
-          const lastMessage = prev[prev.length - 1]
-          // if last message is assistant message, update its content
-          if (lastMessage?.role === 'assistant') {
-            return [
-              ...prev.slice(0, -1),
-              { ...lastMessage, content: lastMessage.content + delta },
-            ]
-          }
-          // if last message is user message, add a new assistant message
-          return [...prev, { content: delta, role: 'assistant' }]
-        })
-      }
-
-      const annotation = toAnnotation(event)
-      console.log('annotation', annotation)
-      if (annotation) {
-        setMessages(prev => {
-          const lastMessage = prev[prev.length - 1]
-          // if last message is assistant message, add annotation to it
-          if (lastMessage?.role === 'assistant') {
-            return [
-              ...prev.slice(0, -1),
-              {
-                ...lastMessage,
-                annotations: [...(lastMessage.annotations || []), annotation],
-              },
-            ]
-          }
-          // if last message is user message, add a new assistant message with annotation
-          return [
-            ...prev,
-            {
-              content: '',
-              role: 'assistant',
-              annotations: [annotation],
-            },
-          ]
-        })
-      }
+      const { delta, annotations } = transformEventToMessageParts(event)
+      updateLastMessage({ delta, annotations })
     },
   })
 

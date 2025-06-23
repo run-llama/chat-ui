@@ -40,6 +40,7 @@ export enum WorkflowEventType {
   StopEvent = 'llama_index.core.workflow.events.StopEvent',
   AgentStream = 'llama_index.core.agent.workflow.workflow_events.AgentStream',
   SourceNodesEvent = 'llama_index.server.models.source_nodes.SourceNodesEvent',
+  ArtifactEvent = 'llama_index.server.models.artifacts.ArtifactEvent',
 }
 
 export interface StreamingEventCallback<
