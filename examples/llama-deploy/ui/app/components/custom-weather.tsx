@@ -29,6 +29,8 @@ function WeatherCard({ data }: { data: WeatherData }) {
     stormy: '⛈️',
   }
 
+  if (!data.location) return null
+
   return (
     <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="flex items-center gap-3">
