@@ -20,6 +20,20 @@ export interface AgentStreamEvent extends WorkflowEvent {
   }
 }
 
+export interface SourceNodesEvent extends WorkflowEvent {
+  type: WorkflowEventType.SourceNodesEvent
+  data: {
+    nodes: {
+      node: {
+        id_: string
+        metadata: Record<string, any>
+        text: string
+      }
+      score: number
+    }[]
+  }
+}
+
 export interface UIEvent extends WorkflowEvent {
   type: string // the qualified name of the UI event can be found in the workflow definition
   data: {
