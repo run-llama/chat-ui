@@ -571,3 +571,67 @@ function CustomWorkflowComponent() {
   )
 }
 ```
+
+### useChatWorkflow
+
+A specialized hook for building chat interfaces with LlamaDeploy workflows. It provides a `ChatHandler` that works seamlessly with chat-ui components.
+
+```tsx
+import { 
+  ChatSection, 
+  ChatMessages, 
+  ChatMessage, 
+  ChatInput,
+  useChatWorkflow 
+} from '@llamaindex/chat-ui'
+
+function WorkflowChatApp() {
+  const handler = useChatWorkflow({
+    baseUrl: 'http://localhost:4501',
+    deployment: 'my-deployment',
+    workflow: 'chat-workflow',
+    onError: (error) => console.error(error),
+  })
+
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages>
+        <ChatMessages.List>
+          {handler.messages.map((message, index) => (
+            <ChatMessage
+              key={index}
+              message={message}
+              isLast={index === handler.messages.length - 1}
+            >
+              <ChatMessage.Avatar />
+              <ChatMessage.Content>
+                <ChatMessage.Content.Markdown />
+                <ChatMessage.Content.Source />
+                {/* Custom annotations for UIEvents */}
+                <WeatherAnnotation />
+              </ChatMessage.Content>
+              <ChatMessage.Actions />
+            </ChatMessage>
+          ))}
+        </ChatMessages.List>
+      </ChatMessages>
+      <ChatInput />
+    </ChatSection>
+  )
+}
+```
+
+**Options:**
+
+- `deployment` - LlamaDeploy deployment name
+- `workflow` - Workflow service name (optional)
+- `baseUrl` - API server URL (optional)
+- `onError` - Error callback
+
+**Key Features:**
+
+- **Chat Handler**: Returns a `ChatHandler` compatible with all chat-ui components
+- **Auto Processing**: Converts workflow events into chat messages and annotations
+- **Event Support**: Handles `SourceNodesEvent`, `ArtifactEvent`, and `UIEvent` from workflows
+
+The hook automatically processes workflow events and renders them as annotations in the chat interface, making it easy to build rich conversational experiences with LlamaDeploy workflows.

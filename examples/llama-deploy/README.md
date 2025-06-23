@@ -22,6 +22,98 @@ The `useWorkflow` hook is a React hook provided by chat-ui that simplifies inter
 - Manage workflow state and session persistence
 - Handle workflow completion and error states
 
+## useChatWorkflow Hook
+
+The `useChatWorkflow` hook is a specialized version of `useWorkflow` designed specifically for chat interfaces. It provides a chat-compatible API that integrates seamlessly with chat components while handling workflow communication in the background.
+
+### Key Features:
+
+- **Chat Interface**: Provides standard chat interface methods (`append`, `reload`, `stop`)
+- **Message Management**: Automatically manages chat messages and conversation history
+- **Event Processing**: Converts workflow events into chat messages and annotations
+- **Real-time Updates**: Streams workflow responses as chat messages
+
+### Workflow Events
+
+Your LlamaDeploy workflows can send three main types of events to enhance the chat experience:
+
+#### 1. SourceNodesEvent - Citations and References
+
+Send source nodes to display citations and references for generated content:
+
+```python
+from llama_index.server.models import SourceNodesEvent
+from llama_index.core.schema import NodeWithScore
+from llama_index.core.data_structs import Node
+
+ctx.write_event_to_stream(
+    SourceNodesEvent(
+        nodes=[
+            NodeWithScore(
+                node=Node(
+                    text="sample node content",
+                    metadata={"URL": "https://example.com/document.pdf"},
+                ),
+                score=0.8,
+            ),
+        ],
+    )
+)
+```
+
+#### 2. ArtifactEvent - Code and Artifacts
+
+Send code snippets, documents, or other artifacts that can be displayed in a dedicated canvas:
+
+```python
+from llama_index.server.models import ArtifactEvent
+import time
+
+ctx.write_event_to_stream(
+    ArtifactEvent(
+        data={
+            "type": "code",
+            "created_at": int(time.time()),
+            "data": {
+                "language": "typescript",
+                "file_name": "example.ts",
+                "code": 'console.log("Hello, world!");',
+            },
+        }
+    )
+)
+```
+
+#### 3. UIEvent - Custom UI Components
+
+Send custom data to render specialized UI components:
+
+```python
+from llama_index.server.models import UIEvent
+from pydantic import BaseModel
+
+class WeatherData(BaseModel):
+    location: str
+    temperature: float
+    condition: str
+    humidity: int
+    windSpeed: int
+
+weather_data = WeatherData(
+    location="San Francisco, CA",
+    temperature=22,
+    condition="sunny",
+    humidity=65,
+    windSpeed=12,
+)
+
+ctx.write_event_to_stream(
+    UIEvent(type="weather", data=weather_data)
+)
+```
+
+These events will be automatically processed by `useChatWorkflow` and rendered as annotations in the chat interface.
+
 ## Installation
 
 Both the SDK and the CLI are part of the LlamaDeploy Python package. To install, just run:
