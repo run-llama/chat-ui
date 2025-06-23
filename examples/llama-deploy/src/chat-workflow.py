@@ -15,8 +15,10 @@ from llama_index.core.llms import ChatMessage
 from typing import Any, List, Optional, Union
 from llama_index.server.models import (
     SourceNodesEvent,
+    ArtifactEvent,
 )
 from llama_index.core.data_structs import Node
+import time
 
 
 class ChatWorkflow(Workflow):
@@ -50,21 +52,37 @@ class ChatWorkflow(Workflow):
             final_response += chunk.delta or ""
 
         ctx.write_event_to_stream(
-            AgentStream(
-                delta="Tip 💡 You can also send an UIEvent to render information in the UI",
-                response="",
-                current_agent_name="assistant",
-                tool_calls=[],
-                raw="",
+            SourceNodesEvent(
+                nodes=[
+                    NodeWithScore(
+                        node=Node(
+                            text="sample node 1",
+                            metadata={"URL": "https://pdfobject.com/pdf/sample.pdf"},
+                        ),
+                        score=0.7,
+                    ),
+                    NodeWithScore(
+                        node=Node(
+                            text="sample node 2",
+                            metadata={"URL": "https://pdfobject.com/pdf/sample.pdf"},
+                        ),
+                        score=0.8,
+                    ),
+                ],
             )
         )
 
         ctx.write_event_to_stream(
-            SourceNodesEvent(
-                nodes=[
-                    NodeWithScore(node=Node(text="text1"), score=0.7),
-                    NodeWithScore(node=Node(text="text2"), score=0.8),
-                ],
+            ArtifactEvent(
+                data={
+                    "type": "code",
+                    "created_at": int(time.time()),
+                    "data": {
+                        "language": "typescript",
+                        "file_name": "sample-artifact.ts",
+                        "code": 'console.log("Hello, world!");',
+                    },
+                }
             )
         )
 
