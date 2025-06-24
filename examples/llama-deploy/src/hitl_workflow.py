@@ -1,6 +1,3 @@
-import asyncio
-from typing import Literal
-
 from llama_index.core.workflow import (
     Workflow,
     StartEvent,
@@ -9,30 +6,19 @@ from llama_index.core.workflow import (
     Event,
     HumanResponseEvent,
     InputRequiredEvent,
+    Context,
 )
-from pydantic import Field
-
-
-class EchoEvent(Event):
-    """An event that echoes the input message."""
-
-    message: str = Field(description="The message to echo.")
-
-
-class WaitEvent(InputRequiredEvent):
-    wait_please: Literal[True]
 
 
 class ContinueEvent(HumanResponseEvent):
-    """An event that continues the workflow."""
-
-    continue_please: Literal[True]
+    user_response: str
 
 
-# create a dummy workflow
-class EchoWorkflow(Workflow):
-    """A dummy workflow with only one step sending back the input given."""
+class UIEvent(Event):
+    data: dict
 
+
+class HITLWorkflow(Workflow):
     def __init__(self, *args, **kwargs):
         if "timeout" not in kwargs:
             kwargs["timeout"] = None
@@ -43,8 +29,10 @@ class EchoWorkflow(Workflow):
         return InputRequiredEvent(prefix="Enter a number: ")
 
     @step
-    async def step2(self, ev: HumanResponseEvent) -> StopEvent:
-        return StopEvent(result=ev.response)
+    async def step2(self, ctx: Context, ev: ContinueEvent) -> StopEvent:
+        user_response: str = ev.user_response
+        ctx.write_event_to_stream(UIEvent(data={"user_response": user_response}))
+        return StopEvent(result=user_response)
 
 
-workflow = EchoWorkflow()
+workflow = HITLWorkflow()
