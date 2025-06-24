@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useWorkflow, WorkflowEventType } from '@llamaindex/chat-ui'
+import { useWorkflow } from '@llamaindex/chat-ui'
 import {
   Select,
   SelectContent,
