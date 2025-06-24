@@ -26,7 +26,7 @@ class HITLWorkflow(Workflow):
 
     @step
     async def step1(self, ev: StartEvent) -> InputRequiredEvent:
-        return InputRequiredEvent(prefix="Enter a number: ")
+        return InputRequiredEvent(prefix="Please confirm whether to continue or not: ")
 
     @step
     async def step2(self, ctx: Context, ev: ContinueEvent) -> StopEvent:
