@@ -6,6 +6,7 @@ import {
 import { JSONValue } from '../../chat/chat.interface'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
 import { AgentStreamEvent, SourceNodesEvent, UIEvent } from './types'
+import { SourceNode } from '../../widgets'
 
 /**
  * Transform a workflow event to message parts
@@ -68,8 +69,8 @@ function toVercelAnnotations(event: WorkflowEvent) {
         metadata: node.metadata,
         score,
         text: node.text,
-        url: node.metadata?.URL,
-      }))
+        url: (node.metadata?.URL as string) || '',
+      })) satisfies SourceNode[]
 
       return [
         {
