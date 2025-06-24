@@ -6,38 +6,68 @@ import {
   ChatMessage,
   ChatMessages,
   ChatSection,
+  ChatWorkflowResume,
   useChatUI,
   useChatWorkflow,
 } from '@llamaindex/chat-ui'
 import { WeatherAnnotation } from '../components/custom-weather'
+import { CLIHumanInput } from '../components/human-input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useState } from 'react'
 
 const DEPLOYMENT_NAME = 'QuickStart'
 const DEFAULT_WORKFLOW = 'chat_workflow'
 
 export default function Page(): JSX.Element {
+  const [workflow, setWorkflow] = useState(DEFAULT_WORKFLOW)
+
   const handler = useChatWorkflow({
     deployment: DEPLOYMENT_NAME,
-    workflow: DEFAULT_WORKFLOW,
+    workflow,
     onError: error => {
       console.error(error)
     },
   })
 
   return (
-    <ChatSection
-      handler={handler}
-      className="block h-screen flex-row gap-4 p-0 md:flex md:p-5"
-    >
-      <div className="md:max-w-1/2 mx-auto flex h-full min-w-0 max-w-full flex-1 flex-col gap-4">
-        <CustomChatMessages />
-        <ChatInput />
+    <div className="relative h-screen">
+      <div className="absolute right-6 top-6">
+        <Select
+          value={workflow}
+          onValueChange={setWorkflow}
+          disabled={handler.isLoading}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select workflow" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="chat_workflow">Chat Workflow</SelectItem>
+            <SelectItem value="cli_workflow">CLI HITL Workflow</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <ChatCanvas className="w-full md:w-2/3" />
-    </ChatSection>
+
+      <ChatSection
+        handler={handler}
+        className="block h-screen flex-row gap-4 p-0 md:flex md:p-5"
+      >
+        <div className="md:max-w-1/2 mx-auto flex h-full min-w-0 max-w-full flex-1 flex-col gap-4">
+          <CustomChatMessages resume={handler.resume} />
+          <ChatInput />
+        </div>
+        <ChatCanvas className="w-full md:w-2/3" />
+      </ChatSection>
+    </div>
   )
 }
 
-function CustomChatMessages() {
+function CustomChatMessages({ resume }: { resume: ChatWorkflowResume }) {
   const { messages, isLoading, append } = useChatUI()
   return (
     <ChatMessages>
@@ -51,6 +81,7 @@ function CustomChatMessages() {
           >
             <ChatMessage.Avatar />
             <ChatMessage.Content isLoading={isLoading} append={append}>
+              <CLIHumanInput resume={resume} />
               <ChatMessage.Content.Markdown />
               <WeatherAnnotation />
               <ChatMessage.Content.Source />

@@ -53,6 +53,7 @@ function isInlineEvent(event: WorkflowEvent) {
 
 function toVercelAnnotations(event: WorkflowEvent) {
   switch (event.type) {
+    // convert source nodes event to source nodes annotation
     case WorkflowEventType.SourceNodesEvent.toString(): {
       const nodes = (event as SourceNodesEvent).data?.nodes || []
 
@@ -78,6 +79,8 @@ function toVercelAnnotations(event: WorkflowEvent) {
         },
       ]
     }
+
+    // convert ui events to annotations
     case WorkflowEventType.UIEvent.toString(): {
       const uiEvent = event as UIEvent
       return [
@@ -87,7 +90,18 @@ function toVercelAnnotations(event: WorkflowEvent) {
         },
       ]
     }
-  }
 
-  return []
+    // for other events which are not defined, convert them to vercel annotations with type is the qualified name of the event
+    // eg: {"__is_pydantic": true, "value": {"item": "sample"}, "qualified_name": "myworkflow.MyEvent"}
+    // will be converted to this annotation: {"type": "myworkflow.MyEvent", "data": {"item": "sample"}}
+    // this is useful for customizing UI for events that are not defined in the chat-ui
+    default: {
+      return [
+        {
+          type: event.type,
+          data: event.data as JSONValue,
+        },
+      ]
+    }
+  }
 }

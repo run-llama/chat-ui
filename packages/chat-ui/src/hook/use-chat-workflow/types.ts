@@ -1,4 +1,4 @@
-import { JSONValue, Message } from '../../chat/chat.interface'
+import { ChatHandler, JSONValue, Message } from '../../chat/chat.interface'
 import {
   WorkflowEvent,
   WorkflowEventType,
@@ -46,3 +46,12 @@ export type ChatWorkflowHookParams = Pick<
   WorkflowHookParams,
   'deployment' | 'workflow' | 'baseUrl' | 'onError'
 >
+
+export type ChatWorkflowHookHandler = ChatHandler & {
+  resume: ChatWorkflowResume
+}
+
+export type ChatWorkflowResume = (
+  eventType: string,
+  eventData: any
+) => Promise<void>

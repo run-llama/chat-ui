@@ -40,6 +40,12 @@ services:
       type: local
       name: src
     path: src/hitl_workflow:workflow
+  cli_workflow:
+    name: CLI Workflow
+    source:
+      type: local
+      name: src
+    path: src/cli_workflow:workflow
       
 ui:
   name: My Nextjs App

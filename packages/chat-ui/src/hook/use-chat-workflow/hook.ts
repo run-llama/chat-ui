@@ -1,17 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { ChatHandler, JSONValue, Message } from '../../chat/chat.interface'
+import { JSONValue, Message } from '../../chat/chat.interface'
 import { useWorkflow } from '../use-workflow'
 import { transformEventToMessageParts } from './helper'
-import { ChatEvent, ChatWorkflowHookParams } from './types'
+import {
+  ChatEvent,
+  ChatWorkflowHookHandler,
+  ChatWorkflowHookParams,
+} from './types'
 
 export function useChatWorkflow({
   deployment,
   workflow,
   baseUrl,
   onError,
-}: ChatWorkflowHookParams): ChatHandler {
+}: ChatWorkflowHookParams): ChatWorkflowHookHandler {
   const [input, setInput] = useState<string>('')
   const [messages, setMessages] = useState<Message[]>([])
 
@@ -42,7 +46,7 @@ export function useChatWorkflow({
     })
   }
 
-  const { start, stop, status } = useWorkflow<ChatEvent>({
+  const { start, stop, status, sendEvent } = useWorkflow<ChatEvent>({
     deployment,
     workflow,
     baseUrl,
@@ -88,6 +92,15 @@ export function useChatWorkflow({
     }
   }
 
+  // resume is used to send events to the current workflow run without creating a new task
+  const handleResume = async (eventType: string, eventData: any) => {
+    try {
+      await sendEvent({ type: eventType as ChatEvent['type'], data: eventData })
+    } catch (error) {
+      onError?.(error)
+    }
+  }
+
   const isLoading = status === 'running'
 
   return {
@@ -99,5 +112,6 @@ export function useChatWorkflow({
     setMessages,
     stop: handleStop,
     reload: handleReload,
+    resume: handleResume,
   }
 }
