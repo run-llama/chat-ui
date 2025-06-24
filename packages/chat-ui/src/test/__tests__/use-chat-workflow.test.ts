@@ -210,7 +210,7 @@ describe('useChatWorkflow - transformEventToMessageParts', () => {
         },
         score: 0.8,
         text: 'Content without URL',
-        url: "",
+        url: '',
       })
     })
   })
