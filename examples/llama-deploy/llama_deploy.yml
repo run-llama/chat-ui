@@ -34,6 +34,12 @@ services:
     path: src/agent_workflow:workflow
     python-dependencies:
       - llama-index-llms-openai>=0.4.5
+  hitl_workflow:
+    name: HITL Workflow
+    source:
+      type: local
+      name: src
+    path: src/hitl_workflow:workflow
       
 ui:
   name: My Nextjs App
