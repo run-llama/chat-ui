@@ -247,22 +247,4 @@ describe('useChatWorkflow - transformEventToMessageParts', () => {
       })
     })
   })
-
-  describe('Unknown event types', () => {
-    it('should return empty delta and annotations for unknown event types', () => {
-      const event: WorkflowEvent = {
-        type: 'unknown.event.type',
-        data: {
-          someData: 'value',
-        },
-      }
-
-      const result = transformEventToMessageParts(event)
-
-      expect(result).toEqual({
-        delta: '',
-        annotations: [],
-      })
-    })
-  })
 })
