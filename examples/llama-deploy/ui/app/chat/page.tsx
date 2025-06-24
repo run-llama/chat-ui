@@ -114,7 +114,9 @@ function CustomChatMessages({
         />
         <ChatMessages.Loading />
       </ChatMessages.List>
-      <StarterQuestions questions={starterQuestions} append={append} />
+      {messages.length === 0 && (
+        <StarterQuestions questions={starterQuestions} append={append} />
+      )}
     </ChatMessages>
   )
 }

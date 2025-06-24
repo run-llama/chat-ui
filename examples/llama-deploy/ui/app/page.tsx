@@ -18,26 +18,26 @@ export default function Home() {
       {/* Navigation Cards */}
       <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
         <Link
-          href="/chat"
-          className="group rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-500 hover:shadow-lg"
-        >
-          <div className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-blue-600">
-            💬 Chat Demo
-          </div>
-          <p className="text-gray-600">
-            Interactive chat interface using the LlamaIndex Chat UI components
-          </p>
-        </Link>
-
-        <Link
           href="/workflow"
           className="group rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-500 hover:shadow-lg"
         >
           <div className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-blue-600">
-            ⚙️ Workflow Management
+            ⚙️ Workflow Demo - useWorkflow
           </div>
           <p className="text-gray-600">
             Manage and interact with Llama Deploy workflows directly
+          </p>
+        </Link>
+
+        <Link
+          href="/chat"
+          className="group rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-500 hover:shadow-lg"
+        >
+          <div className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-blue-600">
+            💬 Chat Demo - useChatWorkflow
+          </div>
+          <p className="text-gray-600">
+            Interactive chat interface using the LlamaIndex Chat UI components
           </p>
         </Link>
       </div>
