@@ -26,8 +26,8 @@ const DEPLOYMENT_NAME = 'QuickStart'
 const DEFAULT_WORKFLOW = 'chat_workflow'
 
 const chatStarterQuestions = [
-  'Explain machine learning concepts',
-  'What are best practices for React?',
+  'What can you do?',
+  'Write a poem about the weather',
 ]
 
 const hitlStarterQuestions = [
