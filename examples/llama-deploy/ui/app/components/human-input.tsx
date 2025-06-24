@@ -6,11 +6,11 @@ import {
   useChatMessage,
 } from '@llamaindex/chat-ui'
 
-interface CLIHumanInputData {
+type CLIHumanInputData = {
   command: string
 }
 
-interface CLIHumanResponseData {
+type CLIHumanResponseData = {
   execute: boolean
   command: string
 }

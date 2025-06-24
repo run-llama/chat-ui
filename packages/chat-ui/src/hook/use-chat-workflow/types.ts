@@ -26,7 +26,7 @@ export interface SourceNodesEvent extends WorkflowEvent {
     nodes: {
       node: {
         id_: string
-        metadata: Record<string, any>
+        metadata: Record<string, JSONValue>
         text: string
       }
       score: number
@@ -53,5 +53,5 @@ export type ChatWorkflowHookHandler = ChatHandler & {
 
 export type ChatWorkflowResume = (
   eventType: string,
-  eventData: any
+  eventData: JSONValue
 ) => Promise<void>

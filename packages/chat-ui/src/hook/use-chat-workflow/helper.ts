@@ -4,7 +4,6 @@ import {
   toInlineAnnotation,
 } from '../../chat/annotations'
 import { JSONValue } from '../../chat/chat.interface'
-import { SourceNode } from '../../widgets'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
 import { AgentStreamEvent, SourceNodesEvent, UIEvent } from './types'
 
@@ -70,7 +69,7 @@ function toVercelAnnotations(event: WorkflowEvent) {
         score,
         text: node.text,
         url: node.metadata?.URL,
-      })) satisfies SourceNode[]
+      }))
 
       return [
         {
