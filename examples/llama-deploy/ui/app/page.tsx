@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useWorkflow } from '@llamaindex/chat-ui'
+import { useWorkflow, WorkflowEventType } from '@llamaindex/chat-ui'
 import {
   Select,
   SelectContent,
@@ -36,6 +36,14 @@ export default function Home() {
   const handleRetrieve = async () => {
     // AdhocEvent is defined in workflow definition
     await sendEvent({ type: 'adhoc_workflow.AdhocEvent' })
+  }
+
+  const handleContinue = async () => {
+    // ContinueEvent is defined in workflow definition
+    await sendEvent({
+      type: 'hitl_workflow.ContinueEvent',
+      data: { user_response: 'Please continue' },
+    })
   }
 
   const handleStop = async () => {
@@ -75,6 +83,7 @@ export default function Home() {
             <SelectContent>
               <SelectItem value="adhoc_workflow">Adhoc Workflow</SelectItem>
               <SelectItem value="echo_workflow">Echo Workflow</SelectItem>
+              <SelectItem value="hitl_workflow">HITL Workflow</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -153,6 +162,16 @@ export default function Home() {
             className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
           >
             Retrieve
+          </button>
+        )}
+        {workflow === 'hitl_workflow' && (
+          <button
+            type="button"
+            onClick={handleContinue}
+            disabled={status !== 'running'}
+            className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
+          >
+            Continue
           </button>
         )}
         <button
