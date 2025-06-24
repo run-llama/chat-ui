@@ -37,7 +37,7 @@ export default function Page(): JSX.Element {
 
   return (
     <div className="relative h-screen">
-      <div className="absolute right-6 top-6">
+      <div className="absolute left-6 top-6 z-10">
         <Select
           value={workflow}
           onValueChange={setWorkflow}
