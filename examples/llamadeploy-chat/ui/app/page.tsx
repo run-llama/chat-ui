@@ -91,7 +91,7 @@ function CustomChatMessages({
 }) {
   const { messages, isLoading, append } = useChatUI()
   const starterQuestions =
-    workflow === 'hitl_workflow' ? hitlStarterQuestions : chatStarterQuestions
+    workflow === 'cli_workflow' ? hitlStarterQuestions : chatStarterQuestions
   return (
     <ChatMessages>
       <ChatMessages.List className="px-4 py-6">
