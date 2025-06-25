@@ -42,7 +42,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
-      <h1 className="mb-6 text-2xl font-bold">Llama Deploy with Chat UI</h1>
+      <h1 className="mb-6 text-2xl font-bold">Llama-Deploy with useWorkflow</h1>
 
       {/* Workflow Switcher */}
       <div className="mb-4 flex items-center gap-4">

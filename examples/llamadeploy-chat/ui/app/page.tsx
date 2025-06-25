@@ -70,7 +70,10 @@ export default function Page(): JSX.Element {
         className="block h-screen flex-row gap-4 p-0 md:flex md:p-5"
       >
         <div className="md:max-w-1/2 mx-auto flex h-full min-w-0 max-w-full flex-1 flex-col gap-4">
-          <CustomChatMessages resume={handler.resume} workflow={workflow} />
+          <CustomChatMessages
+            resumeWorkflow={handler.resume}
+            workflow={workflow}
+          />
           <ChatInput />
         </div>
         <ChatCanvas className="w-full md:w-2/3" />
@@ -80,10 +83,10 @@ export default function Page(): JSX.Element {
 }
 
 function CustomChatMessages({
-  resume,
+  resumeWorkflow,
   workflow,
 }: {
-  resume: ChatWorkflowResume
+  resumeWorkflow: ChatWorkflowResume
   workflow: string
 }) {
   const { messages, isLoading, append } = useChatUI()
@@ -101,7 +104,7 @@ function CustomChatMessages({
           >
             <ChatMessage.Avatar />
             <ChatMessage.Content isLoading={isLoading} append={append}>
-              <CLIHumanInput resume={resume} />
+              <CLIHumanInput resumeWorkflow={resumeWorkflow} />
               <ChatMessage.Content.Markdown />
               <WeatherAnnotation />
               <ChatMessage.Content.Source />

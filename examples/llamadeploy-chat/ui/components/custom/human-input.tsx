@@ -19,22 +19,31 @@ type CLIHumanResponseData = {
 const CLI_HUMAN_INPUT_EVENT_TYPE = 'cli_workflow.CLIHumanInputEvent'
 const CLI_HUMAN_RESPONSE_EVENT_TYPE = 'cli_workflow.CLIHumanResponseEvent'
 
-export function CLIHumanInput({ resume }: { resume: ChatWorkflowResume }) {
+export function CLIHumanInput({
+  resumeWorkflow,
+}: {
+  resumeWorkflow: ChatWorkflowResume
+}) {
   const { message } = useChatMessage()
   const humanInputData = getAnnotationData<CLIHumanInputData>(
     message,
     CLI_HUMAN_INPUT_EVENT_TYPE
   )
   if (humanInputData.length === 0) return null
-  return <CLIHumanInputCard data={humanInputData[0]} resume={resume} />
+  return (
+    <CLIHumanInputCard
+      data={humanInputData[0]}
+      resumeWorkflow={resumeWorkflow}
+    />
+  )
 }
 
 function CLIHumanInputCard({
   data,
-  resume,
+  resumeWorkflow,
 }: {
   data: CLIHumanInputData
-  resume: ChatWorkflowResume
+  resumeWorkflow: ChatWorkflowResume
 }) {
   if (!data.command) return null
 
@@ -43,7 +52,7 @@ function CLIHumanInputCard({
       execute: true,
       command: data.command,
     }
-    await resume(CLI_HUMAN_RESPONSE_EVENT_TYPE, responseData)
+    await resumeWorkflow(CLI_HUMAN_RESPONSE_EVENT_TYPE, responseData)
   }
 
   const handleReject = async () => {
@@ -51,7 +60,7 @@ function CLIHumanInputCard({
       execute: false,
       command: data.command,
     }
-    await resume(CLI_HUMAN_RESPONSE_EVENT_TYPE, responseData)
+    await resumeWorkflow(CLI_HUMAN_RESPONSE_EVENT_TYPE, responseData)
   }
 
   return (
