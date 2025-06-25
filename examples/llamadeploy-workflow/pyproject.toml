@@ -1,9 +1,12 @@
 [project]
-name = "llama-deploy-chat-ui"
+name = "llama-deploy-workflows"
 version = "0.1.0"
-description = "Using LlamaDeploy with Chat UI"
+description = "Using LlamaDeploy with Workflow"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "fastapi[standard]>=0.115.12",
+    "llama-deploy",
 ]
+
+[tool.uv.sources]
+llama-deploy = { git = "https://github.com/run-llama/llama_deploy" }

@@ -27,7 +27,7 @@ The `useWorkflow` hook is a React hook provided by chat-ui that simplifies inter
 Both the SDK and the CLI are part of the LlamaDeploy Python package. To install, just run:
 
 ```bash
-pip install -U llama-deploy
+uv sync
 ```
 
 ## Running the Deployment
@@ -37,7 +37,7 @@ somewhere in the cloud, but to get started let's start an instance locally. Run 
 from a shell:
 
 ```
-$ python -m llama_deploy.apiserver
+$ uv run -m llama_deploy.apiserver
 INFO:     Started server process [10842]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
@@ -47,7 +47,7 @@ INFO:     Uvicorn running on http://0.0.0.0:4501 (Press CTRL+C to quit)
 From another shell, use the CLI, `llamactl`, to create the deployment:
 
 ```
-$ llamactl deploy llama_deploy.yml
+$ uv run llamactl deploy llama_deploy.yml
 Deployment successful: QuickStart
 ```
 
