@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useWorkflow } from '@llamaindex/chat-ui'
 
-const DEPLOYMENT_NAME = 'QuickStart'
+const DEPLOYMENT_NAME = 'workflow'
 const DEFAULT_WORKFLOW = 'adhoc_workflow'
 
 export default function Home() {

@@ -5,5 +5,5 @@ packages:
   - "docs"
 
   # UI will be built separately by llama-deploy server
-  - '!examples/llamadeploy-workflow/ui'
-  - '!examples/llamadeploy-chat/ui'
+  - "!examples/llamadeploy/workflow/ui"
+  - "!examples/llamadeploy/chat/ui"

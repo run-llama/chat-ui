@@ -1,4 +1,4 @@
-name: QuickStart
+name: chat
 
 control-plane:
   port: 8000
@@ -29,7 +29,7 @@ services:
       type: local
       name: src
     path: src/cli_workflow:workflow
-      
+
 ui:
   name: My Nextjs App
   port: 3000

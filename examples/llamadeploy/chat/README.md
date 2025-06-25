@@ -39,12 +39,12 @@ From another shell, use the CLI, `llamactl`, to create the deployment:
 
 ```
 $ uv run llamactl deploy llama_deploy.yml
-Deployment successful: QuickStart
+Deployment successful: chat
 ```
 
 ### UI Interface
 
-LlamaDeploy will serve the UI through the apiserver. Point the browser to [http://localhost:4501/deployments/QuickStart/ui](http://localhost:4501/deployments/QuickStart/ui) to interact
+LlamaDeploy will serve the UI through the apiserver. Point the browser to [http://localhost:4501/deployments/chat/ui](http://localhost:4501/deployments/chat/ui) to interact
 with your deployment through a user-friendly interface.
 
 ## Learn More

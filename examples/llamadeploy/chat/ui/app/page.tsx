@@ -22,7 +22,7 @@ import {
 import { useState } from 'react'
 import { StarterQuestions } from '@llamaindex/chat-ui/widgets'
 
-const DEPLOYMENT_NAME = 'QuickStart'
+const DEPLOYMENT_NAME = 'chat'
 const DEFAULT_WORKFLOW = 'chat_workflow'
 
 const chatStarterQuestions = [

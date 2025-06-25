@@ -1,4 +1,4 @@
-name: QuickStart
+name: workflow
 
 control-plane:
   port: 8000

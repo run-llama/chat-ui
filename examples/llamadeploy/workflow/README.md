@@ -36,13 +36,13 @@ From another shell, use the CLI, `llamactl`, to create the deployment:
 
 ```
 $ uv run llamactl deploy llama_deploy.yml
-Deployment successful: QuickStart
+Deployment successful: workflow
 ```
 
 ### UI Interface
 
 LlamaDeploy will serve the UI through via its apiserver.
-Point the browser to [http://localhost:4501/deployments/QuickStart/ui](http://localhost:4501/deployments/QuickStart/ui) to interact with your workflow through a user-friendly interface.
+Point the browser to [http://localhost:4501/deployments/workflow/ui](http://localhost:4501/deployments/workflow/ui) to interact with your workflow through a user-friendly interface.
 
 ## Learn More
 
