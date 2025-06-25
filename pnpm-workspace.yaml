@@ -2,5 +2,6 @@ packages:
   - "apps/*"
   - "packages/*"
   - "examples/**"
-  - '!examples/llama-deploy/ui'  # UI will be built separately by llama-deploy server
+  - '!examples/llamadeploy-workflow/ui'  # UI will be built separately by llama-deploy server
+  - '!examples/llamadeploy-chat/ui'  # UI will be built separately by llama-deploy server
   - "docs"
