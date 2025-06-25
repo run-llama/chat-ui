@@ -23,7 +23,7 @@ import { useState } from 'react'
 import { StarterQuestions } from '@llamaindex/chat-ui/widgets'
 
 const DEPLOYMENT_NAME = 'QuickStart'
-const DEFAULT_WORKFLOW = 'agent_workflow'
+const DEFAULT_WORKFLOW = 'chat_workflow'
 
 const chatStarterQuestions = [
   'What can you do?',
@@ -58,8 +58,8 @@ export default function Page(): JSX.Element {
             <SelectValue placeholder="Select workflow" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="agent_workflow">Agent Workflow</SelectItem>
             <SelectItem value="chat_workflow">Chat Workflow</SelectItem>
+            <SelectItem value="agent_workflow">Agent Workflow</SelectItem>
             <SelectItem value="cli_workflow">CLI HITL Workflow</SelectItem>
           </SelectContent>
         </Select>
