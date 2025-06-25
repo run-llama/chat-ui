@@ -3,21 +3,9 @@ name: QuickStart
 control-plane:
   port: 8000
 
-default-service: echo_workflow
+default-service: chat_workflow
 
 services:
-  echo_workflow:
-    name: Echo Workflow
-    source:
-      type: local
-      name: src
-    path: src/echo_workflow:workflow
-  adhoc_workflow:
-    name: Adhoc Workflow
-    source:
-      type: local
-      name: src
-    path: src/adhoc_workflow:workflow
   chat_workflow:
     name: Chat Workflow
     source:
@@ -34,12 +22,6 @@ services:
     path: src/agent_workflow:workflow
     python-dependencies:
       - llama-index-llms-openai>=0.4.5
-  hitl_workflow:
-    name: HITL Workflow
-    source:
-      type: local
-      name: src
-    path: src/hitl_workflow:workflow
   cli_workflow:
     name: CLI Workflow
     source:

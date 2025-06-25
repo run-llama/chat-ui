@@ -1,100 +1,122 @@
 'use client'
 
-import Link from 'next/link'
+import {
+  ChatCanvas,
+  ChatInput,
+  ChatMessage,
+  ChatMessages,
+  ChatSection,
+  ChatWorkflowResume,
+  useChatUI,
+  useChatWorkflow,
+} from '@llamaindex/chat-ui'
+import { WeatherAnnotation } from '@/components/custom/custom-weather'
+import { CLIHumanInput } from '@/components/custom/human-input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useState } from 'react'
+import { StarterQuestions } from '@llamaindex/chat-ui/widgets'
 
-export default function Home() {
+const DEPLOYMENT_NAME = 'QuickStart'
+const DEFAULT_WORKFLOW = 'chat_workflow'
+
+const chatStarterQuestions = [
+  'What can you do?',
+  'Write a poem about the weather',
+]
+
+const hitlStarterQuestions = [
+  'List all files in the current directory',
+  'Check status of the git repository',
+]
+
+export default function Page(): JSX.Element {
+  const [workflow, setWorkflow] = useState(DEFAULT_WORKFLOW)
+
+  const handler = useChatWorkflow({
+    deployment: DEPLOYMENT_NAME,
+    workflow,
+    onError: error => {
+      console.error(error)
+    },
+  })
+
   return (
-    <div className="mx-auto h-screen w-full max-w-4xl px-4 py-8">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">
-          Llama Deploy with Chat UI
-        </h1>
-        <p className="mb-8 text-lg text-gray-600">
-          A demonstration of LlamaIndex Chat UI components integrated with Llama
-          Deploy workflows
-        </p>
-      </div>
-
-      {/* Navigation Cards */}
-      <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Link
-          href="/workflow"
-          className="group rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-500 hover:shadow-lg"
+    <div className="relative h-screen">
+      <div className="absolute left-6 top-6 z-10">
+        <Select
+          value={workflow}
+          onValueChange={setWorkflow}
+          disabled={handler.isLoading}
         >
-          <div className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-blue-600">
-            ⚙️ Workflow Demo - useWorkflow
-          </div>
-          <p className="text-gray-600">
-            Manage and interact with Llama Deploy workflows directly
-          </p>
-        </Link>
-
-        <Link
-          href="/chat"
-          className="group rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-500 hover:shadow-lg"
-        >
-          <div className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-blue-600">
-            💬 Chat Demo - useChatWorkflow
-          </div>
-          <p className="text-gray-600">
-            Interactive chat interface using the LlamaIndex Chat UI components
-          </p>
-        </Link>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select workflow" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="chat_workflow">Chat Workflow</SelectItem>
+            <SelectItem value="cli_workflow">CLI HITL Workflow</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Documentation & Resources */}
-      <div className="rounded-lg bg-gray-50 p-6">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-900">
-          Documentation & Resources
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <h3 className="mb-2 font-semibold text-gray-800">
-              📚 Chat UI Documentation
-            </h3>
-            <a
-              href="https://ui.llamaindex.ai/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              https://ui.llamaindex.ai/ →
-            </a>
-            <p className="mt-1 text-sm text-gray-600">
-              Complete documentation for LlamaIndex Chat UI components, hooks,
-              and examples
-            </p>
-          </div>
-
-          <div>
-            <h3 className="mb-2 font-semibold text-gray-800">💻 Source Code</h3>
-            <a
-              href="https://github.com/run-llama/chat-ui/tree/main/examples/llama-deploy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              https://github.com/run-llama/chat-ui/tree/main/examples/llama-deploy
-              →
-            </a>
-            <p className="mt-1 text-sm text-gray-600">
-              Full source code for this Llama Deploy + Chat UI integration
-              example
-            </p>
-          </div>
+      <ChatSection
+        handler={handler}
+        className="block h-screen flex-row gap-4 p-0 md:flex md:p-5"
+      >
+        <div className="md:max-w-1/2 mx-auto flex h-full min-w-0 max-w-full flex-1 flex-col gap-4">
+          <CustomChatMessages resume={handler.resume} workflow={workflow} />
+          <ChatInput />
         </div>
-
-        <div className="mt-6 rounded-md bg-blue-50 p-4">
-          <h3 className="mb-2 font-semibold text-blue-900">🚀 Quick Start</h3>
-          <p className="text-sm text-blue-800">
-            Install the Chat UI components in your own project:
-          </p>
-          <code className="mt-2 block rounded bg-blue-100 p-2 text-sm text-blue-900">
-            npm install @llamaindex/chat-ui
-          </code>
-        </div>
-      </div>
+        <ChatCanvas className="w-full md:w-2/3" />
+      </ChatSection>
     </div>
+  )
+}
+
+function CustomChatMessages({
+  resume,
+  workflow,
+}: {
+  resume: ChatWorkflowResume
+  workflow: string
+}) {
+  const { messages, isLoading, append } = useChatUI()
+  const starterQuestions =
+    workflow === DEFAULT_WORKFLOW ? chatStarterQuestions : hitlStarterQuestions
+  return (
+    <ChatMessages>
+      <ChatMessages.List className="px-4 py-6">
+        {messages.map((message, index) => (
+          <ChatMessage
+            key={index}
+            message={message}
+            isLast={index === messages.length - 1}
+            className="mb-4"
+          >
+            <ChatMessage.Avatar />
+            <ChatMessage.Content isLoading={isLoading} append={append}>
+              <CLIHumanInput resume={resume} />
+              <ChatMessage.Content.Markdown />
+              <WeatherAnnotation />
+              <ChatMessage.Content.Source />
+            </ChatMessage.Content>
+            <ChatMessage.Actions />
+          </ChatMessage>
+        ))}
+        <ChatMessages.Empty
+          heading="LlamaDeploy with Chat UI Example"
+          subheading="Demo using useChatWorkflow hook"
+        />
+        <ChatMessages.Loading />
+      </ChatMessages.List>
+      {messages.length === 0 && (
+        <StarterQuestions questions={starterQuestions} append={append} />
+      )}
+    </ChatMessages>
   )
 }
