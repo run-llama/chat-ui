@@ -2,17 +2,16 @@
 
 This example demonstrates how to use the **chat-ui** library to create a custom chat interface for workflows deployed with [LlamaDeploy](https://github.com/run-llama/llama_deploy).
 
-LlamaDeploy is a system for deploying and managing LlamaIndex workflows as microservices. This example shows how you can build a React-based chat interface that connects to and interacts with your deployed workflows using the `useChatWorkflow` hook.
+LlamaDeploy is a system for deploying and managing LlamaIndex workflows. This example shows how you can build a React-based chat interface using Chat UI components that connect with your deployed workflow using the [`useChatWorkflow`](../../docs/chat-ui/hooks.mdx#usechatworkflow) hook.
 
-## useChatWorkflow Hook
+## Key Features
 
-The `useChatWorkflow` hook is a specialized version of `useWorkflow` designed specifically for chat interfaces. It provides a chat-compatible API that integrates seamlessly with chat components while handling workflow communication in the background.
+- Multiple examples of workflows:
+  - [Custom Chat Workflow](src/chat_workflow.py)
+  - [Agent Workflow](src/agent_workflow.py)
+  - [Human in the Loop Workflow](src/cli_workflow.py)
 
-### Key Features:
-
-- **Chat Interface**: Provides standard chat interface methods (`append`, `reload`, `stop`)
-- **Message Management**: Automatically manages chat messages and conversation history
-- **Event Processing**: Converts workflow events into chat messages and annotations
+Test the workflows by selecting one of them in the UI. The custom chat workflow is most sophisticated, as it supports sending annotations to the chat messages by sending specific events.
 
 ## Installation
 
@@ -45,92 +44,12 @@ Deployment successful: QuickStart
 
 ### UI Interface
 
-LlamaDeploy will serve the UI through the apiserver, at the address `http://localhost:4501/ui/<deployment name>`. In
-this case, point the browser to [http://localhost:4501/deployments/QuickStart/ui](http://localhost:4501/deployments/QuickStart/ui) to interact
+LlamaDeploy will serve the UI through the apiserver. Point the browser to [http://localhost:4501/deployments/QuickStart/ui](http://localhost:4501/deployments/QuickStart/ui) to interact
 with your deployment through a user-friendly interface.
-
-### Workflow Events
-
-Your LlamaDeploy workflows can send three main types of events to enhance the chat experience:
-
-#### 1. SourceNodesEvent - Citations and References
-
-Send source nodes to display citations and references for generated content:
-
-```python
-from llama_index.server.models import SourceNodesEvent
-from llama_index.core.schema import NodeWithScore
-from llama_index.core.data_structs import Node
-
-ctx.write_event_to_stream(
-    SourceNodesEvent(
-        nodes=[
-            NodeWithScore(
-                node=Node(
-                    text="sample node content",
-                    metadata={"URL": "https://example.com/document.pdf"},
-                ),
-                score=0.8,
-            ),
-        ],
-    )
-)
-```
-
-#### 2. ArtifactEvent - Code and Artifacts
-
-Send code snippets, documents, or other artifacts that can be displayed in a dedicated canvas:
-
-```python
-from llama_index.server.models import ArtifactEvent
-import time
-
-ctx.write_event_to_stream(
-    ArtifactEvent(
-        data={
-            "type": "code",
-            "created_at": int(time.time()),
-            "data": {
-                "language": "typescript",
-                "file_name": "example.ts",
-                "code": 'console.log("Hello, world!");',
-            },
-        }
-    )
-)
-```
-
-#### 3. UIEvent - Custom UI Components
-
-Send custom data to render specialized UI components:
-
-```python
-from llama_index.server.models import UIEvent
-from pydantic import BaseModel
-
-class WeatherData(BaseModel):
-    location: str
-    temperature: float
-    condition: str
-    humidity: int
-    windSpeed: int
-
-weather_data = WeatherData(
-    location="San Francisco, CA",
-    temperature=22,
-    condition="sunny",
-    humidity=65,
-    windSpeed=12,
-)
-
-ctx.write_event_to_stream(
-    UIEvent(type="weather", data=weather_data)
-)
-```
-
-These events will be automatically processed by `useChatWorkflow` and rendered as annotations in the chat interface.
 
 ## Learn More
 
+- [useChatWorkflow Hook](../../docs/chat-ui/hooks.mdx#usechatworkflow)
+- [useWorkflow Hook](../../docs/chat-ui/hooks.mdx#useworkflow)
 - [LlamaDeploy GitHub Repository](https://github.com/run-llama/llama_deploy)
 - [Chat-UI Documentation](../../docs/chat-ui/)
