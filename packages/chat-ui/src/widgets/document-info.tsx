@@ -14,6 +14,7 @@ import { DocxIcon } from '../ui/icons/docx'
 import { PDFIcon } from '../ui/icons/pdf'
 import { SheetIcon } from '../ui/icons/sheet'
 import { TxtIcon } from '../ui/icons/txt'
+import { JSONValue } from '../chat/chat.interface'
 
 export type DocumentFile = {
   id: string
@@ -26,7 +27,7 @@ export type DocumentFile = {
 
 export type SourceNode = {
   id: string
-  metadata: Record<string, unknown>
+  metadata: Record<string, JSONValue>
   score?: number
   text: string
   url?: string
