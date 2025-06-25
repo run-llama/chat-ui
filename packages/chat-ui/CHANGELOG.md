@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.10
+
+### Patch Changes
+
+- b15d152: feat: useChatWorkflow
+
 ## 0.5.9
 
 ### Patch Changes
