@@ -405,27 +405,30 @@ function SafeHookUsage() {
 
 ### useWorkflow
 
-Manage LlamaIndex workflow sessions, send events, and handle streaming responses.
+Manages LlamaIndex workflows that are deployed on [LlamaDeploy](https://github.com/run-llama/llama_deploy). Start new instances, send events, and handle streamed event responses. Key features:
+
+- **Client Management**: Automatically creates and manages the LlamaDeploy client connection
+- **Run Lifecycle**: Creates and manages workflow runs
+- **Event Streaming**: Real-time streaming of workflow events
+- **State Management**: Tracks workflow status (running, complete, error) and event history
+- **Error Handling**: Provides callbacks for handling errors and stop events
+
+To get started, you need a deployment with a workflow running. You can create a deployment with a workflow by following the [LlamaDeploy documentation](https://docs.llamaindex.ai/en/stable/module_guides/llama_deploy/).
+
+To create the hook, you'll pass the `baseUrl` of the LlamaDeploy server, the `deployment` and `workflow` name to the `useWorkflow` hook. Here's an example file:
 
 ```tsx
 import { useWorkflow } from '@llamaindex/chat-ui'
 
 function WorkflowComponent() {
-  const {
-    runId,
-    start,
-    stop,
-    sendEvent,
-    events,
-    status,
-  } = useWorkflow({
+  const { runId, start, stop, sendEvent, events, status } = useWorkflow({
     baseUrl: 'http://localhost:8000',
     deployment: 'my-deployment',
     workflow: 'my-workflow',
-    onStopEvent: (event) => {
+    onStopEvent: event => {
       console.log('Workflow stopped:', event)
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Workflow error:', error)
     },
   })
@@ -437,7 +440,7 @@ function WorkflowComponent() {
   const handleSendCustomEvent = async () => {
     await sendEvent({
       type: 'workflow.ProgressEvent',
-      data: { custom: 'data' }
+      data: { custom: 'data' },
     })
   }
 
@@ -478,7 +481,7 @@ function WorkflowComponent() {
 
 - `baseUrl` - Base URL for the workflow API (optional)
 - `deployment` - Name of the registered deployment
-- `workflow` - Set the service to run - if not set uses the default workflow (optional)
+- `workflow` - Set the workflow to run - if not set uses the default workflow (optional)
 - `runId` - Optional run ID for resuming a previous workflow run
 - `onStopEvent` - Callback when workflow receives a stop event
 - `onError` - Error callback for workflow errors
@@ -486,20 +489,28 @@ function WorkflowComponent() {
 **Returned Properties:**
 
 - `runId` - Current workflow run ID
-- `start` - Function to start a new workflow with initial event data
-- `stop` - Function to send stop event to current workflow
-- `sendEvent` - Function to send custom events to the workflow
-- `events` - Array of all received workflow events
+- `sendEvent` - Function to send events of type `WorkflowEvent` to the workflow. Just pass the event object with the `type` and `data` fields as parameter.
+- `start` - Function to start a new workflow. This is sending a `StartEvent` besides starting the workflow run, so you pass the `data` object for the `StartEvent` as parameter.
+- `stop` - Function to send stop event to current workflow. This is sending a `StopEvent` besides stopping the workflow run, so you pass the `data` object for the `StopEvent` as parameter.
+- `events` - Array of all received workflow events of type `WorkflowEvent`
 - `status` - Current workflow run status ('idle' | 'running' | 'complete' | 'error')
 
 **Workflow Event Types:**
 
+A workflow event is identified by its `type` and can have optional `data` associated with it carrying any JSON-serializable data:
+
 ```tsx
 interface WorkflowEvent {
   type: string
-  data?: any
+  data?: JSONValue | undefined
 }
+```
 
+The `type` field is the fully qualified name of the event type in Python.
+
+There are a few built-in event types that you can use with the `type` field:
+
+```tsx
 // Built-in event types
 enum WorkflowEventType {
   StartEvent = 'llama_index.core.workflow.events.StartEvent',
@@ -516,7 +527,7 @@ function ResumeWorkflowComponent() {
   const workflow = useWorkflow({
     deployment: 'my-deployment',
     runId: 'existing-run-id', // Resume existing task
-    onStopEvent: (event) => {
+    onStopEvent: event => {
       console.log('Workflow completed:', event)
     },
   })
@@ -551,7 +562,7 @@ function CustomWorkflowComponent() {
   const workflow = useWorkflow<CustomWorkflowEvent>({
     deployment: 'progress-deployment',
     workflow: 'progress-workflow',
-    onStopEvent: (event) => {
+    onStopEvent: event => {
       if (event.type === 'workflow.ResultEvent') {
         console.log('Final result:', event.data.result)
       }
@@ -561,7 +572,8 @@ function CustomWorkflowComponent() {
   const progressEvents = workflow.events.filter(
     e => e.type === 'workflow.ProgressEvent'
   )
-  const latestProgress = progressEvents[progressEvents.length - 1]?.data?.progress || 0
+  const latestProgress =
+    progressEvents[progressEvents.length - 1]?.data?.progress || 0
 
   return (
     <div>
@@ -571,3 +583,167 @@ function CustomWorkflowComponent() {
   )
 }
 ```
+
+### useChatWorkflow
+
+The `useChatWorkflow` hook is a specialized version extending the `useWorkflow` designed specifically for chat interfaces. It is used for building chat interfaces for workflows running on [LlamaDeploy](https://github.com/run-llama/llama_deploy).
+It returns a `ChatHandler`, so that it works seamlessly with the chat-ui chat components. Therefore, it is also a drop-in replacement for the [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat#usechat) hook from Vercel AI.
+
+Here's an example of how to use it:
+
+```tsx
+import {
+  ChatSection,
+  ChatMessages,
+  ChatMessage,
+  ChatInput,
+  useChatWorkflow,
+} from '@llamaindex/chat-ui'
+
+function WorkflowChatApp() {
+  const handler = useChatWorkflow({
+    baseUrl: 'http://localhost:4501',
+    deployment: 'my-deployment',
+    workflow: 'chat-workflow',
+    onError: error => console.error(error),
+  })
+
+  return (
+    <ChatSection handler={handler}>
+      <ChatMessages>
+        <ChatMessages.List>
+          {handler.messages.map((message, index) => (
+            <ChatMessage
+              key={index}
+              message={message}
+              isLast={index === handler.messages.length - 1}
+            >
+              <ChatMessage.Avatar />
+              <ChatMessage.Content>
+                <ChatMessage.Content.Markdown />
+                <ChatMessage.Content.Source />
+                {/* Custom annotations for UIEvents */}
+                <WeatherAnnotation />
+              </ChatMessage.Content>
+              <ChatMessage.Actions />
+            </ChatMessage>
+          ))}
+        </ChatMessages.List>
+      </ChatMessages>
+      <ChatInput />
+    </ChatSection>
+  )
+}
+```
+
+**Parameters:**
+
+- `baseUrl` - Base URL for the workflow API (optional)
+- `deployment` - Name of the registered deployment
+- `workflow` - Set the workflow to run - if not set uses the default workflow (optional)
+- `onError` - Error callback for workflow errors
+
+#### Chat Workflows
+
+To be used as a chat workflow, your workflows need to follow the same calling convention as a [Agent Workflow](https://docs.llamaindex.ai/en/stable/understanding/agent) - that's why Agent Workflows are working out of the box with the `useChatWorkflow` hook.
+
+Your workflow will be executed once for each chat request with the following input parameters included in workflow's `StartEvent`:
+
+- `user_msg` [str]: The current user message
+- `chat_history` [list[[ChatMessage](https://docs.llamaindex.ai/en/stable/api_reference/prompts/#llama_index.core.prompts.ChatMessage)]]: All the previous messages of the conversation
+
+Example:
+
+```python
+@step
+def handle_start_event(ev: StartEvent) -> MyNextEvent:
+    user_msg = ev.user_msg
+    chat_history = ev.chat_history
+    ...
+```
+
+#### Built-in Workflow Events
+
+The hook automatically processes workflow events (using `useWorkflow`) and renders them as annotations in the chat interface, making it easy to build rich conversational experiences with LlamaDeploy workflows.
+Your LlamaDeploy workflows can send three main types of events to enhance the chat experience:
+
+##### 1. SourceNodesEvent - Citations and References
+
+Send source nodes to display citations and references for generated content:
+
+```python
+from llama_index.server.models import SourceNodesEvent
+from llama_index.core.schema import NodeWithScore
+from llama_index.core.data_structs import Node
+
+ctx.write_event_to_stream(
+    SourceNodesEvent(
+        nodes=[
+            NodeWithScore(
+                node=Node(
+                    text="sample node content",
+                    metadata={"URL": "https://example.com/document.pdf"},
+                ),
+                score=0.8,
+            ),
+        ],
+    )
+)
+```
+
+> Note: Your `ChatMessage.Content` component needs to have the `ChatMessage.Content.Source` component as a child to display the citations and references (as shown in the example above).
+
+##### 2. ArtifactEvent - Code and Artifacts
+
+Send code snippets, documents, or other artifacts that can be displayed in a dedicated canvas:
+
+```python
+from llama_index.server.models import ArtifactEvent
+import time
+
+ctx.write_event_to_stream(
+    ArtifactEvent(
+        data={
+            "type": "code",
+            "created_at": int(time.time()),
+            "data": {
+                "language": "typescript",
+                "file_name": "example.ts",
+                "code": 'console.log("Hello, world!");',
+            },
+        }
+    )
+)
+```
+
+> Note: Your `ChatMessage.Content` component needs to have the `ChatMessage.Content.Markdown` component as a child to display the artifacts inline in the markdown component (as shown in the example above).
+
+##### 3. UIEvent - Custom UI Components
+
+Send custom data to render it in a specialized UI components. In your workflow code, you can send `UIEvent`s for this - for example to render a weather annotation in the chat interface:
+
+```python
+from llama_index.server.models import UIEvent
+from pydantic import BaseModel
+
+class WeatherData(BaseModel):
+    location: str
+    temperature: float
+    condition: str
+    humidity: int
+    windSpeed: int
+
+weather_data = WeatherData(
+    location="San Francisco, CA",
+    temperature=22,
+    condition="sunny",
+    humidity=65,
+    windSpeed=12,
+)
+
+ctx.write_event_to_stream(
+    UIEvent(type="weather", data=weather_data)
+)
+```
+
+To render this custom UI component, you need to add it as child to your `ChatMessage.Content` component. The example above will render the [`WeatherAnnotation`](../../examples/llamadeploy-chat/ui/components/custom/custom-weather.tsx) component in the chat interface.

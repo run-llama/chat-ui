@@ -13,6 +13,7 @@ export interface WorkflowHookParams<E extends WorkflowEvent = WorkflowEvent> {
   deployment: string // Name of the registered deployment
   runId?: string // Optional task ID for resuming a workflow task
   workflow?: string // Set the default service to run
+  onData?: (event: WorkflowEvent) => void
   onStopEvent?: (event: E) => void
   onError?: (error: any) => void
 }
@@ -37,6 +38,10 @@ export type WorkflowTask = TaskDefinition & {
 export enum WorkflowEventType {
   StartEvent = 'llama_index.core.workflow.events.StartEvent',
   StopEvent = 'llama_index.core.workflow.events.StopEvent',
+  AgentStream = 'llama_index.core.agent.workflow.workflow_events.AgentStream',
+  SourceNodesEvent = 'llama_index.server.models.source_nodes.SourceNodesEvent',
+  ArtifactEvent = 'llama_index.server.models.artifacts.ArtifactEvent',
+  UIEvent = 'llama_index.server.models.ui.UIEvent',
 }
 
 export interface StreamingEventCallback<

@@ -8,8 +8,8 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'LlamaDeploy with Chat UI',
-  description: 'Chat UI Example for LlamaDeploy',
+  title: 'LlamaDeploy with useWorkflow',
+  description: 'useWorkflow Example for LlamaDeploy',
 }
 
 export default function RootLayout({

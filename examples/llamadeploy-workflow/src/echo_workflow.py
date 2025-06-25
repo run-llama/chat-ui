@@ -19,8 +19,8 @@ class EchoWorkflow(Workflow):
     async def run_step(self, ctx: Context, ev: StartEvent) -> StopEvent:
         message = str(ev.get("message", ""))
 
-        # Loop, increase the counter to 10 and show it in UI
-        for i in range(10):
+        # Loop, increase the counter to 5 and show it in UI
+        for i in range(5):
             ctx.write_event_to_stream(UIEvent(data={"counter": i}))
             await ctx.set("counter", i + 1)
             await asyncio.sleep(1)
