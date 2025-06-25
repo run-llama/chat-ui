@@ -1,99 +1,187 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { useWorkflow } from '@llamaindex/chat-ui'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+const DEPLOYMENT_NAME = 'QuickStart'
+const DEFAULT_WORKFLOW = 'adhoc_workflow'
 
 export default function Home() {
+  const [userInput, setUserInput] = useState('Please run task')
+  const [workflow, setWorkflow] = useState(DEFAULT_WORKFLOW)
+
+  const { runId, start, stop, sendEvent, events, status } = useWorkflow({
+    deployment: DEPLOYMENT_NAME,
+    workflow,
+    onStopEvent: event => {
+      console.log('Stop event:', event)
+    },
+    onError: error => {
+      console.error('Error:', error)
+    },
+  })
+
+  const handleStart = async () => {
+    await start({ message: userInput })
+  }
+
+  const handleRetrieve = async () => {
+    // AdhocEvent is defined in workflow definition
+    await sendEvent({ type: 'adhoc_workflow.AdhocEvent' })
+  }
+
+  const handleContinue = async () => {
+    // ContinueEvent is defined in workflow definition
+    await sendEvent({
+      type: 'hitl_workflow.ContinueEvent',
+      data: { user_response: 'Please continue' },
+    })
+  }
+
+  const handleStop = async () => {
+    await stop()
+  }
+
+  const handleWorkflowSwitch = (value: string) => {
+    setWorkflow(value)
+  }
+
   return (
-    <div className="mx-auto h-screen w-full max-w-4xl px-4 py-8">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">
-          Llama Deploy with Chat UI
-        </h1>
-        <p className="mb-8 text-lg text-gray-600">
-          A demonstration of LlamaIndex Chat UI components integrated with Llama
-          Deploy workflows
-        </p>
-      </div>
-
-      {/* Navigation Cards */}
-      <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Link
-          href="/workflow"
-          className="group rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-500 hover:shadow-lg"
-        >
-          <div className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-blue-600">
-            ⚙️ Workflow Demo - useWorkflow
-          </div>
-          <p className="text-gray-600">
-            Manage and interact with Llama Deploy workflows directly
-          </p>
-        </Link>
-
+    <div className="mx-auto h-screen w-full max-w-4xl px-4 py-4">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Llama Deploy with Chat UI</h1>
         <Link
           href="/chat"
-          className="group rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-500 hover:shadow-lg"
+          className="rounded bg-blue-500 px-4 py-1 text-white hover:bg-blue-600"
         >
-          <div className="mb-2 text-xl font-semibold text-gray-900 group-hover:text-blue-600">
-            💬 Chat Demo - useChatWorkflow
-          </div>
-          <p className="text-gray-600">
-            Interactive chat interface using the LlamaIndex Chat UI components
-          </p>
+          Go to Chat Demo
         </Link>
       </div>
 
-      {/* Documentation & Resources */}
-      <div className="rounded-lg bg-gray-50 p-6">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-900">
-          Documentation & Resources
-        </h2>
+      {/* Workflow Switcher */}
+      <div className="mb-4 flex items-center gap-4">
+        <label htmlFor="workflow-select" className="font-medium">
+          Workflow:
+        </label>
+        <div className="ml-auto">
+          <Select
+            value={workflow}
+            onValueChange={handleWorkflowSwitch}
+            disabled={status === 'running'}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select workflow" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="adhoc_workflow">Adhoc Workflow</SelectItem>
+              <SelectItem value="echo_workflow">Echo Workflow</SelectItem>
+              <SelectItem value="hitl_workflow">HITL Workflow</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
-        <div className="space-y-4">
+      {/* Status Panel */}
+      <div className="mb-6 rounded-lg bg-gray-100 p-4">
+        <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <h3 className="mb-2 font-semibold text-gray-800">
-              📚 Chat UI Documentation
-            </h3>
-            <a
-              href="https://ui.llamaindex.ai/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              https://ui.llamaindex.ai/ →
-            </a>
-            <p className="mt-1 text-sm text-gray-600">
-              Complete documentation for LlamaIndex Chat UI components, hooks,
-              and examples
-            </p>
+            <strong>Workflow:</strong> {workflow}
           </div>
 
           <div>
-            <h3 className="mb-2 font-semibold text-gray-800">💻 Source Code</h3>
-            <a
-              href="https://github.com/run-llama/chat-ui/tree/main/examples/llama-deploy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 hover:underline"
+            <strong>Run ID:</strong> {runId || 'Not created'}
+          </div>
+
+          <div>
+            <strong>Event Count:</strong> {events.length}
+          </div>
+          <div>
+            <strong>Run Status:</strong>{' '}
+            <span
+              className={`text-sm ${
+                status === 'idle' || !status
+                  ? 'text-gray-500'
+                  : status === 'complete'
+                    ? 'text-green-500'
+                    : status === 'error'
+                      ? 'text-red-500'
+                      : status === 'running'
+                        ? 'text-yellow-500'
+                        : ''
+              }`}
             >
-              https://github.com/run-llama/chat-ui/tree/main/examples/llama-deploy
-              →
-            </a>
-            <p className="mt-1 text-sm text-gray-600">
-              Full source code for this Llama Deploy + Chat UI integration
-              example
-            </p>
+              {status}
+            </span>
           </div>
         </div>
+      </div>
 
-        <div className="mt-6 rounded-md bg-blue-50 p-4">
-          <h3 className="mb-2 font-semibold text-blue-900">🚀 Quick Start</h3>
-          <p className="text-sm text-blue-800">
-            Install the Chat UI components in your own project:
-          </p>
-          <code className="mt-2 block rounded bg-blue-100 p-2 text-sm text-blue-900">
-            npm install @llamaindex/chat-ui
-          </code>
-        </div>
+      {/* Events Interface */}
+      <div className="mb-4 h-96 overflow-auto rounded border bg-white p-4">
+        <h3 className="mb-2 font-semibold">Events</h3>
+        {events.map((event, index) => (
+          <div key={index} className="mb-2 ml-4 text-sm text-blue-600">
+            Event {index + 1}: {JSON.stringify(event)}
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={userInput}
+          onChange={e => {
+            setUserInput(e.target.value)
+          }}
+          className="flex-1 rounded border border-gray-300 p-2"
+          placeholder="Type your message..."
+          disabled={status === 'running'}
+        />
+        <button
+          type="button"
+          onClick={handleStart}
+          disabled={status === 'running'}
+          className="rounded-full bg-green-500 px-6 py-2 text-white shadow-2xl hover:bg-green-600 disabled:opacity-50"
+        >
+          Start
+        </button>
+        {workflow === 'adhoc_workflow' && (
+          <button
+            type="button"
+            onClick={handleRetrieve}
+            disabled={status !== 'running'}
+            className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
+          >
+            Retrieve
+          </button>
+        )}
+        {workflow === 'hitl_workflow' && (
+          <button
+            type="button"
+            onClick={handleContinue}
+            disabled={status !== 'running'}
+            className="rounded-full bg-yellow-500 px-6 py-2 text-white shadow-2xl hover:bg-yellow-600 disabled:opacity-50"
+          >
+            Continue
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={handleStop}
+          disabled={status !== 'running'}
+          className="rounded-full bg-red-500 px-6 py-2 text-white shadow-2xl hover:bg-red-600 disabled:opacity-50"
+        >
+          Stop
+        </button>
       </div>
     </div>
   )
