@@ -217,7 +217,10 @@ export default function Page(): JSX.Element {
                       npx shadcn@latest add https://ui.llamaindex.ai/r/chat.json
                     </code>
                     <div className="absolute right-4 top-4">
-                      <button className="rounded-lg bg-white/10 p-2 text-white transition-colors hover:bg-white/20">
+                      <button
+                        type="button"
+                        className="rounded-lg bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                      >
                         <svg
                           className="h-4 w-4"
                           fill="none"
@@ -251,7 +254,10 @@ export default function Page(): JSX.Element {
                       npm install @llamaindex/chat-ui
                     </code>
                     <div className="absolute right-4 top-4">
-                      <button className="rounded-lg bg-white/10 p-2 text-white transition-colors hover:bg-white/20">
+                      <button
+                        type="button"
+                        className="rounded-lg bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                      >
                         <svg
                           className="h-4 w-4"
                           fill="none"
