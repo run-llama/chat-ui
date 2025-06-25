@@ -59,6 +59,7 @@ export default function Page(): JSX.Element {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="chat_workflow">Chat Workflow</SelectItem>
+            <SelectItem value="agent_workflow">Agent Workflow</SelectItem>
             <SelectItem value="cli_workflow">CLI HITL Workflow</SelectItem>
           </SelectContent>
         </Select>
@@ -87,7 +88,7 @@ function CustomChatMessages({
 }) {
   const { messages, isLoading, append } = useChatUI()
   const starterQuestions =
-    workflow === DEFAULT_WORKFLOW ? chatStarterQuestions : hitlStarterQuestions
+    workflow === 'hitl_workflow' ? hitlStarterQuestions : chatStarterQuestions
   return (
     <ChatMessages>
       <ChatMessages.List className="px-4 py-6">
