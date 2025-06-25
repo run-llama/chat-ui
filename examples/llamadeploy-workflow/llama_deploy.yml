@@ -18,7 +18,7 @@ services:
       type: local
       name: src
     path: src/adhoc_workflow:workflow
-      
+
 ui:
   name: My Nextjs App
   port: 3000
