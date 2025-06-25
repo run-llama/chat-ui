@@ -18,12 +18,6 @@ services:
       type: local
       name: src
     path: src/adhoc_workflow:workflow
-  hitl_workflow:
-    name: HITL Workflow
-    source:
-      type: local
-      name: src
-    path: src/hitl_workflow:workflow
       
 ui:
   name: My Nextjs App
