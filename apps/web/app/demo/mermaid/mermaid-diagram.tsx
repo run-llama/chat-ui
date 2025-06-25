@@ -144,7 +144,7 @@ const MermaidDiagram: React.FC<LanguageRendererProps> = ({
         className="flex justify-center p-4"
         style={{ minHeight: '2.5rem' }}
       >
-        {error && (
+        {error ? (
           <div
             style={{
               color: 'red',
@@ -155,7 +155,7 @@ const MermaidDiagram: React.FC<LanguageRendererProps> = ({
           >
             Mermaid render error: {error}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
