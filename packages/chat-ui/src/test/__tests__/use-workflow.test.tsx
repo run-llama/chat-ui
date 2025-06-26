@@ -51,16 +51,17 @@ describe('useWorkflow', () => {
   })
 
   describe('Starting workflow', () => {
-    it('should set status to running immediately after start() is called', async () => {
+    it('should set status to running after task created', async () => {
       const originalHandlers = [...server.listHandlers()]
-
+      let resolve: () => void = () => {} // eslint-disable-line @typescript-eslint/no-empty-function -- empty until set by Promise
       try {
         server.use(
           http.get(
             'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-run-id/events',
             () => {
-              return new Promise(() => {
-                // This promise never resolves, simulating a long running task with no events
+              return new Promise(resolver => {
+                // simulating a long running task with no events
+                resolve = resolver
               })
             }
           )
@@ -78,6 +79,10 @@ describe('useWorkflow', () => {
           expect(result.current.runId).toBe('test-run-id')
           // should set to running despite no events received
           expect(result.current.status).toBe('running')
+        })
+        resolve()
+        await waitFor(() => {
+          expect(result.current.status).toBe('complete')
         })
       } finally {
         server.resetHandlers(...originalHandlers)
@@ -151,6 +156,48 @@ describe('useWorkflow', () => {
         expect(result.current.runId).toBe('test-existing-run-id')
         expect(result.current.status).toBe('complete')
       })
+    })
+
+    it('should set status to running immediately when reconnecting to existing task', async () => {
+      const originalHandlers = [...server.listHandlers()]
+      let resolve: () => void = () => {} // eslint-disable-line @typescript-eslint/no-empty-function -- empty until set by Promise
+
+      try {
+        server.use(
+          http.get(
+            'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-existing-run-id/events',
+            () => {
+              return new Promise(resolver => {
+                // simulating a long running task with no events
+                resolve = resolver
+              })
+            }
+          )
+        )
+
+        const paramsWithRunId = {
+          ...mockWorkflowParams,
+          runId: 'test-existing-run-id',
+        }
+
+        const { result } = renderHook(() =>
+          useWorkflow<TestEvent>(paramsWithRunId)
+        )
+
+        // Should set status to running immediately when reconnecting to existing task
+        await waitFor(() => {
+          expect(result.current.runId).toBe('test-existing-run-id')
+          // should set to running despite no events received yet
+          expect(result.current.status).toBe('running')
+        })
+
+        resolve()
+        await waitFor(() => {
+          expect(result.current.status).toBe('complete')
+        })
+      } finally {
+        server.resetHandlers(...originalHandlers)
+      }
     })
   })
 
