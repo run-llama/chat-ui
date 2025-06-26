@@ -53,15 +53,28 @@ describe('useWorkflow', () => {
   describe('Starting workflow', () => {
     it('should set status to running after task created', async () => {
       const originalHandlers = [...server.listHandlers()]
-      let resolve: () => void = () => {} // eslint-disable-line @typescript-eslint/no-empty-function -- empty until set by Promise
+      let streamController: ReadableStreamDefaultController<Uint8Array>
+
       try {
         server.use(
           http.get(
             'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-run-id/events',
             () => {
-              return new Promise(resolver => {
-                // simulating a long running task with no events
-                resolve = resolver
+              // Create a proper SSE stream with headers
+              const stream = new ReadableStream({
+                start(controller) {
+                  streamController = controller
+                  // Don't send any data initially - simulating long running task
+                },
+              })
+
+              return new Response(stream, {
+                status: 200,
+                headers: {
+                  'Content-Type': 'text/event-stream',
+                  'Cache-Control': 'no-cache',
+                  Connection: 'keep-alive',
+                },
               })
             }
           )
@@ -71,6 +84,7 @@ describe('useWorkflow', () => {
           useWorkflow<TestEvent>(mockWorkflowParams)
         )
         expect(result.current.status).toBeUndefined()
+
         act(() => {
           result.current.start({ message: 'test start' })
         })
@@ -80,7 +94,12 @@ describe('useWorkflow', () => {
           // should set to running despite no events received
           expect(result.current.status).toBe('running')
         })
-        resolve()
+
+        // Close the stream to complete the workflow
+        act(() => {
+          streamController.close()
+        })
+
         await waitFor(() => {
           expect(result.current.status).toBe('complete')
         })
@@ -160,16 +179,28 @@ describe('useWorkflow', () => {
 
     it('should set status to running immediately when reconnecting to existing task', async () => {
       const originalHandlers = [...server.listHandlers()]
-      let resolve: () => void = () => {} // eslint-disable-line @typescript-eslint/no-empty-function -- empty until set by Promise
+      let streamController: ReadableStreamDefaultController<Uint8Array>
 
       try {
         server.use(
           http.get(
             'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-existing-run-id/events',
             () => {
-              return new Promise(resolver => {
-                // simulating a long running task with no events
-                resolve = resolver
+              // Create a proper SSE stream with headers
+              const stream = new ReadableStream({
+                start(controller) {
+                  streamController = controller
+                  // Don't send any data initially - simulating long running task
+                },
+              })
+
+              return new Response(stream, {
+                status: 200,
+                headers: {
+                  'Content-Type': 'text/event-stream',
+                  'Cache-Control': 'no-cache',
+                  Connection: 'keep-alive',
+                },
               })
             }
           )
@@ -187,11 +218,15 @@ describe('useWorkflow', () => {
         // Should set status to running immediately when reconnecting to existing task
         await waitFor(() => {
           expect(result.current.runId).toBe('test-existing-run-id')
-          // should set to running despite no events received yet
+          // should set to running after headers received but before events
           expect(result.current.status).toBe('running')
         })
 
-        resolve()
+        // Close the stream to complete the workflow
+        act(() => {
+          streamController.close()
+        })
+
         await waitFor(() => {
           expect(result.current.status).toBe('complete')
         })
