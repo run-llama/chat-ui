@@ -103,6 +103,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
         eventData,
         workflow,
       })
+      setStatus('running')
       setTask(newTask) // update new task with new session when trigger start event
       await streamTaskEvents(newTask)
     },
