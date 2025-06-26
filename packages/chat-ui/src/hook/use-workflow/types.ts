@@ -20,7 +20,7 @@ export interface WorkflowHookParams<E extends WorkflowEvent = WorkflowEvent> {
 
 export interface WorkflowHookHandler<E extends WorkflowEvent = WorkflowEvent> {
   runId?: string // Task ID used internally, will be the same for the whole session
-  start: (eventData: E['data']) => Promise<void> // Create new task with start event data, updates sessionId
+  start: (eventData: E['data']) => Promise<void> // Create new task with start event data, updates sessionId. Returned promise resolves on task stop (completion)
   stop: (data?: E['data']) => Promise<void> // Send stop event to stop current task
   sendEvent: (event: E) => Promise<void> // Function to send a new event to the current session, throws error if session is not created yet
   events: E[] // events of the current run

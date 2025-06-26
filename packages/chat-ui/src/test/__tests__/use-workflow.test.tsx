@@ -51,6 +51,39 @@ describe('useWorkflow', () => {
   })
 
   describe('Starting workflow', () => {
+    it('should set status to running immediately after start() is called', async () => {
+      const originalHandlers = [...server.listHandlers()]
+
+      try {
+        server.use(
+          http.get(
+            'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-run-id/events',
+            () => {
+              return new Promise(() => {
+                // This promise never resolves, simulating a long running task with no events
+              })
+            }
+          )
+        )
+
+        const { result } = renderHook(() =>
+          useWorkflow<TestEvent>(mockWorkflowParams)
+        )
+        expect(result.current.status).toBeUndefined()
+        act(() => {
+          result.current.start({ message: 'test start' })
+        })
+
+        await waitFor(() => {
+          expect(result.current.runId).toBe('test-run-id')
+          // should set to running despite no events received
+          expect(result.current.status).toBe('running')
+        })
+      } finally {
+        server.resetHandlers(...originalHandlers)
+      }
+    })
+
     it('should create a new task and start streaming events', async () => {
       const { result } = renderHook(() =>
         useWorkflow<TestEvent>(mockWorkflowParams)
