@@ -2,4 +2,4 @@
 '@llamaindex/chat-ui': patch
 ---
 
-set workflow status running as soon as start streaming events
+set the run status to running as soon as event streaming starts
