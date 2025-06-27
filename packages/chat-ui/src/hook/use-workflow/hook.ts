@@ -42,9 +42,6 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
       await fetchTaskEvents<E>(
         { client, deploymentName, task: inputTask },
         {
-          onStart: () => {
-            setStatus('running')
-          },
           onData: event => {
             setEvents(prev => [...prev, event])
             onData?.(event)
@@ -78,6 +75,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
 
       setTask(existingTask)
       setIsInitialized(true)
+      setStatus('running')
       await streamTaskEvents(existingTask)
     }
 
@@ -104,6 +102,7 @@ export function useWorkflow<E extends WorkflowEvent = WorkflowEvent>(
         workflow,
       })
       setTask(newTask) // update new task with new session when trigger start event
+      setStatus('running') // set status running as soon as start streaming events
       await streamTaskEvents(newTask)
     },
     [client, deploymentName, streamTaskEvents, workflow]
