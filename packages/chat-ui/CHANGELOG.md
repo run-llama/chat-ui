@@ -1,5 +1,12 @@
 # @llamaindex/chat-ui
 
+## 0.5.11
+
+### Patch Changes
+
+- 05dbe25: set the run status to running as soon as event streaming starts
+- 84a67d3: Fix: Prevents incorrect input commitment when selecting IME candidates
+
 ## 0.5.10
 
 ### Patch Changes
