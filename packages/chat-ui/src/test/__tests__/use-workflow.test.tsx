@@ -51,6 +51,63 @@ describe('useWorkflow', () => {
   })
 
   describe('Starting workflow', () => {
+    it('should set status to running after task created', async () => {
+      const originalHandlers = [...server.listHandlers()]
+      let streamController: ReadableStreamDefaultController<Uint8Array>
+
+      try {
+        server.use(
+          http.get(
+            'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-run-id/events',
+            () => {
+              // Create a proper SSE stream with headers
+              const stream = new ReadableStream({
+                start(controller) {
+                  streamController = controller
+                  // Don't send any data initially - simulating long running task
+                },
+              })
+
+              return new Response(stream, {
+                status: 200,
+                headers: {
+                  'Content-Type': 'text/event-stream',
+                  'Cache-Control': 'no-cache',
+                  Connection: 'keep-alive',
+                },
+              })
+            }
+          )
+        )
+
+        const { result } = renderHook(() =>
+          useWorkflow<TestEvent>(mockWorkflowParams)
+        )
+        expect(result.current.status).toBeUndefined()
+
+        act(() => {
+          result.current.start({ message: 'test start' })
+        })
+
+        await waitFor(() => {
+          expect(result.current.runId).toBe('test-run-id')
+          // should set to running despite no events received
+          expect(result.current.status).toBe('running')
+        })
+
+        // Close the stream to complete the workflow
+        act(() => {
+          streamController.close()
+        })
+
+        await waitFor(() => {
+          expect(result.current.status).toBe('complete')
+        })
+      } finally {
+        server.resetHandlers(...originalHandlers)
+      }
+    })
+
     it('should create a new task and start streaming events', async () => {
       const { result } = renderHook(() =>
         useWorkflow<TestEvent>(mockWorkflowParams)
@@ -118,6 +175,64 @@ describe('useWorkflow', () => {
         expect(result.current.runId).toBe('test-existing-run-id')
         expect(result.current.status).toBe('complete')
       })
+    })
+
+    it('should set status to running immediately when reconnecting to existing task', async () => {
+      const originalHandlers = [...server.listHandlers()]
+      let streamController: ReadableStreamDefaultController<Uint8Array>
+
+      try {
+        server.use(
+          http.get(
+            'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-existing-run-id/events',
+            () => {
+              // Create a proper SSE stream with headers
+              const stream = new ReadableStream({
+                start(controller) {
+                  streamController = controller
+                  // Don't send any data initially - simulating long running task
+                },
+              })
+
+              return new Response(stream, {
+                status: 200,
+                headers: {
+                  'Content-Type': 'text/event-stream',
+                  'Cache-Control': 'no-cache',
+                  Connection: 'keep-alive',
+                },
+              })
+            }
+          )
+        )
+
+        const paramsWithRunId = {
+          ...mockWorkflowParams,
+          runId: 'test-existing-run-id',
+        }
+
+        const { result } = renderHook(() =>
+          useWorkflow<TestEvent>(paramsWithRunId)
+        )
+
+        // Should set status to running immediately when reconnecting to existing task
+        await waitFor(() => {
+          expect(result.current.runId).toBe('test-existing-run-id')
+          // should set to running after headers received but before events
+          expect(result.current.status).toBe('running')
+        })
+
+        // Close the stream to complete the workflow
+        act(() => {
+          streamController.close()
+        })
+
+        await waitFor(() => {
+          expect(result.current.status).toBe('complete')
+        })
+      } finally {
+        server.resetHandlers(...originalHandlers)
+      }
     })
   })
 
