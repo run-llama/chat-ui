@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Sparkles, Star } from "lucide-react";
+import { Sparkles, Star } from 'lucide-react'
 
 export default function Header() {
   return (
@@ -36,5 +36,5 @@ export default function Header() {
         </a>
       </div>
     </div>
-  );
+  )
 }

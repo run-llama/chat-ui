@@ -27,8 +27,8 @@ const STAGE_META = {
 };
 
 function ArtifactWorkflowCard({ event }) {
-  const [visible, setVisible] = useState(event?.state !== "completed");
-  const [fade, setFade] = useState(false);
+  const [ visible, setVisible ] = useState(event?.state !== "completed");
+  const [ fade, setFade ] = useState(false);
 
   useEffect(() => {
     if (event?.state === "completed") {
@@ -37,12 +37,12 @@ function ArtifactWorkflowCard({ event }) {
       setVisible(true);
       setFade(false);
     }
-  }, [event?.state]);
+  }, [ event?.state ]);
 
   if (!event || !visible) return null;
 
   const { state, requirement } = event;
-  const meta = STAGE_META[state];
+  const meta = STAGE_META[ state ];
 
   if (!meta) return null;
 
@@ -123,7 +123,7 @@ function ArtifactWorkflowCard({ event }) {
 export default function Component({ events }) {
   const aggregateEvents = () => {
     if (!events || events.length === 0) return null;
-    return events[events.length - 1];
+    return events[ events.length - 1 ];
   };
 
   const event = aggregateEvents();
