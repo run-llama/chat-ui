@@ -5,7 +5,7 @@ new LlamaIndexServer({
   uiConfig: {
     starterQuestions: ['What can you do?', 'what is the weather in tokyo?'],
     componentsDir: 'components',
-    layoutDir: 'layouts',
+    layoutDir: 'layout',
     // deploymentName: 'chat', // TODO
     // workflowName: 'workflow', // TODO
     // devMode: false, // TODO: disable dev mode because workflow is in python
