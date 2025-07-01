@@ -1,6 +1,6 @@
 {
   "name": "@llamaindex/chat-ui-docs",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "files": [
     "chat-ui"
   ],

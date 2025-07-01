@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.12
+
+### Patch Changes
+
+- f28cb7e: feat: add llamadexploy + ts-server example
+
 ## 0.5.11
 
 ### Patch Changes
