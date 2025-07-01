@@ -12,7 +12,7 @@ from llama_index.llms.openai import OpenAI
 from llama_index.core.agent.workflow.workflow_events import AgentStream
 from llama_index.core.llms import ChatMessage
 from typing import List, Optional
-from llama_index.server.models import (
+from llama_index.core.chat_ui.events import (
     SourceNodesEvent,
     ArtifactEvent,
     UIEvent,

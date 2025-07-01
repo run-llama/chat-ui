@@ -3,18 +3,18 @@ name: chat
 control-plane:
   port: 8000
 
-default-service: chat_workflow
+default-service: workflow
 
 services:
-  chat_workflow:
-    name: Chat Workflow
+  workflow:
+    name: Workflow
     source:
       type: local
       name: src
-    path: src/chat_workflow:workflow
+    path: src/workflow:workflow
     python-dependencies:
       - llama-index-llms-openai>=0.4.5
-      - llama-index-server>=0.1.22
+      - llama-index-core>=0.12.45
 
 ui:
   name: My Nextjs App
