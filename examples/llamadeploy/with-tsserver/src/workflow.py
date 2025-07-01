@@ -26,6 +26,7 @@ from llama_index.core.chat_ui.models.artifact import (
     CodeArtifactData,
 )
 from llama_index.llms.openai import OpenAI
+from .utils import get_last_artifact
 
 
 class Requirement(BaseModel):
@@ -88,6 +89,10 @@ class ArtifactWorkflow(Workflow):
                 content=user_msg,
             )
         )
+
+        # import get last artifact from utils
+        self.last_artifact = get_last_artifact(chat_history)
+
         memory = ChatMemoryBuffer.from_defaults(
             chat_history=chat_history,
             llm=self.llm,
