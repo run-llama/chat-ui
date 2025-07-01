@@ -65,7 +65,7 @@ The easiest way to get started is to connect the whole `ChatSection` component w
 
 ```tsx
 import { ChatSection } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from "@ai-sdk/react";
 
 const ChatExample = () => {
   const handler = useChat()
