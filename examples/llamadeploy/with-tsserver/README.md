@@ -1,8 +1,8 @@
-# LlamaDeploy + Chat-UI Example
+# LlamaDeploy + LlamaIndexServer Example
 
-This example demonstrates how to use the **chat-ui** library to create a custom chat interface for workflows deployed with [LlamaDeploy](https://github.com/run-llama/llama_deploy).
+This example demonstrates how to use **LlamaIndexServer** as a frontend chat interface for workflows deployed with [LlamaDeploy](https://github.com/run-llama/llama_deploy).
 
-LlamaDeploy is a system for deploying and managing LlamaIndex workflows. This example shows how you can build a React-based chat interface using Chat UI components that connect with your deployed workflow using the [`useChatWorkflow`](../../docs/chat-ui/hooks.mdx#usechatworkflow) hook.
+LlamaDeploy is a system for deploying and managing LlamaIndex workflows, while LlamaIndexServer provides a pre-built TypeScript server with an integrated chat UI that can connect directly to LlamaDeploy deployments. This example shows how you can quickly set up a complete chat application by combining these two technologies without needing to build custom UI components.
 
 ## Key Features
 
