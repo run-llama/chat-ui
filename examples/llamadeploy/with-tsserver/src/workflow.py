@@ -78,16 +78,15 @@ class ArtifactWorkflow(Workflow):
     @step
     async def prepare_chat_history(self, ctx: Context, ev: StartEvent) -> PlanEvent:
         user_msg: str = ev.get("user_msg")
-        chat_history: Optional[List[ChatMessage]] = ev.get("chat_history", [])
+        chat_history = [
+            ChatMessage(role=msg.get("role", "user"), content=msg.get("content", ""))
+            for msg in ev.get("chat_history", [])
+        ]
         messages = [*chat_history, ChatMessage(role="user", content=user_msg)]
-
-        print(f"messages: {messages}")
 
         # extract inline artifact from chat history
         last_artifact = get_last_artifact(messages)
         self.last_artifact = last_artifact
-
-        print(f"last_artifact: {last_artifact}")
 
         memory = ChatMemoryBuffer.from_defaults(
             chat_history=messages,

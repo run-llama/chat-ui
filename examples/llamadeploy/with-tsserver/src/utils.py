@@ -15,8 +15,6 @@ INLINE_ANNOTATION_KEY = "annotation"
 
 
 def get_inline_annotations(message: ChatMessage) -> List[Any]:
-    print("message object:", message)
-
     """Extract inline annotations from a chat message."""
     markdown_content = message.content
 
@@ -70,10 +68,12 @@ def artifact_from_message(message: ChatMessage) -> Optional[Artifact]:
                 artifact_type = artifact_data.get("type")
 
                 if artifact_type == "code":
+                    # Get the nested data object that contains the actual code information
+                    code_info = artifact_data.get("data", {})
                     code_data = CodeArtifactData(
-                        file_name=artifact_data.get("file_name", ""),
-                        code=artifact_data.get("code", ""),
-                        language=artifact_data.get("language", ""),
+                        file_name=code_info.get("file_name", ""),
+                        code=code_info.get("code", ""),
+                        language=code_info.get("language", ""),
                     )
                     artifact = Artifact(
                         created_at=artifact_data.get("created_at"),
@@ -81,11 +81,13 @@ def artifact_from_message(message: ChatMessage) -> Optional[Artifact]:
                         data=code_data,
                     )
                 elif artifact_type == "document":
+                    # Get the nested data object that contains the actual document information
+                    doc_info = artifact_data.get("data", {})
                     doc_data = DocumentArtifactData(
-                        title=artifact_data.get("title", ""),
-                        content=artifact_data.get("content", ""),
-                        type=artifact_data.get("type", "markdown"),
-                        sources=artifact_data.get("sources"),
+                        title=doc_info.get("title", ""),
+                        content=doc_info.get("content", ""),
+                        type=doc_info.get("type", "markdown"),
+                        sources=doc_info.get("sources"),
                     )
                     artifact = Artifact(
                         created_at=artifact_data.get("created_at"),
