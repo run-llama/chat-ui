@@ -1,21 +1,22 @@
 import json
 import re
-from typing import List, Optional, Any, Literal, Union
-from enum import Enum
+from typing import List, Optional, Any
 
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from llama_index.core.chat_ui.models.artifact import (
     Artifact,
     ArtifactType,
     CodeArtifactData,
     DocumentArtifactData,
 )
-from llama_index.core.chat_engine.types import ChatMessage
+from llama_index.core.llms import ChatMessage
 
 INLINE_ANNOTATION_KEY = "annotation"
 
 
 def get_inline_annotations(message: ChatMessage) -> List[Any]:
+    print("message object:", message)
+
     """Extract inline annotations from a chat message."""
     markdown_content = message.content
 

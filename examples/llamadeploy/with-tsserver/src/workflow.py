@@ -1,11 +1,10 @@
 import re
 import time
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal, Optional, Union, List
 
 from pydantic import BaseModel
 
-from llama_index.core.chat_engine.types import ChatMessage
-from llama_index.core.llms import LLM
+from llama_index.core.llms import LLM, ChatMessage
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.core.prompts import PromptTemplate
 from llama_index.core.workflow import (
@@ -82,7 +81,7 @@ class ArtifactWorkflow(Workflow):
         if user_msg is None:
             raise ValueError("user_msg is required to run the workflow")
         await ctx.set("user_msg", user_msg)
-        chat_history = ev.chat_history or []
+        chat_history: Optional[List[ChatMessage]] = ev.get("chat_history", [])
         chat_history.append(
             ChatMessage(
                 role="user",
@@ -90,6 +89,7 @@ class ArtifactWorkflow(Workflow):
             )
         )
 
+        # extract last inline artifact from chat history
         last_artifact = get_last_artifact(chat_history)
         self.last_artifact = last_artifact
 
@@ -98,6 +98,7 @@ class ArtifactWorkflow(Workflow):
             llm=self.llm,
         )
         await ctx.set("memory", memory)
+
         return PlanEvent(
             user_msg=user_msg,
             context=(str(last_artifact.model_dump_json()) if last_artifact else ""),
