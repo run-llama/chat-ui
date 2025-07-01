@@ -19,11 +19,6 @@ export default function Header() {
           >
             Built by LlamaIndex
           </a>
-          <img
-            className="h-[24px] w-[24px] rounded-sm"
-            src="/llama.png"
-            alt="Llama Logo"
-          />
         </div>
         <a
           href="https://github.com/run-llama/LlamaIndexTS"
