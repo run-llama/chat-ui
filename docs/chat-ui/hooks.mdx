@@ -672,7 +672,9 @@ Your LlamaDeploy workflows can send three main types of events to enhance the ch
 Send source nodes to display citations and references for generated content:
 
 ```python
-from llama_index.server.models import SourceNodesEvent
+from llama_index.core.chat_ui.events import (
+    SourceNodesEvent,
+)
 from llama_index.core.schema import NodeWithScore
 from llama_index.core.data_structs import Node
 
@@ -698,7 +700,9 @@ ctx.write_event_to_stream(
 Send code snippets, documents, or other artifacts that can be displayed in a dedicated canvas:
 
 ```python
-from llama_index.server.models import ArtifactEvent
+from llama_index.core.chat_ui.events import (
+    ArtifactEvent,
+)
 import time
 
 ctx.write_event_to_stream(
@@ -723,7 +727,9 @@ ctx.write_event_to_stream(
 Send custom data to render it in a specialized UI components. In your workflow code, you can send `UIEvent`s for this - for example to render a weather annotation in the chat interface:
 
 ```python
-from llama_index.server.models import UIEvent
+from llama_index.core.chat_ui.events import (
+    UIEvent,
+)
 from pydantic import BaseModel
 
 class WeatherData(BaseModel):
