@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.13
+
+### Patch Changes
+
+- db881e1: feat: support display image in document editor
+
 ## 0.5.12
 
 ### Patch Changes
