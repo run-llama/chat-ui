@@ -12,6 +12,7 @@ import {
   toolbarPlugin,
   thematicBreakPlugin,
   quotePlugin,
+  imagePlugin,
 } from '@mdxeditor/editor'
 
 export function DocumentEditor({
@@ -34,6 +35,7 @@ export function DocumentEditor({
     markdownShortcutPlugin(),
     thematicBreakPlugin(),
     quotePlugin(),
+    imagePlugin(),
   ]
 
   if (showToolbar) {

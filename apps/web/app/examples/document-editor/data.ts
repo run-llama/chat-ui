@@ -34,6 +34,10 @@ If you need a few ideas, here's what you can try:
 5. Test the diff feature to see how the markdown has changed
 6. Add a frontmatter block through the toolbar button
 
+## A sample image block
+
+![Cute cat](https://placecats.com/300/200)
+
 ## A table
 
 Play with the table below - add rows, columns, change column alignment. When editing,
