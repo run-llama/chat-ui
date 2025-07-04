@@ -100,13 +100,32 @@ export async function fetchTaskEvents<E extends WorkflowEvent>(
   try {
     callback?.onStart?.()
 
+    let retryParsedLines: string[] = []
+
     // eslint-disable-next-line no-constant-condition -- needed
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
 
-      const chunk = decoder.decode(value, { stream: true })
-      const events = toWorkflowEvents<E>(chunk)
+      let chunk = decoder.decode(value, { stream: true })
+      console.log('origin chunk', { chunk })
+
+      if (retryParsedLines.length > 0) {
+        // if there are lines that failed to parse, append them to the current chunk
+        chunk = `${retryParsedLines.join('')}${chunk}`
+        console.log('retry chunk', { chunk })
+        retryParsedLines = [] // reset for next iteration
+      }
+
+      const { events, failedLines } = toWorkflowEvents<E>(chunk)
+
+      console.log('toWorkflowEvents', {
+        events,
+        failedLines,
+      })
+
+      retryParsedLines.push(...failedLines)
+
       if (!events.length) continue
 
       accumulatedEvents.push(...events)
@@ -152,10 +171,15 @@ export async function sendEventToTask<E extends WorkflowEvent>(params: {
   return data.data
 }
 
-function toWorkflowEvents<E extends WorkflowEvent>(chunk: string): E[] {
+function toWorkflowEvents<E extends WorkflowEvent>(
+  chunk: string
+): {
+  events: E[]
+  failedLines: string[]
+} {
   if (typeof chunk !== 'string') {
     console.warn('Skipping non-string chunk:', chunk)
-    return []
+    return { events: [], failedLines: [] }
   }
 
   // One chunk can contain multiple events, so we need to parse each line
@@ -163,20 +187,52 @@ function toWorkflowEvents<E extends WorkflowEvent>(chunk: string): E[] {
     .trim()
     .split('\n')
     .filter(line => line.trim() !== '')
-  return lines.map(parseChunkLine<E>).filter(Boolean) as E[]
+
+  console.log({
+    lines,
+    linesCount: lines.length,
+  })
+
+  const parsedLines = lines.map(line => parseChunkLine<E>(line)).filter(Boolean)
+
+  // successfully parsed events
+  const events = parsedLines.map(line => line?.event).filter(Boolean) as E[]
+
+  // failed lines that could not be parsed into events
+  // will be merged into next chunk to re-try parsing
+  const failedLines = parsedLines
+    .filter(l => !l?.event)
+    .map(line => line?.line || '')
+    .filter(Boolean)
+
+  return {
+    events,
+    failedLines,
+  }
 }
 
-function parseChunkLine<E extends WorkflowEvent>(line: string): E | null {
+function parseChunkLine<E extends WorkflowEvent>(
+  line: string
+): {
+  line: string
+  event?: E | null
+} | null {
   try {
     const event = JSON.parse(line) as RawEvent
     if (!isRawEvent(event)) {
       console.warn('Skipping invalid raw event:', event)
       return null
     }
-    return { type: event.qualified_name, data: event.value } as E
+    return {
+      line,
+      event: { type: event.qualified_name, data: event.value } as E,
+    }
   } catch (error) {
     console.warn(`Failed to parse chunk in line: ${line}`, error)
-    return null
+    return {
+      line,
+      event: null,
+    }
   }
 }
 
