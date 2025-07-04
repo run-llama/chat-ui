@@ -108,21 +108,14 @@ export async function fetchTaskEvents<E extends WorkflowEvent>(
       if (done) break
 
       let chunk = decoder.decode(value, { stream: true })
-      console.log('origin chunk', { chunk })
 
       if (retryParsedLines.length > 0) {
         // if there are lines that failed to parse, append them to the current chunk
         chunk = `${retryParsedLines.join('')}${chunk}`
-        console.log('retry chunk', { chunk })
         retryParsedLines = [] // reset for next iteration
       }
 
       const { events, failedLines } = toWorkflowEvents<E>(chunk)
-
-      console.log('toWorkflowEvents', {
-        events,
-        failedLines,
-      })
 
       retryParsedLines.push(...failedLines)
 
@@ -187,11 +180,6 @@ function toWorkflowEvents<E extends WorkflowEvent>(
     .trim()
     .split('\n')
     .filter(line => line.trim() !== '')
-
-  console.log({
-    lines,
-    linesCount: lines.length,
-  })
 
   const parsedLines = lines.map(line => parseChunkLine<E>(line)).filter(Boolean)
 

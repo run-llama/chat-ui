@@ -355,4 +355,70 @@ describe('useWorkflow', () => {
       await waitFor(() => expect(result.current.events.length).toBeLessThan(13))
     })
   })
+
+  describe('Chunk parsing', () => {
+    it('should handle incomplete JSON chunks and retry parsing', async () => {
+      const originalHandlers = [...server.listHandlers()]
+
+      try {
+        const incompleteChunk1 = `{"__is_pydantic": true, "value": {"type": "ui_event", "data": {"id": null, "event": "analyze", "state": "inpro`
+        const incompleteChunk2 = `gress", "question": null, "answer": null}}, "qualified_name": "llama_index.core.chat_ui.events.UIEvent"}
+{"__is_pydantic": true, "value": {}, "qualified_name": "llama_index.core.workflow.events.StopEvent"}`
+
+        server.use(
+          http.get(
+            'http://127.0.0.1:4501/deployments/test-workflow/tasks/test-run-id/events',
+            () => {
+              const encoder = new TextEncoder()
+              const stream = new ReadableStream({
+                start(controller) {
+                  // Send incomplete chunk first
+                  controller.enqueue(encoder.encode(incompleteChunk1))
+
+                  // Wait a bit, then send the completion
+                  setTimeout(() => {
+                    controller.enqueue(encoder.encode(incompleteChunk2))
+                    controller.close()
+                  }, 10)
+                },
+              })
+
+              return new HttpResponse(stream, {
+                headers: { 'Content-Type': 'application/json' },
+              })
+            }
+          )
+        )
+
+        const { result } = renderHook(() =>
+          useWorkflow<TestEvent>(mockWorkflowParams)
+        )
+
+        await act(async () => {
+          await result.current.start({ message: 'test incomplete chunks' })
+        })
+
+        await waitFor(() => {
+          expect(result.current.events).toHaveLength(2)
+          expect(result.current.status).toBe('complete')
+        })
+
+        // First event should be the reconstructed incomplete chunk
+        const firstEvent = result.current.events[0]
+        expect(firstEvent.type).toBe('llama_index.core.chat_ui.events.UIEvent')
+        expect(firstEvent.data.type).toBe('ui_event')
+        expect(firstEvent.data.data.event).toBe('analyze')
+        expect(firstEvent.data.data.state).toBe('inprogress')
+        expect(firstEvent.data.data.id).toBeNull()
+
+        // Second event should be the stop event
+        const lastEvent = result.current.events[1]
+        expect(lastEvent.type).toBe(
+          'llama_index.core.workflow.events.StopEvent'
+        )
+      } finally {
+        server.resetHandlers(...originalHandlers)
+      }
+    })
+  })
 })
