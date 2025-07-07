@@ -20,18 +20,28 @@ export interface AgentStreamEvent extends WorkflowEvent {
   }
 }
 
+// represent the raw node in the source nodes event
+export type RawNode = {
+  node: {
+    id_: string
+    metadata: {
+      page_label: string | null
+      file_name: string | null
+      file_path: string | null
+      file_type: string | null
+      file_size: number | null
+      creation_date: string | null
+      last_modified_date: string | null
+      URL: string | null
+    }
+    text: string
+  }
+  score: number
+}
+
 export interface SourceNodesEvent extends WorkflowEvent {
   type: WorkflowEventType.SourceNodesEvent
-  data: {
-    nodes: {
-      node: {
-        id_: string
-        metadata: Record<string, JSONValue>
-        text: string
-      }
-      score: number
-    }[]
-  }
+  data: { nodes: RawNode[] }
 }
 
 export interface UIEvent extends WorkflowEvent {

@@ -7,6 +7,7 @@ import { JSONValue } from '../../chat/chat.interface'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
 import {
   AgentStreamEvent,
+  RawNode,
   SourceNodesEvent,
   ToolCallEvent,
   ToolCallResultEvent,
@@ -70,18 +71,10 @@ function toVercelAnnotations(event: WorkflowEvent) {
         return []
       }
 
-      const sources = nodes.map(({ node, score }) => ({
-        id: node.id_,
-        metadata: node.metadata,
-        score,
-        text: node.text,
-        url: (node.metadata?.URL as string) || '',
-      })) satisfies SourceNode[]
-
       return [
         {
           type: MessageAnnotationType.SOURCES,
-          data: { nodes: sources },
+          data: { nodes: nodes.map(convertRawNodeToSourceNode) },
         },
       ]
     }
@@ -149,21 +142,11 @@ function toVercelAnnotations(event: WorkflowEvent) {
           'source_nodes' in raw_output &&
           Array.isArray(raw_output.source_nodes)
         ) {
-          const sourceNodes =
-            raw_output.source_nodes as SourceNodesEvent['data']['nodes']
-
-          const sources = sourceNodes.map(({ node, score }) => ({
-            id: node.id_,
-            metadata: node.metadata,
-            score,
-            text: node.text,
-            url: (node.metadata?.URL as string) || '', // TODO
-          })) satisfies SourceNode[]
-
+          const rawNodes = raw_output.source_nodes as RawNode[]
           return [
             {
               type: MessageAnnotationType.SOURCES,
-              data: { nodes: sources },
+              data: { nodes: rawNodes.map(convertRawNodeToSourceNode) },
             },
           ]
         }
@@ -187,5 +170,17 @@ function toVercelAnnotations(event: WorkflowEvent) {
         },
       ]
     }
+  }
+}
+
+function convertRawNodeToSourceNode(rawNode: RawNode): SourceNode {
+  const { node, score } = rawNode
+
+  return {
+    id: node.id_,
+    metadata: node.metadata,
+    score,
+    text: node.text,
+    url: (node.metadata?.URL as string) || '', // TODO
   }
 }
