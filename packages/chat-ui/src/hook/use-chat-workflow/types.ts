@@ -42,6 +42,27 @@ export interface UIEvent extends WorkflowEvent {
   }
 }
 
+export interface ToolCallEvent extends WorkflowEvent {
+  type: WorkflowEventType.ToolCall
+  data: {
+    tool_id: string
+    tool_name: string
+    tool_kwargs: JSONValue
+  }
+}
+
+export interface ToolCallResultEvent extends WorkflowEvent {
+  type: WorkflowEventType.ToolCallResult
+  data: {
+    tool_id: string
+    tool_name: string
+    tool_kwargs: JSONValue
+    tool_output: {
+      raw_output: JSONValue
+    }
+  }
+}
+
 export type ChatWorkflowHookParams = Pick<
   WorkflowHookParams,
   'deployment' | 'workflow' | 'baseUrl' | 'onError'

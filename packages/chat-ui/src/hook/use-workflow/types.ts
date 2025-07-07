@@ -42,6 +42,8 @@ export enum WorkflowEventType {
   SourceNodesEvent = 'llama_index.core.chat_ui.events.SourceNodesEvent',
   ArtifactEvent = 'llama_index.core.chat_ui.events.ArtifactEvent',
   UIEvent = 'llama_index.core.chat_ui.events.UIEvent',
+  ToolCall = 'llama_index.core.agent.workflow.workflow_events.ToolCall',
+  ToolCallResult = 'llama_index.core.agent.workflow.workflow_events.ToolCallResult',
 }
 
 export interface StreamingEventCallback<

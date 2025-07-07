@@ -5,8 +5,14 @@ import {
 } from '../../chat/annotations'
 import { JSONValue } from '../../chat/chat.interface'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
-import { AgentStreamEvent, SourceNodesEvent, UIEvent } from './types'
-import { SourceNode } from '../../widgets'
+import {
+  AgentStreamEvent,
+  SourceNodesEvent,
+  ToolCallEvent,
+  ToolCallResultEvent,
+  UIEvent,
+} from './types'
+import { AgentEventData, SourceNode } from '../../widgets'
 
 /**
  * Transform a workflow event to message parts
@@ -89,6 +95,84 @@ function toVercelAnnotations(event: WorkflowEvent) {
           data: uiEvent.data.data,
         },
       ]
+    }
+
+    // transfrom ToolCallEvent to AgentEvent
+    case WorkflowEventType.ToolCall.toString(): {
+      const { data } = event as ToolCallEvent
+
+      if (
+        'tool_name' in data &&
+        'tool_kwargs' in data &&
+        typeof data.tool_kwargs === 'object'
+      ) {
+        const { tool_name, tool_kwargs } = data
+
+        return [
+          {
+            type: MessageAnnotationType.AGENT_EVENTS,
+            data: {
+              agent: 'Agent',
+              text: `Calling tool: ${tool_name} with: ${JSON.stringify(tool_kwargs)}`,
+            } as AgentEventData,
+          },
+        ]
+      }
+
+      console.warn(
+        `Not supported this tool call event: ${JSON.stringify(event)}`
+      )
+
+      return []
+    }
+
+    // transform ToolCallResultEvent to suitable annotations
+    case WorkflowEventType.ToolCallResult.toString(): {
+      const { data } = event as ToolCallResultEvent
+      const { tool_output } = data
+
+      if (
+        'raw_output' in tool_output &&
+        typeof tool_output.raw_output === 'object'
+      ) {
+        const { raw_output } = tool_output
+
+        if (raw_output === null || typeof raw_output !== 'object') {
+          console.warn(
+            `Invalid raw output in tool call result event: ${JSON.stringify(event)}`
+          )
+          return []
+        }
+
+        // to source nodes annotation
+        if (
+          'source_nodes' in raw_output &&
+          Array.isArray(raw_output.source_nodes)
+        ) {
+          const sourceNodes =
+            raw_output.source_nodes as SourceNodesEvent['data']['nodes']
+
+          const sources = sourceNodes.map(({ node, score }) => ({
+            id: node.id_,
+            metadata: node.metadata,
+            score,
+            text: node.text,
+            url: (node.metadata?.URL as string) || '', // TODO
+          })) satisfies SourceNode[]
+
+          return [
+            {
+              type: MessageAnnotationType.SOURCES,
+              data: { nodes: sources },
+            },
+          ]
+        }
+      }
+
+      console.warn(
+        `Not supported this tool call result event: ${JSON.stringify(event)}`
+      )
+      return []
     }
 
     // for other events which are not defined, convert them to vercel annotations with type is the qualified name of the event
