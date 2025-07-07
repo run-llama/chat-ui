@@ -206,7 +206,7 @@ function getDocumentUrlFromRawNode(
   // if `fileServerUrl` is not provided, return empty string
   if (!fileServerUrl) {
     console.warn(
-      `No 'fileServerUrl' provided. Node won't be displayed in ChatSources UI.`
+      `No 'fileServerUrl' provided. Nodes won't be displayed in ChatSources UI.`
     )
     return ''
   }
@@ -219,10 +219,9 @@ function getDocumentUrlFromRawNode(
     return ''
   }
 
-  // construct the url to get the file. eg: `https://localhost:3000/api/files?file_name=sample.pdf&pipeline_id=pl...`
-  const url = new URL(fileServerUrl)
-  url.searchParams.set('file_name', file_name)
-  if (pipeline_id) url.searchParams.set('pipeline_id', pipeline_id)
+  if (pipeline_id) {
+    return `${fileServerUrl}/output/llamacloud/${pipeline_id}$${file_name}`
+  }
 
-  return url.toString()
+  return `${fileServerUrl}/data/${file_name}`
 }

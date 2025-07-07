@@ -27,6 +27,7 @@ export type RawNode = {
     metadata: {
       file_name: string | null
       pipeline_id: string | null
+      pipeline_file_id: string | null
       page_label: string | null
       file_path: string | null
       file_type: string | null
