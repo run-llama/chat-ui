@@ -1,0 +1,54 @@
+[project]
+name = "app"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [ "python-dotenv>=1.0.0,<2.0.0", "pydantic>=2.11.5", "aiostream>=0.5.2,<0.6.0", "llama-index-core>=0.12.28,<0.13.0", "llama-index-readers-file>=0.4.6,<1.0.0", "llama-index-indices-managed-llama-cloud>=0.6.3,<1.0.0", "llama-deploy", "docx2txt>=0.8,<0.9", "llama-index-llms-openai>=0.3.2,<0.4.0", "llama-index-embeddings-openai>=0.3.1,<0.4.0" ]
+
+[[project.authors]]
+name = "Marcus Schiesser"
+email = "mail@marcusschiesser.de"
+
+[project.optional-dependencies]
+dev = [ "mypy>=1.8.0,<2.0.0", "pytest>=8.3.5,<9.0.0", "pytest-asyncio>=0.25.3,<0.26.0" ]
+
+[project.scripts]
+generate = "src.generate:generate_index"
+
+[tool]
+[tool.uv]
+[tool.uv.sources]
+[tool.uv.sources.llama-deploy]
+git = "https://github.com/run-llama/llama_deploy"
+
+[tool.mypy]
+python_version = "3.11"
+plugins = "pydantic.mypy"
+exclude = [ "tests", "venv", ".venv", "output", "config" ]
+check_untyped_defs = true
+warn_unused_ignores = false
+show_error_codes = true
+namespace_packages = true
+ignore_missing_imports = true
+follow_imports = "silent"
+implicit_optional = true
+strict_optional = false
+disable_error_code = [ "return-value", "assignment" ]
+
+[[tool.mypy.overrides]]
+module = "src.*"
+ignore_missing_imports = false
+
+[tool.hatch]
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build]
+[tool.hatch.build.targets]
+[tool.hatch.build.targets.wheel]
+packages = [ "src" ]
+
+[build-system]
+requires = [ "hatchling>=1.24" ]
+build-backend = "hatchling.build"
