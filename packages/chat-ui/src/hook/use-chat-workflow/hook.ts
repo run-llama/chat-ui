@@ -15,6 +15,7 @@ export function useChatWorkflow({
   workflow,
   baseUrl,
   onError,
+  fileServerUrl,
 }: ChatWorkflowHookParams): ChatWorkflowHookHandler {
   const [input, setInput] = useState<string>('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -51,7 +52,10 @@ export function useChatWorkflow({
     workflow,
     baseUrl,
     onData: event => {
-      const { delta, annotations } = transformEventToMessageParts(event)
+      const { delta, annotations } = transformEventToMessageParts(
+        event,
+        fileServerUrl
+      )
       updateLastMessage({ delta, annotations })
     },
   })

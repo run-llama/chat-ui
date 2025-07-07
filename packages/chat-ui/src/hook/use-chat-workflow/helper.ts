@@ -23,7 +23,10 @@ import { AgentEventData, SourceNode } from '../../widgets'
  * @param event - The event to transform
  * @returns The message parts (delta and annotations)
  */
-export function transformEventToMessageParts(event: WorkflowEvent): {
+export function transformEventToMessageParts(
+  event: WorkflowEvent,
+  fileServerUrl?: string
+): {
   delta: string
   annotations: MessageAnnotation<JSONValue>[]
 } {
@@ -38,7 +41,7 @@ export function transformEventToMessageParts(event: WorkflowEvent): {
     }
   }
 
-  const annotations = toVercelAnnotations(event)
+  const annotations = toVercelAnnotations(event, fileServerUrl)
   return { delta: '', annotations }
 }
 
@@ -58,7 +61,7 @@ function isInlineEvent(event: WorkflowEvent) {
   return inlineEventTypes.includes(event.type) && hasInlineData
 }
 
-function toVercelAnnotations(event: WorkflowEvent) {
+function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
   switch (event.type) {
     // convert source nodes event to source nodes annotation
     case WorkflowEventType.SourceNodesEvent.toString(): {
@@ -74,7 +77,11 @@ function toVercelAnnotations(event: WorkflowEvent) {
       return [
         {
           type: MessageAnnotationType.SOURCES,
-          data: { nodes: nodes.map(convertRawNodeToSourceNode) },
+          data: {
+            nodes: nodes.map(rawNode =>
+              convertRawNodeToSourceNode(rawNode, fileServerUrl)
+            ),
+          },
         },
       ]
     }
@@ -126,16 +133,10 @@ function toVercelAnnotations(event: WorkflowEvent) {
 
       if (
         'raw_output' in tool_output &&
-        typeof tool_output.raw_output === 'object'
+        typeof tool_output.raw_output === 'object' &&
+        tool_output.raw_output !== null
       ) {
         const { raw_output } = tool_output
-
-        if (raw_output === null || typeof raw_output !== 'object') {
-          console.warn(
-            `Invalid raw output in tool call result event: ${JSON.stringify(event)}`
-          )
-          return []
-        }
 
         // to source nodes annotation
         if (
@@ -146,7 +147,11 @@ function toVercelAnnotations(event: WorkflowEvent) {
           return [
             {
               type: MessageAnnotationType.SOURCES,
-              data: { nodes: rawNodes.map(convertRawNodeToSourceNode) },
+              data: {
+                nodes: rawNodes.map(rawNode =>
+                  convertRawNodeToSourceNode(rawNode, fileServerUrl)
+                ),
+              },
             },
           ]
         }
@@ -173,7 +178,10 @@ function toVercelAnnotations(event: WorkflowEvent) {
   }
 }
 
-function convertRawNodeToSourceNode(rawNode: RawNode): SourceNode {
+function convertRawNodeToSourceNode(
+  rawNode: RawNode,
+  fileServerUrl?: string
+): SourceNode {
   const { node, score } = rawNode
 
   return {
@@ -181,6 +189,40 @@ function convertRawNodeToSourceNode(rawNode: RawNode): SourceNode {
     metadata: node.metadata,
     score,
     text: node.text,
-    url: (node.metadata?.URL as string) || '', // TODO
+    url: getDocumentUrlFromRawNode(rawNode, fileServerUrl),
   }
+}
+
+function getDocumentUrlFromRawNode(
+  rawNode: RawNode,
+  fileServerUrl?: string
+): string {
+  const { metadata } = rawNode.node
+  const { URL: fileURL, file_name, pipeline_id } = metadata
+
+  // if the file URL is provided in the metadata, use it
+  if (fileURL) return fileURL
+
+  // if `fileServerUrl` is not provided, return empty string
+  if (!fileServerUrl) {
+    console.warn(
+      `No 'fileServerUrl' provided. Node won't be displayed in ChatSources UI.`
+    )
+    return ''
+  }
+
+  // check if file_name is provided in the metadata
+  if (!file_name) {
+    console.warn(
+      `No file name found in this raw node: ${JSON.stringify(rawNode)}. It won't be displayed in ChatSources UI.`
+    )
+    return ''
+  }
+
+  // construct the url to get the file. eg: `https://localhost:3000/api/files?file_name=sample.pdf&pipeline_id=pl...`
+  const url = new URL(fileServerUrl)
+  url.searchParams.set('file_name', file_name)
+  if (pipeline_id) url.searchParams.set('pipeline_id', pipeline_id)
+
+  return url.toString()
 }

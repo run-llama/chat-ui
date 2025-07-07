@@ -25,8 +25,9 @@ export type RawNode = {
   node: {
     id_: string
     metadata: {
-      page_label: string | null
       file_name: string | null
+      pipeline_id: string | null
+      page_label: string | null
       file_path: string | null
       file_type: string | null
       file_size: number | null
@@ -76,7 +77,10 @@ export interface ToolCallResultEvent extends WorkflowEvent {
 export type ChatWorkflowHookParams = Pick<
   WorkflowHookParams,
   'deployment' | 'workflow' | 'baseUrl' | 'onError'
->
+> & {
+  // the endpoint to serve local files and llamacloud files
+  fileServerUrl?: string
+}
 
 export type ChatWorkflowHookHandler = ChatHandler & {
   resume: ChatWorkflowResume
