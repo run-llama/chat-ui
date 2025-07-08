@@ -79,7 +79,10 @@ export type ChatWorkflowHookParams = Pick<
   WorkflowHookParams,
   'deployment' | 'workflow' | 'baseUrl' | 'onError'
 > & {
-  // the endpoint to serve local files and llamacloud files
+  // the endpoint to serve local files or llamacloud files
+  // if not provided, url for files cannot be constructed, and ChatSources won't be displayed in the UI
+  // eg. for non-llamacloud: localhost:3000/deployments/chat/ui/api/files/data
+  // eg. for llamacloud: localhost:3000/deployments/chat/ui/api/files/output/llamacloud
   fileServerUrl?: string
 }
 
