@@ -112,6 +112,7 @@ export async function fetchTaskEvents<E extends WorkflowEvent>(
       if (retryParsedLines.length > 0) {
         // if there are lines that failed to parse, append them to the current chunk
         chunk = `${retryParsedLines.join('')}${chunk}`
+        console.info('Retry parsing with chunk:', { retryParsedLines, chunk })
         retryParsedLines = [] // reset for next iteration
       }
 
