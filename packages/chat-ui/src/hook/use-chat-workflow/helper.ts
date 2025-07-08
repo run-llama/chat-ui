@@ -198,7 +198,7 @@ function getDocumentUrlFromRawNode(
   fileServerUrl?: string
 ): string {
   const { metadata } = rawNode.node
-  const { URL: fileURL, file_name, pipeline_id } = metadata
+  const { URL: fileURL, pipeline_id } = metadata
 
   // if the file URL is provided in the metadata, use it
   if (fileURL) return fileURL
@@ -211,8 +211,10 @@ function getDocumentUrlFromRawNode(
     return ''
   }
 
+  let fileName = metadata?.file_name
+
   // check if file_name is provided in the metadata
-  if (!file_name) {
+  if (!fileName) {
     console.warn(
       `No file name found in this raw node: ${JSON.stringify(rawNode)}. It won't be displayed in ChatSources UI.`
     )
@@ -220,8 +222,9 @@ function getDocumentUrlFromRawNode(
   }
 
   if (pipeline_id) {
-    return `${fileServerUrl}/output/llamacloud/${pipeline_id}$${file_name}`
+    // pipeline_id is provided, the file is stored in LlamaCloud, make sure to cache it at the `fileServerUrl`
+    fileName = `${pipeline_id}$${fileName}`
   }
 
-  return `${fileServerUrl}/data/${file_name}`
+  return `${fileServerUrl}/${fileName}`
 }
