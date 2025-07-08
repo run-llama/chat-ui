@@ -7,7 +7,7 @@ import { JSONValue } from '../../chat/chat.interface'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
 import {
   AgentStreamEvent,
-  RawNode,
+  RawNodeWithScore,
   SourceNodesEvent,
   ToolCallEvent,
   ToolCallResultEvent,
@@ -143,7 +143,7 @@ function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
           'source_nodes' in raw_output &&
           Array.isArray(raw_output.source_nodes)
         ) {
-          const rawNodes = raw_output.source_nodes as RawNode[]
+          const rawNodes = raw_output.source_nodes as RawNodeWithScore[]
           return [
             {
               type: MessageAnnotationType.SOURCES,
@@ -179,7 +179,7 @@ function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
 }
 
 function convertRawNodeToSourceNode(
-  rawNode: RawNode,
+  rawNode: RawNodeWithScore,
   fileServerUrl?: string
 ): SourceNode {
   const { node, score } = rawNode
@@ -194,7 +194,7 @@ function convertRawNodeToSourceNode(
 }
 
 function getDocumentUrlFromRawNode(
-  rawNode: RawNode,
+  rawNode: RawNodeWithScore,
   fileServerUrl?: string
 ): string {
   const { metadata } = rawNode.node

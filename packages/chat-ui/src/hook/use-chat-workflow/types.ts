@@ -21,7 +21,7 @@ export interface AgentStreamEvent extends WorkflowEvent {
 }
 
 // represent the raw node in the source nodes event
-export type RawNode = {
+export type RawNodeWithScore = {
   node: {
     id_: string
     metadata: {
@@ -43,7 +43,7 @@ export type RawNode = {
 
 export interface SourceNodesEvent extends WorkflowEvent {
   type: WorkflowEventType.SourceNodesEvent
-  data: { nodes: RawNode[] }
+  data: { nodes: RawNodeWithScore[] }
 }
 
 export interface UIEvent extends WorkflowEvent {
