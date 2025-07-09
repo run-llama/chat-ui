@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.15
+
+### Patch Changes
+
+- 62955a6: fix(useWorkflow): handle incomplete chunk from llama-deploy workflow and retry parsing
+
 ## 0.5.14
 
 ### Patch Changes
