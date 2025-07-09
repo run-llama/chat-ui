@@ -1,5 +1,12 @@
 # nextjs-chat-ui-example
 
+## 0.1.17
+
+### Patch Changes
+
+- Updated dependencies [8bc761b]
+  - @llamaindex/chat-ui@0.5.14
+
 ## 0.1.16
 
 ### Patch Changes
