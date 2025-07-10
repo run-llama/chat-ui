@@ -58,9 +58,8 @@ function CustomChat() {
   )
 }
 
-export function CodePreview() {
+function CodePreview() {
   const { displayedArtifact } = useChatCanvas()
-
   if (displayedArtifact?.type !== 'code') return null
 
   const {
