@@ -1,5 +1,12 @@
 # web
 
+## 1.0.48
+
+### Patch Changes
+
+- Updated dependencies [284ff69]
+  - @llamaindex/dynamic-ui@0.0.2
+
 ## 1.0.47
 
 ### Patch Changes
