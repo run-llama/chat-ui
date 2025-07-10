@@ -40,20 +40,22 @@ export function ArtifactCard({
   return (
     <div
       className={cn(
-        'border-border flex w-full max-w-72 cursor-pointer items-center justify-between gap-2 rounded-lg border-2 p-2 hover:border-blue-500',
-        isDisplayed && 'border-blue-500'
+        'border-border hover:border-primary flex w-full max-w-72 cursor-pointer items-center justify-between gap-2 rounded-lg border-2 p-2',
+        isDisplayed && 'border-primary'
       )}
       onClick={() => openArtifactInCanvas(data)}
     >
       <div className="flex flex-1 items-center gap-2">
-        <Icon className="size-7 shrink-0 text-blue-500" />
+        <Icon className="text-primary size-7 shrink-0" />
         <div className="flex flex-col">
           <div className="text-sm font-semibold">Version {versionNumber}</div>
           <div className="text-xs text-gray-600">{title}</div>
         </div>
       </div>
       {isLatest ? (
-        <Badge className="ml-2 bg-blue-500 hover:bg-blue-600">Latest</Badge>
+        <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 ml-2">
+          Latest
+        </Badge>
       ) : (
         <Button
           variant="ghost"

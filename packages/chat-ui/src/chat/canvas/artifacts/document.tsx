@@ -67,7 +67,7 @@ export function DocumentArtifactViewer({
     <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
       <div className="flex items-center justify-between border-b p-4">
         <h3 className="flex items-center gap-3 text-gray-600">
-          <FileText className="size-8 text-blue-500" />
+          <FileText className="text-primary size-8" />
           <div className="flex flex-col">
             <div className="text font-semibold">{title}</div>
             <div className="text-xs text-gray-500">{type}</div>
@@ -80,7 +80,7 @@ export function DocumentArtifactViewer({
           <div className="absolute right-[30px] top-[14px] z-20 flex gap-2 text-sm">
             <Button
               size="sm"
-              className="h-7 bg-blue-500 hover:bg-blue-600"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-7"
               onClick={handleSaveChanges}
             >
               Save
