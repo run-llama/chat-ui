@@ -1,5 +1,5 @@
 {
-  "name": "@llamaindex/chat-ui/dynamic",
+  "name": "@llamaindex/dynamic-ui",
   "version": "0.0.1",
   "types": "./dist/chat/index.d.ts",
   "type": "module",
