@@ -1,7 +1,7 @@
 {
   "name": "@llamaindex/dynamic-ui",
   "version": "0.0.1",
-  "types": "./dist/chat/index.d.ts",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "files": [
     "dist",
@@ -9,9 +9,9 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/chat/index.d.ts",
-      "import": "./dist/chat/index.js",
-      "require": "./dist/chat/index.cjs"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "license": "MIT",
@@ -22,8 +22,9 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/babel__standalone": "^7.1.9",
-    "@types/babel__traverse": "^7.20.7",
+    "@types/babel__standalone": "7.1.9",
+    "@types/babel__traverse": "7.20.7",
+    "@babel/types": "7.27.0",
     "@llamaindex/eslint-config": "workspace:*",
     "@llamaindex/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "4.0.7",
@@ -36,10 +37,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@babel/parser": "^7.27.0",
-    "@babel/standalone": "^7.27.0",
-    "@babel/traverse": "^7.27.0",
-    "@babel/types": "^7.27.0",
+    "@babel/parser": "7.27.0",
+    "@babel/standalone": "7.27.0",
+    "@babel/traverse": "7.27.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",

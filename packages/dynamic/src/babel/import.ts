@@ -1,8 +1,11 @@
 'use client'
 
 import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
+import babelTraverse from '@babel/traverse'
 import React from 'react'
+
+// Fix webpack error: _babel_traverse__WEBPACK_IMPORTED_MODULE_1__ is not a function
+const traverse = (babelTraverse as any).default as typeof babelTraverse
 
 export const SHADCN_IMPORT_PREFIX = '@/components/ui' // all 46 Shadcn components
 
