@@ -78,11 +78,11 @@ function ArtifactVersionHistory() {
                   setIsOpen(false)
                 }}
               >
-                <span className={cn(isCurrent && 'text-blue-500')}>
+                <span className={cn(isCurrent && 'text-primary')}>
                   Version {versionNumber}
                 </span>
                 {isLatest ? (
-                  <Badge className="h-6 w-[70px] justify-center bg-blue-500 text-center hover:bg-blue-600">
+                  <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 h-6 w-[70px] justify-center text-center">
                     Latest
                   </Badge>
                 ) : (

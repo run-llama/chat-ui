@@ -34,7 +34,7 @@ export function PdfDialog(props: PdfDialogProps) {
             <DrawerDescription className="break-all">
               File URL:{' '}
               <a
-                className="hover:text-blue-900"
+                className="hover:text-primary"
                 href={props.url}
                 target="_blank"
                 rel="noopener"

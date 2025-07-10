@@ -68,7 +68,7 @@ export function CodeArtifactViewer({
             <div className="bg-background absolute right-0 top-0 flex gap-2 pr-2 text-sm">
               <Button
                 size="sm"
-                className="h-7 bg-blue-500 hover:bg-blue-600"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-7"
                 onClick={handleSaveChanges}
               >
                 Save
