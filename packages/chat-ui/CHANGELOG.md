@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.16
+
+### Patch Changes
+
+- 709a5d3: Use theme color for artifacts
+
 ## 0.5.15
 
 ### Patch Changes
