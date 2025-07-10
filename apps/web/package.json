@@ -15,6 +15,7 @@
     "framer-motion": "^12.15.0",
     "@faker-js/faker": "^9.4.0",
     "@llamaindex/chat-ui": "workspace:*",
+    "@llamaindex/dynamic-ui": "workspace:*",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.1.1",
     "ai": "4.0.0",

@@ -8,7 +8,7 @@ import {
   ChatSection,
 } from '@llamaindex/chat-ui'
 import { Message, useChat } from 'ai/react'
-import { ArrowRightIcon } from 'lucide-react'
+import { ArrowRightIcon, Code } from 'lucide-react'
 import Link from 'next/link'
 
 const code = `
@@ -765,6 +765,14 @@ function CustomChat() {
                 className="flex h-10 items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
               >
                 Custom Viewer <ArrowRightIcon className="h-4 w-4" />
+              </button>
+            </Link>
+            <Link href="/demo/canvas/code-preview">
+              <button
+                type="button"
+                className="flex h-10 items-center gap-2 rounded-lg bg-orange-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-500"
+              >
+                Code Preview <Code className="h-4 w-4" />
               </button>
             </Link>
           </div>
