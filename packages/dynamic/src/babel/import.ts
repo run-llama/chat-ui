@@ -100,6 +100,9 @@ export const SOURCE_MAP: Record<string, () => Promise<any>> = {
 
   ///// ZOD /////
   [`zod`]: () => import('zod'),
+
+  ///// RECHARTS /////
+  [`recharts`]: () => import('recharts'),
 }
 
 // parse imports from code to get Function constructor arguments and component name
