@@ -27,9 +27,8 @@ export class DynamicComponentErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.warn(error, errorInfo)
-    const errorMessage = `Fail to render component: ${error.message}`
-    this.props.onError?.(errorMessage)
+    console.warn('Runtime Error caught:', error, errorInfo)
+    this.props.onError?.(error.message)
   }
 
   render() {

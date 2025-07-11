@@ -49,12 +49,13 @@ export function DynamicComponent({
     )
   }
 
-  if (!component) {
+  if (errors.length > 0 || !component) {
     return (
       <div className="flex h-full w-full p-10">
         <div className="max-w-3xl space-y-4">
           <div className="text-gray-500">
-            Failed to render component. Please check the following errors:
+            Failed to render component. Please check the following errors and
+            console for more details:
           </div>
           <ul className="list-disc pl-4 text-sm">
             {errors.map((error, index) => (
