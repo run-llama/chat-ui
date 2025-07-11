@@ -68,10 +68,12 @@ curl -X POST 'http://localhost:4501/deployments/chat/tasks/create' \
   }'
 ```
 
-Stream events:
+Stream events (while the task is running):
 
 ```bash
-curl 'http://localhost:4501/deployments/chat/tasks/0b411be6-005d-43f0-9b6b-6a0017f08002/events?session_id=dd36442c-45ca-4eaa-8d75-b4e6dad1a83e&raw_event=true' \
+TASK_ID=0b411be6-005d-43f0-9b6b-6a0017f08002
+SESSION_ID=dd36442c-45ca-4eaa-8d75-b4e6dad1a83e
+curl 'http://localhost:4501/deployments/chat/tasks/$TASK_ID/events?session_id=$SESSION_ID&raw_event=true' \
   -H 'Content-Type: application/json'
 ```
 

@@ -13,8 +13,8 @@ services:
       name: src
     path: src/chat_workflow:workflow
     python-dependencies:
-      - llama-index-llms-openai>=0.4.5
-      - llama-index-core>=0.12.45
+      - llama-index-llms-openai==0.4.5
+      - llama-index-core==0.12.45
   agent_workflow:
     name: Agent Workflow
     source:
@@ -22,7 +22,7 @@ services:
       name: src
     path: src/agent_workflow:workflow
     python-dependencies:
-      - llama-index-llms-openai>=0.4.5
+      - llama-index-llms-openai==0.4.5
   cli_workflow:
     name: CLI Workflow
     source:

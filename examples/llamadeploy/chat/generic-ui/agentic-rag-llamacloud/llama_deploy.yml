@@ -13,8 +13,8 @@ services:
       name: src
     path: src/workflow:workflow
     python-dependencies:
-      - llama-index-llms-openai>=0.4.5
-      - llama-index-core>=0.12.45
+      - llama-index-llms-openai==0.4.5
+      - llama-index-core==0.12.45
 
 ui:
   name: My Nextjs App
