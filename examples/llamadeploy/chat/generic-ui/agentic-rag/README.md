@@ -1,8 +1,8 @@
-# LlamaIndex Workflow Example
+# LlamaDeploy + LlamaIndexServer Example
 
-This is a [LlamaIndex](https://www.llamaindex.ai/) project that using [Workflows](https://docs.llamaindex.ai/en/stable/understanding/workflows/) deployed with [LlamaDeploy](https://github.com/run-llama/llama_deploy).
+This is a [LlamaIndex](https://www.llamaindex.ai/) project that using [AgentWorkflows](https://docs.llamaindex.ai/en/stable/understanding/agent/) to deploy an agentic RAG with [LlamaDeploy](https://github.com/run-llama/llama_deploy).
 
-LlamaDeploy is a system for deploying and managing LlamaIndex workflows, while LlamaIndexServer provides a pre-built TypeScript server with an integrated chat UI that can connect directly to LlamaDeploy deployments. This example shows how you can quickly set up a complete chat application by combining these two technologies/
+LlamaDeploy is a system for deploying and managing LlamaIndex workflows, while LlamaIndexServer provides a pre-built TypeScript server with an integrated chat UI that can connect directly to LlamaDeploy deployments. This example shows how you can quickly set up a complete chat application by combining these two technologies.
 
 ## Prerequisites
 
@@ -20,11 +20,9 @@ Both the SDK and the CLI are part of the LlamaDeploy Python package. To install,
 uv sync
 ```
 
-If you don't have uv installed, you can follow the instructions [here](https://docs.astral.sh/uv/getting-started/installation/).
-
 ## Generate Index
 
-Generate the embeddings of the documents in the `./data` directory:
+Generate the embeddings of the documents in the [`./ui/data`](./ui/data) directory:
 
 ```shell
 uv run generate
@@ -81,7 +79,7 @@ Note that the task_id and session_id are returned when creating a new task.
 
 ## Use Case
 
-We have prepared an [example workflow](./src/workflow.py) for the agentic RAG use case, where you can ask questions about the example documents in the [./data](./data) directory.
+We have prepared an [example workflow](./src/workflow.py) for the agentic RAG use case, where you can ask questions about the example documents in the [./ui/data](./ui/data) directory.
 To update the workflow, you can modify the code in [`src/workflow.py`](src/workflow.py).
 
 ## Customize the UI
@@ -93,7 +91,6 @@ The following are the available options:
 - `starterQuestions`: Predefined questions for chat interface
 - `componentsDir`: Directory for custom event components
 - `layoutDir`: Directory for custom layout components
-- `llamaCloudIndexSelector`: Enable LlamaCloud integration
 - `llamaDeploy`: The LlamaDeploy configration (deployment name and workflow name that defined in the [llama_deploy.yml](llama_deploy.yml) file)
 
 ## Learn More

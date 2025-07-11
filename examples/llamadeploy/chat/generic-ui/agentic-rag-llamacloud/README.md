@@ -1,8 +1,8 @@
-# LlamaIndex Workflow Example
+# LlamaDeploy + LlamaCloud + LlamaIndexServer Example
 
-This is a [LlamaIndex](https://www.llamaindex.ai/) project that using [Workflows](https://docs.llamaindex.ai/en/stable/understanding/workflows/) deployed with [LlamaDeploy](https://github.com/run-llama/llama_deploy).
+This is a [LlamaIndex](https://www.llamaindex.ai/) project that using [AgentWorkflows](https://docs.llamaindex.ai/en/stable/understanding/agent/) to deploy an agentic RAG with [LlamaDeploy](https://github.com/run-llama/llama_deploy) using an index hosted on [LlamaCloud](https://llamacloud.ai/).
 
-LlamaDeploy is a system for deploying and managing LlamaIndex workflows, while LlamaIndexServer provides a pre-built TypeScript server with an integrated chat UI that can connect directly to LlamaDeploy deployments. This example shows how you can quickly set up a complete chat application by combining these two technologies/
+LlamaDeploy is a system for deploying and managing LlamaIndex workflows, while LlamaIndexServer provides a pre-built TypeScript server with an integrated chat UI that can connect directly to LlamaDeploy deployments. This example shows how you can quickly set up a complete chat application by combining these two technologies.
 
 ## Prerequisites
 
@@ -20,11 +20,9 @@ Both the SDK and the CLI are part of the LlamaDeploy Python package. To install,
 uv sync
 ```
 
-If you don't have uv installed, you can follow the instructions [here](https://docs.astral.sh/uv/getting-started/installation/).
-
 ## Generate Index
 
-Generate the embeddings of the documents in the `./data` directory:
+Generate the embeddings of the documents in the [`./ui/data`](./ui/data) directory:
 
 ```shell
 uv run generate
