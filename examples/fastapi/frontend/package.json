@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@llamaindex/chat-ui": "workspace:*",
+    "@llamaindex/chat-ui": "latest",
     "ai": "^4.3.16",
     "next": "^15.3.2",
     "react": "^19.1.0",
