@@ -74,7 +74,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     ([, config]) => config.theme || config.color
   )
 
-  if (!colorConfig.length) {
+  if (!colorConfig?.length) {
     return null
   }
 
@@ -168,7 +168,7 @@ function ChartTooltipContent({
     return null
   }
 
-  const nestLabel = payload.length === 1 && indicator !== 'dot'
+  const nestLabel = payload?.length === 1 && indicator !== 'dot'
 
   return (
     <div
