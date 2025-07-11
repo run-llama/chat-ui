@@ -120,7 +120,7 @@ importers:
   examples/fastapi/frontend:
     dependencies:
       '@llamaindex/chat-ui':
-        specifier: workspace:*
+        specifier: latest
         version: link:../../../packages/chat-ui
       ai:
         specifier: ^4.3.16
@@ -169,7 +169,7 @@ importers:
   examples/nextjs:
     dependencies:
       '@llamaindex/chat-ui':
-        specifier: workspace:*
+        specifier: latest
         version: link:../../packages/chat-ui
       ai:
         specifier: ^4.3.16
