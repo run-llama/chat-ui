@@ -3,6 +3,4 @@ packages:
   - "packages/*"
   - "examples/**"
   - "docs"
-
-  # UI will be built separately by llama-deploy server
-  - "!examples/llamadeploy/*/ui"
+  - "!examples/*"

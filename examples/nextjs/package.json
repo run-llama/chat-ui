@@ -17,8 +17,9 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@llamaindex/eslint-config": "workspace:*",
-    "@llamaindex/typescript-config": "workspace:*",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.5",
+    "@eslint/eslintrc": "^3",
     "@next/eslint-plugin-next": "^14.2.3",
     "@tailwindcss/postcss": "^4.0.7",
     "@types/node": "^20.11.24",
