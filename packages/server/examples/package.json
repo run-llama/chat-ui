@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
     "dev": "nodemon --exec tsx simple-workflow/calculator.ts"
   },
   "dependencies": {
