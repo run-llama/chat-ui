@@ -1,5 +1,5 @@
-import { artifactEvent, extractLastArtifact } from "@llamaindex/server";
-import { ChatMemoryBuffer, MessageContent, Settings } from "llamaindex";
+import { artifactEvent, extractLastArtifact } from '@llamaindex/server'
+import { ChatMemoryBuffer, MessageContent, Settings } from 'llamaindex'
 
 import {
   agentStreamEvent,
@@ -8,95 +8,95 @@ import {
   startAgentEvent,
   stopAgentEvent,
   workflowEvent,
-} from "@llamaindex/workflow";
+} from '@llamaindex/workflow'
 
-import { z } from "zod";
+import { z } from 'zod'
 
 export const RequirementSchema = z.object({
-  next_step: z.enum(["answering", "coding"]),
+  next_step: z.enum(['answering', 'coding']),
   language: z.string().nullable().optional(),
   file_name: z.string().nullable().optional(),
   requirement: z.string(),
-});
+})
 
-export type Requirement = z.infer<typeof RequirementSchema>;
+export type Requirement = z.infer<typeof RequirementSchema>
 
 export const UIEventSchema = z.object({
-  type: z.literal("ui_event"),
+  type: z.literal('ui_event'),
   data: z.object({
     state: z
-      .enum(["plan", "generate", "completed"])
+      .enum(['plan', 'generate', 'completed'])
       .describe(
-        "The current state of the workflow: 'plan', 'generate', or 'completed'.",
+        "The current state of the workflow: 'plan', 'generate', or 'completed'."
       ),
     requirement: z
       .string()
       .optional()
       .describe(
-        "An optional requirement creating or updating a code, if applicable.",
+        'An optional requirement creating or updating a code, if applicable.'
       ),
   }),
-});
+})
 
-export type UIEvent = z.infer<typeof UIEventSchema>;
+export type UIEvent = z.infer<typeof UIEventSchema>
 const planEvent = workflowEvent<{
-  userInput: MessageContent;
-  context?: string | undefined;
-}>();
+  userInput: MessageContent
+  context?: string | undefined
+}>()
 
 const generateArtifactEvent = workflowEvent<{
-  requirement: Requirement;
-}>();
+  requirement: Requirement
+}>()
 
-const synthesizeAnswerEvent = workflowEvent<object>();
+const synthesizeAnswerEvent = workflowEvent<object>()
 
-const uiEvent = workflowEvent<UIEvent>();
+const uiEvent = workflowEvent<UIEvent>()
 
 export function workflowFactory(reqBody: unknown) {
-  const llm = Settings.llm;
+  const llm = Settings.llm
 
   const { withState, getContext } = createStatefulMiddleware(() => {
     return {
       memory: new ChatMemoryBuffer({ llm }),
       lastArtifact: extractLastArtifact(reqBody),
-    };
-  });
-  const workflow = withState(createWorkflow());
+    }
+  })
+  const workflow = withState(createWorkflow())
 
   workflow.handle([startAgentEvent], async ({ data }) => {
-    const { userInput, chatHistory = [] } = data;
+    const { userInput, chatHistory = [] } = data
     // Prepare chat history
-    const { state } = getContext();
+    const { state } = getContext()
     // Put user input to the memory
     if (!userInput) {
-      throw new Error("Missing user input to start the workflow");
+      throw new Error('Missing user input to start the workflow')
     }
-    state.memory.set(chatHistory);
-    state.memory.put({ role: "user", content: userInput });
+    state.memory.set(chatHistory)
+    state.memory.put({ role: 'user', content: userInput })
 
     return planEvent.with({
       userInput: userInput,
       context: state.lastArtifact
         ? JSON.stringify(state.lastArtifact)
         : undefined,
-    });
-  });
+    })
+  })
 
   workflow.handle([planEvent], async ({ data: planData }) => {
-    const { sendEvent } = getContext();
-    const { state } = getContext();
+    const { sendEvent } = getContext()
+    const { state } = getContext()
     sendEvent(
       uiEvent.with({
-        type: "ui_event",
+        type: 'ui_event',
         data: {
-          state: "plan",
+          state: 'plan',
         },
-      }),
-    );
-    const user_msg = planData.userInput;
+      })
+    )
+    const user_msg = planData.userInput
     const context = planData.context
       ? `## The context is: \n${planData.context}\n`
-      : "";
+      : ''
     const prompt = `
 You are a product analyst responsible for analyzing the user's request and providing the next step for code or document generation.
 You are helping user with their code artifact. To update the code, you need to plan a coding step.
@@ -151,50 +151,50 @@ ${context}
 
 Now, plan the user's next step for this request:
 ${user_msg}
-`;
+`
 
     const response = await llm.complete({
       prompt,
-    });
+    })
     // parse the response to Requirement
     // 1. use regex to find the json block
-    const jsonBlock = response.text.match(/```json\s*([\s\S]*?)\s*```/);
+    const jsonBlock = response.text.match(/```json\s*([\s\S]*?)\s*```/)
     if (!jsonBlock) {
-      throw new Error("No JSON block found in the response.");
+      throw new Error('No JSON block found in the response.')
     }
-    const requirement = RequirementSchema.parse(JSON.parse(jsonBlock[1]));
+    const requirement = RequirementSchema.parse(JSON.parse(jsonBlock[1]))
     state.memory.put({
-      role: "assistant",
+      role: 'assistant',
       content: `The plan for next step: \n${response.text}`,
-    });
+    })
 
-    if (requirement.next_step === "coding") {
+    if (requirement.next_step === 'coding') {
       return generateArtifactEvent.with({
         requirement,
-      });
+      })
     } else {
-      return synthesizeAnswerEvent.with({});
+      return synthesizeAnswerEvent.with({})
     }
-  });
+  })
 
   workflow.handle([generateArtifactEvent], async ({ data: planData }) => {
-    const { sendEvent } = getContext();
-    const { state } = getContext();
+    const { sendEvent } = getContext()
+    const { state } = getContext()
 
     sendEvent(
       uiEvent.with({
-        type: "ui_event",
+        type: 'ui_event',
         data: {
-          state: "generate",
+          state: 'generate',
           requirement: planData.requirement.requirement,
         },
-      }),
-    );
+      })
+    )
 
     const previousArtifact = state.lastArtifact
       ? JSON.stringify(state.lastArtifact)
-      : "There is no previous artifact";
-    const requirementText = planData.requirement.requirement;
+      : 'There is no previous artifact'
+    const requirementText = planData.requirement.requirement
 
     const prompt = `
         You are a skilled developer who can help user with coding.
@@ -244,94 +244,94 @@ ${user_msg}
         Now, i have to generate the code for the following requirement:
         {requirement}
       `
-      .replace("{previousArtifact}", previousArtifact)
-      .replace("{requirement}", requirementText);
+      .replace('{previousArtifact}', previousArtifact)
+      .replace('{requirement}', requirementText)
 
     const response = await llm.complete({
       prompt,
-    });
+    })
 
     // Extract the code from the response
-    const codeMatch = response.text.match(/```(\w+)([\s\S]*)```/);
+    const codeMatch = response.text.match(/```(\w+)([\s\S]*)```/)
     if (!codeMatch) {
-      return synthesizeAnswerEvent.with({});
+      return synthesizeAnswerEvent.with({})
     }
 
-    const code = codeMatch[2].trim();
+    const code = codeMatch[2].trim()
 
     // Put the generated code to the memory
     state.memory.put({
-      role: "assistant",
+      role: 'assistant',
       content: `Updated the code: \n${response.text}`,
-    });
+    })
 
     // To show the Canvas panel for the artifact
     sendEvent(
       artifactEvent.with({
-        type: "artifact",
+        type: 'artifact',
         data: {
-          type: "code",
+          type: 'code',
           created_at: Date.now(),
           data: {
-            language: planData.requirement.language || "",
-            file_name: planData.requirement.file_name || "",
+            language: planData.requirement.language || '',
+            file_name: planData.requirement.file_name || '',
             code,
           },
         },
-      }),
-    );
+      })
+    )
 
-    return synthesizeAnswerEvent.with({});
-  });
+    return synthesizeAnswerEvent.with({})
+  })
 
   workflow.handle([synthesizeAnswerEvent], async () => {
-    const { sendEvent } = getContext();
-    const { state } = getContext();
+    const { sendEvent } = getContext()
+    const { state } = getContext()
 
-    const chatHistory = await state.memory.getMessages();
+    const chatHistory = await state.memory.getMessages()
     const messages = [
       ...chatHistory,
       {
-        role: "system" as const,
+        role: 'system' as const,
         content: `
         You are a helpful assistant who is responsible for explaining the work to the user.
         Based on the conversation history, provide an answer to the user's question. 
         The user has access to the code so avoid mentioning the whole code again in your response.
       `,
       },
-    ];
+    ]
 
     const responseStream = await llm.chat({
       messages,
       stream: true,
-    });
+    })
 
     sendEvent(
       uiEvent.with({
-        type: "ui_event",
+        type: 'ui_event',
         data: {
-          state: "completed",
+          state: 'completed',
         },
-      }),
-    );
+      })
+    )
 
-    let response = "";
+    let response = ''
     for await (const chunk of responseStream) {
-      response += chunk.delta;
+      response += chunk.delta
       sendEvent(
         agentStreamEvent.with({
           delta: chunk.delta,
-          response: "",
-          currentAgentName: "assistant",
+          response: '',
+          currentAgentName: 'assistant',
           raw: chunk,
-        }),
-      );
+        })
+      )
     }
 
     return stopAgentEvent.with({
       result: response,
-    });
-  });
+    })
+  })
 
-  return workflow;
+  return workflow
 }

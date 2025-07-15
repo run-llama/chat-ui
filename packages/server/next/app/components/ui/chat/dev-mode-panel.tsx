@@ -1,156 +1,156 @@
-"use client";
+'use client'
 
 import {
   CodeEditor,
   fileExtensionToEditorLang,
-} from "@llamaindex/chat-ui/widgets";
-import { AlertCircle, Loader2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "../button";
-import { getConfig } from "../lib/utils";
+} from '@llamaindex/chat-ui/widgets'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Button } from '../button'
+import { getConfig } from '../lib/utils'
 
-const API_PATH = "/api/dev/files/workflow";
-const POLLING_TIMEOUT = 30_000; // 30 seconds
+const API_PATH = '/api/dev/files/workflow'
+const POLLING_TIMEOUT = 30_000 // 30 seconds
 
 type WorkflowFile = {
-  last_modified: number;
-  file_path: string;
-  content: string;
-};
+  last_modified: number
+  file_path: string
+  content: string
+}
 
 export function DevModePanel() {
   const devModeEnabled =
-    getConfig("DEV_MODE") ?? process.env.NEXT_PUBLIC_DEV_MODE === "true";
-  if (!devModeEnabled) return null;
-  return <DevModePanelComp />;
+    getConfig('DEV_MODE') ?? process.env.NEXT_PUBLIC_DEV_MODE === 'true'
+  if (!devModeEnabled) return null
+  return <DevModePanelComp />
 }
 
 function DevModePanelComp() {
-  const [devModeOpen, setDevModeOpen] = useState(false);
+  const [devModeOpen, setDevModeOpen] = useState(false)
 
-  const [isFetching, setIsFetching] = useState(false);
-  const [fetchingError, setFetchingError] = useState<string | null>();
-  const [workflowFile, setWorkflowFile] = useState<WorkflowFile | null>(null);
+  const [isFetching, setIsFetching] = useState(false)
+  const [fetchingError, setFetchingError] = useState<string | null>()
+  const [workflowFile, setWorkflowFile] = useState<WorkflowFile | null>(null)
 
-  const [updatedCode, setUpdatedCode] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [updatedCode, setUpdatedCode] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const [isPolling, setIsPolling] = useState(false);
-  const [pollingError, setPollingError] = useState<string | null>(null);
+  const [isPolling, setIsPolling] = useState(false)
+  const [pollingError, setPollingError] = useState<string | null>(null)
 
   async function fetchWorkflowCode() {
     try {
-      setIsFetching(true);
-      const response = await fetch(API_PATH);
-      const data = await response.json();
+      setIsFetching(true)
+      const response = await fetch(API_PATH)
+      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data?.detail ?? "Unknown error");
+        throw new Error(data?.detail ?? 'Unknown error')
       }
 
-      setWorkflowFile(data);
-      setFetchingError(null);
+      setWorkflowFile(data)
+      setFetchingError(null)
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      setFetchingError(errorMessage);
-      console.warn("Error fetching workflow code:", error);
+        error instanceof Error ? error.message : 'Unknown error'
+      setFetchingError(errorMessage)
+      console.warn('Error fetching workflow code:', error)
     } finally {
-      setIsFetching(false);
+      setIsFetching(false)
     }
   }
 
   async function restartingWorkflow() {
-    if (!workflowFile) return;
+    if (!workflowFile) return
 
-    const initialLastModified = workflowFile.last_modified;
-    setIsPolling(true);
-    setPollingError(null);
+    const initialLastModified = workflowFile.last_modified
+    setIsPolling(true)
+    setPollingError(null)
 
-    const pollStartTime = Date.now();
+    const pollStartTime = Date.now()
 
     // interval refetching the updated workflow code
     const poll = async () => {
       if (Date.now() - pollStartTime > POLLING_TIMEOUT) {
         setPollingError(
-          `Server not responding after ${POLLING_TIMEOUT / 1000} seconds.`,
-        );
-        return;
+          `Server not responding after ${POLLING_TIMEOUT / 1000} seconds.`
+        )
+        return
       }
 
       try {
-        const pollResponse = await fetch(API_PATH);
-        const pollData = (await pollResponse.json()) as WorkflowFile;
+        const pollResponse = await fetch(API_PATH)
+        const pollData = (await pollResponse.json()) as WorkflowFile
         if (pollData.last_modified !== initialLastModified) {
-          setWorkflowFile(pollData);
-          setUpdatedCode(pollData.content);
-          setIsPolling(false);
-          setPollingError(null);
-          setDevModeOpen(false);
+          setWorkflowFile(pollData)
+          setUpdatedCode(pollData.content)
+          setIsPolling(false)
+          setPollingError(null)
+          setDevModeOpen(false)
         } else {
-          setTimeout(poll, 2000);
+          setTimeout(poll, 2000)
         }
       } catch (error) {
-        console.info("Polling error", error);
-        setTimeout(poll, 2000);
+        console.info('Polling error', error)
+        setTimeout(poll, 2000)
       }
-    };
+    }
 
-    setTimeout(poll, 2000);
+    setTimeout(poll, 2000)
   }
 
   const handleResetCode = () => {
-    setUpdatedCode(workflowFile?.content ?? null);
-    setSaveError(null);
-  };
+    setUpdatedCode(workflowFile?.content ?? null)
+    setSaveError(null)
+  }
 
   const handleSaveCode = async () => {
-    if (!workflowFile) return;
+    if (!workflowFile) return
 
     try {
-      setIsSaving(true);
+      setIsSaving(true)
       const response = await fetch(API_PATH, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           content: updatedCode,
           file_path: workflowFile.file_path,
         }),
-      });
-      const data = await response.json();
+      })
+      const data = await response.json()
       if (!response.ok) {
-        throw new Error(data?.detail ?? "Unknown error");
+        throw new Error(data?.detail ?? 'Unknown error')
       }
-      setSaveError(null);
-      await restartingWorkflow();
+      setSaveError(null)
+      await restartingWorkflow()
     } catch (error) {
-      console.warn("Error saving workflow code:", error);
+      console.warn('Error saving workflow code:', error)
       setSaveError(
         error instanceof Error
           ? error.message
-          : "Unknown error happened when saving workflow code",
-      );
+          : 'Unknown error happened when saving workflow code'
+      )
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   useEffect(() => {
     if (devModeOpen) {
-      fetchWorkflowCode();
+      fetchWorkflowCode()
     }
-  }, [devModeOpen]);
+  }, [devModeOpen])
 
   const codeEditorLanguage = useMemo(() => {
-    if (!workflowFile?.file_path) return undefined;
+    if (!workflowFile?.file_path) return undefined
     return fileExtensionToEditorLang(
-      workflowFile.file_path.split(".").pop() ?? "",
-    );
-  }, [workflowFile]);
+      workflowFile.file_path.split('.').pop() ?? ''
+    )
+  }, [workflowFile])
 
   return (
     <>
@@ -193,27 +193,27 @@ function DevModePanelComp() {
 
       <div
         className={`border-border fixed right-0 top-0 z-10 h-full w-full border-l shadow-xl transition-all duration-300 ease-in-out ${
-          devModeOpen ? "translate-x-0 bg-black/50" : "translate-x-full"
+          devModeOpen ? 'translate-x-0 bg-black/50' : 'translate-x-full'
         }`}
         onClick={() => setDevModeOpen(false)}
       >
         <div
           className={`bg-background ml-auto flex h-full w-[800px] flex-col p-4`}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold">Workflow Editor</h2>
               <p className="text-muted-foreground text-sm">
                 {isFetching ? (
-                  "Loading..."
+                  'Loading...'
                 ) : workflowFile ? (
                   <>
                     Edit the code of <b>{workflowFile.file_path}</b> and save to
                     apply changes to your workflow.
                   </>
                 ) : (
-                  ""
+                  ''
                 )}
               </p>
             </div>
@@ -233,7 +233,7 @@ function DevModePanelComp() {
               </div>
             ) : (
               <CodeEditor
-                code={updatedCode ?? workflowFile?.content ?? ""}
+                code={updatedCode ?? workflowFile?.content ?? ''}
                 onChange={setUpdatedCode}
                 language={codeEditorLanguage}
               />
@@ -270,5 +270,5 @@ function DevModePanelComp() {
         </div>
       </div>
     </>
-  );
+  )
 }

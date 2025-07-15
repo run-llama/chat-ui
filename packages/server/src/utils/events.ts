@@ -1,55 +1,55 @@
-import { randomUUID } from "@llamaindex/env";
-import { workflowEvent } from "@llamaindex/workflow";
-import type { Message } from "ai";
+import { randomUUID } from '@llamaindex/env'
+import { workflowEvent } from '@llamaindex/workflow'
+import type { Message } from 'ai'
 import {
   MetadataMode,
   type ChatMessage,
   type Metadata,
   type NodeWithScore,
-} from "llamaindex";
-import { z } from "zod";
-import { getStoredFilePath } from "./file";
-import { getInlineAnnotations } from "./inline";
+} from 'llamaindex'
+import { z } from 'zod'
+import { getStoredFilePath } from './file'
+import { getInlineAnnotations } from './inline'
 
 // Events that appended to stream as annotations
 export type SourceEventNode = {
-  id: string;
-  metadata: Metadata;
-  score: number | null;
-  url: string;
-  text: string;
-  fileName: string;
-  filePath: string;
-};
+  id: string
+  metadata: Metadata
+  score: number | null
+  url: string
+  text: string
+  fileName: string
+  filePath: string
+}
 
 export type SourceEventData = {
-  type: "sources";
+  type: 'sources'
   data: {
-    nodes: SourceEventNode[];
-  };
-};
-export const sourceEvent = workflowEvent<SourceEventData>();
+    nodes: SourceEventNode[]
+  }
+}
+export const sourceEvent = workflowEvent<SourceEventData>()
 
 export type AgentRunEventData = {
-  type: "agent";
+  type: 'agent'
   data: {
-    agent: string;
-    text: string;
-    type: "text" | "progress";
-    data?: { id: string; total: number; current: number } | undefined;
-  };
-};
-export const agentRunEvent = workflowEvent<AgentRunEventData>();
+    agent: string
+    text: string
+    type: 'text' | 'progress'
+    data?: { id: string; total: number; current: number } | undefined
+  }
+}
+export const agentRunEvent = workflowEvent<AgentRunEventData>()
 
 export function toSourceEventNode(
   node: NodeWithScore<Metadata>,
-  llamaCloudOutputDir: string = "output/llamacloud",
+  llamaCloudOutputDir: string = 'output/llamacloud'
 ) {
-  const { file_name, pipeline_id } = node.node.metadata;
+  const { file_name, pipeline_id } = node.node.metadata
 
   const filePath = pipeline_id
     ? `${llamaCloudOutputDir}/${pipeline_id}$${file_name}`
-    : `data/${file_name}`;
+    : `data/${file_name}`
 
   return {
     id: node.node.id_,
@@ -59,28 +59,28 @@ export function toSourceEventNode(
     metadata: node.node.metadata,
     score: node.score ?? null,
     text: node.node.getContent(MetadataMode.NONE),
-  };
+  }
 }
 
 export function toSourceEvent(
   sourceNodes: NodeWithScore<Metadata>[] = [],
-  llamaCloudOutputDir: string = "output/llamacloud",
+  llamaCloudOutputDir: string = 'output/llamacloud'
 ) {
-  const nodes: SourceEventNode[] = sourceNodes.map((node) =>
-    toSourceEventNode(node, llamaCloudOutputDir),
-  );
+  const nodes: SourceEventNode[] = sourceNodes.map(node =>
+    toSourceEventNode(node, llamaCloudOutputDir)
+  )
   return sourceEvent.with({
     data: { nodes },
-    type: "sources",
-  });
+    type: 'sources',
+  })
 }
 
 export function toAgentRunEvent(input: {
-  agent: string;
-  text: string;
-  type: "text" | "progress";
-  current?: number;
-  total?: number;
+  agent: string
+  text: string
+  type: 'text' | 'progress'
+  current?: number
+  total?: number
 }) {
   return agentRunEvent.with({
     data: {
@@ -94,134 +94,134 @@ export function toAgentRunEvent(input: {
             }
           : undefined,
     },
-    type: "agent",
-  });
+    type: 'agent',
+  })
 }
 
-export type ArtifactType = "code" | "document";
+export type ArtifactType = 'code' | 'document'
 
 export type Artifact<T = unknown> = {
-  created_at: number;
-  type: ArtifactType;
-  data: T;
-};
+  created_at: number
+  type: ArtifactType
+  data: T
+}
 
 export type CodeArtifactData = {
-  file_name: string;
-  code: string;
-  language: string;
-};
+  file_name: string
+  code: string
+  language: string
+}
 
 export type DocumentArtifactData = {
-  title: string;
-  content: string;
-  type: string; // markdown, html,...
-  sources?: { id: string }[]; // sources that are used to render citation numbers in the document
-};
+  title: string
+  content: string
+  type: string // markdown, html,...
+  sources?: { id: string }[] // sources that are used to render citation numbers in the document
+}
 
 export type CodeArtifact = Artifact<CodeArtifactData> & {
-  type: "code";
-};
+  type: 'code'
+}
 
 export type DocumentArtifact = Artifact<DocumentArtifactData> & {
-  type: "document";
-};
+  type: 'document'
+}
 
 export const artifactEvent = workflowEvent<{
-  type: "artifact";
-  data: Artifact;
-}>();
+  type: 'artifact'
+  data: Artifact
+}>()
 
 export const codeArtifactSchema = z.object({
-  type: z.literal("code"),
+  type: z.literal('code'),
   data: z.object({
     file_name: z.string(),
     code: z.string(),
     language: z.string(),
   }),
   created_at: z.number(),
-});
+})
 
 export const documentArtifactSchema = z.object({
-  type: z.literal("document"),
+  type: z.literal('document'),
   data: z.object({
     title: z.string(),
     content: z.string(),
     type: z.string(),
   }),
   created_at: z.number(),
-});
+})
 
 export const artifactSchema = z.union([
   codeArtifactSchema,
   documentArtifactSchema,
-]);
+])
 
 export const artifactAnnotationSchema = z.object({
-  type: z.literal("artifact"),
+  type: z.literal('artifact'),
   data: artifactSchema,
-});
+})
 
 export function extractArtifactsFromMessage(message: ChatMessage): Artifact[] {
-  const inlineAnnotations = getInlineAnnotations(message);
+  const inlineAnnotations = getInlineAnnotations(message)
   const artifacts = inlineAnnotations.filter(
     (annotation): annotation is z.infer<typeof artifactAnnotationSchema> => {
-      return artifactAnnotationSchema.safeParse(annotation).success;
-    },
-  );
-  return artifacts.map((artifact) => artifact.data);
+      return artifactAnnotationSchema.safeParse(annotation).success
+    }
+  )
+  return artifacts.map(artifact => artifact.data)
 }
 
 export function extractArtifactsFromAllMessages(
-  messages: ChatMessage[],
+  messages: ChatMessage[]
 ): Artifact[] {
   return messages
-    .flatMap((message) => extractArtifactsFromMessage(message))
-    .sort((a, b) => a.created_at - b.created_at);
+    .flatMap(message => extractArtifactsFromMessage(message))
+    .sort((a, b) => a.created_at - b.created_at)
 }
 
 export function extractLastArtifact(
   requestBody: unknown,
-  type: "code",
-): CodeArtifact | undefined;
+  type: 'code'
+): CodeArtifact | undefined
 
 export function extractLastArtifact(
   requestBody: unknown,
-  type: "document",
-): DocumentArtifact | undefined;
+  type: 'document'
+): DocumentArtifact | undefined
 
 export function extractLastArtifact(
   requestBody: unknown,
-  type?: ArtifactType,
-): Artifact | undefined;
+  type?: ArtifactType
+): Artifact | undefined
 
 export function extractLastArtifact(
   requestBody: unknown,
-  type?: ArtifactType,
+  type?: ArtifactType
 ): CodeArtifact | DocumentArtifact | Artifact | undefined {
-  const { messages } = (requestBody as { messages?: ChatMessage[] }) ?? {};
-  if (!messages) return undefined;
+  const { messages } = (requestBody as { messages?: ChatMessage[] }) ?? {}
+  if (!messages) return undefined
 
-  const artifacts = extractArtifactsFromAllMessages(messages);
-  if (!artifacts.length) return undefined;
+  const artifacts = extractArtifactsFromAllMessages(messages)
+  if (!artifacts.length) return undefined
 
   if (type) {
     const lastArtifact = artifacts
       .reverse()
-      .find((artifact) => artifact.type === type);
+      .find(artifact => artifact.type === type)
 
-    if (!lastArtifact) return undefined;
+    if (!lastArtifact) return undefined
 
-    if (type === "code") {
-      return lastArtifact as CodeArtifact;
+    if (type === 'code') {
+      return lastArtifact as CodeArtifact
     }
 
-    if (type === "document") {
-      return lastArtifact as DocumentArtifact;
+    if (type === 'document') {
+      return lastArtifact as DocumentArtifact
     }
   }
 
-  return artifacts[artifacts.length - 1];
+  return artifacts[artifacts.length - 1]
 }
 
 export const fileAnnotationSchema = z.object({
@@ -229,21 +229,21 @@ export const fileAnnotationSchema = z.object({
   size: z.number(),
   type: z.string(),
   url: z.string(),
-});
+})
 
 export const documentFileAnnotationSchema = z.object({
-  type: z.literal("document_file"),
+  type: z.literal('document_file'),
   data: z.object({
     files: z.array(fileAnnotationSchema),
   }),
-});
-type DocumentFileAnnotation = z.infer<typeof documentFileAnnotationSchema>;
+})
+type DocumentFileAnnotation = z.infer<typeof documentFileAnnotationSchema>
 
-export type FileAnnotation = z.infer<typeof fileAnnotationSchema>;
+export type FileAnnotation = z.infer<typeof fileAnnotationSchema>
 
 export type ServerFile = FileAnnotation & {
-  path: string;
-};
+  path: string
+}
 
 /**
  * Extract file attachments from an user message.
@@ -251,23 +251,23 @@ export type ServerFile = FileAnnotation & {
  * @returns The file attachments.
  */
 export function extractFileAttachmentsFromMessage(
-  message: Message,
+  message: Message
 ): ServerFile[] {
-  const fileAttachments: ServerFile[] = [];
-  if (message.role === "user" && message.annotations) {
+  const fileAttachments: ServerFile[] = []
+  if (message.role === 'user' && message.annotations) {
     for (const annotation of message.annotations) {
       if (documentFileAnnotationSchema.safeParse(annotation).success) {
-        const { data } = annotation as DocumentFileAnnotation;
+        const { data } = annotation as DocumentFileAnnotation
         for (const file of data.files) {
           fileAttachments.push({
             ...file,
             path: getStoredFilePath({ id: file.id }),
-          });
+          })
         }
       }
     }
   }
-  return fileAttachments;
+  return fileAttachments
 }
 
 /**
@@ -276,11 +276,11 @@ export function extractFileAttachmentsFromMessage(
  * @returns The file attachments.
  */
 export function extractFileAttachments(messages: Message[]): ServerFile[] {
-  const fileAttachments: ServerFile[] = [];
+  const fileAttachments: ServerFile[] = []
 
   for (const message of messages) {
-    fileAttachments.push(...extractFileAttachmentsFromMessage(message));
+    fileAttachments.push(...extractFileAttachmentsFromMessage(message))
   }
 
-  return fileAttachments;
+  return fileAttachments
 }

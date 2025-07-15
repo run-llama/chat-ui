@@ -1,19 +1,19 @@
-"use client";
+'use client'
 
-import { ChatMessage, ChatMessages, useChatUI } from "@llamaindex/chat-ui";
-import { ChatMessageAvatar } from "./chat-avatar";
-import { ChatMessageContent } from "./chat-message-content";
-import { ChatStarter } from "./chat-starter";
-import { ComponentDef } from "./custom/events/types";
+import { ChatMessage, ChatMessages, useChatUI } from '@llamaindex/chat-ui'
+import { ChatMessageAvatar } from './chat-avatar'
+import { ChatMessageContent } from './chat-message-content'
+import { ChatStarter } from './chat-starter'
+import { ComponentDef } from './custom/events/types'
 
 export default function CustomChatMessages({
   componentDefs,
   appendError,
 }: {
-  componentDefs: ComponentDef[];
-  appendError: (error: string) => void;
+  componentDefs: ComponentDef[]
+  appendError: (error: string) => void
 }) {
-  const { messages } = useChatUI();
+  const { messages } = useChatUI()
 
   return (
     <ChatMessages>
@@ -40,5 +40,5 @@ export default function CustomChatMessages({
       </ChatMessages.List>
       <ChatStarter />
     </ChatMessages>
-  );
+  )
 }

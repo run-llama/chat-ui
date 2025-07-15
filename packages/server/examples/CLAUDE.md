@@ -96,7 +96,7 @@ new LlamaIndexServer({
     /* UI configuration */
   },
   port: 3000,
-}).start();
+}).start()
 ```
 
 ### Tool Definition Pattern
@@ -105,15 +105,15 @@ Consistent tool creation with Zod schemas:
 
 ```typescript
 tool({
-  name: "tool_name",
-  description: "Tool description",
+  name: 'tool_name',
+  description: 'Tool description',
   parameters: z.object({
     /* parameters */
   }),
-  execute: (params) => {
+  execute: params => {
     /* implementation */
   },
-});
+})
 ```
 
 ## Example-Specific Features

@@ -48,15 +48,15 @@ In this example, we have implemented these two custom events in [`events.ts`](sr
 
 ```typescript
 export const cliHumanInputEvent = humanInputEvent<{
-  type: "cli_human_input";
-  data: { command: string };
-  response: typeof cliHumanResponseEvent;
-}>();
+  type: 'cli_human_input'
+  data: { command: string }
+  response: typeof cliHumanResponseEvent
+}>()
 
 export const cliHumanResponseEvent = humanResponseEvent<{
-  type: "human_response";
-  data: { execute: boolean; command: string };
-}>();
+  type: 'human_response'
+  data: { execute: boolean; command: string }
+}>()
 ```
 
 ### UI Component
@@ -67,18 +67,18 @@ The custom component must use `append` to send a message with a `human_response`
 
 ```tsx
 append({
-  content: "Yes",
-  role: "user",
+  content: 'Yes',
+  role: 'user',
   annotations: [
     {
-      type: "human_response",
+      type: 'human_response',
       data: {
         execute: true,
-        command: "ls -l", // The command to execute
+        command: 'ls -l', // The command to execute
       },
     },
   ],
-});
+})
 ```
 
 This component displays the command to execute and the user can choose to execute or cancel the command execution.
@@ -91,47 +91,47 @@ The workflow is implemented in [`workflow.ts`](src/app/workflow.ts) using LlamaI
 
 ```typescript
 workflow.handle([startAgentEvent], async ({ data }) => {
-  const { userInput, chatHistory = [] } = data;
+  const { userInput, chatHistory = [] } = data
 
   const toolCallResponse = await chatWithTools(
     llm,
     [cliExecutor],
-    chatHistory.concat({ role: "user", content: userInput }),
-  );
+    chatHistory.concat({ role: 'user', content: userInput })
+  )
 
   const cliExecutorToolCall = toolCallResponse.toolCalls.find(
-    (toolCall) => toolCall.name === cliExecutor.metadata.name,
-  );
+    toolCall => toolCall.name === cliExecutor.metadata.name
+  )
 
-  const command = cliExecutorToolCall?.input?.command as string;
+  const command = cliExecutorToolCall?.input?.command as string
   if (command) {
     return cliHumanInputEvent.with({
-      type: "cli_human_input",
+      type: 'cli_human_input',
       data: { command },
       response: cliHumanResponseEvent,
-    });
+    })
   }
 
-  return summaryEvent.with("");
-});
+  return summaryEvent.with('')
+})
 ```
 
 2. **Human Response Handling**: After receiving human input, the workflow either executes the command or cancels based on the user's choice.
 
 ```typescript
 workflow.handle([cliHumanResponseEvent], async ({ data }) => {
-  const { command, execute } = data.data;
+  const { command, execute } = data.data
 
   if (!execute) {
-    return summaryEvent.with(`User reject to execute the command ${command}`);
+    return summaryEvent.with(`User reject to execute the command ${command}`)
   }
 
-  const result = (await cliExecutor.call({ command })) as string;
+  const result = (await cliExecutor.call({ command })) as string
 
   return summaryEvent.with(
-    `Executed the command ${command} and got the result: ${result}`,
-  );
-});
+    `Executed the command ${command} and got the result: ${result}`
+  )
+})
 ```
 
 3. **Final Response**: The workflow generates a final response based on the execution result and streams it back to the user.
@@ -142,21 +142,21 @@ The CLI executor tool is defined in [`tools.ts`](src/app/tools.ts):
 
 ```typescript
 export const cliExecutor = tool({
-  name: "cli_executor",
-  description: "This tool executes a command and returns the output.",
+  name: 'cli_executor',
+  description: 'This tool executes a command and returns the output.',
   parameters: z.object({ command: z.string() }),
   execute: async ({ command }) => {
     try {
       const output = execSync(command, {
-        encoding: "utf-8",
-      });
-      return output;
+        encoding: 'utf-8',
+      })
+      return output
     } catch (error) {
-      console.error(error);
-      return "Command failed";
+      console.error(error)
+      return 'Command failed'
     }
   },
-});
+})
 ```
 
 ## Architecture

@@ -1,42 +1,38 @@
-import { parse } from "@babel/parser";
-import type { NodePath } from "@babel/traverse";
-import traverse from "@babel/traverse";
+import { parse } from '@babel/parser'
+import type { NodePath } from '@babel/traverse'
+import traverse from '@babel/traverse'
 import type {
   ExportDefaultDeclaration,
   ImportDeclaration,
   ImportDefaultSpecifier,
   ImportNamespaceSpecifier,
   ImportSpecifier,
-} from "@babel/types";
-import {
-  createWorkflow,
-  getContext,
-  workflowEvent,
-} from "@llamaindex/workflow";
-import type { LLM } from "llamaindex";
-import type { ZodType } from "zod";
+} from '@babel/types'
+import { createWorkflow, getContext, workflowEvent } from '@llamaindex/workflow'
+import type { LLM } from 'llamaindex'
+import type { ZodType } from 'zod'
 
 const writeAggregationEvent = workflowEvent<{
-  eventSchema: object;
-  uiDescription: string;
-}>();
+  eventSchema: object
+  uiDescription: string
+}>()
 
 const writeUiComponentEvent = workflowEvent<{
-  eventSchema: object;
-  uiDescription: string;
-  aggregationFunction: string | undefined;
-}>();
+  eventSchema: object
+  uiDescription: string
+  aggregationFunction: string | undefined
+}>()
 
 const refineGeneratedCodeEvent = workflowEvent<{
-  uiCode: string;
-  aggregationFunction: string;
-  uiDescription: string;
-}>();
+  uiCode: string
+  aggregationFunction: string
+  uiDescription: string
+}>()
 
 const startEvent = workflowEvent<{
-  eventSchema: object;
-}>();
-const stopEvent = workflowEvent<string | null>();
+  eventSchema: object
+}>()
+const stopEvent = workflowEvent<string | null>()
 
 const CODE_STRUCTURE = `
 // export the component
@@ -66,70 +62,70 @@ export default function Component({ events }) {
     </div>
   );
 }
-`;
+`
 
 const SOURCE_MAP: Record<string, boolean> = {
   react: true,
-  "react-dom": true,
-  "@/components/ui/accordion": true,
-  "@/components/ui/alert": true,
-  "@/components/ui/alert-dialog": true,
-  "@/components/ui/aspect-ratio": true,
-  "@/components/ui/avatar": true,
-  "@/components/ui/badge": true,
-  "@/components/ui/breadcrumb": true,
-  "@/components/ui/button": true,
-  "@/components/ui/calendar": true,
-  "@/components/ui/card": true,
-  "@/components/ui/carousel": true,
-  "@/components/ui/chart": true,
-  "@/components/ui/checkbox": true,
-  "@/components/ui/collapsible": true,
-  "@/components/ui/command": true,
-  "@/components/ui/context-menu": true,
-  "@/components/ui/dialog": true,
-  "@/components/ui/drawer": true,
-  "@/components/ui/dropdown-menu": true,
-  "@/components/ui/form": true,
-  "@/components/ui/hover-card": true,
-  "@/components/ui/input": true,
-  "@/components/ui/input-otp": true,
-  "@/components/ui/label": true,
-  "@/components/ui/menubar": true,
-  "@/components/ui/navigation-menu": true,
-  "@/components/ui/pagination": true,
-  "@/components/ui/popover": true,
-  "@/components/ui/progress": true,
-  "@/components/ui/radio-group": true,
-  "@/components/ui/resizable": true,
-  "@/components/ui/scroll-area": true,
-  "@/components/ui/select": true,
-  "@/components/ui/separator": true,
-  "@/components/ui/sheet": true,
-  "@/components/ui/sidebar": true,
-  "@/components/ui/skeleton": true,
-  "@/components/ui/slider": true,
-  "@/components/ui/sonner": true,
-  "@/components/ui/switch": true,
-  "@/components/ui/table": true,
-  "@/components/ui/tabs": true,
-  "@/components/ui/textarea": true,
-  "@/components/ui/toggle": true,
-  "@/components/ui/toggle-group": true,
-  "@/components/ui/tooltip": true,
-  "@/components/lib/utils": true,
-  "@/lib/utils": true,
-  "lucide-react": true,
-  "@llamaindex/chat-ui/widgets": true,
-};
+  'react-dom': true,
+  '@/components/ui/accordion': true,
+  '@/components/ui/alert': true,
+  '@/components/ui/alert-dialog': true,
+  '@/components/ui/aspect-ratio': true,
+  '@/components/ui/avatar': true,
+  '@/components/ui/badge': true,
+  '@/components/ui/breadcrumb': true,
+  '@/components/ui/button': true,
+  '@/components/ui/calendar': true,
+  '@/components/ui/card': true,
+  '@/components/ui/carousel': true,
+  '@/components/ui/chart': true,
+  '@/components/ui/checkbox': true,
+  '@/components/ui/collapsible': true,
+  '@/components/ui/command': true,
+  '@/components/ui/context-menu': true,
+  '@/components/ui/dialog': true,
+  '@/components/ui/drawer': true,
+  '@/components/ui/dropdown-menu': true,
+  '@/components/ui/form': true,
+  '@/components/ui/hover-card': true,
+  '@/components/ui/input': true,
+  '@/components/ui/input-otp': true,
+  '@/components/ui/label': true,
+  '@/components/ui/menubar': true,
+  '@/components/ui/navigation-menu': true,
+  '@/components/ui/pagination': true,
+  '@/components/ui/popover': true,
+  '@/components/ui/progress': true,
+  '@/components/ui/radio-group': true,
+  '@/components/ui/resizable': true,
+  '@/components/ui/scroll-area': true,
+  '@/components/ui/select': true,
+  '@/components/ui/separator': true,
+  '@/components/ui/sheet': true,
+  '@/components/ui/sidebar': true,
+  '@/components/ui/skeleton': true,
+  '@/components/ui/slider': true,
+  '@/components/ui/sonner': true,
+  '@/components/ui/switch': true,
+  '@/components/ui/table': true,
+  '@/components/ui/tabs': true,
+  '@/components/ui/textarea': true,
+  '@/components/ui/toggle': true,
+  '@/components/ui/toggle-group': true,
+  '@/components/ui/tooltip': true,
+  '@/components/lib/utils': true,
+  '@/lib/utils': true,
+  'lucide-react': true,
+  '@llamaindex/chat-ui/widgets': true,
+}
 
 function generateSupportedDeps(): string {
   // Extract all shadcn component names from SOURCE_MAP
   const shadcnComponents = Object.keys(SOURCE_MAP)
-    .filter((key) => key.startsWith("@/components/ui/"))
-    .map((key) => key.replace("@/components/ui/", ""))
+    .filter(key => key.startsWith('@/components/ui/'))
+    .map(key => key.replace('@/components/ui/', ''))
     .sort()
-    .join(", ");
+    .join(', ')
 
   return `
         - React: import { useState } from "react";
@@ -139,25 +135,25 @@ function generateSupportedDeps(): string {
         - lucide-react: import { IconName } from "lucide-react";
         - tailwind css: import { cn } from "@/lib/utils"; // Note: clsx is not supported
         - LlamaIndex's markdown-ui: import { Markdown } from "@llamaindex/chat-ui/widgets";
-`;
+`
 }
 
-const SUPPORTED_DEPS = generateSupportedDeps();
+const SUPPORTED_DEPS = generateSupportedDeps()
 
 function validateComponentCode(code: string): {
-  isValid: boolean;
-  error?: string;
-  componentName?: string;
+  isValid: boolean
+  error?: string
+  componentName?: string
 } {
   try {
-    const imports: Array<{ name: string; source: string }> = [];
-    let componentName: string | null = null;
+    const imports: Array<{ name: string; source: string }> = []
+    let componentName: string | null = null
 
     // Parse the code into an AST
     const ast = parse(code, {
-      sourceType: "module",
-      plugins: ["jsx", "typescript"],
-    });
+      sourceType: 'module',
+      plugins: ['jsx', 'typescript'],
+    })
 
     // Traverse the AST to find import declarations
     traverse(ast, {
@@ -168,62 +164,62 @@ function validateComponentCode(code: string): {
             specifier:
               | ImportSpecifier
               | ImportDefaultSpecifier
-              | ImportNamespaceSpecifier,
+              | ImportNamespaceSpecifier
           ) => {
             if (
-              specifier.type === "ImportSpecifier" ||
-              specifier.type === "ImportDefaultSpecifier"
+              specifier.type === 'ImportSpecifier' ||
+              specifier.type === 'ImportDefaultSpecifier'
             ) {
               imports.push({
                 name: specifier.local.name, // e.g., "Button"
                 source: path.node.source.value, // e.g., "@/components/ui/button"
-              });
+              })
             }
-          },
-        );
+          }
+        )
       },
       // Find export default declaration
       ExportDefaultDeclaration(path: NodePath<ExportDefaultDeclaration>) {
-        const declaration = path.node.declaration;
-        if (declaration.type === "FunctionDeclaration" && declaration.id) {
-          componentName = declaration.id.name; // e.g., "EventTimeline"
+        const declaration = path.node.declaration
+        if (declaration.type === 'FunctionDeclaration' && declaration.id) {
+          componentName = declaration.id.name // e.g., "EventTimeline"
         } else if (
-          declaration.type === "Identifier" &&
+          declaration.type === 'Identifier' &&
           path.scope.hasBinding(declaration.name)
         ) {
-          componentName = declaration.name; // e.g., named function assigned to export
+          componentName = declaration.name // e.g., named function assigned to export
         }
       },
-    });
+    })
 
     // Validate imports
     for (const { name, source } of imports) {
       if (!(source in SOURCE_MAP)) {
-        console.error(`Invalid import: ${name} from ${source}`);
+        console.error(`Invalid import: ${name} from ${source}`)
         return {
           isValid: false,
           error: `Failed to import ${name} from ${source}. Reason: Module not found. 
           \nHere is the list of supported imports: ${SUPPORTED_DEPS}`,
-        };
+        }
       }
     }
 
     // Validate component export
     if (!componentName) {
-      console.warn("Could not identify component name in the generated code.");
+      console.warn('Could not identify component name in the generated code.')
     }
 
     return {
       isValid: true,
       ...(componentName ? { componentName } : {}),
-    };
+    }
   } catch (error) {
-    console.error("Error during code validation:", error);
+    console.error('Error during code validation:', error)
     return {
       isValid: false,
       error:
-        error instanceof Error ? error.message : "Unknown validation error",
-    };
+        error instanceof Error ? error.message : 'Unknown validation error',
+    }
   }
 }
 
@@ -234,10 +230,10 @@ function validateComponentCode(code: string): {
  * @returns The configured workflow instance.
  */
 export function createGenUiWorkflow(llm: LLM) {
-  const genUiWorkflow = createWorkflow();
+  const genUiWorkflow = createWorkflow()
 
   genUiWorkflow.handle([startEvent], async ({ data: { eventSchema } }) => {
-    const context = getContext();
+    const context = getContext()
 
     const planningPrompt = `
 # Your role
@@ -265,34 +261,34 @@ e.g: Assume that the backend produce list of events with animal name, action, an
     \`\`\`
 
 Don't be verbose, just return the description for the UI based on the event schema and data.
-`;
+`
 
     try {
       const response = await llm.complete({
         prompt: planningPrompt,
         stream: false,
-      });
+      })
 
-      const responseText = response.text.trim();
-      console.log("\nUI Description:", responseText);
+      const responseText = response.text.trim()
+      console.log('\nUI Description:', responseText)
 
       context.sendEvent(
         writeAggregationEvent.with({
           eventSchema,
           uiDescription: responseText,
-        }),
-      );
+        })
+      )
     } catch (error) {
-      console.error("Error during UI planning:", error);
-      context.sendEvent(stopEvent.with(null));
+      console.error('Error during UI planning:', error)
+      context.sendEvent(stopEvent.with(null))
     }
-  });
+  })
 
   genUiWorkflow.handle([writeAggregationEvent], async ({ data: planData }) => {
-    const context = getContext();
+    const context = getContext()
 
-    const schemaContext = JSON.stringify(planData.eventSchema, null, 2);
-    const uiDescriptionContext = planData.uiDescription;
+    const schemaContext = JSON.stringify(planData.eventSchema, null, 2)
+    const uiDescriptionContext = planData.uiDescription
 
     const writingPrompt = `
 # Your role
@@ -313,39 +309,39 @@ const aggregateEvents = () => {
     // code for aggregating events here if needed otherwise let the jsx code block empty
 }
 \`\`\`
-`;
+`
 
     try {
       const response = await llm.complete({
         prompt: writingPrompt,
         stream: false,
-      });
+      })
 
-      const generatedCode = response.text.trim();
+      const generatedCode = response.text.trim()
       context.sendEvent(
         writeUiComponentEvent.with({
           eventSchema: planData.eventSchema,
           uiDescription: planData.uiDescription,
           aggregationFunction: generatedCode,
-        }),
-      );
+        })
+      )
     } catch (error) {
-      console.error("Error during aggregation function writing:", error);
-      context.sendEvent(stopEvent.with(null));
+      console.error('Error during aggregation function writing:', error)
+      context.sendEvent(stopEvent.with(null))
     }
-  });
+  })
 
   genUiWorkflow.handle([writeUiComponentEvent], async ({ data: planData }) => {
-    const context = getContext();
+    const context = getContext()
 
     const aggregationFunctionContext = planData.aggregationFunction
       ? `
 # Here is the aggregation function that aggregates the events:
 ${planData.aggregationFunction}`
-      : "";
+      : ''
 
-    const schemaContext = JSON.stringify(planData.eventSchema, null, 2);
-    const uiDescriptionContext = planData.uiDescription;
+    const schemaContext = JSON.stringify(planData.eventSchema, null, 2)
+    const uiDescriptionContext = planData.uiDescription
 
     const writingPrompt = `
 # Your role
@@ -388,45 +384,45 @@ Here is the description of the UI:
     <Markdown content={content} />
     \`\`\`
 - Try to make the component placement not monotonous, consider use row/column/flex/grid layout.
-`;
+`
 
     try {
       const response = await llm.complete({
         prompt: writingPrompt,
         stream: false,
-      });
+      })
 
-      const generatedCode = response.text.trim();
+      const generatedCode = response.text.trim()
 
       context.sendEvent(
         refineGeneratedCodeEvent.with({
           uiCode: generatedCode,
-          aggregationFunction: planData.aggregationFunction || "",
+          aggregationFunction: planData.aggregationFunction || '',
           uiDescription: planData.uiDescription,
-        }),
-      );
+        })
+      )
     } catch (error) {
-      console.error("Error during UI component writing:", error);
-      context.sendEvent(stopEvent.with(null));
+      console.error('Error during UI component writing:', error)
+      context.sendEvent(stopEvent.with(null))
     }
-  });
+  })
 
   genUiWorkflow.handle(
     [refineGeneratedCodeEvent],
     async ({ data: writeData }) => {
-      const context = getContext();
-      const MAX_VALIDATION_ATTEMPTS = 3;
+      const context = getContext()
+      const MAX_VALIDATION_ATTEMPTS = 3
 
-      let currentCode = writeData.uiCode;
-      let attemptCount = 0;
-      let validationError = null;
+      let currentCode = writeData.uiCode
+      let attemptCount = 0
+      let validationError = null
 
       while (attemptCount < MAX_VALIDATION_ATTEMPTS) {
-        attemptCount++;
+        attemptCount++
         if (attemptCount > 1) {
           console.log(
-            `Refinement attempt ${attemptCount}/${MAX_VALIDATION_ATTEMPTS}`,
-          );
+            `Refinement attempt ${attemptCount}/${MAX_VALIDATION_ATTEMPTS}`
+          )
         }
 
         try {
@@ -434,7 +430,7 @@ Here is the description of the UI:
           const errorSection =
             attemptCount > 1 && validationError
               ? `\n# Error to fix:\n${validationError}\n\n# Additional requirements:\n1. Only import from supported modules\n2. Ensure the component has an export default statement\n3. Component must accept an 'events' array prop`
-              : "";
+              : ''
 
           const refiningPrompt = `
 # Your role
@@ -444,8 +440,8 @@ You are a senior frontend developer reviewing React code written by a junior dev
 - The goal is to create a React component that displays an array of events.
 - Required Code Structure (Component accepts an \`events\` array prop):
 ${CODE_STRUCTURE}
-- Aggregation Context (if any): ${writeData.aggregationFunction || "None"}
-- ${attemptCount > 1 ? "Previous" : "Generated"} Code:
+- Aggregation Context (if any): ${writeData.aggregationFunction || 'None'}
+- ${attemptCount > 1 ? 'Previous' : 'Generated'} Code:
 ${currentCode}${errorSection}
 
 # Task:
@@ -453,62 +449,62 @@ Review and refine the provided code. Ensure it strictly follows the "Required Co
 
 # Output Format:
 Return ONLY the final, refined code, enclosed in a single JSX code block (\`\`\`jsx ... \`\`\`). Do not add any explanations before or after the code block.
-`;
+`
 
           const response = await llm.complete({
             prompt: refiningPrompt,
             stream: false,
-          });
+          })
 
-          const refinedCode = response.text.trim();
+          const refinedCode = response.text.trim()
           // Extract code from markdown block if present
-          const codeMatch = refinedCode.match(/```jsx\n?([^]*?)\n?```/);
+          const codeMatch = refinedCode.match(/```jsx\n?([^]*?)\n?```/)
           if (codeMatch && codeMatch[1]) {
-            currentCode = codeMatch[1].trim();
+            currentCode = codeMatch[1].trim()
           } else {
             // Fallback if no block found - attempt cleanup
-            currentCode = refinedCode.replace(/^```jsx|```$/g, "").trim();
+            currentCode = refinedCode.replace(/^```jsx|```$/g, '').trim()
             console.warn(
-              "Could not find standard JSX code block in refinement response, using raw content.",
-            );
+              'Could not find standard JSX code block in refinement response, using raw content.'
+            )
           }
 
           // Validate the refined code
-          const validation = validateComponentCode(currentCode);
+          const validation = validateComponentCode(currentCode)
 
           if (validation.isValid) {
-            console.log(`\n✅ Code validated successfully`);
-            context.sendEvent(stopEvent.with(currentCode));
-            return;
+            console.log(`\n✅ Code validated successfully`)
+            context.sendEvent(stopEvent.with(currentCode))
+            return
           } else {
-            validationError = validation.error;
+            validationError = validation.error
             console.warn(
-              `Validation failed (attempt ${attemptCount}/${MAX_VALIDATION_ATTEMPTS}): ${validation.error}`,
-            );
+              `Validation failed (attempt ${attemptCount}/${MAX_VALIDATION_ATTEMPTS}): ${validation.error}`
+            )
 
             // If this was the last attempt, give up
             if (attemptCount >= MAX_VALIDATION_ATTEMPTS) {
               console.error(
-                `Failed to generate valid code after ${MAX_VALIDATION_ATTEMPTS} attempts`,
-              );
-              context.sendEvent(stopEvent.with(null));
-              return;
+                `Failed to generate valid code after ${MAX_VALIDATION_ATTEMPTS} attempts`
+              )
+              context.sendEvent(stopEvent.with(null))
+              return
             }
             // Otherwise continue to the next iteration of the loop
           }
         } catch (error) {
           console.error(
             `Error during refinement attempt ${attemptCount}:`,
-            error,
-          );
-          context.sendEvent(stopEvent.with(null));
-          return;
+            error
+          )
+          context.sendEvent(stopEvent.with(null))
+          return
         }
       }
-    },
-  );
+    }
+  )
 
-  return genUiWorkflow;
+  return genUiWorkflow
 }
 
 /**
@@ -522,42 +518,42 @@ Return ONLY the final, refined code, enclosed in a single JSX code block (\`\`\`
  */
 export async function generateEventComponent(
   eventType: ZodType | object,
-  llm: LLM,
+  llm: LLM
 ): Promise<string> {
-  let eventSchema: object = eventType;
-  if ("parse" in eventType && "safeParse" in eventType) {
+  let eventSchema: object = eventType
+  if ('parse' in eventType && 'safeParse' in eventType) {
     // Zod schema given, convert to JSON schema including descriptions
-    const zodToJsonSchema = (await import("zod-to-json-schema")).default;
+    const zodToJsonSchema = (await import('zod-to-json-schema')).default
     const zodEventSchema = zodToJsonSchema(eventType, {
-      target: "openApi3",
-    });
+      target: 'openApi3',
+    })
     if (!zodEventSchema) {
-      throw new Error("Could not get JSON schema for the event type");
+      throw new Error('Could not get JSON schema for the event type')
     }
-    eventSchema = zodEventSchema;
+    eventSchema = zodEventSchema
   }
   console.log(`🎨 Starting UI generation...
-`);
+`)
 
   try {
-    const genUiWorkflow = createGenUiWorkflow(llm);
+    const genUiWorkflow = createGenUiWorkflow(llm)
 
-    const { stream, sendEvent } = genUiWorkflow.createContext();
-    sendEvent(startEvent.with({ eventSchema }));
+    const { stream, sendEvent } = genUiWorkflow.createContext()
+    sendEvent(startEvent.with({ eventSchema }))
 
     // Collect all events until the stop event and get the last one
-    const allEvents = await stream.toArray();
-    const result = allEvents[allEvents.length - 1];
+    const allEvents = await stream.toArray()
+    const result = allEvents[allEvents.length - 1]
     if (result?.data === null) {
-      throw new Error("Workflow failed.");
+      throw new Error('Workflow failed.')
     } else if (result) {
-      console.log("\nWorkflow finished successfully.");
-      return result.data;
+      console.log('\nWorkflow finished successfully.')
+      return result.data
     } else {
-      throw new Error("Workflow result is undefined.");
+      throw new Error('Workflow result is undefined.')
     }
   } catch (error) {
-    console.error("Workflow execution failed:", error);
-    throw new Error(`UI generation workflow failed: ${error}`);
+    console.error('Workflow execution failed:', error)
+    throw new Error(`UI generation workflow failed: ${error}`)
   }
 }

@@ -11,4 +11,4 @@ Your answer should be wrapped in three sticks which follows the following format
 <question 2>
 <question 3>
 \`\`\`
-`;
+`

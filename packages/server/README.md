@@ -21,19 +21,19 @@ npm i @llamaindex/server
 Create an `index.ts` file and add the following code:
 
 ```ts
-import { LlamaIndexServer } from "@llamaindex/server";
-import { openai } from "@llamaindex/openai";
-import { agent } from "@llamaindex/workflow";
-import { wiki } from "@llamaindex/tools"; // or any other tool
+import { LlamaIndexServer } from '@llamaindex/server'
+import { openai } from '@llamaindex/openai'
+import { agent } from '@llamaindex/workflow'
+import { wiki } from '@llamaindex/tools' // or any other tool
 
-const createWorkflow = () => agent({ tools: [wiki()], llm: openai("gpt-4o") });
+const createWorkflow = () => agent({ tools: [wiki()], llm: openai('gpt-4o') })
 
 new LlamaIndexServer({
   workflow: createWorkflow,
   uiConfig: {
-    starterQuestions: ["Who is the first president of the United States?"],
+    starterQuestions: ['Who is the first president of the United States?'],
   },
-}).start();
+}).start()
 ```
 
 The `createWorkflow` function is a factory function that creates an [Agent Workflow](https://ts.llamaindex.ai/docs/llamaindex/modules/agents/agent_workflow) with a tool that retrieves information from Wikipedia in this case. For more details, read about the [Workflow factory contract](#workflow-factory-contract).
@@ -104,28 +104,28 @@ import {
   createStatefulMiddleware,
   createWorkflow,
   startAgentEvent,
-} from "@llamaindex/workflow";
-import { ChatMemoryBuffer, type ChatMessage, Settings } from "llamaindex";
-import { openai } from "@llamaindex/openai";
-import { wiki } from "@llamaindex/tools";
+} from '@llamaindex/workflow'
+import { ChatMemoryBuffer, type ChatMessage, Settings } from 'llamaindex'
+import { openai } from '@llamaindex/openai'
+import { wiki } from '@llamaindex/tools'
 
-Settings.llm = openai("gpt-4o");
+Settings.llm = openai('gpt-4o')
 
 export const workflowFactory = async () => {
-  const workflow = createWorkflow();
+  const workflow = createWorkflow()
 
   workflow.handle([startAgentEvent], async ({ data }) => {
-    const { state, sendEvent } = getContext();
-    const messages = data.chatHistory;
+    const { state, sendEvent } = getContext()
+    const messages = data.chatHistory
 
     const toolCallResponse = await chatWithTools(
       Settings.llm,
       [wiki()],
-      messages,
-    );
+      messages
+    )
 
     // using result from tool call and use `sendEvent` to emit the next event...
-  });
+  })
 
   // define more workflow handling logic here...
 
@@ -134,8 +134,8 @@ export const workflowFactory = async () => {
   //   result: "This is the end!",
   // });
 
-  return workflow;
-};
+  return workflow
+}
 ```
 
 To generate sophisticated examples of workflows, you best use the [create-llama](https://github.com/run-llama/create-llama) project.
@@ -151,8 +151,8 @@ To display custom UI components, your workflow needs to emit UI events that have
 
 ```typescript
 class UIEvent extends WorkflowEvent<{
-  type: "ui_event";
-  data: UIEventData;
+  type: 'ui_event'
+  data: UIEventData
 }> {}
 ```
 
@@ -162,17 +162,17 @@ The `data` object can be any JSON object. To enable AI generation of the UI comp
 const MyEventDataSchema = z
   .object({
     stage: z
-      .enum(["retrieve", "analyze", "answer"])
-      .describe("The current stage the workflow process is in."),
+      .enum(['retrieve', 'analyze', 'answer'])
+      .describe('The current stage the workflow process is in.'),
     progress: z
       .number()
       .min(0)
       .max(1)
-      .describe("The progress in percent of the current stage"),
+      .describe('The progress in percent of the current stage'),
   })
-  .describe("WorkflowStageProgress");
+  .describe('WorkflowStageProgress')
 
-type UIEventData = z.infer<typeof MyEventDataSchema>;
+type UIEventData = z.infer<typeof MyEventDataSchema>
 ```
 
 ### Generate UI Components
@@ -180,19 +180,19 @@ type UIEventData = z.infer<typeof MyEventDataSchema>;
 The `generateEventComponent` function uses an LLM to generate a custom UI component based on the JSON schema of a workflow event. The schema should contain accurate descriptions of each field so that the LLM can generate matching components for your use case. We've done this for you in the example above using the `describe` function from Zod:
 
 ```typescript
-import { OpenAI } from "llamaindex";
-import { generateEventComponent } from "@llamaindex/server";
-import { MyEventDataSchema } from "./your-workflow";
+import { OpenAI } from 'llamaindex'
+import { generateEventComponent } from '@llamaindex/server'
+import { MyEventDataSchema } from './your-workflow'
 
 // Also works well with Claude 3.5 Sonnet and Google Gemini 2.5 Pro
-const llm = new OpenAI({ model: "gpt-4.1" });
-const code = generateEventComponent(MyEventDataSchema, llm);
+const llm = new OpenAI({ model: 'gpt-4.1' })
+const code = generateEventComponent(MyEventDataSchema, llm)
 ```
 
 After generating the code, we need to save it to a file. The file name must match the event type from your workflow (e.g., `ui_event.jsx` for handling events with `ui_event` type):
 
 ```ts
-fs.writeFileSync("components/ui_event.jsx", code);
+fs.writeFileSync('components/ui_event.jsx', code)
 ```
 
 Feel free to modify the generated code to match your needs. If you're not satisfied with the generated code, we suggest improving the provided JSON schema first or trying another LLM.
@@ -207,9 +207,9 @@ LlamaIndex Server supports custom layout for header and footer. To use custom la
 new LlamaIndexServer({
   workflow: createWorkflow,
   uiConfig: {
-    layoutDir: "layout",
+    layoutDir: 'layout',
   },
-}).start();
+}).start()
 ```
 
 ```
@@ -229,9 +229,9 @@ To use the generated UI components, you need to initialize the LlamaIndex server
 new LlamaIndexServer({
   workflow: createWorkflow,
   uiConfig: {
-    componentsDir: "components",
+    componentsDir: 'components',
   },
-}).start();
+}).start()
 ```
 
 ## Sending Artifacts to the UI
@@ -251,22 +251,22 @@ To send an artifact, your workflow needs to emit an event with `type: "artifact"
 First, define your artifact event using `workflowEvent` from `@llamaindex/workflow`:
 
 ```typescript
-import { workflowEvent } from "@llamaindex/workflow";
+import { workflowEvent } from '@llamaindex/workflow'
 
 // Example for a document artifact
 const artifactEvent = workflowEvent<{
-  type: "artifact"; // Must be "artifact"
+  type: 'artifact' // Must be "artifact"
   data: {
-    type: "document"; // Custom type for your artifact (e.g., "document", "code")
-    created_at: number;
+    type: 'document' // Custom type for your artifact (e.g., "document", "code")
+    created_at: number
     data: {
       // Specific data for the document artifact type
-      title: string;
-      content: string;
-      type: "markdown" | "html"; // document format
-    };
-  };
-}>();
+      title: string
+      content: string
+      type: 'markdown' | 'html' // document format
+    }
+  }
+}>()
 ```
 
 Then, within your workflow logic, use `sendEvent` (obtained from `getContext()`) to emit the event:

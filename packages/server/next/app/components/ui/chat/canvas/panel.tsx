@@ -1,12 +1,12 @@
-"use client";
+'use client'
 
-import { ChatCanvas, useChatCanvas } from "@llamaindex/chat-ui";
-import { ResizableHandle, ResizablePanel } from "../../resizable";
-import { CodeArtifactRenderer } from "./preview";
+import { ChatCanvas, useChatCanvas } from '@llamaindex/chat-ui'
+import { ResizableHandle, ResizablePanel } from '../../resizable'
+import { CodeArtifactRenderer } from './preview'
 
 export function ChatCanvasPanel() {
-  const { displayedArtifact, isCanvasOpen } = useChatCanvas();
-  if (!displayedArtifact || !isCanvasOpen) return null;
+  const { displayedArtifact, isCanvasOpen } = useChatCanvas()
+  if (!displayedArtifact || !isCanvasOpen) return null
 
   return (
     <>
@@ -20,5 +20,5 @@ export function ChatCanvasPanel() {
         </ChatCanvas>
       </ResizablePanel>
     </>
-  );
+  )
 }

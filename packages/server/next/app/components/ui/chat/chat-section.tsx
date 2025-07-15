@@ -1,52 +1,52 @@
-"use client";
+'use client'
 
-import { ChatSection as ChatUI, useChatWorkflow } from "@llamaindex/chat-ui";
-import { useChat } from "ai/react";
-import { useEffect, useMemo, useState } from "react";
-import { getConfig } from "../lib/utils";
-import { ResizablePanel, ResizablePanelGroup } from "../resizable";
-import { ChatCanvasPanel } from "./canvas/panel";
-import { ChatInjection } from "./chat-injection";
-import CustomChatInput from "./chat-input";
-import CustomChatMessages from "./chat-messages";
-import { DynamicEventsErrors } from "./custom/events/dynamic-events-errors";
-import { fetchComponentDefinitions } from "./custom/events/loader";
-import { ComponentDef } from "./custom/events/types";
-import { DevModePanel } from "./dev-mode-panel";
-import { ChatLayout } from "./layout";
+import { ChatSection as ChatUI, useChatWorkflow } from '@llamaindex/chat-ui'
+import { useChat } from 'ai/react'
+import { useEffect, useMemo, useState } from 'react'
+import { getConfig } from '../lib/utils'
+import { ResizablePanel, ResizablePanelGroup } from '../resizable'
+import { ChatCanvasPanel } from './canvas/panel'
+import { ChatInjection } from './chat-injection'
+import CustomChatInput from './chat-input'
+import CustomChatMessages from './chat-messages'
+import { DynamicEventsErrors } from './custom/events/dynamic-events-errors'
+import { fetchComponentDefinitions } from './custom/events/loader'
+import { ComponentDef } from './custom/events/types'
+import { DevModePanel } from './dev-mode-panel'
+import { ChatLayout } from './layout'
 
 export default function ChatSection() {
-  const deployment = getConfig("DEPLOYMENT") || "";
-  const workflow = getConfig("WORKFLOW") || "";
-  const shouldUseChatWorkflow = deployment && workflow;
+  const deployment = getConfig('DEPLOYMENT') || ''
+  const workflow = getConfig('WORKFLOW') || ''
+  const shouldUseChatWorkflow = deployment && workflow
 
   const handleError = (error: unknown) => {
-    if (!(error instanceof Error)) throw error;
-    let errorMessage: string;
+    if (!(error instanceof Error)) throw error
+    let errorMessage: string
     try {
-      errorMessage = JSON.parse(error.message).detail;
+      errorMessage = JSON.parse(error.message).detail
     } catch (e) {
-      errorMessage = error.message;
+      errorMessage = error.message
     }
-    alert(errorMessage);
-  };
+    alert(errorMessage)
+  }
 
   const useChatHandler = useChat({
-    api: getConfig("CHAT_API") || "/api/chat",
+    api: getConfig('CHAT_API') || '/api/chat',
     onError: handleError,
     experimental_throttle: 100,
-  });
+  })
 
   const useChatWorkflowHandler = useChatWorkflow({
-    fileServerUrl: getConfig("FILE_SERVER_URL"),
+    fileServerUrl: getConfig('FILE_SERVER_URL'),
     deployment,
     workflow,
     onError: handleError,
-  });
+  })
 
   const handler = shouldUseChatWorkflow
     ? useChatWorkflowHandler
-    : useChatHandler;
+    : useChatHandler
 
   return (
     <>
@@ -64,31 +64,31 @@ export default function ChatSection() {
       </ChatLayout>
       <ChatInjection />
     </>
-  );
+  )
 }
 
 function ChatSectionPanel() {
-  const [componentDefs, setComponentDefs] = useState<ComponentDef[]>([]);
-  const [dynamicEventsErrors, setDynamicEventsErrors] = useState<string[]>([]); // contain all errors when rendering dynamic events from componentDir
+  const [componentDefs, setComponentDefs] = useState<ComponentDef[]>([])
+  const [dynamicEventsErrors, setDynamicEventsErrors] = useState<string[]>([]) // contain all errors when rendering dynamic events from componentDir
 
   const appendError = (error: string) => {
-    setDynamicEventsErrors((prev) => [...prev, error]);
-  };
+    setDynamicEventsErrors(prev => [...prev, error])
+  }
 
   const uniqueErrors = useMemo(() => {
-    return Array.from(new Set(dynamicEventsErrors));
-  }, [dynamicEventsErrors]);
+    return Array.from(new Set(dynamicEventsErrors))
+  }, [dynamicEventsErrors])
 
   // fetch component definitions and use Babel to tranform JSX code to JS code
   // this is triggered only once when the page is initialised
   useEffect(() => {
     fetchComponentDefinitions().then(({ components, errors }) => {
-      setComponentDefs(components);
+      setComponentDefs(components)
       if (errors.length > 0) {
-        setDynamicEventsErrors((prev) => [...prev, ...errors]);
+        setDynamicEventsErrors(prev => [...prev, ...errors])
       }
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <ResizablePanel defaultSize={40} minSize={30} className="max-w-1/2 mx-auto">
@@ -104,5 +104,5 @@ function ChatSectionPanel() {
         <CustomChatInput />
       </div>
     </ResizablePanel>
-  );
+  )
 }

@@ -1,25 +1,25 @@
-"use client";
+'use client'
 
-import "@llamaindex/chat-ui/styles/markdown.css";
-import "@llamaindex/chat-ui/styles/pdf.css";
-import { XIcon } from "lucide-react";
+import '@llamaindex/chat-ui/styles/markdown.css'
+import '@llamaindex/chat-ui/styles/pdf.css'
+import { XIcon } from 'lucide-react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../../../accordion";
-import { buttonVariants } from "../../../button";
-import { cn } from "../../../lib/utils";
+} from '../../../accordion'
+import { buttonVariants } from '../../../button'
+import { cn } from '../../../lib/utils'
 
 export function DynamicEventsErrors({
   errors,
   clearErrors,
 }: {
-  errors: string[];
-  clearErrors: () => void;
+  errors: string[]
+  clearErrors: () => void
 }) {
-  if (errors.length === 0) return null;
+  if (errors.length === 0) return null
   return (
     <Accordion
       type="single"
@@ -39,10 +39,10 @@ export function DynamicEventsErrors({
               </span>
             </div>
             <div
-              className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
-              onClick={(e) => {
-                e.stopPropagation();
-                clearErrors();
+              className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+              onClick={e => {
+                e.stopPropagation()
+                clearErrors()
               }}
             >
               <XIcon className="mr-2 h-4 w-4" />
@@ -61,5 +61,5 @@ export function DynamicEventsErrors({
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  );
+  )
 }

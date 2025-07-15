@@ -9,7 +9,7 @@ new LlamaIndexServer({
     devMode: true,
   },
   port: 3000,
-}).start();
+}).start()
 ```
 
 Export OpenAI API key and start the server in dev mode.

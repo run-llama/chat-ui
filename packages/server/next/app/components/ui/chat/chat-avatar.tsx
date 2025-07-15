@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import { ChatMessage } from "@llamaindex/chat-ui";
-import { LLAMA_LOGO_URL } from "../../../constants";
+import { ChatMessage } from '@llamaindex/chat-ui'
+import { LLAMA_LOGO_URL } from '../../../constants'
 
 export function ChatMessageAvatar() {
   return (
@@ -12,5 +12,5 @@ export function ChatMessageAvatar() {
         alt="Llama Logo"
       />
     </ChatMessage.Avatar>
-  );
+  )
 }

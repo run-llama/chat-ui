@@ -1,33 +1,33 @@
-"use client";
+'use client'
 
-import { CodeArtifact, useChatCanvas } from "@llamaindex/chat-ui";
-import { Loader2, WandSparkles } from "lucide-react";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import { CodeArtifact, useChatCanvas } from '@llamaindex/chat-ui'
+import { Loader2, WandSparkles } from 'lucide-react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../../accordion";
-import { buttonVariants } from "../../button";
-import { cn } from "../../lib/utils";
-import { DynamicComponentErrorBoundary } from "../custom/events/error-boundary";
-import { parseComponent } from "../custom/events/loader";
+} from '../../accordion'
+import { buttonVariants } from '../../button'
+import { cn } from '../../lib/utils'
+import { DynamicComponentErrorBoundary } from '../custom/events/error-boundary'
+import { parseComponent } from '../custom/events/loader'
 
 const SUPPORTED_FRONTEND_PREVIEW = [
-  "js",
-  "ts",
-  "jsx",
-  "tsx",
-  "javascript",
-  "typescript",
-];
+  'js',
+  'ts',
+  'jsx',
+  'tsx',
+  'javascript',
+  'typescript',
+]
 
 export function CodeArtifactRenderer() {
-  const { displayedArtifact } = useChatCanvas();
+  const { displayedArtifact } = useChatCanvas()
 
-  if (displayedArtifact?.type !== "code") return null;
-  const codeArtifact = displayedArtifact as CodeArtifact;
+  if (displayedArtifact?.type !== 'code') return null
+  const codeArtifact = displayedArtifact as CodeArtifact
 
   if (!SUPPORTED_FRONTEND_PREVIEW.includes(codeArtifact.data.language)) {
     return (
@@ -36,41 +36,41 @@ export function CodeArtifactRenderer() {
           Preview is not supported for this language
         </p>
       </div>
-    );
+    )
   }
 
-  return <CodeArtifactRendererComp artifact={codeArtifact} />;
+  return <CodeArtifactRendererComp artifact={codeArtifact} />
 }
 
 function CodeArtifactRendererComp({ artifact }: { artifact: CodeArtifact }) {
-  const { appendErrors } = useChatCanvas();
-  const [isRendering, setIsRendering] = useState(true);
-  const [component, setComponent] = useState<FunctionComponent | null>(null);
+  const { appendErrors } = useChatCanvas()
+  const [isRendering, setIsRendering] = useState(true)
+  const [component, setComponent] = useState<FunctionComponent | null>(null)
 
   const {
     data: { code, file_name },
-  } = artifact;
+  } = artifact
 
   useEffect(() => {
     const renderComponent = async () => {
-      setIsRendering(true);
+      setIsRendering(true)
       const { component: parsedComponent, error } = await parseComponent(
         code,
-        file_name,
-      );
+        file_name
+      )
 
       if (error) {
-        setComponent(null);
-        appendErrors(artifact, [error]);
+        setComponent(null)
+        appendErrors(artifact, [error])
       } else {
-        setComponent(() => parsedComponent);
+        setComponent(() => parsedComponent)
       }
 
-      setIsRendering(false);
-    };
+      setIsRendering(false)
+    }
 
-    renderComponent();
-  }, [artifact]);
+    renderComponent()
+  }, [artifact])
 
   if (isRendering) {
     return (
@@ -78,27 +78,27 @@ function CodeArtifactRendererComp({ artifact }: { artifact: CodeArtifact }) {
         <Loader2 className="size-4 animate-spin" />
         <p className="text-sm text-gray-500">Rendering Artifact...</p>
       </div>
-    );
+    )
   }
 
   if (!component) {
-    return <CodeErrors artifact={artifact} />;
+    return <CodeErrors artifact={artifact} />
   }
 
   return (
     <DynamicComponentErrorBoundary
-      onError={(error) => appendErrors(artifact, [error])}
+      onError={error => appendErrors(artifact, [error])}
     >
       {React.createElement(component)}
     </DynamicComponentErrorBoundary>
-  );
+  )
 }
 
 function CodeErrors({ artifact }: { artifact: CodeArtifact }) {
-  const { getCodeErrors, fixCodeErrors } = useChatCanvas();
-  const uniqueErrors = getCodeErrors(artifact);
+  const { getCodeErrors, fixCodeErrors } = useChatCanvas()
+  const uniqueErrors = getCodeErrors(artifact)
 
-  if (uniqueErrors.length === 0) return null;
+  if (uniqueErrors.length === 0) return null
 
   return (
     <div className="flex flex-col gap-10 px-10 pt-10">
@@ -125,12 +125,12 @@ function CodeErrors({ artifact }: { artifact: CodeArtifact }) {
               <div className="flex items-center gap-2">
                 <div
                   className={cn(
-                    buttonVariants({ variant: "default", size: "sm" }),
-                    "mr-2 h-8 cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600",
+                    buttonVariants({ variant: 'default', size: 'sm' }),
+                    'mr-2 h-8 cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600'
                   )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fixCodeErrors(artifact);
+                  onClick={e => {
+                    e.stopPropagation()
+                    fixCodeErrors(artifact)
                   }}
                 >
                   <WandSparkles className="mr-2 h-4 w-4" />
@@ -151,5 +151,5 @@ function CodeErrors({ artifact }: { artifact: CodeArtifact }) {
         </AccordionItem>
       </Accordion>
     </div>
-  );
+  )
 }

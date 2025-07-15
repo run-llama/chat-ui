@@ -1,182 +1,182 @@
-"use client";
+'use client'
 
 export interface WeatherData {
-  latitude: number;
-  longitude: number;
-  generationtime_ms: number;
-  utc_offset_seconds: number;
-  timezone: string;
-  timezone_abbreviation: string;
-  elevation: number;
+  latitude: number
+  longitude: number
+  generationtime_ms: number
+  utc_offset_seconds: number
+  timezone: string
+  timezone_abbreviation: string
+  elevation: number
   current_units: {
-    time: string;
-    interval: string;
-    temperature_2m: string;
-    weather_code: string;
-  };
+    time: string
+    interval: string
+    temperature_2m: string
+    weather_code: string
+  }
   current: {
-    time: string;
-    interval: number;
-    temperature_2m: number;
-    weather_code: number;
-  };
+    time: string
+    interval: number
+    temperature_2m: number
+    weather_code: number
+  }
   hourly_units: {
-    time: string;
-    temperature_2m: string;
-    weather_code: string;
-  };
+    time: string
+    temperature_2m: string
+    weather_code: string
+  }
   hourly: {
-    time: string[];
-    temperature_2m: number[];
-    weather_code: number[];
-  };
+    time: string[]
+    temperature_2m: number[]
+    weather_code: number[]
+  }
   daily_units: {
-    time: string;
-    weather_code: string;
-  };
+    time: string
+    weather_code: string
+  }
   daily: {
-    time: string[];
-    weather_code: number[];
-  };
+    time: string[]
+    weather_code: number[]
+  }
 }
 
 // Follow WMO Weather interpretation codes (WW)
 const weatherCodeDisplayMap: Record<
   string,
   {
-    icon: React.ReactNode;
-    status: string;
+    icon: React.ReactNode
+    status: string
   }
 > = {
-  "0": {
+  '0': {
     icon: <span>☀️</span>,
-    status: "Clear sky",
+    status: 'Clear sky',
   },
-  "1": {
+  '1': {
     icon: <span>🌤️</span>,
-    status: "Mainly clear",
+    status: 'Mainly clear',
   },
-  "2": {
+  '2': {
     icon: <span>☁️</span>,
-    status: "Partly cloudy",
+    status: 'Partly cloudy',
   },
-  "3": {
+  '3': {
     icon: <span>☁️</span>,
-    status: "Overcast",
+    status: 'Overcast',
   },
-  "45": {
+  '45': {
     icon: <span>🌫️</span>,
-    status: "Fog",
+    status: 'Fog',
   },
-  "48": {
+  '48': {
     icon: <span>🌫️</span>,
-    status: "Depositing rime fog",
+    status: 'Depositing rime fog',
   },
-  "51": {
+  '51': {
     icon: <span>🌧️</span>,
-    status: "Drizzle",
+    status: 'Drizzle',
   },
-  "53": {
+  '53': {
     icon: <span>🌧️</span>,
-    status: "Drizzle",
+    status: 'Drizzle',
   },
-  "55": {
+  '55': {
     icon: <span>🌧️</span>,
-    status: "Drizzle",
+    status: 'Drizzle',
   },
-  "56": {
+  '56': {
     icon: <span>🌧️</span>,
-    status: "Freezing Drizzle",
+    status: 'Freezing Drizzle',
   },
-  "57": {
+  '57': {
     icon: <span>🌧️</span>,
-    status: "Freezing Drizzle",
+    status: 'Freezing Drizzle',
   },
-  "61": {
+  '61': {
     icon: <span>🌧️</span>,
-    status: "Rain",
+    status: 'Rain',
   },
-  "63": {
+  '63': {
     icon: <span>🌧️</span>,
-    status: "Rain",
+    status: 'Rain',
   },
-  "65": {
+  '65': {
     icon: <span>🌧️</span>,
-    status: "Rain",
+    status: 'Rain',
   },
-  "66": {
+  '66': {
     icon: <span>🌧️</span>,
-    status: "Freezing Rain",
+    status: 'Freezing Rain',
   },
-  "67": {
+  '67': {
     icon: <span>🌧️</span>,
-    status: "Freezing Rain",
+    status: 'Freezing Rain',
   },
-  "71": {
+  '71': {
     icon: <span>❄️</span>,
-    status: "Snow fall",
+    status: 'Snow fall',
   },
-  "73": {
+  '73': {
     icon: <span>❄️</span>,
-    status: "Snow fall",
+    status: 'Snow fall',
   },
-  "75": {
+  '75': {
     icon: <span>❄️</span>,
-    status: "Snow fall",
+    status: 'Snow fall',
   },
-  "77": {
+  '77': {
     icon: <span>❄️</span>,
-    status: "Snow grains",
+    status: 'Snow grains',
   },
-  "80": {
+  '80': {
     icon: <span>🌧️</span>,
-    status: "Rain showers",
+    status: 'Rain showers',
   },
-  "81": {
+  '81': {
     icon: <span>🌧️</span>,
-    status: "Rain showers",
+    status: 'Rain showers',
   },
-  "82": {
+  '82': {
     icon: <span>🌧️</span>,
-    status: "Rain showers",
+    status: 'Rain showers',
   },
-  "85": {
+  '85': {
     icon: <span>❄️</span>,
-    status: "Snow showers",
+    status: 'Snow showers',
   },
-  "86": {
+  '86': {
     icon: <span>❄️</span>,
-    status: "Snow showers",
+    status: 'Snow showers',
   },
-  "95": {
+  '95': {
     icon: <span>⛈️</span>,
-    status: "Thunderstorm",
+    status: 'Thunderstorm',
   },
-  "96": {
+  '96': {
     icon: <span>⛈️</span>,
-    status: "Thunderstorm",
+    status: 'Thunderstorm',
   },
-  "99": {
+  '99': {
     icon: <span>⛈️</span>,
-    status: "Thunderstorm",
+    status: 'Thunderstorm',
   },
-};
+}
 
 const displayDay = (time: string) => {
-  return new Date(time).toLocaleDateString("en-US", {
-    weekday: "long",
-  });
-};
+  return new Date(time).toLocaleDateString('en-US', {
+    weekday: 'long',
+  })
+}
 
 export function WeatherCard({ data }: { data: WeatherData }) {
   const currentDayString = new Date(data.current.time).toLocaleDateString(
-    "en-US",
+    'en-US',
     {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    },
-  );
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    }
+  )
 
   return (
     <div className="w-fit space-y-4 rounded-2xl bg-[#61B9F2] p-5 text-white shadow-xl">
@@ -196,7 +196,7 @@ export function WeatherCard({ data }: { data: WeatherData }) {
       </div>
       <div className="grid grid-cols-6 gap-2">
         {data.daily.time.map((time, index) => {
-          if (index === 0) return null; // skip the current day
+          if (index === 0) return null // skip the current day
           return (
             <div key={time} className="flex flex-col items-center gap-4">
               <span>{displayDay(time)}</span>
@@ -207,9 +207,9 @@ export function WeatherCard({ data }: { data: WeatherData }) {
                 {weatherCodeDisplayMap[data.daily.weather_code[index]].status}
               </span>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
+  )
 }

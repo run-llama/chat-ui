@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import { Sparkles, Star } from "lucide-react";
-import { LLAMA_LOGO_URL } from "../../../../constants";
+import { Sparkles, Star } from 'lucide-react'
+import { LLAMA_LOGO_URL } from '../../../../constants'
 
 export function DefaultHeader() {
   return (
@@ -37,5 +37,5 @@ export function DefaultHeader() {
         </a>
       </div>
     </div>
-  );
+  )
 }

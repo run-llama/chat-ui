@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   getAnnotationData,
@@ -6,77 +6,77 @@ import {
   MessageAnnotation,
   MessageAnnotationType,
   useChatMessage,
-} from "@llamaindex/chat-ui";
-import React, { useEffect, useRef, useState } from "react";
-import { DynamicComponentErrorBoundary } from "./error-boundary";
-import { ComponentDef } from "./types";
+} from '@llamaindex/chat-ui'
+import React, { useEffect, useRef, useState } from 'react'
+import { DynamicComponentErrorBoundary } from './error-boundary'
+import { ComponentDef } from './types'
 
 type EventComponent = ComponentDef & {
-  events: JSONValue[];
-};
+  events: JSONValue[]
+}
 
 // image, document_file, sources, events, suggested_questions, agent
-const BUILT_IN_CHATUI_COMPONENTS = Object.values(MessageAnnotationType);
+const BUILT_IN_CHATUI_COMPONENTS = Object.values(MessageAnnotationType)
 
 export const DynamicEvents = ({
   componentDefs,
   appendError,
 }: {
-  componentDefs: ComponentDef[];
-  appendError: (error: string) => void;
+  componentDefs: ComponentDef[]
+  appendError: (error: string) => void
 }) => {
-  const { message } = useChatMessage();
-  const annotations = message.annotations;
+  const { message } = useChatMessage()
+  const annotations = message.annotations
 
-  const shownWarningsRef = useRef<Set<string>>(new Set()); // track warnings
-  const [hasErrors, setHasErrors] = useState(false);
+  const shownWarningsRef = useRef<Set<string>>(new Set()) // track warnings
+  const [hasErrors, setHasErrors] = useState(false)
 
   const handleError = (error: string) => {
-    setHasErrors(true);
-    appendError(error);
-  };
+    setHasErrors(true)
+    appendError(error)
+  }
 
   // Check for missing components in annotations
   useEffect(() => {
-    if (!annotations?.length) return;
+    if (!annotations?.length) return
 
-    const availableComponents = new Set(componentDefs.map((comp) => comp.type));
+    const availableComponents = new Set(componentDefs.map(comp => comp.type))
 
     annotations.forEach((item: JSONValue) => {
-      const annotation = item as MessageAnnotation;
-      const type = annotation.type;
-      if (!type) return; // Skip if annotation doesn't have a type
+      const annotation = item as MessageAnnotation
+      const type = annotation.type
+      if (!type) return // Skip if annotation doesn't have a type
 
-      const events = getAnnotationData<JSONValue>(message, type);
+      const events = getAnnotationData<JSONValue>(message, type)
 
       // Skip if it's a built-in component or if we've already shown the warning
       if (
         BUILT_IN_CHATUI_COMPONENTS.includes(type as MessageAnnotationType) ||
         shownWarningsRef.current.has(type)
       ) {
-        return;
+        return
       }
 
       // If we have events for a type but no component definition, show a warning
       if (events && !availableComponents.has(type)) {
         console.warn(
-          `No component found for event type: ${type} or having error when rendering it. Ensure there is a component file named ${type}.tsx or ${type}.jsx in your components directory, and verify the code for any errors.`,
-        );
-        shownWarningsRef.current.add(type);
+          `No component found for event type: ${type} or having error when rendering it. Ensure there is a component file named ${type}.tsx or ${type}.jsx in your components directory, and verify the code for any errors.`
+        )
+        shownWarningsRef.current.add(type)
       }
-    });
-  }, [annotations, componentDefs]);
+    })
+  }, [annotations, componentDefs])
 
   const components: EventComponent[] = componentDefs
-    .map((comp) => {
-      const events = getAnnotationData<JSONValue>(message, comp.type);
-      if (!events?.length) return null;
-      return { ...comp, events };
+    .map(comp => {
+      const events = getAnnotationData<JSONValue>(message, comp.type)
+      if (!events?.length) return null
+      return { ...comp, events }
     })
-    .filter((comp) => comp !== null);
+    .filter(comp => comp !== null)
 
-  if (components.length === 0) return null;
-  if (hasErrors) return null;
+  if (components.length === 0) return null
+  if (hasErrors) return null
 
   return (
     <div className="components-container">
@@ -85,15 +85,15 @@ export const DynamicEvents = ({
           <React.Fragment key={`${component.type}-${index}`}>
             {renderEventComponent(component, handleError)}
           </React.Fragment>
-        );
+        )
       })}
     </div>
-  );
-};
+  )
+}
 
 function renderEventComponent(
   component: EventComponent,
-  appendError: (error: string) => void,
+  appendError: (error: string) => void
 ) {
   return (
     <DynamicComponentErrorBoundary
@@ -102,5 +102,5 @@ function renderEventComponent(
     >
       {React.createElement(component.comp, { events: component.events })}
     </DynamicComponentErrorBoundary>
-  );
+  )
 }

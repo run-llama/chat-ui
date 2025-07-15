@@ -1,33 +1,33 @@
-import fs from "node:fs";
-import https from "node:https";
-import path from "node:path";
+import fs from 'node:fs'
+import https from 'node:https'
+import path from 'node:path'
 
 export async function downloadFile(
   urlToDownload: string,
-  downloadedPath: string,
+  downloadedPath: string
 ) {
   try {
     // Check if file already exists
-    if (fs.existsSync(downloadedPath)) return;
+    if (fs.existsSync(downloadedPath)) return
 
-    const file = fs.createWriteStream(downloadedPath);
+    const file = fs.createWriteStream(downloadedPath)
     https
-      .get(urlToDownload, (response) => {
-        response.pipe(file);
-        file.on("finish", () => {
+      .get(urlToDownload, response => {
+        response.pipe(file)
+        file.on('finish', () => {
           file.close(() => {
-            console.log("File downloaded successfully");
-          });
-        });
+            console.log('File downloaded successfully')
+          })
+        })
       })
-      .on("error", (err) => {
+      .on('error', err => {
         fs.unlink(downloadedPath, () => {
-          console.error("Error downloading file:", err);
-          throw err;
-        });
-      });
+          console.error('Error downloading file:', err)
+          throw err
+        })
+      })
   } catch (error) {
-    throw new Error(`Error downloading file: ${error}`);
+    throw new Error(`Error downloading file: ${error}`)
   }
 }
 
@@ -55,16 +55,16 @@ export function getStoredFilePath({
   id,
   saveDir,
 }: {
-  id: string;
-  saveDir?: string;
+  id: string
+  saveDir?: string
 }): string {
   // Validate id to prevent path traversal and invalid characters
-  if (id.includes("/") || id.includes("\\") || id.includes("..")) {
+  if (id.includes('/') || id.includes('\\') || id.includes('..')) {
     throw new Error(
-      "Invalid file id: path traversal or separators are not allowed.",
-    );
+      'Invalid file id: path traversal or separators are not allowed.'
+    )
   }
   // Use path.join to construct the default directory for cross-platform compatibility
-  const directory = saveDir ?? path.join("output", "uploaded");
-  return path.join(directory, id);
+  const directory = saveDir ?? path.join('output', 'uploaded')
+  return path.join(directory, id)
 }

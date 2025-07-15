@@ -5,13 +5,13 @@ new LlamaIndexServer({
   workflow: workflowFactory,
   uiConfig: {
     starterQuestions: [
-      "Generate a calculator app",
-      "Create a simple todo list app",
+      'Generate a calculator app',
+      'Create a simple todo list app',
     ],
-    componentsDir: "components",
+    componentsDir: 'components',
   },
   port: 3000,
-}).start();
+}).start()
 ```
 
 Export OpenAI API key and start the server in dev mode.

@@ -1,9 +1,9 @@
-"use client";
+'use client'
 
-import { useChatUI } from "@llamaindex/chat-ui";
-import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { getConfig } from "../../lib/utils";
+import { useChatUI } from '@llamaindex/chat-ui'
+import { Loader2 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { getConfig } from '../../lib/utils'
 import {
   Select,
   SelectContent,
@@ -12,35 +12,35 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "../../select";
+} from '../../select'
 
 type LLamaCloudPipeline = {
-  id: string;
-  name: string;
-};
+  id: string
+  name: string
+}
 
 type LLamaCloudProject = {
-  id: string;
-  organization_id: string;
-  name: string;
-  is_default: boolean;
-  pipelines: Array<LLamaCloudPipeline>;
-};
+  id: string
+  organization_id: string
+  name: string
+  is_default: boolean
+  pipelines: Array<LLamaCloudPipeline>
+}
 
 type PipelineConfig = {
-  project: string; // project name
-  pipeline: string; // pipeline name
-};
+  project: string // project name
+  pipeline: string // pipeline name
+}
 
 type LlamaCloudConfig = {
-  projects?: LLamaCloudProject[];
-  pipeline?: PipelineConfig;
-};
+  projects?: LLamaCloudProject[]
+  pipeline?: PipelineConfig
+}
 
 export interface LlamaCloudSelectorProps {
-  onSelect?: (pipeline: PipelineConfig | undefined) => void;
-  defaultPipeline?: PipelineConfig;
-  shouldCheckValid?: boolean;
+  onSelect?: (pipeline: PipelineConfig | undefined) => void
+  defaultPipeline?: PipelineConfig
+  shouldCheckValid?: boolean
 }
 
 export function LlamaCloudSelector({
@@ -48,68 +48,68 @@ export function LlamaCloudSelector({
   defaultPipeline,
   shouldCheckValid = false,
 }: LlamaCloudSelectorProps) {
-  const { setRequestData } = useChatUI();
-  const [config, setConfig] = useState<LlamaCloudConfig>();
+  const { setRequestData } = useChatUI()
+  const [config, setConfig] = useState<LlamaCloudConfig>()
 
   const updateRequestParams = useCallback(
     (pipeline?: PipelineConfig) => {
       if (setRequestData) {
         setRequestData({
           llamaCloudPipeline: pipeline,
-        });
+        })
       } else {
-        onSelect?.(pipeline);
+        onSelect?.(pipeline)
       }
     },
-    [onSelect, setRequestData],
-  );
+    [onSelect, setRequestData]
+  )
 
   useEffect(() => {
     const llamaCloudAPI =
-      getConfig("LLAMA_CLOUD_API") ??
-      (process.env.NEXT_PUBLIC_SHOW_LLAMACLOUD_SELECTOR === "true"
-        ? "/api/chat/config/llamacloud"
-        : "");
+      getConfig('LLAMA_CLOUD_API') ??
+      (process.env.NEXT_PUBLIC_SHOW_LLAMACLOUD_SELECTOR === 'true'
+        ? '/api/chat/config/llamacloud'
+        : '')
 
     if (!config && llamaCloudAPI) {
       fetch(llamaCloudAPI)
-        .then((response) => {
+        .then(response => {
           if (!response.ok) {
-            return response.json().then((errorData) => {
+            return response.json().then(errorData => {
               window.alert(
-                `Error: ${JSON.stringify(errorData) || "Unknown error occurred"}`,
-              );
-            });
+                `Error: ${JSON.stringify(errorData) || 'Unknown error occurred'}`
+              )
+            })
           }
-          return response.json();
+          return response.json()
         })
-        .then((data) => {
-          const pipeline = defaultPipeline ?? data.pipeline; // defaultPipeline will override pipeline in .env
-          setConfig({ ...data, pipeline });
-          updateRequestParams(pipeline);
+        .then(data => {
+          const pipeline = defaultPipeline ?? data.pipeline // defaultPipeline will override pipeline in .env
+          setConfig({ ...data, pipeline })
+          updateRequestParams(pipeline)
         })
-        .catch((error) => console.error("Error fetching config", error));
+        .catch(error => console.error('Error fetching config', error))
     }
-  }, [config, defaultPipeline, updateRequestParams]);
+  }, [config, defaultPipeline, updateRequestParams])
 
   const setPipeline = (pipelineConfig?: PipelineConfig) => {
-    setConfig((prevConfig) => ({
+    setConfig(prevConfig => ({
       ...prevConfig,
       pipeline: pipelineConfig,
-    }));
-    updateRequestParams(pipelineConfig);
-  };
+    }))
+    updateRequestParams(pipelineConfig)
+  }
 
   const handlePipelineSelect = async (value: string) => {
-    setPipeline(JSON.parse(value) as PipelineConfig);
-  };
+    setPipeline(JSON.parse(value) as PipelineConfig)
+  }
 
   if (!config) {
     return (
       <div className="flex items-center justify-center p-3">
         <Loader2 className="h-4 w-4 animate-spin" />
       </div>
-    );
+    )
   }
 
   if (shouldCheckValid && !isValid(config.projects, config.pipeline)) {
@@ -117,9 +117,9 @@ export function LlamaCloudSelector({
       <p className="text-red-500">
         Invalid LlamaCloud configuration. Check console logs.
       </p>
-    );
+    )
   }
-  const { projects, pipeline } = config;
+  const { projects, pipeline } = config
 
   return (
     <Select
@@ -139,7 +139,7 @@ export function LlamaCloudSelector({
             <SelectLabel className="capitalize">
               Project: {project.name}
             </SelectLabel>
-            {project.pipelines.map((pipeline) => (
+            {project.pipelines.map(pipeline => (
               <SelectItem
                 key={pipeline.id}
                 className="last:border-b"
@@ -155,37 +155,37 @@ export function LlamaCloudSelector({
         ))}
       </SelectContent>
     </Select>
-  );
+  )
 }
 
 function isValid(
   projects: LLamaCloudProject[] | undefined,
   pipeline: PipelineConfig | undefined,
-  logErrors: boolean = true,
+  logErrors: boolean = true
 ): boolean {
-  if (!projects?.length) return false;
-  if (!pipeline) return false;
+  if (!projects?.length) return false
+  if (!pipeline) return false
   const matchedProject = projects.find(
-    (project: LLamaCloudProject) => project.name === pipeline.project,
-  );
+    (project: LLamaCloudProject) => project.name === pipeline.project
+  )
   if (!matchedProject) {
     if (logErrors) {
       console.error(
-        `LlamaCloud project ${pipeline.project} not found. Check LLAMA_CLOUD_PROJECT_NAME variable`,
-      );
+        `LlamaCloud project ${pipeline.project} not found. Check LLAMA_CLOUD_PROJECT_NAME variable`
+      )
     }
-    return false;
+    return false
   }
   const pipelineExists = matchedProject.pipelines.some(
-    (p) => p.name === pipeline.pipeline,
-  );
+    p => p.name === pipeline.pipeline
+  )
   if (!pipelineExists) {
     if (logErrors) {
       console.error(
-        `LlamaCloud pipeline ${pipeline.pipeline} not found. Check LLAMA_CLOUD_INDEX_NAME variable`,
-      );
+        `LlamaCloud pipeline ${pipeline.pipeline} not found. Check LLAMA_CLOUD_INDEX_NAME variable`
+      )
     }
-    return false;
+    return false
   }
-  return true;
+  return true
 }

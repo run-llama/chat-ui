@@ -1,16 +1,16 @@
-"use client";
+'use client'
 
-import { ChatMessage } from "@llamaindex/chat-ui";
-import { DynamicEvents } from "./custom/events/dynamic-events";
-import { ComponentDef } from "./custom/events/types";
-import { ToolAnnotations } from "./tools/chat-tools";
+import { ChatMessage } from '@llamaindex/chat-ui'
+import { DynamicEvents } from './custom/events/dynamic-events'
+import { ComponentDef } from './custom/events/types'
+import { ToolAnnotations } from './tools/chat-tools'
 
 export function ChatMessageContent({
   componentDefs,
   appendError,
 }: {
-  componentDefs: ComponentDef[];
-  appendError: (error: string) => void;
+  componentDefs: ComponentDef[]
+  appendError: (error: string) => void
 }) {
   return (
     <ChatMessage.Content>
@@ -24,5 +24,5 @@ export function ChatMessageContent({
       <ChatMessage.Content.Source />
       <ChatMessage.Content.SuggestedQuestions />
     </ChatMessage.Content>
-  );
+  )
 }

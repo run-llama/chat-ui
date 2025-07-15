@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 /**
  * The default border color has changed to `currentColor` in Tailwind CSS v4,
@@ -17,7 +17,7 @@ const tailwindConfig = `
     border-color: var(--color-gray-200, currentColor);
   }
 }
-`;
+`
 
 export function ChatInjection() {
   return (
@@ -28,5 +28,5 @@ export function ChatInjection() {
       ></script>
       <style type="text/tailwindcss">{tailwindConfig}</style>
     </>
-  );
+  )
 }
