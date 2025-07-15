@@ -7,7 +7,7 @@ new LlamaIndexServer({
     llamaDeploy: { deployment: 'chat', workflow: 'workflow' },
   },
   llamaCloud: {
-    outputDir: "output/llamacloud",
+    outputDir: 'output/llamacloud',
   },
   port: 3000,
 }).start()
