@@ -1,6 +1,6 @@
 packages:
   - "apps/*"
   - "packages/*"
-  - "examples/**"
+  - "packages/server/examples"
   - "docs"
   - "!examples/**"
