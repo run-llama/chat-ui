@@ -9,10 +9,14 @@ import { ChatCanvasProvider } from './canvas/context'
 export interface ChatSectionProps extends React.PropsWithChildren {
   handler: ChatHandler
   className?: string
+
+  // whether to open the canvas automatically when there is an artifact in the assistant's response
+  // default to true
+  autoOpenCanvas?: boolean
 }
 
 export default function ChatSection(props: ChatSectionProps) {
-  const { handler, className } = props
+  const { handler, className, autoOpenCanvas = true } = props
   const [requestData, setRequestData] = useState<any>()
 
   const children = props.children ?? (
@@ -25,7 +29,9 @@ export default function ChatSection(props: ChatSectionProps) {
   return (
     <ChatProvider value={{ ...handler, requestData, setRequestData }}>
       <div className={cn('flex h-full w-full flex-col gap-4 p-5', className)}>
-        <ChatCanvasProvider>{children}</ChatCanvasProvider>
+        <ChatCanvasProvider autoOpenCanvas={autoOpenCanvas}>
+          {children}
+        </ChatCanvasProvider>
       </div>
     </ChatProvider>
   )
