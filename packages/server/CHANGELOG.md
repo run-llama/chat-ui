@@ -1,5 +1,11 @@
 # @llamaindex/server
 
+## 0.3.3
+
+### Patch Changes
+
+- 682e836: fix: eject make changeset release fail
+
 ## 0.3.2
 
 ### Patch Changes
