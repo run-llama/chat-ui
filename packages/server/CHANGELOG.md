@@ -1,5 +1,11 @@
 # @llamaindex/server
 
+## 0.3.2
+
+### Patch Changes
+
+- fa6e851: move server package to chat-ui
+
 ## 0.3.1
 
 ### Patch Changes
