@@ -134,5 +134,8 @@
     "zod-to-json-schema": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
