@@ -11,12 +11,15 @@ import { useChatCanvas } from '../context'
 
 interface CodeArtifactViewerProps {
   className?: string
+  tabListClassName?: string
+  defaultTab?: string
   tabs?: Record<string, React.ReactNode>
 }
 
 export function CodeArtifactViewer({
   className,
   tabs,
+  defaultTab = 'code',
 }: CodeArtifactViewerProps) {
   const { displayedArtifact, updateArtifact } = useChatCanvas()
   const [updatedCode, setUpdatedCode] = useState<string | undefined>()
@@ -41,18 +44,25 @@ export function CodeArtifactViewer({
 
   return (
     <Tabs
-      defaultValue="code"
+      defaultValue={defaultTab}
       className={cn('flex h-full min-h-0 flex-1 flex-col gap-4 p-4', className)}
     >
       <div className="flex items-center justify-between">
         <TabsList>
-          <TabsTrigger value="code">Code</TabsTrigger>
+          {defaultTab === 'code' && (
+            // Show code tab at the start if defaultTab is code
+            <TabsTrigger value="code">Code</TabsTrigger>
+          )}
           {tabs &&
             Object.entries(tabs).map(([key]) => (
               <TabsTrigger key={key} value={key} className="capitalize">
                 {key}
               </TabsTrigger>
             ))}
+          {defaultTab !== 'code' && (
+            // Show code tab at the end if defaultTab is not code
+            <TabsTrigger value="code">Code</TabsTrigger>
+          )}
         </TabsList>
         <ChatCanvasActions />
       </div>

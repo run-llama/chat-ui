@@ -44,7 +44,13 @@ const ChatCanvasContext = createContext<ChatCanvasContextType | undefined>(
   undefined
 )
 
-export function ChatCanvasProvider({ children }: { children: ReactNode }) {
+export function ChatCanvasProvider({
+  children,
+  autoOpenCanvas = true,
+}: {
+  children: ReactNode
+  autoOpenCanvas?: boolean
+}) {
   const { messages, isLoading, append, requestData, setMessages } = useChatUI()
 
   const [isCanvasOpen, setIsCanvasOpen] = useState(false) // whether the canvas is open
@@ -66,13 +72,13 @@ export function ChatCanvasProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // when stream is loading and last message has a artifact, open the canvas with that artifact
-    if (artifactsFromLastMessage.length > 0 && isLoading) {
+    if (artifactsFromLastMessage.length > 0 && isLoading && autoOpenCanvas) {
       setIsCanvasOpen(true)
       setDisplayedArtifact(
         artifactsFromLastMessage[artifactsFromLastMessage.length - 1]
       )
     }
-  }, [artifactsFromLastMessage, isCanvasOpen, isLoading])
+  }, [artifactsFromLastMessage, isCanvasOpen, isLoading, autoOpenCanvas])
 
   const openArtifactInCanvas = (artifact: Artifact) => {
     setDisplayedArtifact(artifact)
