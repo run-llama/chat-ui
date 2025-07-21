@@ -1,5 +1,12 @@
 # llamaindex-server-examples
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [682e836]
+  - @llamaindex/server@0.3.3
+
 ## 0.0.3
 
 ### Patch Changes
