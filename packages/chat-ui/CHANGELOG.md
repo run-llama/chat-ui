@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.5.17
+
+### Patch Changes
+
+- 82bc236: feat: support config auto open canvas
+
 ## 0.5.16
 
 ### Patch Changes
