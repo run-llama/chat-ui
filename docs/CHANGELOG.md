@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui-docs
 
+## 0.0.9
+
+### Patch Changes
+
+- f726f19: fix: missing document for ChatSection
+
 ## 0.0.8
 
 ### Patch Changes
