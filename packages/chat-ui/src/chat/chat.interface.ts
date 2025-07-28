@@ -1,4 +1,4 @@
-type MessageRole = 'system' | 'user' | 'assistant' | 'data'
+type MessageRole = 'system' | 'user' | 'assistant'
 
 export type JSONValue =
   | null
@@ -10,10 +10,15 @@ export type JSONValue =
     }
   | JSONValue[]
 
-export interface Message {
-  content: string
+export type Message = {
+  id: string
   role: MessageRole
-  annotations?: JSONValue[]
+  parts: MessagePart[]
+}
+
+export type MessagePart = {
+  type: string
+  [key: string]: unknown
 }
 
 export type ChatHandler = {
@@ -27,10 +32,7 @@ export type ChatHandler = {
     message: Message,
     chatRequestOptions?: { data?: any }
   ) => Promise<string | null | undefined>
-
-  // TODO: (Message & { id: string }) is a quick fix for compatibility with Message from ai/react
-  // We should make Message type in ChatHandler more flexible. Eg: ChatHandler<T extends Message = Message>
-  setMessages?: (messages: (Message & { id: string })[]) => void
+  setMessages?: (messages: Message[]) => void
 }
 
 export type ChatContext = ChatHandler & {
