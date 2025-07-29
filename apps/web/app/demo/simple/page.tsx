@@ -1,9 +1,8 @@
 'use client'
 
-import { useChat } from "@ai-sdk/react";
+import { useChat } from '@ai-sdk/react'
 import { ChatSection } from '@llamaindex/chat-ui'
 import { Code } from '@/components/code'
-import { useState } from 'react'
 
 const code = `
 import { ChatSection } from '@llamaindex/chat-ui'
@@ -16,15 +15,7 @@ function SimpleChat() {
 `
 
 export default function Page(): JSX.Element {
-  const [input, setInput] = useState('')
-  const {
-    regenerate,
-    sendMessage,
-    status,
-    stop,
-    messages,
-    setMessages
-  } = useChat()
+  const handler = useChat()
   return (
     <div className="flex gap-10">
       <div className="hidden w-1/3 justify-center space-y-10 self-center p-10 md:block">
@@ -36,18 +27,7 @@ export default function Page(): JSX.Element {
       </div>
       <div className="w-full md:w-2/3 md:border-l">
         <ChatSection
-          handler={{
-            input,
-            setInput,
-            isLoading: status === 'streaming',
-            regenerate,
-            stop,
-            sendMessage,
-            messages,
-            setMessages: (msgList) => {
-              setMessages(msgList)
-            },
-          }}
+          handler={handler}
           className="mx-auto h-screen max-w-3xl overflow-hidden p-0 md:p-5"
         />
       </div>
