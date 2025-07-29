@@ -26,9 +26,9 @@ export type ChatHandler = {
   setInput: (input: string) => void
   isLoading: boolean
   messages: Message[]
-  reload?: (chatRequestOptions?: { data?: any }) => void
+  regenerate?: (chatRequestOptions?: { data?: any }) => void
   stop?: () => void
-  append: (
+  sendMessage: (
     message: Message,
     chatRequestOptions?: { data?: any }
   ) => Promise<string | null | undefined>

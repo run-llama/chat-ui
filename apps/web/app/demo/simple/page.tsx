@@ -40,9 +40,9 @@ export default function Page(): JSX.Element {
             input,
             setInput,
             isLoading: status === 'streaming',
-            reload: regenerate,
+            regenerate,
             stop,
-            append: sendMessage,
+            sendMessage,
             messages,
             setMessages: (msgList) => {
               setMessages(msgList)
