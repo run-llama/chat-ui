@@ -17,7 +17,10 @@ export interface ChatSectionProps extends React.PropsWithChildren {
 
 export default function ChatSection(props: ChatSectionProps) {
   const { handler, className, autoOpenCanvas = true } = props
+  const [input, setInput] = useState('')
   const [requestData, setRequestData] = useState<any>()
+
+  const isLoading = handler.status === 'streaming'
 
   const children = props.children ?? (
     <>
@@ -27,7 +30,16 @@ export default function ChatSection(props: ChatSectionProps) {
   )
 
   return (
-    <ChatProvider value={{ ...handler, requestData, setRequestData }}>
+    <ChatProvider
+      value={{
+        ...handler,
+        input,
+        setInput,
+        requestData,
+        setRequestData,
+        isLoading,
+      }}
+    >
       <div className={cn('flex h-full w-full flex-col gap-4 p-5', className)}>
         <ChatCanvasProvider autoOpenCanvas={autoOpenCanvas}>
           {children}
