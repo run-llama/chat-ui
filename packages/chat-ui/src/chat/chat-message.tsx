@@ -97,6 +97,7 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 }
 
 function ChatMessageContent(props: ChatMessageContentProps) {
+  // TODO: we should render the parts in the order they are in the message
   const children = props.children ?? (
     <>
       <EventAnnotations />
@@ -120,24 +121,32 @@ function ChatMarkdown(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
 
   const nodes = useMemo(() => getSourceNodes(message), [message])
+  const markdownParts = message.parts.filter(
+    part => part.type === PartType.TEXT.toString()
+  )
 
   return (
-    <Markdown
-      content={message.content}
-      sources={{ nodes }}
-      citationComponent={props.citationComponent}
-      languageRenderers={props.languageRenderers}
-      annotationRenderers={
-        props.annotationRenderers ?? defaultAnnotationRenderers
-      }
-      className={cn(
-        {
-          'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
-            message.role === 'user',
-        },
-        props.className
-      )}
-    />
+    <>
+      {markdownParts.map((part, index) => (
+        <Markdown
+          key={index}
+          content={part.text as string}
+          sources={{ nodes }}
+          citationComponent={props.citationComponent}
+          languageRenderers={props.languageRenderers}
+          annotationRenderers={
+            props.annotationRenderers ?? defaultAnnotationRenderers
+          }
+          className={cn(
+            {
+              'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
+                message.role === 'user',
+            },
+            props.className
+          )}
+        />
+      ))}
+    </>
   )
 }
 
