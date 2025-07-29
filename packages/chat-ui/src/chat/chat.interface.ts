@@ -49,4 +49,17 @@ export type ChatContext = ChatHandler & {
 
   // computed state from status
   isLoading: boolean
+} & {
+  /**
+   * @deprecated Use `regenerate` instead
+   */
+  reload?: (chatRequestOptions?: { data?: any }) => void
+
+  /**
+   * @deprecated Use `sendMessage` instead
+   */
+  append?: (
+    message: Message,
+    chatRequestOptions?: { data?: any }
+  ) => Promise<string | null | undefined>
 }

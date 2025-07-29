@@ -3,7 +3,7 @@ import { cn } from '../lib/utils'
 import ChatInput from './chat-input'
 import ChatMessages from './chat-messages'
 import { ChatProvider } from './chat.context'
-import { type ChatHandler } from './chat.interface'
+import { Message, type ChatHandler } from './chat.interface'
 import { ChatCanvasProvider } from './canvas/context'
 
 export interface ChatSectionProps extends React.PropsWithChildren {
@@ -20,6 +20,13 @@ export default function ChatSection(props: ChatSectionProps) {
   const [input, setInput] = useState('')
   const [requestData, setRequestData] = useState<any>()
 
+  // @deprecated: keep `reload`, `append` and `isLoading` for backward compatibility
+  // should use `regenerate`, `sendMessage` and `status` instead
+  const reload = (data: any) => handler.regenerate?.({ body: data })
+  const append = async (message: Message, data: any) => {
+    await handler.sendMessage(message, { body: data })
+    return null
+  }
   const isLoading = handler.status === 'streaming'
 
   const children = props.children ?? (
@@ -37,6 +44,8 @@ export default function ChatSection(props: ChatSectionProps) {
         setInput,
         requestData,
         setRequestData,
+        reload,
+        append,
         isLoading,
       }}
     >
