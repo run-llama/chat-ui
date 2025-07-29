@@ -62,14 +62,17 @@ function ChatInput(props: ChatInputProps) {
   const submit = async () => {
     const newMessage: Omit<Message, 'id'> = {
       role: 'user',
-      content: input,
+      parts: [{ type: 'text', text: input }],
       annotations: props.annotations,
     }
 
     setInput('') // Clear the input
     props.resetUploadedFiles?.() // Reset the uploaded files
 
-    await append(newMessage, { data: requestData })
+    await append({
+      ...newMessage,
+      id: crypto.randomUUID(),
+    }, { data: requestData })
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -58,8 +58,19 @@ export type ChatContext = ChatHandler & {
   /**
    * @deprecated Use `sendMessage` instead
    */
-  append?: (
+  append: (
     message: Message,
     chatRequestOptions?: { data?: any }
   ) => Promise<string | null | undefined>
+}
+
+// built-in chat-ui part types
+export enum PartType {
+  TEXT = 'text',
+  IMAGE = 'image',
+  DOCUMENT_FILE = 'document_file',
+  SOURCES = 'sources',
+  EVENTS = 'events',
+  SUGGESTED_QUESTIONS = 'suggested_questions',
+  AGENT = 'agent',
 }

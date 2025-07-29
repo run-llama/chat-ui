@@ -1,11 +1,11 @@
 import { createContext, useContext } from 'react'
-import { ChatHandler, Message } from './chat.interface'
+import { ChatContext, Message } from './chat.interface'
 
 export interface ChatMessageContext {
   message: Message
   isLast: boolean
   isLoading?: boolean
-  append?: ChatHandler['append']
+  append?: ChatContext['append']
 }
 
 export const chatMessageContext = createContext<ChatMessageContext | null>(null)

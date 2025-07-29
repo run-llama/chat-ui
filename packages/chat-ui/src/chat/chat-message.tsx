@@ -19,7 +19,7 @@ import {
 } from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ChatHandler, Message } from './chat.interface'
+import { ChatContext, Message, PartType } from './chat.interface'
 import { defaultAnnotationRenderers } from './chat-renderers.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
@@ -27,37 +27,17 @@ interface ChatMessageProps extends React.PropsWithChildren {
   isLast: boolean
   className?: string
   isLoading?: boolean
-  append?: ChatHandler['append']
+  append?: ChatContext['append']
 }
 
 interface ChatMessageAvatarProps extends React.PropsWithChildren {
   className?: string
 }
 
-export enum ContentPosition {
-  TOP = -9999,
-  CHAT_EVENTS = 0,
-  AFTER_EVENTS = 1,
-  CHAT_AGENT_EVENTS = 2,
-  AFTER_AGENT_EVENTS = 3,
-  CHAT_IMAGE = 4,
-  AFTER_IMAGE = 5,
-  BEFORE_MARKDOWN = 6,
-  MARKDOWN = 7,
-  AFTER_MARKDOWN = 8,
-  CHAT_DOCUMENT_FILES = 9,
-  AFTER_DOCUMENT_FILES = 10,
-  CHAT_SOURCES = 11,
-  AFTER_SOURCES = 12,
-  SUGGESTED_QUESTIONS = 13,
-  AFTER_SUGGESTED_QUESTIONS = 14,
-  BOTTOM = 9999,
-}
-
 interface ChatMessageContentProps extends React.PropsWithChildren {
   className?: string
   isLoading?: boolean
-  append?: ChatHandler['append']
+  append?: ChatContext['append']
   message?: Message // in case you want to customize the message
 }
 
@@ -171,11 +151,17 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
   const isLastMessageFromAssistant = message.role === 'assistant' && isLast
   const showReload = reload && !isLoading && isLastMessageFromAssistant
 
+  // content to copy is all text parts joined by newlines
+  const messageTextContent = message.parts
+    .filter(part => part.type === PartType.TEXT.toString())
+    .map(part => part.text)
+    .join('\n\n')
+
   const children = props.children ?? (
     <>
       <Button
         title="Copy"
-        onClick={() => copyToClipboard(message.content)}
+        onClick={() => copyToClipboard(messageTextContent)}
         size="icon"
         variant="outline"
         className="h-8 w-8"
