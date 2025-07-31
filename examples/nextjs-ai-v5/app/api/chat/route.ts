@@ -8,7 +8,6 @@ const steps = [
   },
   {
     type: 'data-weather',
-    id: 'weather-1',
     data: { city: 'San Francisco', status: 'loading' },
   },
 
@@ -41,6 +40,29 @@ const steps = [
     id: 'weather-1',
     data: { city: 'San Francisco', weather: 'sunny', status: 'success' },
   },
+
+  { type: 'start' },
+  { type: 'start-step' },
+  {
+    type: 'text-start',
+    id: 'msg_2',
+    providerMetadata: {
+      openai: {
+        itemId: 'msg_2',
+      },
+    },
+  },
+  ...['I', ' am ', 'a bot'].map(word => ({
+    type: 'text-delta',
+    id: 'msg_2',
+    delta: word,
+  })),
+  {
+    type: 'text-end',
+    id: 'msg_2',
+  },
+  { type: 'finish-step' },
+  { type: 'finish' },
 ]
 
 export async function POST() {

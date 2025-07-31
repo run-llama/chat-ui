@@ -32,7 +32,7 @@ export function EventAnnotations() {
 }
 
 export function AgentEventAnnotations() {
-  const { message, isLast } = useChatMessage()
+  const { message, isLast, textParts } = useChatMessage()
 
   const agentEventData = getAnnotationData<AgentEventData>(
     message,
@@ -42,7 +42,7 @@ export function AgentEventAnnotations() {
   return (
     <ChatAgentEvents
       data={agentEventData}
-      isFinished={Boolean(message.content)}
+      isFinished={textParts.length > 0}
       isLast={isLast}
     />
   )

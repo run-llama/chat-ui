@@ -1,11 +1,11 @@
-import { Message } from '../chat.interface'
+import { Message, TextPartType } from '../chat.interface'
 
 /**
- * Gets annotation data directly from a message by type
+ * Gets all annotations from a message (data parts)
+ * Annotations are all parts that are not text parts.
  * @param message - The message to extract annotations from
- * @param type - The annotation type to filter by (can be standard or custom)
- * @returns Array of data from annotations of the specified type, or null if none found
+ * @returns Array of data from annotations
  */
 export function getVercelAnnotations(message: Message): unknown[] {
-  return message.annotations ?? []
+  return message.parts.filter(part => part.type !== TextPartType) ?? []
 }

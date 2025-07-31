@@ -1,10 +1,10 @@
-import { ChatHandler } from '../chat/chat.interface'
+import { ChatContext } from '../chat/chat.interface'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 
 interface StarterQuestionsProps {
   questions: string[]
-  append: ChatHandler['append']
+  append: ChatContext['append']
   className?: string
 }
 

@@ -8,10 +8,17 @@ export enum MessageAnnotationType {
   ARTIFACT = 'artifact',
 }
 
+/**
+ * @deprecated Use DataPart instead
+ */
 export type MessageAnnotation<T = unknown> = {
   type: string
-  data: T
+  data?: T
+  id?: string // TODO: support handling optional id, only last data event with the same id will be used.
 }
+
+// data parts is the same as message annotations
+export type DataPart<T = unknown> = MessageAnnotation<T>
 
 export function isMessageAnnotation(
   annotation: unknown

@@ -19,8 +19,9 @@ import {
 } from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ChatContext, Message, PartType } from './chat.interface'
+import { ChatContext, Message, TextPart, TextPartType } from './chat.interface'
 import { defaultAnnotationRenderers } from './chat-renderers.js'
+import { DataPart } from './annotations'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -53,6 +54,13 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
 }
 
 function ChatMessage(props: ChatMessageProps) {
+  const textParts = props.message.parts.filter(
+    (part): part is TextPart => part.type === TextPartType
+  )
+  const dataParts = props.message.parts.filter(
+    (part): part is DataPart => part.type !== TextPartType
+  )
+
   const children = props.children ?? (
     <>
       <ChatMessageAvatar />
@@ -68,6 +76,9 @@ function ChatMessage(props: ChatMessageProps) {
         isLast: props.isLast,
         isLoading: props.isLoading,
         append: props.append,
+        parts: props.message.parts,
+        textParts,
+        dataParts,
       }}
     >
       <div className={cn('group flex gap-4 p-3', props.className)}>
@@ -122,7 +133,7 @@ function ChatMarkdown(props: ChatMarkdownProps) {
 
   const nodes = useMemo(() => getSourceNodes(message), [message])
   const markdownParts = message.parts.filter(
-    part => part.type === PartType.TEXT.toString()
+    (part): part is TextPart => part.type === TextPartType
   )
 
   return (
@@ -162,7 +173,7 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
 
   // content to copy is all text parts joined by newlines
   const messageTextContent = message.parts
-    .filter(part => part.type === PartType.TEXT.toString())
+    .filter((part): part is TextPart => part.type === TextPartType)
     .map(part => part.text)
     .join('\n\n')
 

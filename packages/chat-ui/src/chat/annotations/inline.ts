@@ -1,7 +1,7 @@
 import { remark } from 'remark'
 import remarkParse from 'remark-parse'
 import { visit } from 'unist-util-visit'
-import { Message } from '../chat.interface'
+import { Message, TextPart, TextPartType } from '../chat.interface'
 import { isMessageAnnotation, MessageAnnotation } from './types'
 
 const INLINE_ANNOTATION_KEY = 'annotation'
@@ -30,7 +30,16 @@ function parseMarkdownCodeBlocks(markdown: string) {
 
 // extract all inline annotations from markdown
 export function getInlineAnnotations(message: Message): unknown[] {
-  const codeBlocks = parseMarkdownCodeBlocks(message.content)
+  const textParts = message.parts.filter(
+    (part): part is TextPart => part.type === TextPartType
+  )
+  return textParts
+    .map(part => getInlineAnnotationsFromMessageContent(part.text))
+    .flat()
+}
+
+function getInlineAnnotationsFromMessageContent(content: string): unknown[] {
+  const codeBlocks = parseMarkdownCodeBlocks(content)
   return codeBlocks
     .filter(block => block.language === INLINE_ANNOTATION_KEY)
     .map(block => tryParse(block.code))

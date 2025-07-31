@@ -1,3 +1,5 @@
+import { DataPart } from './annotations/types'
+
 export type JSONValue =
   | null
   | string
@@ -14,15 +16,29 @@ export interface Message {
   parts: MessagePart[]
 }
 
-export type MessagePart = {
-  type: string
-  [key: string]: unknown
+/**
+ * Chat-UI MessagePart contract, have two types of parts:
+ * - text parts: will be accumulated to one or more message content
+ * - data parts: basically our current annotations
+ *
+ * message.parts = textParts + dataParts (annotations)
+ */
+export type MessagePart = TextPart | DataPart
+
+export const TextPartType = 'text' as const
+
+export interface TextPart {
+  type: typeof TextPartType
+  text: string
 }
 
 // User can have various parts, so we need to allow any parts when updating or sending messages
 // See many specific MessagePart types from Vercel AI SDK here:
 // https://github.com/vercel/ai/blob/7948ec215d21675c1100edf58af8bb03a1f1dbe4/packages/ai/src/ui/ui-messages.ts#L75-L272
-export type MessageInput = Omit<Message, 'parts'> & { parts: any[] }
+export type MessageInput = Omit<Message, 'parts'> & {
+  parts: any[]
+  id?: string
+}
 
 export type ChatRequestOptions = {
   headers?: Record<string, string> | Headers
@@ -59,18 +75,11 @@ export type ChatContext = ChatHandler & {
    * @deprecated Use `sendMessage` instead
    */
   append: (
-    message: Message,
+    message: {
+      role: Message['role']
+      content: string
+      annotations?: any
+    },
     chatRequestOptions?: { data?: any }
   ) => Promise<string | null | undefined>
-}
-
-// built-in chat-ui part types
-export enum PartType {
-  TEXT = 'text',
-  IMAGE = 'image',
-  DOCUMENT_FILE = 'document_file',
-  SOURCES = 'sources',
-  EVENTS = 'events',
-  SUGGESTED_QUESTIONS = 'suggested_questions',
-  AGENT = 'agent',
 }

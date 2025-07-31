@@ -1,11 +1,15 @@
 import { createContext, useContext } from 'react'
-import { ChatContext, Message } from './chat.interface'
+import { ChatContext, Message, MessagePart, TextPart } from './chat.interface'
+import { DataPart } from './annotations'
 
 export interface ChatMessageContext {
   message: Message
   isLast: boolean
   isLoading?: boolean
   append?: ChatContext['append']
+  parts: MessagePart[]
+  textParts: TextPart[]
+  dataParts: DataPart[]
 }
 
 export const chatMessageContext = createContext<ChatMessageContext | null>(null)

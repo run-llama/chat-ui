@@ -1,4 +1,4 @@
-import { ChatHandler } from '../chat/chat.interface'
+import { ChatContext } from '../chat/chat.interface'
 
 export type SuggestedQuestionsData = string[]
 
@@ -8,7 +8,7 @@ export function SuggestedQuestions({
   requestData,
 }: {
   questions: SuggestedQuestionsData
-  append: ChatHandler['append']
+  append: ChatContext['append']
   requestData?: any
 }) {
   const showQuestions = questions.length > 0
