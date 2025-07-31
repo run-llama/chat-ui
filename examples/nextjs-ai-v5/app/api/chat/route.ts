@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server'
 
 const steps = [
+  {
+    type: 'data-notification',
+    data: { message: 'Processing your request...', level: 'info' },
+    transient: true,
+  },
+  {
+    type: 'data-weather',
+    id: 'weather-1',
+    data: { city: 'San Francisco', status: 'loading' },
+  },
+
   { type: 'start' },
   { type: 'start-step' },
   {
@@ -25,6 +36,11 @@ const steps = [
   },
   { type: 'finish-step' },
   { type: 'finish' },
+  {
+    type: 'data-weather',
+    id: 'weather-1',
+    data: { city: 'San Francisco', weather: 'sunny', status: 'success' },
+  },
 ]
 
 export async function POST() {
