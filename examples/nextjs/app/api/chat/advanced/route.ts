@@ -14,22 +14,33 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 const TOKEN_DELAY = 30 // 30ms delay between tokens
-const TEXT_PREFIX = '0:' // vercel ai text prefix
-const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
-const INLINE_ANNOTATION_KEY = 'annotation' // the language key to detect inline annotation code in markdown
+const DATA_PREFIX = 'data: ' // use data: prefix for SSE format
 const ANNOTATION_DELAY = 1000 // 1 second delay between annotations
+const INLINE_ANNOTATION_KEY = 'annotation'
+
+interface TextChunk {
+  type: 'text-delta' | 'text-start' | 'text-end'
+  id: string
+  delta?: string
+}
+
+interface DataChunk {
+  type: `data-${string}` // requires `data-` prefix when sending data parts
+  data: Record<string, any>
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // extract query from last message
     const { messages } = await request.json()
-    const lastMessage = messages[messages.length - 1]
+    const query = messages[messages.length - 1]?.parts[0]?.text ?? ''
 
-    const stream = fakeChatStream(`User query: "${lastMessage.content}".\n`)
+    const stream = fakeChatStream(`User query: "${query}".\n`)
 
     return new Response(stream, {
+      // Set headers for Server-Sent Events (SSE)
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-Vercel-AI-Data-Stream': 'v1',
+        'Content-Type': 'text/event-stream',
         Connection: 'keep-alive',
       },
     })
@@ -191,34 +202,71 @@ const fakeChatStream = (query: string): ReadableStream => {
   return new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder()
-      controller.enqueue(
-        encoder.encode(`${TEXT_PREFIX}${JSON.stringify(query)}\n`)
-      )
+
+      function writeStream(chunk: TextChunk | DataChunk) {
+        controller.enqueue(
+          encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
+        )
+      }
+
+      async function writeTextMessage(content: string) {
+        // init a unique message id
+        const messageId = crypto.randomUUID()
+
+        // important: we need to write the start chunk first
+        const startChunk: TextChunk = { id: messageId, type: 'text-start' }
+        writeStream(startChunk)
+
+        // simulate token-by-token streaming
+        for (const token of content.split(' ')) {
+          const deltaChunk: TextChunk = {
+            id: messageId,
+            type: 'text-delta',
+            delta: token + ' ',
+          }
+          writeStream(deltaChunk)
+          await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
+        }
+
+        // important: we need to write the end chunk last
+        const endChunk: TextChunk = { id: messageId, type: 'text-end' }
+        writeStream(endChunk)
+      }
+
+      async function writeAnnotation(anno: { type: string; data: any }) {
+        const chunk: DataChunk = {
+          type: `data-${anno.type}`,
+          data: anno.data,
+        }
+        writeStream(chunk)
+      }
+
+      // show the query message
+      await writeTextMessage(query)
 
       // insert inline annotations
       for (const item of SAMPLE_TEXT) {
         if (typeof item === 'string') {
-          for (const token of item.split(' ')) {
-            await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
-            controller.enqueue(
-              encoder.encode(`${TEXT_PREFIX}${JSON.stringify(`${token} `)}\n`)
-            )
-          }
+          await writeTextMessage(item)
         } else {
           await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
-          // append inline annotation with 0: prefix
+          // append inline annotation
           const annotationCode = toInlineAnnotationCode(item)
-          controller.enqueue(
-            encoder.encode(`${TEXT_PREFIX}${JSON.stringify(annotationCode)}\n`)
-          )
+          const annotationId = crypto.randomUUID()
+          writeStream({ type: 'text-start', id: annotationId })
+          writeStream({
+            id: annotationId,
+            type: 'text-delta',
+            delta: annotationCode,
+          })
+          writeStream({ type: 'text-end', id: annotationId })
         }
       }
 
       // insert sources in fixed positions
       for (const item of SAMPLE_SOURCES) {
-        controller.enqueue(
-          encoder.encode(`${ANNOTATION_PREFIX}${JSON.stringify([item])}\n`)
-        )
+        await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
+        await writeAnnotation(item)
       }
 
       controller.close()

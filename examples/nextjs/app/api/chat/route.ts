@@ -122,6 +122,14 @@ const fakeChatStream = (query: string): ReadableStream => {
         writeStream(endChunk)
       }
 
+      async function writeAnnotation(anno: { type: string; data: any }) {
+        const chunk: DataChunk = {
+          type: `data-${anno.type}`,
+          data: anno.data,
+        }
+        writeStream(chunk)
+      }
+
       // show the query message
       await writeTextMessage(query)
 
@@ -130,10 +138,7 @@ const fakeChatStream = (query: string): ReadableStream => {
 
       // show the sample annotations
       for (const item of SAMPLE_ANNOTATIONS) {
-        const chunk: DataChunk = { type: `data-${item.type}`, data: item.data }
-        controller.enqueue(
-          encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
-        )
+        await writeAnnotation(item)
       }
 
       controller.close()
