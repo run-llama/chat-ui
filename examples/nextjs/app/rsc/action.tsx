@@ -2,7 +2,7 @@
 
 import { defaultAnnotationRenderers } from '@llamaindex/chat-ui'
 import { Markdown } from '@llamaindex/chat-ui/widgets'
-import { createStreamableUI } from 'ai/rsc'
+import { createStreamableUI } from '@ai-sdk/rsc'
 import { ReactNode } from 'react'
 
 const TOKEN_DELAY = 30

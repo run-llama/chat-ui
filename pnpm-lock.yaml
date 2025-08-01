@@ -134,6 +134,9 @@ importers:
       '@ai-sdk/react':
         specifier: 2.0.0
         version: 2.0.0(react@19.1.0)(zod@3.25.76)
+      '@ai-sdk/rsc':
+        specifier: 1.0.0
+        version: 1.0.0(react@19.1.0)(zod@3.25.76)
       '@llamaindex/chat-ui':
         specifier: workspace:*
         version: link:../../packages/chat-ui
@@ -980,6 +983,24 @@ packages:
       react: 18.3.1
       swr: 2.3.3(react@18.3.1)
       throttleit: 2.1.0
+      zod: 3.25.76
+    dev: false
+
+  /@ai-sdk/rsc@1.0.0(react@19.1.0)(zod@3.25.76):
+    resolution: {integrity: sha512-+sxLeWHNKDtNQQO1VTYBzNPvA4C02uZAC/7RQtmf2uKqV+0bY8SKcW/4a3PZHHVWMLOsb9F1BOUFQIrba4wcTQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: ^18 || ^19 || ^19.0.0-rc
+      zod: ^3.25.76 || ^4
+    peerDependenciesMeta:
+      zod:
+        optional: true
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.0(zod@3.25.76)
+      ai: 5.0.0(zod@3.25.76)
+      jsondiffpatch: 0.6.0
+      react: 19.1.0
       zod: 3.25.76
     dev: false
 

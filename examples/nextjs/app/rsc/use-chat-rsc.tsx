@@ -1,7 +1,7 @@
 'use client'
 
-import { generateId, Message } from 'ai'
-import { useActions, useUIState } from 'ai/rsc'
+import { generateId, TextPart, UIMessage } from 'ai'
+import { useActions, useUIState } from '@ai-sdk/rsc'
 import { useState } from 'react'
 import { AIProvider } from './ai'
 import { ChatHandler } from '@llamaindex/chat-ui'
@@ -9,52 +9,71 @@ import { ChatHandler } from '@llamaindex/chat-ui'
 // simple hook to create chat handler from RSC actions
 // then we can easily use it with @llamaindex/chat-ui
 export function useChatRSC(): ChatHandler {
-  const [input, setInput] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [status, setStatus] = useState<
+    'submitted' | 'streaming' | 'ready' | 'error'
+  >('ready')
   const [messages, setMessages] = useUIState<AIProvider>()
   const { chatAction } = useActions<AIProvider>()
 
   // similar append function as useChat hook
-  const append = async (message: Omit<Message, 'id'>) => {
-    const newMsg: Message = { ...message, id: generateId() }
+  const append = async (message: Omit<UIMessage, 'id'>) => {
+    const newMsg: UIMessage = { ...message, id: generateId() }
 
-    setIsLoading(true)
+    setStatus('streaming')
     try {
       setMessages(prev => [
         ...prev,
         {
           ...newMsg,
           display: (
-            <div className="bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2">
-              {message.content}
-            </div>
+            <>
+              {message.parts.map((part, index) => {
+                if (part.type === 'text') {
+                  return (
+                    <div
+                      key={index}
+                      className="bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2"
+                    >
+                      {part.text}
+                    </div>
+                  )
+                }
+                return null
+              })}
+            </>
           ),
         },
       ])
-      const assistantMsg = await chatAction(newMsg.content)
+
+      const messageContent = newMsg.parts
+        .filter((part): part is TextPart => part.type === 'text')
+        .map(part => part.text)
+        .join('\n\n')
+
+      const assistantMsg = await chatAction(messageContent)
       setMessages(prev => [
         ...prev,
         {
           id: generateId(),
           role: 'assistant',
-          content: '',
+          parts: [],
           display: assistantMsg,
         },
       ])
     } catch (error) {
       console.error(error)
+      setStatus('error')
     }
-    setIsLoading(false)
-    setInput('')
+    setStatus('ready')
 
-    return message.content
+    return message
   }
 
   return {
-    input,
-    setInput,
-    isLoading,
-    append,
+    sendMessage: async message => {
+      append(message)
+    },
+    status,
     messages,
     setMessages: setMessages as ChatHandler['setMessages'],
   }
