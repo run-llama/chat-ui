@@ -1,4 +1,4 @@
-import { DataPart } from './annotations/types'
+import { MessageAnnotation } from './annotations/types'
 
 export type JSONValue =
   | null
@@ -27,9 +27,15 @@ export type MessagePart = TextPart | DataPart
 
 export const TextPartType = 'text' as const
 
-export interface TextPart {
+export type TextPart = {
   type: typeof TextPartType
   text: string
+}
+
+export type DataPart = {
+  id?: string // TODO: support optional id, only last data event with the same id will be used.
+  type: string
+  data?: any
 }
 
 // User can have various parts, so we need to allow any parts when updating or sending messages
