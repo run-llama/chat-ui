@@ -32,6 +32,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@ai-sdk/llamaindex':
+        specifier: 1.0.0
+        version: 1.0.0(zod@3.25.76)
       '@ai-sdk/openai':
         specifier: 2.0.0
         version: 2.0.0(zod@3.25.76)
@@ -838,6 +841,15 @@ packages:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.0(zod@3.25.76)
       zod: 3.25.76
+    dev: false
+
+  /@ai-sdk/llamaindex@1.0.0(zod@3.25.76):
+    resolution: {integrity: sha512-bRGMtf049SPh6PGMA7GDw2rF7yT50aaK+NC3oswftNHVI/9+LhOXV2fKZRp131C+Sn9TjEfERkVOX3VThRL9kw==}
+    engines: {node: '>=18'}
+    dependencies:
+      ai: 5.0.0(zod@3.25.76)
+    transitivePeerDependencies:
+      - zod
     dev: false
 
   /@ai-sdk/openai@2.0.0(zod@3.25.76):

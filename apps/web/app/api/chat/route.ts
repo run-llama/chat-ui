@@ -1,13 +1,14 @@
-import { Message, LlamaIndexAdapter, StreamData } from 'ai'
+import { fakeStreamText } from '@/app/utils'
+import { toUIMessageStream } from '@ai-sdk/llamaindex'
+import { UIMessage as Message } from '@ai-sdk/react'
 import {
-  ChatMessage,
+  MessageContentDetail,
   OpenAI,
   OpenAIEmbedding,
   Settings,
   SimpleChatEngine,
 } from 'llamaindex'
 import { NextResponse, type NextRequest } from 'next/server'
-import { fakeStreamText } from '@/app/utils'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -24,13 +25,11 @@ export async function POST(request: NextRequest) {
     const messages = body.messages
     const lastMessage = messages[messages.length - 1]
 
-    const vercelStreamData = new StreamData()
-
     if (!process.env.OPENAI_API_KEY) {
       // Return fake stream if API key is not set
       return new Response(fakeStreamText(), {
         headers: {
-          'Content-Type': 'text/plain',
+          'Content-Type': 'text/event-stream',
           Connection: 'keep-alive',
         },
       })
@@ -38,20 +37,18 @@ export async function POST(request: NextRequest) {
 
     const chatEngine = new SimpleChatEngine()
 
-    const response = await chatEngine.chat({
-      message: lastMessage.content,
-      chatHistory: messages as ChatMessage[],
+    const messageContent = (lastMessage.parts[0] as { text: string }).text ?? ''
+
+    const stream = await chatEngine.chat({
+      message: messageContent,
+      chatHistory: messages.map(message => ({
+        role: message.role,
+        content: message.parts as MessageContentDetail[],
+      })),
       stream: true,
     })
 
-    return LlamaIndexAdapter.toDataStreamResponse(response, {
-      data: vercelStreamData,
-      callbacks: {
-        onCompletion: async () => {
-          await vercelStreamData.close()
-        },
-      },
-    })
+    return toUIMessageStream(stream)
   } catch (error) {
     const detail = (error as Error).message
     return NextResponse.json({ detail }, { status: 500 })
