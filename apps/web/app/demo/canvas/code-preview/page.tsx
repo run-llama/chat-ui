@@ -9,19 +9,24 @@ import {
   useChatCanvas,
 } from '@llamaindex/chat-ui'
 import { DynamicComponent } from '@llamaindex/dynamic-ui'
-import { Message, useChat } from 'ai/react'
+import { UIMessage as Message, useChat } from '@ai-sdk/react'
 
 const initialMessages: Message[] = [
   {
     id: 'code-gen1',
     role: 'user',
-    content: 'Generate a simple calculator',
+    parts: [{ type: 'text', text: 'Generate a simple calculator' }],
   },
   {
     id: 'code-gen2',
     role: 'assistant',
-    content:
-      '\n```annotation\n{"type":"artifact","data":{"type":"code","created_at":1752124365106,"data":{"language":"typescript","file_name":"calculator.tsx","code":"import React, { useState } from \\"react\\"\\nimport { Button } from \\"@/components/ui/button\\"\\nimport { Card } from \\"@/components/ui/card\\"\\nimport { cn } from \\"@/lib/utils\\"\\n\\nconst buttons = [\\n  [\\"7\\", \\"8\\", \\"9\\", \\"/\\"],\\n  [\\"4\\", \\"5\\", \\"6\\", \\"*\\"],\\n  [\\"1\\", \\"2\\", \\"3\\", \\"-\\"],\\n  [\\"0\\", \\"C\\", \\"=\\", \\"+\\"],\\n]\\n\\nexport default function Calculator() {\\n  const [input, setInput] = useState<string>(\\"\\")\\n  const [result, setResult] = useState<string | null>(null)\\n\\n  const handleButtonClick = (value: string) => {\\n    if (value === \\"C\\") {\\n      setInput(\\"\\")\\n      setResult(null)\\n      return\\n    }\\n    if (value === \\"=\\") {\\n      try {\\n        // eslint-disable-next-line no-eval\\n        const evalResult = eval(input)\\n        setResult(evalResult.toString())\\n      } catch {\\n        setResult(\\"Error\\")\\n      }\\n      return\\n    }\\n    if (result !== null) {\\n      setInput(value.match(/[0-9.]/) ? value : result + value)\\n      setResult(null)\\n    } else {\\n      setInput((prev) => prev + value)\\n    }\\n  }\\n\\n  return (\\n    <div className=\\"flex items-center justify-center min-h-screen bg-muted\\">\\n      <Card className=\\"w-[320px] p-6 shadow-lg\\">\\n        <div className={cn(\\"mb-4 h-16 bg-background rounded flex items-end justify-end px-4 text-2xl font-mono border\\", result && \\"text-muted-foreground\\")}>\\n          {result !== null ? result : input || \\"0\\"}\\n        </div>\\n        <div className=\\"grid grid-cols-4 gap-3\\">\\n          {buttons.flat().map((btn, idx) => (\\n            <Button\\n              key={idx}\\n              variant={btn === \\"C\\" ? \\"destructive\\" : btn === \\"=\\" ? \\"default\\" : \\"outline\\"}\\n              className={cn(\\n                \\"h-12 text-xl\\",\\n                btn === \\"=\\" && \\"col-span-1 bg-primary text-primary-foreground\\",\\n                btn === \\"C\\" && \\"col-span-1\\"\\n              )}\\n              onClick={() => handleButtonClick(btn)}\\n            >\\n              {btn}\\n            </Button>\\n          ))}\\n        </div>\\n      </Card>\\n    </div>\\n  )\\n}"}}}\n```\nHere\'s how the simple calculator works:\n\n- The calculator displays the current input or the result at the top.\n- You can click the number buttons (0-9) and the operators (+, -, *, /) to build your calculation.\n- Pressing the = button evaluates the expression and shows the result.\n- Pressing the C button clears the input and resets the calculator.\n- If you get an error (like dividing by zero or entering an invalid expression), "Error" will be displayed.\n\nYou can further customize the calculator\'s appearance or add more features as needed! If you have any questions about how the code works or want to add more functionality, let me know!',
+    parts: [
+      {
+        type: 'text',
+        content:
+          '\n```annotation\n{"type":"artifact","data":{"type":"code","created_at":1752124365106,"data":{"language":"typescript","file_name":"calculator.tsx","code":"import React, { useState } from \\"react\\"\\nimport { Button } from \\"@/components/ui/button\\"\\nimport { Card } from \\"@/components/ui/card\\"\\nimport { cn } from \\"@/lib/utils\\"\\n\\nconst buttons = [\\n  [\\"7\\", \\"8\\", \\"9\\", \\"/\\"],\\n  [\\"4\\", \\"5\\", \\"6\\", \\"*\\"],\\n  [\\"1\\", \\"2\\", \\"3\\", \\"-\\"],\\n  [\\"0\\", \\"C\\", \\"=\\", \\"+\\"],\\n]\\n\\nexport default function Calculator() {\\n  const [input, setInput] = useState<string>(\\"\\")\\n  const [result, setResult] = useState<string | null>(null)\\n\\n  const handleButtonClick = (value: string) => {\\n    if (value === \\"C\\") {\\n      setInput(\\"\\")\\n      setResult(null)\\n      return\\n    }\\n    if (value === \\"=\\") {\\n      try {\\n        // eslint-disable-next-line no-eval\\n        const evalResult = eval(input)\\n        setResult(evalResult.toString())\\n      } catch {\\n        setResult(\\"Error\\")\\n      }\\n      return\\n    }\\n    if (result !== null) {\\n      setInput(value.match(/[0-9.]/) ? value : result + value)\\n      setResult(null)\\n    } else {\\n      setInput((prev) => prev + value)\\n    }\\n  }\\n\\n  return (\\n    <div className=\\"flex items-center justify-center min-h-screen bg-muted\\">\\n      <Card className=\\"w-[320px] p-6 shadow-lg\\">\\n        <div className={cn(\\"mb-4 h-16 bg-background rounded flex items-end justify-end px-4 text-2xl font-mono border\\", result && \\"text-muted-foreground\\")}>\\n          {result !== null ? result : input || \\"0\\"}\\n        </div>\\n        <div className=\\"grid grid-cols-4 gap-3\\">\\n          {buttons.flat().map((btn, idx) => (\\n            <Button\\n              key={idx}\\n              variant={btn === \\"C\\" ? \\"destructive\\" : btn === \\"=\\" ? \\"default\\" : \\"outline\\"}\\n              className={cn(\\n                \\"h-12 text-xl\\",\\n                btn === \\"=\\" && \\"col-span-1 bg-primary text-primary-foreground\\",\\n                btn === \\"C\\" && \\"col-span-1\\"\\n              )}\\n              onClick={() => handleButtonClick(btn)}\\n            >\\n              {btn}\\n            </Button>\\n          ))}\\n        </div>\\n      </Card>\\n    </div>\\n  )\\n}"}}}\n```\nHere\'s how the simple calculator works:\n\n- The calculator displays the current input or the result at the top.\n- You can click the number buttons (0-9) and the operators (+, -, *, /) to build your calculation.\n- Pressing the = button evaluates the expression and shows the result.\n- Pressing the C button clears the input and resets the calculator.\n- If you get an error (like dividing by zero or entering an invalid expression), "Error" will be displayed.\n\nYou can further customize the calculator\'s appearance or add more features as needed! If you have any questions about how the code works or want to add more functionality, let me know!',
+      },
+    ],
   },
 ]
 
@@ -30,7 +35,7 @@ export default function Page(): JSX.Element {
 }
 
 function CustomChat() {
-  const handler = useChat({ initialMessages })
+  const handler = useChat({ messages: initialMessages })
 
   return (
     <ChatSection

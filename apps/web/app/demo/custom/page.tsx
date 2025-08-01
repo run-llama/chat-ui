@@ -9,7 +9,7 @@ import {
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
-import { Message, useChat } from 'ai/react'
+import { UIMessage as Message, useChat } from '@ai-sdk/react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const code = `
@@ -21,7 +21,7 @@ import {
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export function CustomChat() {
@@ -110,17 +110,19 @@ function CustomChatMessages() {
 const initialMessages: Message[] = [
   {
     id: '1',
-    content: 'Generate a logo for LlamaIndex',
+    parts: [{ type: 'text', text: 'Generate a logo for LlamaIndex' }],
     role: 'user',
   },
   {
     id: '2',
     role: 'assistant',
-    content:
-      'Got it! Here is the logo for LlamaIndex. The logo features a friendly llama mascot that represents our AI-powered document indexing and chat capabilities.',
-    annotations: [
+    parts: [
       {
-        type: 'image',
+        type: 'text',
+        text: 'Got it! Here is the logo for LlamaIndex. The logo features a friendly llama mascot that represents our AI-powered document indexing and chat capabilities.',
+      },
+      {
+        type: 'data-image',
         data: {
           url: '/llama.png',
         },
@@ -130,16 +132,18 @@ const initialMessages: Message[] = [
   {
     id: '3',
     role: 'user',
-    content: 'Show me a pdf file',
+    parts: [{ type: 'text', text: 'Show me a pdf file' }],
   },
   {
     id: '4',
     role: 'assistant',
-    content:
-      'Got it! Here is a sample PDF file that demonstrates PDF handling capabilities. This PDF contains some basic text and formatting examples that you can use to test PDF viewing functionality.',
-    annotations: [
+    parts: [
       {
-        type: 'document_file',
+        type: 'text',
+        text: 'Got it! Here is a sample PDF file that demonstrates PDF handling capabilities. This PDF contains some basic text and formatting examples that you can use to test PDF viewing functionality.',
+      },
+      {
+        type: 'data-document-file',
         data: {
           files: [
             {
@@ -172,7 +176,7 @@ export default function Page(): JSX.Element {
 }
 
 function CustomChat() {
-  const handler = useChat({ initialMessages })
+  const handler = useChat({ messages: initialMessages })
   const { imageUrl, getAnnotations, uploadFile, reset } = useFile({
     uploadAPI: '/chat/upload',
   })
@@ -190,7 +194,7 @@ function CustomChat() {
       className="h-screen overflow-hidden p-0 md:p-5"
     >
       <CustomChatMessages />
-      <ChatInput annotations={annotations} resetUploadedFiles={reset}>
+      <ChatInput resetUploadedFiles={reset}>
         <div>
           {imageUrl ? (
             <img
