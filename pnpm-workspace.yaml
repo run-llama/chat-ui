@@ -3,4 +3,6 @@ packages:
   - "packages/*"
   - "packages/server/examples"
   - "docs"
-  - "!examples/**"
+  - "!examples/fastapi"
+  - "!examples/llamadeploy"
+  - "examples/nextjs"

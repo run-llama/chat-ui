@@ -8,15 +8,21 @@ import {
   ChatSection,
   useChatUI,
 } from '@llamaindex/chat-ui'
-import { Message, useChat } from 'ai/react'
+import { UIMessage, useChat } from '@ai-sdk/react'
 import { WeatherAnnotation } from '../components/custom-weather'
 import { WikiCard } from '@/components/custom-wiki'
+import { DefaultChatTransport } from 'ai'
 
-const initialMessages: Message[] = [
+const initialMessages: UIMessage[] = [
   {
     id: '1',
-    content: 'Hello! How can I help you today?',
     role: 'assistant',
+    parts: [
+      {
+        type: 'text',
+        text: 'Hello! How can I help you today?',
+      },
+    ],
   },
 ]
 
@@ -40,15 +46,16 @@ export default function Page(): JSX.Element {
 
 function ChatExample() {
   const handler = useChat({
-    api: '/api/chat',
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
 
-    // uncomment this to try edge runtime example in app/api/chat/edge/route.ts
-    // api: '/api/chat/edge',
+      // uncomment this to try edge runtime example in app/api/chat/edge/route.ts
+      // api: '/api/chat/edge',
 
-    // uncomment this to try advanced example in app/api/chat/advanced/route.ts
-    // api: '/api/chat/advanced',
-
-    initialMessages,
+      // uncomment this to try advanced example in app/api/chat/advanced/route.ts
+      // api: '/api/chat/advanced',
+    }),
+    messages: initialMessages,
   })
 
   return (
