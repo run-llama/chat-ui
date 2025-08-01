@@ -1,6 +1,11 @@
 import { createContext, useContext } from 'react'
-import { ChatContext, Message, MessagePart, TextPart } from './chat.interface'
-import { DataPart } from './annotations'
+import {
+  ChatContext,
+  DataPart,
+  Message,
+  MessagePart,
+  TextPart,
+} from './chat.interface'
 
 export interface ChatMessageContext {
   message: Message
