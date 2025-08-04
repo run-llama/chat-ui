@@ -5,6 +5,18 @@ export type SourceData = {
   nodes: SourceNode[]
 }
 
+export function preprocessSourceNodes(nodes: SourceNode[]): SourceNode[] {
+  // Filter source nodes has lower score
+  const processedNodes = nodes.map(node => {
+    // remove trailing slash for node url if exists
+    if (node.url) {
+      node.url = node.url.replace(/\/$/, '')
+    }
+    return node
+  })
+  return processedNodes
+}
+
 export function ChatSources({ data }: { data: SourceData }) {
   const documents: Document[] = useMemo(() => {
     // group nodes by document (a document must have a URL)

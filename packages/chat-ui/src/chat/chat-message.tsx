@@ -1,27 +1,31 @@
 import { Bot, Check, Copy, RefreshCw } from 'lucide-react'
-import { ComponentType, memo, useMemo } from 'react'
+import { ComponentType, memo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import {
   CitationComponentProps,
-  Markdown,
   LanguageRendererProps,
 } from '../widgets/index.js'
-import {
-  AgentEventAnnotations,
-  DocumentFileAnnotations,
-  EventAnnotations,
-  ImageAnnotations,
-  SourceAnnotations,
-  SuggestedQuestionsAnnotations,
-  getSourceNodes,
-} from './chat-annotations'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { ChatContext, Message, TextPart, TextPartType } from './chat.interface'
-import { defaultAnnotationRenderers } from './chat-renderers.js'
-import { DataPart } from './annotations'
+import {
+  ChatContext,
+  DataPart,
+  Message,
+  TextPart,
+  TextPartType,
+} from './chat.interface'
+import {
+  AgentEventsPart,
+  DocumentFilePart,
+  EventsPart,
+  ImagePart,
+  MarkdownPart,
+  SourcesPart,
+  SuggestedQuestionsPart,
+} from './message-parts/index.js'
+import { ChatPartProvider } from './message-parts/context.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -108,56 +112,26 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 }
 
 function ChatMessageContent(props: ChatMessageContentProps) {
-  // TODO: we should render the parts in the order they are in the message
   const children = props.children ?? (
     <>
-      <EventAnnotations />
-      <AgentEventAnnotations />
-      <ImageAnnotations />
-      <ChatMarkdown />
-      <DocumentFileAnnotations />
-      <SourceAnnotations />
-      <SuggestedQuestionsAnnotations />
+      <EventsPart />
+      <AgentEventsPart />
+      <ImagePart />
+      <MarkdownPart />
+      <DocumentFilePart />
+      <SourcesPart />
+      <SuggestedQuestionsPart />
     </>
   )
 
   return (
     <div className={cn('flex min-w-0 flex-1 flex-col gap-4', props.className)}>
-      {children}
-    </div>
-  )
-}
-
-function ChatMarkdown(props: ChatMarkdownProps) {
-  const { message } = useChatMessage()
-
-  const nodes = useMemo(() => getSourceNodes(message), [message])
-  const markdownParts = message.parts.filter(
-    (part): part is TextPart => part.type === TextPartType
-  )
-
-  return (
-    <>
-      {markdownParts.map((part, index) => (
-        <Markdown
-          key={index}
-          content={part.text as string}
-          sources={{ nodes }}
-          citationComponent={props.citationComponent}
-          languageRenderers={props.languageRenderers}
-          annotationRenderers={
-            props.annotationRenderers ?? defaultAnnotationRenderers
-          }
-          className={cn(
-            {
-              'bg-primary text-primary-foreground ml-auto w-fit max-w-[80%] rounded-xl px-3 py-2':
-                message.role === 'user',
-            },
-            props.className
-          )}
-        />
+      {props.message?.parts.map((part, index) => (
+        <ChatPartProvider key={index} value={{ part }}>
+          {children}
+        </ChatPartProvider>
       ))}
-    </>
+    </div>
   )
 }
 
@@ -213,13 +187,13 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
 }
 
 type ComposibleChatMessageContent = typeof ChatMessageContent & {
-  Event: typeof EventAnnotations
-  AgentEvent: typeof AgentEventAnnotations
-  Image: typeof ImageAnnotations
-  Markdown: typeof ChatMarkdown
-  DocumentFile: typeof DocumentFileAnnotations
-  Source: typeof SourceAnnotations
-  SuggestedQuestions: typeof SuggestedQuestionsAnnotations
+  Event: typeof EventsPart
+  AgentEvent: typeof AgentEventsPart
+  Image: typeof ImagePart
+  Markdown: typeof MarkdownPart
+  DocumentFile: typeof DocumentFilePart
+  Source: typeof SourcesPart
+  SuggestedQuestions: typeof SuggestedQuestionsPart
 }
 
 type ComposibleChatMessage = typeof ChatMessage & {
@@ -239,13 +213,13 @@ const PrimiviteChatMessage = memo(ChatMessage, (prevProps, nextProps) => {
 PrimiviteChatMessage.Content =
   ChatMessageContent as ComposibleChatMessageContent
 
-PrimiviteChatMessage.Content.Event = EventAnnotations
-PrimiviteChatMessage.Content.AgentEvent = AgentEventAnnotations
-PrimiviteChatMessage.Content.Image = ImageAnnotations
-PrimiviteChatMessage.Content.Markdown = ChatMarkdown
-PrimiviteChatMessage.Content.DocumentFile = DocumentFileAnnotations
-PrimiviteChatMessage.Content.Source = SourceAnnotations
-PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsAnnotations
+PrimiviteChatMessage.Content.Event = EventsPart
+PrimiviteChatMessage.Content.AgentEvent = AgentEventsPart
+PrimiviteChatMessage.Content.Image = ImagePart
+PrimiviteChatMessage.Content.Markdown = MarkdownPart
+PrimiviteChatMessage.Content.DocumentFile = DocumentFilePart
+PrimiviteChatMessage.Content.Source = SourcesPart
+PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsPart
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions
