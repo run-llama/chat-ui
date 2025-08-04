@@ -1,5 +1,3 @@
-import { MessageAnnotation } from './annotations/types'
-
 export type JSONValue =
   | null
   | string

@@ -10,6 +10,11 @@ export const chatPartContext = createContext<ChatPartContext | null>(null)
 
 export const ChatPartProvider = chatPartContext.Provider
 
+/**
+ * Get a single part by type from the context. This is useful when you want to render a single part of a specific type. Eg: a image part.
+ * @param partType - The type of the part to get.
+ * @returns The part, or null if the part type is not found.
+ */
 export const usePart = <T>(partType: string): T | null => {
   const context = useContext(chatPartContext)
 
@@ -24,6 +29,11 @@ export const usePart = <T>(partType: string): T | null => {
   return context.part as T
 }
 
+/**
+ * Get all parts by type from the context. This is useful when you want to aggregate parts of a specific type. Eg: all sources parts.
+ * @param partType - The type of the parts to get.
+ * @returns The parts, or an empty array if the part type is not found.
+ */
 export const useAllParts = <T>(partType: string): T[] => {
   const context = useContext(chatPartContext)
   const { message } = useChatMessage()
