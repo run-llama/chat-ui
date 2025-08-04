@@ -5,8 +5,8 @@ import { MessagePartType } from '../types.js'
 /**
  * Render an image part as a ChatImage component.
  */
-export function ImagePart() {
+export function ImagePart({ className }: { className?: string }) {
   const image = usePart<ImageData>(MessagePartType.IMAGE)
   if (!image) return null
-  return <ChatImage data={image} />
+  return <ChatImage data={image} className={className} />
 }

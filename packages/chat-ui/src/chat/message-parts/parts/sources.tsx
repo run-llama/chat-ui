@@ -1,3 +1,4 @@
+import { cn } from "../../../lib/utils.js"
 import {
   ChatSources,
   preprocessSourceNodes,
@@ -10,7 +11,7 @@ import { MessagePartType } from '../types.js'
  * Aggregates all `sources` parts for a message and renders them as a ChatSources component.
  * Displayed at the bottom of the message with `order-last` style.
  */
-export function SourcesPart() {
+export function SourcesPart({ className }: { className?: string }) {
   const sources = useAllParts<SourceData>(MessagePartType.SOURCES)
 
   const nodes = sources
@@ -21,9 +22,5 @@ export function SourcesPart() {
     .flatMap(item => item.nodes)
 
   if (nodes.length === 0) return null
-  return (
-    <div className="order-last">
-      <ChatSources data={{ nodes }} />
-    </div>
-  )
+  return <ChatSources data={{ nodes }} className={cn('order-last', className)} />
 }

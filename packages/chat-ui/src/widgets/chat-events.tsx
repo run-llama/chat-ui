@@ -6,6 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '../ui/collapsible'
+import { cn } from '../lib/utils'
 
 export type EventData = {
   title: string
@@ -14,9 +15,11 @@ export type EventData = {
 export function ChatEvents({
   data,
   showLoading,
+  className,
 }: {
   data: EventData[]
   showLoading: boolean
+  className?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -29,7 +32,7 @@ export function ChatEvents({
   )
 
   return (
-    <div className="border-l-2 border-indigo-400 pl-2">
+    <div className={cn('border-l-2 border-indigo-400 pl-2', className)}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <Button variant="secondary" className="space-x-2">

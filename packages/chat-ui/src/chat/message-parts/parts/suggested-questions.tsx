@@ -1,3 +1,4 @@
+import { cn } from '../../../lib/utils'
 import {
   SuggestedQuestions,
   SuggestedQuestionsData,
@@ -11,7 +12,7 @@ import { MessagePartType } from '../types.js'
  * Render a suggested questions part as a SuggestedQuestions component.
  * Displayed at the bottom of the message with `order-last` style.
  */
-export function SuggestedQuestionsPart() {
+export function SuggestedQuestionsPart({ className }: { className?: string }) {
   const { append, requestData } = useChatUI()
   const { isLast } = useChatMessage()
   if (!isLast || !append) return null
@@ -22,12 +23,11 @@ export function SuggestedQuestionsPart() {
 
   if (!suggestedQuestions) return null
   return (
-    <div className="order-last">
-      <SuggestedQuestions
-        questions={suggestedQuestions}
-        append={append}
-        requestData={requestData}
-      />
-    </div>
+    <SuggestedQuestions
+      questions={suggestedQuestions}
+      append={append}
+      requestData={requestData}
+      className={cn('order-last', className)}
+    />
   )
 }

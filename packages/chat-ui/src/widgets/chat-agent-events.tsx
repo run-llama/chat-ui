@@ -11,6 +11,7 @@ import {
 } from '../ui/drawer'
 import { Markdown } from './markdown'
 import { Progress } from '../ui/progress'
+import { cn } from '../lib/utils'
 
 const AgentIcons: Record<string, LucideIcon> = {
   bot: icons.Bot,
@@ -51,14 +52,16 @@ export function ChatAgentEvents({
   data,
   isFinished,
   isLast,
+  className,
 }: {
   data: AgentEventData[]
   isFinished: boolean
   isLast: boolean
+  className?: string
 }) {
   const events = useMemo(() => mergeAdjacentEvents(data), [data])
   return (
-    <div className="pl-2">
+    <div className={cn('pl-2', className)}>
       <div className="space-y-4 text-sm">
         {events.map((eventItem, index) => (
           <AgentEventContent

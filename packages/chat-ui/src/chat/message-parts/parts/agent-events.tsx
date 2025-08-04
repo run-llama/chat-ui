@@ -6,7 +6,7 @@ import { useChatMessage } from '../../chat-message.context.js'
 /**
  * Aggregates all `agent` parts for a message and renders them as a ChatAgentEvents component.
  */
-export function AgentEventsPart() {
+export function AgentEventsPart({ className }: { className?: string }) {
   const agentEvents = useAllParts<AgentEventData>(MessagePartType.AGENT_EVENTS)
   const { isLast, textParts } = useChatMessage()
 
@@ -16,6 +16,7 @@ export function AgentEventsPart() {
       data={agentEvents}
       isFinished={textParts.length > 0}
       isLast={isLast}
+      className={className}
     />
   )
 }
