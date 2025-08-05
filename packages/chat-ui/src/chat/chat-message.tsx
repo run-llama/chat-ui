@@ -5,18 +5,11 @@ import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import {
-  ChatContext,
-  DataPart,
-  Message,
-  TextPart,
-  TextPartType,
-} from './chat.interface'
+import { Message, TextPart, TextPartType } from './chat.interface'
 import { ChatPartProvider } from './message-parts/context.js'
 import {
-  DocumentFilePart,
   EventPart,
-  ImagePart,
+  FilePart,
   MarkdownPart,
   SourcesPart,
   SuggestedQuestionsPart,
@@ -26,8 +19,6 @@ interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
   isLast: boolean
   className?: string
-  isLoading?: boolean
-  append?: ChatContext['append']
 }
 
 interface ChatMessageAvatarProps extends React.PropsWithChildren {
@@ -36,9 +27,6 @@ interface ChatMessageAvatarProps extends React.PropsWithChildren {
 
 interface ChatMessageContentProps extends React.PropsWithChildren {
   className?: string
-  isLoading?: boolean
-  append?: ChatContext['append']
-  message?: Message // in case you want to customize the message
 }
 
 interface ChatMessageActionsProps extends React.PropsWithChildren {
@@ -46,17 +34,10 @@ interface ChatMessageActionsProps extends React.PropsWithChildren {
 }
 
 function ChatMessage(props: ChatMessageProps) {
-  const textParts = props.message.parts.filter(
-    (part): part is TextPart => part.type === TextPartType
-  )
-  const dataParts = props.message.parts.filter(
-    (part): part is DataPart => part.type !== TextPartType
-  )
-
   const children = props.children ?? (
     <>
       <ChatMessageAvatar />
-      <ChatMessageContent isLoading={props.isLoading} append={props.append} />
+      <ChatMessageContent />
       <ChatMessageActions />
     </>
   )
@@ -66,11 +47,6 @@ function ChatMessage(props: ChatMessageProps) {
       value={{
         message: props.message,
         isLast: props.isLast,
-        isLoading: props.isLoading,
-        append: props.append,
-        parts: props.message.parts,
-        textParts,
-        dataParts,
       }}
     >
       <div className={cn('group flex gap-4 p-3', props.className)}>
@@ -103,10 +79,9 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   const { message } = useChatMessage()
   const children = props.children ?? (
     <>
+      <FilePart />
       <EventPart />
-      <ImagePart />
       <MarkdownPart />
-      <DocumentFilePart />
       <SourcesPart />
       <SuggestedQuestionsPart />
     </>
@@ -114,7 +89,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
 
   return (
     <div className={cn('flex min-w-0 flex-1 flex-col gap-4', props.className)}>
-      {(props.message ?? message).parts.map((part, index) => (
+      {message.parts.map((part, index) => (
         <ChatPartProvider key={index} value={{ part }}>
           {children}
         </ChatPartProvider>
@@ -175,10 +150,9 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
 }
 
 type ComposibleChatMessageContent = typeof ChatMessageContent & {
+  File: typeof FilePart
   Event: typeof EventPart
-  Image: typeof ImagePart
   Markdown: typeof MarkdownPart
-  DocumentFile: typeof DocumentFilePart
   Source: typeof SourcesPart
   SuggestedQuestions: typeof SuggestedQuestionsPart
 }
@@ -201,9 +175,8 @@ PrimiviteChatMessage.Content =
   ChatMessageContent as ComposibleChatMessageContent
 
 PrimiviteChatMessage.Content.Event = EventPart
-PrimiviteChatMessage.Content.Image = ImagePart
+PrimiviteChatMessage.Content.File = FilePart
 PrimiviteChatMessage.Content.Markdown = MarkdownPart
-PrimiviteChatMessage.Content.DocumentFile = DocumentFilePart
 PrimiviteChatMessage.Content.Source = SourcesPart
 PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsPart
 

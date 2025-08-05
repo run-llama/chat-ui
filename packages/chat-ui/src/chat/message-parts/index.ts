@@ -1,6 +1,5 @@
 export * from './parts/event.js'
-export * from './parts/image.js'
-export * from './parts/document-file.js'
+export * from './parts/file.js'
 export * from './parts/markdown.js'
 export * from './parts/sources.js'
 export * from './parts/suggested-questions.js'

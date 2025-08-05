@@ -15,13 +15,12 @@ export const SuggestedQuestionsPartType = 'data-suggested-questions' as const
 export function SuggestedQuestionsPart({ className }: { className?: string }) {
   const { append, requestData } = useChatUI()
   const { isLast } = useChatMessage()
-  if (!isLast || !append) return null
-
   const suggestedQuestions = usePartData<SuggestedQuestionsData>(
     SuggestedQuestionsPartType
   )
 
-  if (!suggestedQuestions) return null
+  if (!isLast || !append || !suggestedQuestions) return null
+
   return (
     <SuggestedQuestions
       questions={suggestedQuestions}
