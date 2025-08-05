@@ -6,7 +6,8 @@ import {
 import { useChatMessage } from '../../chat-message.context.js'
 import { useChatUI } from '../../chat.context.js'
 import { usePartData } from '../context.js'
-import { MessagePartType } from '../types.js'
+
+export const SuggestedQuestionsPartType = 'data-suggested-questions' as const
 
 /**
  * Render a suggested questions part as a SuggestedQuestions component.
@@ -18,7 +19,7 @@ export function SuggestedQuestionsPart({ className }: { className?: string }) {
   if (!isLast || !append) return null
 
   const suggestedQuestions = usePartData<SuggestedQuestionsData>(
-    MessagePartType.SUGGESTED_QUESTIONS
+    SuggestedQuestionsPartType
   )
 
   if (!suggestedQuestions) return null
