@@ -1,5 +1,5 @@
 import { Message } from '../chat.interface'
-import { extractAllPartData } from '../message-parts'
+import { extractAllPartData } from '../message-parts/context'
 
 export const ArtifactPartType = 'data-artifact' as const
 
