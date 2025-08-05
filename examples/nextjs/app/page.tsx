@@ -47,13 +47,14 @@ export default function Page(): JSX.Element {
 function ChatExample() {
   const handler = useChat({
     transport: new DefaultChatTransport({
-      api: '/api/chat',
+      // uncomment this to try advanced example in app/api/chat/advanced/route.ts
+      api: '/api/chat/advanced',
+
+      // uncomment this to try basic example in app/api/chat/route.ts
+      // api: '/api/chat',
 
       // uncomment this to try edge runtime example in app/api/chat/edge/route.ts
       // api: '/api/chat/edge',
-
-      // uncomment this to try advanced example in app/api/chat/advanced/route.ts
-      // api: '/api/chat/advanced',
     }),
     messages: initialMessages,
   })

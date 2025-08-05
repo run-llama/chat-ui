@@ -3,56 +3,17 @@
  *
  * This example demonstrates advanced streaming features:
  * - Text streaming with token-by-token delivery
- * - Both standard annotations (sent after text) and inline annotations (embedded in text)
- * - Inline annotations are embedded as special code blocks within the markdown stream
+ * - Both standard annotations (sent after text) and artifacts inlined in the markdown stream
  * - Multiple annotation types: sources, artifacts, and custom components (wiki)
  *
- * Use this example to understand how to mix regular content with interactive
- * components that appear at specific positions in the chat stream.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
+import { chatHandler, MessagePart } from '../handler'
 
-const TOKEN_DELAY = 30 // 30ms delay between tokens
-const DATA_PREFIX = 'data: ' // use data: prefix for SSE format
-const ANNOTATION_DELAY = 1000 // 1 second delay between annotations
-const INLINE_ANNOTATION_KEY = 'annotation'
-
-interface TextChunk {
-  type: 'text-delta' | 'text-start' | 'text-end'
-  id: string
-  delta?: string
-}
-
-interface DataChunk {
-  type: `data-${string}` // requires `data-` prefix when sending data parts
-  data: Record<string, any>
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    // extract query from last message
-    const { messages } = await request.json()
-    const query = messages[messages.length - 1]?.parts[0]?.text ?? ''
-
-    const stream = fakeChatStream(`User query: "${query}".\n`)
-
-    return new Response(stream, {
-      // Set headers for Server-Sent Events (SSE)
-      headers: {
-        'Content-Type': 'text/event-stream',
-        Connection: 'keep-alive',
-      },
-    })
-  } catch (error) {
-    const detail = (error as Error).message
-    return NextResponse.json({ detail }, { status: 500 })
-  }
-}
-
-const SAMPLE_TEXT = [
+const SAMPLE_PARTS: (string | MessagePart)[] = [
   `
-Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
+  Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
 
 ### Markdown with code block
 
@@ -63,130 +24,69 @@ const c = a + b
 console.log(c)
 \`\`\`
 
-`,
-  '\n ### Demo inline annotations \n',
-  'Here are some steps to create a simple wiki app: \n',
-  '1. Create package.json file:',
-  {
-    type: 'artifact',
-    data: {
-      type: 'code',
-      created_at: 1717334400000,
-      data: {
-        file_name: 'package.json',
-        language: 'json',
-        code: `{
-  "name": "wiki-app",
-  "version": "1.0.0",
-  "description": "Wiki application",
-  "main": "wiki.js",
-  "dependencies": {
-    "axios": "^1.0.0",
-    "wiki-api": "^2.1.0"
-  }
-}`,
-      },
-    },
-  },
-  '2. Check the wiki fetching script:',
-  {
-    type: 'artifact',
-    data: {
-      created_at: 1717334500000,
-      type: 'code',
-      data: {
-        file_name: 'wiki.js',
-        language: 'javascript',
-        code: `async function getWiki(search) {
-  const response = await fetch("/api/wiki?search=" + search);
-  const data = await response.json();
-  return data;
-}`,
-      },
-    },
-  },
-  '3. Run getWiki with the search term:',
-  {
-    type: 'artifact',
-    data: {
-      created_at: 1717334600000,
-      type: 'code',
-      data: {
-        file_name: 'wiki.js',
-        language: 'javascript',
-        code: `getWiki(\`What is \${search}?\`);`,
-      },
-    },
-  },
-  '4. Check the current wiki:',
-  {
-    type: 'wiki',
-    data: {
-      title: 'LlamaIndex',
-      summary: 'LlamaIndex is a framework for building AI applications.',
-      url: 'https://www.llamaindex.ai',
-      category: 'AI',
-      lastUpdated: '2025-06-02',
-    },
-  },
-  '#### 🎯 Demo generating a document artifact',
-  {
-    type: 'artifact',
-    data: {
-      type: 'document',
-      data: {
-        title: 'Sample document',
-        content: `# Getting Started Guide
-  
-  ## Introduction
-  This comprehensive guide will walk you through everything you need to know to get started with our platform. Whether you're a beginner or an experienced user, you'll find valuable information here.
-  
-  ## Key Features
-  - **Easy Setup**: Get running in minutes
-  - **Powerful Tools**: Access advanced capabilities
-  - **Great Documentation**: Find answers quickly
-  - **Active Community**: Get help when needed
-  
-  ## Setup Process
-  1. Install Dependencies
-     First, ensure you have all required dependencies installed on your system.
-  
-  2. Configuration
-     Update your configuration files with the necessary settings:
-     - API keys
-     - Environment variables
-     - User preferences
-  
-  3. First Steps
-     Begin with basic operations to familiarize yourself with the platform.
-  
-  ## Best Practices
-  - Always backup your data
-  - Follow security guidelines
-  - Keep your dependencies updated
-  - Document your changes
-  
-  ## Troubleshooting
-  If you encounter issues, try these steps:
-  1. Check logs for errors
-  2. Verify configurations
-  3. Update to latest version
-  4. Contact support if needed
-  
-  ## Additional Resources
-  - [Documentation](https://docs.example.com)
-  - [API Reference](https://api.example.com)
-  - [Community Forums](https://community.example.com)
-  
-  Feel free to explore and reach out if you need assistance!`,
-        type: 'markdown',
-      },
-    },
-  },
-  '\n\n Please feel free to open the document in the canvas and edit it. The document will be saved as a new version',
-]
+### Parts:
+  `,
 
-const SAMPLE_SOURCES = [
+  'First, let show the uploaded file (type=file):',
+  {
+    type: 'file',
+    data: { name: 'upload.pdf', url: 'https://pdfobject.com/pdf/sample.pdf' },
+  },
+
+  'Then, let me call a tool to get the weather in San Francisco (type=event):',
+  {
+    id: 'demo_sample_event_id',
+    type: 'event',
+    data: {
+      title: 'Calling tool `get_weather` with input `San Francisco, CA`',
+      status: 'pending',
+    },
+  },
+
+  'Get the result from the tool (type=event):',
+  {
+    id: 'demo_sample_event_id', // use the same id to override the previous part
+    type: 'event',
+    data: {
+      title:
+        'Got response from tool `get_weather` with input `San Francisco, CA`',
+      status: 'success',
+      data: {
+        location: 'San Francisco, CA',
+        temperature: 22,
+        condition: 'sunny',
+        humidity: 65,
+        windSpeed: 12,
+      },
+    },
+  },
+
+  'Let me show a weather card (type=weather):',
+  {
+    type: 'weather',
+    data: {
+      location: 'San Francisco, CA',
+      temperature: 22,
+      condition: 'sunny',
+      humidity: 65,
+      windSpeed: 12,
+    },
+  },
+
+  'Let me generate a code artifact (type=artifact):',
+  {
+    type: 'artifact',
+    data: {
+      type: 'code',
+      data: {
+        file_name: 'code.py',
+        code: 'print("Hello, world!")',
+        language: 'python',
+      },
+    },
+  },
+
+  'Let me show the sources (type=sources):',
   {
     type: 'sources',
     data: {
@@ -196,96 +96,18 @@ const SAMPLE_SOURCES = [
       ],
     },
   },
+
+  'Let me show a suggestion (type=suggested-questions):',
+  {
+    type: 'suggested-questions',
+    data: [
+      'I think you should go to the beach',
+      'I think you should go to the mountains',
+      'I think you should go to the city',
+    ],
+  },
 ]
 
-const fakeChatStream = (query: string): ReadableStream => {
-  return new ReadableStream({
-    async start(controller) {
-      const encoder = new TextEncoder()
-
-      function writeStream(chunk: TextChunk | DataChunk) {
-        controller.enqueue(
-          encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
-        )
-      }
-
-      async function writeTextMessage(content: string) {
-        // init a unique message id
-        const messageId = crypto.randomUUID()
-
-        // important: we need to write the start chunk first
-        const startChunk: TextChunk = { id: messageId, type: 'text-start' }
-        writeStream(startChunk)
-
-        // simulate token-by-token streaming
-        for (const token of content.split(' ')) {
-          const deltaChunk: TextChunk = {
-            id: messageId,
-            type: 'text-delta',
-            delta: token + ' ',
-          }
-          writeStream(deltaChunk)
-          await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
-        }
-
-        // important: we need to write the end chunk last
-        const endChunk: TextChunk = { id: messageId, type: 'text-end' }
-        writeStream(endChunk)
-      }
-
-      async function writeAnnotation(anno: { type: string; data: any }) {
-        const chunk: DataChunk = {
-          type: `data-${anno.type}`,
-          data: anno.data,
-        }
-        writeStream(chunk)
-      }
-
-      // show the query message
-      await writeTextMessage(query)
-
-      // insert inline annotations
-      for (const item of SAMPLE_TEXT) {
-        if (typeof item === 'string') {
-          await writeTextMessage(item)
-        } else {
-          await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
-          // append inline annotation
-          const annotationCode = toInlineAnnotationCode(item)
-          const annotationId = crypto.randomUUID()
-          writeStream({ type: 'text-start', id: annotationId })
-          writeStream({
-            id: annotationId,
-            type: 'text-delta',
-            delta: annotationCode,
-          })
-          writeStream({ type: 'text-end', id: annotationId })
-        }
-      }
-
-      // insert sources in fixed positions
-      for (const item of SAMPLE_SOURCES) {
-        await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
-        await writeAnnotation(item)
-      }
-
-      controller.close()
-    },
-  })
-}
-
-/**
- * To append inline annotations to the stream, we need to wrap the annotation in a code block with the language key.
- * The language key is `annotation` and the code block is wrapped in backticks.
- * The prefix `0:` ensures it will be treated as inline markdown. Example:
- *
- * 0:\`\`\`annotation
- * \{
- *   "type": "artifact",
- *   "data": \{...\}
- * \}
- * \`\`\`
- */
-function toInlineAnnotationCode(item: any) {
-  return `\n\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(item)}\n\`\`\`\n`
+export async function POST(request: NextRequest) {
+  return chatHandler(request, SAMPLE_PARTS)
 }
