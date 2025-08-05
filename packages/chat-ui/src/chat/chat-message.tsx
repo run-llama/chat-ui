@@ -14,9 +14,8 @@ import {
 } from './chat.interface'
 import { ChatPartProvider } from './message-parts/context.js'
 import {
-  AgentEventsPart,
   DocumentFilePart,
-  EventsPart,
+  EventPart,
   ImagePart,
   MarkdownPart,
   SourcesPart,
@@ -104,8 +103,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   const { message } = useChatMessage()
   const children = props.children ?? (
     <>
-      <EventsPart />
-      <AgentEventsPart />
+      <EventPart />
       <ImagePart />
       <MarkdownPart />
       <DocumentFilePart />
@@ -177,8 +175,7 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
 }
 
 type ComposibleChatMessageContent = typeof ChatMessageContent & {
-  Event: typeof EventsPart
-  AgentEvent: typeof AgentEventsPart
+  Event: typeof EventPart
   Image: typeof ImagePart
   Markdown: typeof MarkdownPart
   DocumentFile: typeof DocumentFilePart
@@ -203,8 +200,7 @@ const PrimiviteChatMessage = memo(ChatMessage, (prevProps, nextProps) => {
 PrimiviteChatMessage.Content =
   ChatMessageContent as ComposibleChatMessageContent
 
-PrimiviteChatMessage.Content.Event = EventsPart
-PrimiviteChatMessage.Content.AgentEvent = AgentEventsPart
+PrimiviteChatMessage.Content.Event = EventPart
 PrimiviteChatMessage.Content.Image = ImagePart
 PrimiviteChatMessage.Content.Markdown = MarkdownPart
 PrimiviteChatMessage.Content.DocumentFile = DocumentFilePart

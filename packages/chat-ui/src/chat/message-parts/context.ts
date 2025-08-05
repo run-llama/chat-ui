@@ -21,7 +21,9 @@ export const ChatPartProvider = chatPartContext.Provider
  * Return data if the part type is data.
  * Return null if the input type is not matched with current part type.
  */
-export const usePartData = <T>(partType: string): T | null => {
+export const usePartData = <T>(
+  partType: 'text' | `data-${string}`
+): T | null => {
   const context = useContext(chatPartContext)
 
   if (!context) {
@@ -48,7 +50,10 @@ export const usePartData = <T>(partType: string): T | null => {
  * This is useful when you want to accumulate data from all parts.
  * Eg: get all artifacts to display history, get all sources to display markdown citations.
  */
-export function extractAllPartData<T>(message: Message, partType: string): T[] {
+export function extractAllPartData<T>(
+  message: Message,
+  partType: 'text' | `data-${string}`
+): T[] {
   return message.parts
     .filter(part => part.type === partType)
     .map(part => {
