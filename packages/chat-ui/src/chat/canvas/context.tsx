@@ -173,19 +173,33 @@ export function ChatCanvasProvider({
 
     if (!newArtifact) return
 
-    const newMessages = [
+    const newMessages: Message[] = [
       ...messages,
       {
+        id: uuid(),
         role: 'user',
-        content: `Update content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+        parts: [
+          {
+            type: 'text',
+            text: `Update content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+          },
+        ],
       },
       {
+        id: uuid(),
         role: 'assistant',
-        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
-        // TODO:
-        // content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`,
+        parts: [
+          {
+            type: 'text',
+            text: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+          },
+          {
+            type: 'data-artifact',
+            data: newArtifact,
+          },
+        ],
       },
-    ] as (Message & { id: string })[]
+    ]
 
     setMessages(newMessages)
     openArtifactInCanvas(newArtifact)

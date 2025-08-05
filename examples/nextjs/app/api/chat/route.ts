@@ -49,21 +49,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-const SAMPLE_TEXT = `
-Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
-
-### Markdown with code block
-
-\`\`\`js
-const a = 1
-const b = 2
-const c = a + b
-console.log(c)
-\`\`\`
-
-### Parts
-
-`
 const SAMPLE_PARTS = [
   `
   Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
@@ -77,15 +62,15 @@ const c = a + b
 console.log(c)
 \`\`\`
 
-### Parts with files, events, weather, sources, and suggestions
+### Parts:
 
-First, let analyze the uploaded file:
+First, let show the uploaded file (type=file):
   `,
   {
     type: 'file',
     data: { name: 'upload.pdf', url: '/upload.pdf' },
   },
-  'Then, let me call a tool to get the weather in San Francisco:',
+  'Then, let me call a tool to get the weather in San Francisco (type=event):',
   {
     id: 'demo_sample_event_id',
     type: 'event',
@@ -94,7 +79,7 @@ First, let analyze the uploaded file:
       status: 'pending',
     },
   },
-  'Get the result from the tool:',
+  'Get the result from the tool (type=event):',
   {
     id: 'demo_sample_event_id', // use the same id to override the previous part
     type: 'event',
@@ -111,7 +96,7 @@ First, let analyze the uploaded file:
       },
     },
   },
-  'Let me show a weather card:',
+  'Let me show a weather card (type=weather):',
   {
     type: 'weather',
     data: {
@@ -122,7 +107,7 @@ First, let analyze the uploaded file:
       windSpeed: 12,
     },
   },
-  'Let me generate a code artifact:',
+  'Let me generate a code artifact (type=artifact):',
   {
     type: 'artifact',
     data: {
@@ -134,7 +119,7 @@ First, let analyze the uploaded file:
       },
     },
   },
-  'Let me show the sources:',
+  'Let me show the sources (type=sources):',
   {
     type: 'sources',
     data: {
@@ -144,7 +129,7 @@ First, let analyze the uploaded file:
       ],
     },
   },
-  'Let me show a suggestion:',
+  'Let me show a suggestion (type=suggested-questions):',
   {
     type: 'suggested-questions',
     data: [
@@ -207,9 +192,6 @@ const fakeChatStream = (query: string): ReadableStream => {
 
       // show the query message
       await writeText(query)
-
-      // show the sample text message
-      await writeText(SAMPLE_TEXT)
 
       for (const item of SAMPLE_PARTS) {
         if (typeof item === 'string') {
