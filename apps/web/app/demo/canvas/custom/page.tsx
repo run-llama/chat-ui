@@ -289,11 +289,7 @@ function CustomChatMessages() {
           >
             <ChatMessage.Avatar />
             <ChatMessage.Content>
-              <ChatMessage.Content.Markdown
-                annotationRenderers={{
-                  artifact: CustomArtifactCard,
-                }}
-              />
+              <ChatMessage.Part.Markdown />
             </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>

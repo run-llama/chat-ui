@@ -116,7 +116,7 @@ function MermaidChat() {
 }
 
 function MermaidChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
   return (
     <ChatMessages>
       <ChatMessages.List>
@@ -128,8 +128,8 @@ function MermaidChatMessages() {
             className="items-start"
           >
             <ChatMessage.Avatar />
-            <ChatMessage.Content isLoading={isLoading} append={append}>
-              <ChatMessage.Content.Markdown
+            <ChatMessage.Content>
+              <ChatMessage.Part.Markdown
                 languageRenderers={{ mermaid: MermaidDiagram }}
               />
             </ChatMessage.Content>
