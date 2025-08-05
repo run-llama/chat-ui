@@ -45,7 +45,8 @@ export const usePartData = <T>(partType: string): T | null => {
 
 /**
  * Extract all part data from a message by part type.
- * This is useful when you want to accumulate data from all parts. Eg: get all artifacts to display history.
+ * This is useful when you want to accumulate data from all parts.
+ * Eg: get all artifacts to display history, get all sources to display markdown citations.
  */
 export function extractAllPartData<T>(message: Message, partType: string): T[] {
   return message.parts

@@ -1,4 +1,3 @@
-import { cn } from '../../../lib/utils'
 import {
   SuggestedQuestions,
   SuggestedQuestionsData,
@@ -10,7 +9,8 @@ import { usePartData } from '../context.js'
 export const SuggestedQuestionsPartType = 'data-suggested-questions' as const
 
 /**
- * Render a suggested questions part as a SuggestedQuestions component.
+ * Render a suggested questions part inside a ChatMessage, return null if current part is not suggested questions type
+ * @param props.className - custom styles for the suggested questions
  */
 export function SuggestedQuestionsPart({ className }: { className?: string }) {
   const { append, requestData } = useChatUI()

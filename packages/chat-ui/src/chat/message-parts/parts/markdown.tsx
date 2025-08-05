@@ -24,6 +24,7 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
 export function MarkdownPart(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
   const markdown = usePartData<string>(TextPartType)
+
   const sources = extractAllPartData<SourceData>(message, SourcesPartType)
 
   const nodes =
@@ -35,6 +36,7 @@ export function MarkdownPart(props: ChatMarkdownProps) {
       .flatMap(item => item.nodes) ?? []
 
   if (!markdown) return null
+
   return (
     <Markdown
       content={markdown}
