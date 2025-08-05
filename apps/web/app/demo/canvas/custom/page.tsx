@@ -141,20 +141,18 @@ const initialMessages: Message[] = [
     parts: [
       {
         type: 'text',
-        text:
-          'Here is a cat image named Millie.' +
-          `\n\`\`\`annotation\n${JSON.stringify({
-            type: 'artifact',
-            data: {
-              type: 'image',
-              data: {
-                imageUrl: 'https://placecats.com/millie/700/500',
-                caption: 'A cute cat image named Millie',
-              },
-              created_at: 1745480281756,
-            },
-          })}
-        \n\`\`\`\n`,
+        text: 'Here is a cat image named Millie.',
+      },
+      {
+        type: 'data-artifact',
+        data: {
+          type: 'image',
+          data: {
+            imageUrl: 'https://placecats.com/millie/700/500',
+            caption: 'A cute cat image named Millie',
+          },
+          created_at: 1745480281756,
+        },
       },
     ],
   },
@@ -169,20 +167,18 @@ const initialMessages: Message[] = [
     parts: [
       {
         type: 'text',
-        text:
-          'Here is a black cat image named Poppy.' +
-          `\n\`\`\`annotation\n${JSON.stringify({
-            type: 'artifact',
-            data: {
-              type: 'image',
-              data: {
-                imageUrl: 'https://placecats.com/poppy/700/500',
-                caption: 'A black cat image named Poppy',
-              },
-              created_at: 1745480281999,
-            },
-          })}
-      \n\`\`\`\n`,
+        text: 'Here is a black cat image named Poppy.',
+      },
+      {
+        type: 'data-artifact',
+        data: {
+          type: 'image',
+          data: {
+            imageUrl: 'https://placecats.com/poppy/700/500',
+            caption: 'A black cat image named Poppy',
+          },
+          created_at: 1745480281999,
+        },
       },
     ],
   },
@@ -290,6 +286,7 @@ function CustomChatMessages() {
             <ChatMessage.Avatar />
             <ChatMessage.Content>
               <ChatMessage.Part.Markdown />
+              <ChatMessage.Part.Artifact />
             </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>
