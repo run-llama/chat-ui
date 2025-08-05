@@ -1,0 +1,498 @@
+---
+title: Message Parts
+description: Working with rich content parts for multimedia and interactive chat experiences
+---
+
+Message parts are the key to creating rich, interactive chat experiences beyond simple text. They allow you to embed text, files, sources, events, artifacts, and custom content types directly into chat messages as structured components.
+
+## Parts System Overview
+
+Parts are structured data components that make up chat messages. Each message can contain multiple parts that widgets can render as rich content. The system supports both built-in part types and custom parts for domain-specific content.
+
+### Message Structure with Parts
+
+```typescript
+interface Message {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  parts: MessagePart[]
+}
+
+interface MessagePart {
+  type: string
+  data?: any
+}
+
+// Built-in part types
+interface TextPart {
+  type: 'text'
+  text: string
+}
+
+interface DataPart {
+  type: string // e.g., 'file', 'event', 'artifact', etc.
+  data: any
+}
+```
+
+### Built-in Part Types
+
+The library provides several built-in part types:
+
+- **TEXT** - Text content in markdown format
+- **FILE** - File attachments and metadata
+- **SOURCES** - Citation and source references
+- **EVENT** - Process events and function calls
+- **ARTIFACT** - Interactive code and document artifacts
+- **SUGGESTED_QUESTIONS** - Follow-up question suggestions
+
+## Using Message Parts
+
+Parts automatically render when using the `parts` property on a message. Here's an example of how to structure a message with multiple parts:
+
+```tsx
+const handler = useChat({
+  messages: [
+    {
+      id: '1',
+      role: 'assistant',
+      parts: [
+        {
+          type: 'text',
+          text: 'Here is a file for you:'
+        },
+        {
+          type: 'file',
+          data: {
+            name: 'sample.pdf',
+            url: '/sample.pdf',
+            type: 'application/pdf'
+          }
+        }
+      ]
+    }
+  ]
+})
+
+return (
+  <ChatSection
+    handler={handler}
+    className="block h-full flex-row gap-4 p-0 md:flex md:p-5"
+  >
+    <ChatMessage message={message}>
+      <ChatMessage.Content>
+        <ChatMessage.Part.Markdown />
+        <ChatMessage.Part.File />
+        <ChatMessage.Part.Event />
+        <ChatMessage.Part.Artifact />
+        <ChatMessage.Part.Source />
+        <ChatMessage.Part.Suggestion />
+      </ChatMessage.Content>
+    </ChatMessage>
+  </ChatSection>
+)
+```
+
+In the example above, the part components automatically render the appropriate content based on the part types in the message.
+
+## File Parts
+
+Display file attachments with download links and preview capabilities.
+
+### Document File Parts
+
+```typescript
+const filePart = {
+  type: 'file',
+  data: {
+    name: 'quarterly-report.pdf',
+    type: 'application/pdf',
+    url: '/files/quarterly-report.pdf',
+    size: 2048576, // 2MB in bytes
+    metadata: {
+      title: 'Q4 2024 Quarterly Report',
+      author: 'Finance Team',
+      pages: 25,
+    },
+  },
+}
+```
+
+## Source Parts
+
+Display citations and source references with document grouping.
+
+### Creating Source Parts
+
+```typescript
+const sourcePart = {
+  type: 'sources',
+  data: {
+    nodes: [
+      {
+        id: 'source1',
+        url: '/documents/research-paper.pdf',
+        metadata: {
+          title: 'Machine Learning in Healthcare',
+          author: 'Dr. Jane Smith',
+          page_number: 15,
+          section: 'Methodology',
+          published_date: '2024-01-15',
+        },
+      },
+      {
+        id: 'source2',
+        url: '/documents/clinical-study.pdf',
+        metadata: {
+          title: 'Clinical Trial Results',
+          author: 'Medical Research Institute',
+          page_number: 8,
+          figure: 'Figure 3.2',
+        },
+      },
+    ],
+  },
+}
+```
+
+### Citation in Text Content
+
+Reference sources directly in your text parts using citation syntax:
+
+```typescript
+const message = {
+  id: '1',
+  role: 'assistant',
+  parts: [
+    {
+      type: 'text',
+      text: `
+Based on recent research [^1], machine learning shows promising results 
+in medical diagnosis. The clinical trial data [^2] supports these findings 
+with a 95% accuracy rate.
+
+[^1]: Machine Learning in Healthcare, p. 15
+[^2]: Clinical Trial Results, Figure 3.2
+      `
+    },
+    sourcePart
+  ]
+}
+```
+
+## Event Parts
+
+Display process events, function calls, and system activities.
+
+### Basic Events
+
+```typescript
+const eventPart = {
+  type: 'event',
+  data: {
+    title: 'Calling tool `search_database` with input `machine learning papers`',
+    status: 'success',
+    data: {
+      query: 'machine learning papers',
+      limit: 10,
+      result: 'Found 8 relevant papers',
+      timestamp: '2024-01-15T10:30:00Z',
+    },
+  },
+}
+```
+
+### Progressive Events
+
+Events can be updated with the same ID to show progress:
+
+```typescript
+// Initial event
+const eventPart1 = {
+  id: 'search_event',
+  type: 'event',
+  data: {
+    title: 'Searching database...',
+    status: 'pending',
+  },
+}
+
+// Updated event with result
+const eventPart2 = {
+  id: 'search_event', // Same ID to update previous event
+  type: 'event',
+  data: {
+    title: 'Database search completed',
+    status: 'success',
+    data: {
+      results: 'Found 8 relevant papers',
+    },
+  },
+}
+```
+
+## Artifact Parts
+
+Create interactive code and document artifacts that users can edit.
+
+### Code Artifacts
+
+```typescript
+const codeArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'code',
+    data: {
+      title: 'Data Analysis Script',
+      file_name: 'analyze_data.py',
+      language: 'python',
+      code: `
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def analyze_sales_data(file_path):
+    # Load data
+    df = pd.read_csv(file_path)
+    
+    # Calculate monthly totals
+    monthly_sales = df.groupby('month')['sales'].sum()
+    
+    # Create visualization
+    plt.figure(figsize=(10, 6))
+    monthly_sales.plot(kind='bar')
+    plt.title('Monthly Sales Analysis')
+    plt.ylabel('Sales ($)')
+    plt.show()
+    
+    return monthly_sales
+
+# Usage
+sales_data = analyze_sales_data('sales.csv')
+print(sales_data)
+      `,
+    },
+  },
+}
+```
+
+### Document Artifacts
+
+```typescript
+const documentArtifact = {
+  type: 'artifact',
+  data: {
+    type: 'document',
+    data: {
+      title: 'Project Proposal',
+      content: `
+# AI-Powered Analytics Platform
+
+## Executive Summary
+
+This proposal outlines the development of an AI-powered analytics platform 
+designed to help businesses make data-driven decisions.
+
+## Key Features
+
+- **Real-time Data Processing**: Stream analytics with sub-second latency
+- **Machine Learning Models**: Automated insight generation
+- **Interactive Dashboards**: Self-service analytics for business users
+
+## Implementation Timeline
+
+### Phase 1 (Months 1-3)
+- Core platform development
+- Basic ML model integration
+
+### Phase 2 (Months 4-6)  
+- Advanced analytics features
+- Dashboard creation tools
+
+## Budget Estimate
+
+Total project cost: $250,000
+      `,
+    },
+  },
+}
+```
+
+## Suggested Questions Parts
+
+Provide interactive follow-up questions to guide the conversation.
+
+```typescript
+const suggestedQuestionsPart = {
+  type: 'suggested-questions',
+  data: [
+    'Can you explain the methodology in more detail?',
+    'What are the potential limitations of this approach?',
+    'How does this compare to traditional methods?',
+    'What would be the next steps for implementation?',
+  ],
+}
+```
+
+## Custom Parts
+
+Create domain-specific parts for specialized content.
+
+### Weather Widget Example
+
+```typescript
+// Define custom part type
+interface WeatherPart {
+  type: 'weather'
+  data: {
+    location: string
+    temperature: number
+    condition: string
+    humidity: number
+    windSpeed: number
+    forecast?: Array<{
+      day: string
+      high: number
+      low: number
+      condition: string
+    }>
+  }
+}
+
+// Create weather part
+const weatherPart: WeatherPart = {
+  type: 'weather',
+  data: {
+    location: 'San Francisco, CA',
+    temperature: 22,
+    condition: 'sunny',
+    humidity: 65,
+    windSpeed: 12,
+    forecast: [
+      { day: 'Tomorrow', high: 24, low: 18, condition: 'cloudy' },
+      { day: 'Wednesday', high: 26, low: 20, condition: 'sunny' },
+    ],
+  },
+}
+```
+
+### Custom Part Component Implementation
+
+```tsx
+import { useChatMessage, usePartData } from '@llamaindex/chat-ui'
+
+interface WeatherData {
+  location: string
+  temperature: number
+  condition: string
+  humidity: number
+  windSpeed: number
+}
+
+function WeatherPart() {
+  const { message } = useChatMessage()
+  const data = usePartData<WeatherData>('weather')
+
+  if (!data) return null
+  
+  return (
+    <div className="weather-widget">
+      <h3>{data.location}</h3>
+      <div className="temperature">{data.temperature}°C</div>
+      <div className="condition">{data.condition}</div>
+      <div className="details">
+        <span>Humidity: {data.humidity}%</span>
+        <span>Wind: {data.windSpeed} km/h</span>
+      </div>
+    </div>
+  )
+}
+```
+
+## Part Utilities
+
+### usePartData
+
+Extract part data by type from messages:
+
+```tsx
+import { usePartData } from '@llamaindex/chat-ui'
+
+// Usage in a component
+function CustomPartComponent() {
+  const { message } = useChatMessage()
+  const weatherData = usePartData<WeatherData>(message, 'weather')
+  
+  // Use weatherData...
+}
+```
+
+## Streaming Parts
+
+Parts can be streamed from the server using the chat handler:
+
+```typescript
+// Server-side streaming
+const parts = [
+  'Here is some text content',
+  {
+    type: 'file',
+    data: { name: 'document.pdf', url: '/document.pdf' }
+  },
+  {
+    type: 'weather',
+    data: { location: 'San Francisco', temperature: 22 }
+  }
+]
+
+// Stream using chatHandler
+return chatHandler(request, parts)
+```
+
+## Complete Message Example
+
+```typescript
+const completeMessage = {
+  id: 'msg-123',
+  role: 'assistant',
+  parts: [
+    {
+      type: 'text',
+      text: 'I\'ve analyzed the data and created a visualization for you:'
+    },
+    {
+      type: 'artifact',
+      data: {
+        type: 'code',
+        data: {
+          title: 'Sales Analysis',
+          file_name: 'analysis.py',
+          language: 'python',
+          code: 'import pandas as pd\n# Analysis code...'
+        }
+      }
+    },
+    {
+      type: 'sources',
+      data: {
+        nodes: [
+          { id: '1', url: '/data/sales.csv', metadata: { title: 'Sales Data' } }
+        ]
+      }
+    },
+    {
+      type: 'suggested-questions',
+      data: [
+        'Can you explain the trend?',
+        'What about quarterly data?'
+      ]
+    }
+  ]
+}
+```
+
+## Next Steps
+
+- [Artifacts](./artifacts.mdx) - Learn about interactive code and document artifacts
+- [Widgets](./widgets.mdx) - Explore widget implementation details
+- [Examples](./examples.mdx) - See complete part examples
+- [Customization](./customization.mdx) - Style and customize part appearance
