@@ -42,15 +42,6 @@ interface DataPart {
 }
 ```
 
-### Important ID Behavior for Data Parts
-
-When data parts have the same `id`, only the **last** data part with that ID will exist in `message.parts`. This is useful for:
-
-- **Single data display**: Show only the final result (e.g., hide loading, show final weather data)
-- **Progressive updates**: Update the same component as new data arrives (e.g., streaming events)
-
-If you want multiple parts of the same type, **don't provide an ID** or use different IDs.
-
 ## How Chat-UI Renders Parts
 
 Parts are automatically rendered when using the `ChatMessage.Content` component. Each part type has a corresponding component that checks if the current part matches its type:
@@ -370,6 +361,46 @@ const fakeChatStream = (parts: (string | MessagePart)[]): ReadableStream => {
   })
 }
 ```
+
+### Important ID Behavior for Data Parts
+
+When data parts have the same `id`, only the **last** data part with that ID will exist in `message.parts`. This is useful for:
+
+- **Single data display**: Show only the final result (e.g., hide loading, show final weather data)
+- **Progressive updates**: Update the same component as new data arrives (e.g., streaming events)
+
+If you want multiple parts of the same type, **don't provide an ID** or use different IDs.
+
+Example:
+
+1. When calling a tool, send an event with tool call information:
+
+```typescript
+part1 = {
+  id: 'demo_sample_event_id',
+  type: 'event',
+  data: {
+    title: 'Calling tool `get_weather` with input `San Francisco, CA`',
+    status: 'pending',
+  },
+}
+```
+
+2. When the tool call is completed, send an event with the tool call result. The previous event with the same id will be replaced by the new one.
+
+```typescript
+part2 = {
+  id: 'demo_sample_event_id',
+  type: 'event',
+  data: {
+    title: 'Calling tool `get_weather` with input `San Francisco, CA`',
+    status: 'pending',
+  },
+}
+```
+
+When checking `message.parts`, you will only see the last event with the final result.
+
 
 ### Important Notes
 
