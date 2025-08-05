@@ -13,7 +13,8 @@ Chat-UI supports two fundamental types of parts that make up chat messages:
 Text parts contain markdown content that gets rendered as formatted text. They use the `text` type and are the primary way to display textual content.
 
 ### 2. Data Parts  
-Data parts contain structured data for rich interactive components like weather widgets, file attachments, sources, and more. They use types with the `data-` prefix and can include any custom data structure.
+Data parts contain structured data for rich interactive components like weather widgets, file attachments, sources, and more.
+Both built-in and custom parts are both using the data- prefix because Vercel need `data-` prefix to detect data parts from events.
 
 ## Message Structure with Parts
 
@@ -202,7 +203,6 @@ Create domain-specific parts for specialized content by implementing a custom co
 ### 1. Define the Part Type and Data Interface
 
 ```typescript
-// Use 'data-' prefix for custom parts
 const WeatherPartType = 'data-weather'
 
 interface WeatherData {
