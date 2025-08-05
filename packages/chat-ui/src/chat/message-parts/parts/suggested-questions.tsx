@@ -11,7 +11,6 @@ export const SuggestedQuestionsPartType = 'data-suggested-questions' as const
 
 /**
  * Render a suggested questions part as a SuggestedQuestions component.
- * Displayed at the bottom of the message with `order-last` style.
  */
 export function SuggestedQuestionsPart({ className }: { className?: string }) {
   const { append, requestData } = useChatUI()
@@ -28,7 +27,7 @@ export function SuggestedQuestionsPart({ className }: { className?: string }) {
       questions={suggestedQuestions}
       append={append}
       requestData={requestData}
-      className={cn('order-last', className)}
+      className={className}
     />
   )
 }
