@@ -40,6 +40,19 @@ export const usePartData = <T>(partType: string): T | null => {
   return null
 }
 
-export function getAllParts<T>(message: Message, partType: string): T[] {
-  return message.parts.filter(part => part.type === partType) as T[]
+export function extractAllPartData<T>(message: Message, partType: string): T[] {
+  return message.parts
+    .filter(part => part.type === partType)
+    .map(part => {
+      if (part.type === TextPartType) {
+        return (part as TextPart).text
+      }
+
+      if ('data' in part) {
+        return (part as DataPart).data
+      }
+
+      return null
+    })
+    .filter(Boolean) as T[]
 }

@@ -15,6 +15,7 @@ export { useChatCanvas } from './chat/canvas/context'
 export { useChatMessage } from './chat/chat-message.context'
 export { useChatInput } from './chat/chat-input'
 export { useChatMessages } from './chat/chat-messages'
+export * from './chat/message-parts'
 
 // Custom Hooks
 export { useFile } from './hook/use-file'

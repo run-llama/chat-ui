@@ -1,6 +1,6 @@
 'use client'
 
-import { useChatMessage, getAnnotationData } from '@llamaindex/chat-ui'
+import { usePartData } from '@llamaindex/chat-ui'
 
 interface WeatherData {
   location: string
@@ -10,14 +10,13 @@ interface WeatherData {
   windSpeed: number
 }
 
-// A custom annotation component that is used to display weather information in a chat message
-// The weather data is extracted from annotations in the message that has type 'weather'
-export function WeatherAnnotation() {
-  const { message } = useChatMessage()
-  const weatherData = getAnnotationData<WeatherData>(message, 'weather')
+const WeatherPartType = 'data-weather'
 
-  if (weatherData.length === 0) return null
-  return <WeatherCard data={weatherData[0]} />
+// A custom part component that is used to display weather information in a chat message
+export function WeatherPart() {
+  const weatherData = usePartData<WeatherData>(WeatherPartType)
+  if (!weatherData) return null
+  return <WeatherCard data={weatherData} />
 }
 
 function WeatherCard({ data }: { data: WeatherData }) {

@@ -12,14 +12,8 @@ export const SourcesPartType = 'data-sources' as const
  * @param props.className - custom styles for the sources
  */
 export function SourcesPart({ className }: { className?: string }) {
-  const sources = usePartData<SourceData[]>(SourcesPartType)
-  const nodes =
-    sources
-      ?.map(item => ({
-        ...item,
-        nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
-      }))
-      .flatMap(item => item.nodes) ?? []
+  const sources = usePartData<SourceData>(SourcesPartType)
+  const nodes = preprocessSourceNodes(sources?.nodes ?? [])
 
   if (nodes.length === 0) return null
   return <ChatSources data={{ nodes }} className={className} />

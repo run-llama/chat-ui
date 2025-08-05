@@ -1,5 +1,7 @@
 'use client'
 
+import { usePartData } from '@llamaindex/chat-ui'
+
 interface WikiData {
   title: string
   summary: string
@@ -8,8 +10,16 @@ interface WikiData {
   lastUpdated: string
 }
 
+const WikiPartType = 'data-wiki'
+
+export function WikiPart() {
+  const wikiData = usePartData<WikiData>(WikiPartType)
+  if (!wikiData) return null
+  return <WikiCard data={wikiData} />
+}
+
 // A UI widget that displays wiki information, it can be used inline with markdown text
-export function WikiCard({ data }: { data: WikiData }) {
+function WikiCard({ data }: { data: WikiData }) {
   const iconMap: Record<string, string> = {
     science: '🧪',
     history: '📜',
