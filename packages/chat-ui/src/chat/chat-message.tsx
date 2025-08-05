@@ -12,7 +12,7 @@ import {
   FilePart,
   MarkdownPart,
   SourcesPart,
-  SuggestedQuestionsPart,
+  SuggestionPart,
 } from './message-parts/index.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
@@ -83,7 +83,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       <EventPart />
       <MarkdownPart />
       <SourcesPart />
-      <SuggestedQuestionsPart />
+      <SuggestionPart />
     </>
   )
 
@@ -154,7 +154,7 @@ type ComposibleChatMessageContent = typeof ChatMessageContent & {
   Event: typeof EventPart
   Markdown: typeof MarkdownPart
   Source: typeof SourcesPart
-  SuggestedQuestions: typeof SuggestedQuestionsPart
+  Suggestion: typeof SuggestionPart
 }
 
 type ComposibleChatMessage = typeof ChatMessage & {
@@ -178,7 +178,7 @@ PrimiviteChatMessage.Content.Event = EventPart
 PrimiviteChatMessage.Content.File = FilePart
 PrimiviteChatMessage.Content.Markdown = MarkdownPart
 PrimiviteChatMessage.Content.Source = SourcesPart
-PrimiviteChatMessage.Content.SuggestedQuestions = SuggestedQuestionsPart
+PrimiviteChatMessage.Content.Suggestion = SuggestionPart
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions

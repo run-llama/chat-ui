@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { cn } from '../lib/utils'
+import { ChatCanvasProvider } from './canvas/context'
 import ChatInput from './chat-input'
 import ChatMessages from './chat-messages'
 import { ChatProvider } from './chat.context'
-import { Message, type ChatHandler } from './chat.interface'
-import { ChatCanvasProvider } from './canvas/context'
+import { type ChatHandler } from './chat.interface'
 
 export interface ChatSectionProps extends React.PropsWithChildren {
   handler: ChatHandler
