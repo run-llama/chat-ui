@@ -1,16 +1,21 @@
-import { useAllParts } from '../context.js'
-import { MessagePartType } from '../types.js'
+import { useCurrentPart } from '../context.js'
 import { AgentEventData, ChatAgentEvents } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
 
+export const AgentEventsPartType = 'data-agent-events' as const
+
 /**
- * Aggregates all `agent` parts for a message and renders them as a ChatAgentEvents component.
+ * Render a list of agent events inside a ChatMessage, return null if current part is not agent events type
+ * @param props.className - custom styles for the agent events
  */
 export function AgentEventsPart({ className }: { className?: string }) {
-  const agentEvents = useAllParts<AgentEventData>(MessagePartType.AGENT_EVENTS)
+  const agentEvents = useCurrentPart<AgentEventData[]>(AgentEventsPartType)
+
+  // TODO: this status should be from backend
   const { isLast, textParts } = useChatMessage()
 
-  if (agentEvents.length === 0) return null
+  if (!agentEvents) return null
+
   return (
     <ChatAgentEvents
       data={agentEvents}

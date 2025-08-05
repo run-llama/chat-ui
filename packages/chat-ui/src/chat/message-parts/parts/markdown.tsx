@@ -9,7 +9,7 @@ import {
 } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
 import { TextPart, TextPartType } from '../../chat.interface.js'
-import { useAllParts, usePart } from '../context.js'
+import { getAllParts, useCurrentPart } from '../context.js'
 import { SourcesPartType } from './sources.js'
 
 interface ChatMarkdownProps extends React.PropsWithChildren {
@@ -23,8 +23,8 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
  */
 export function MarkdownPart(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
-  const markdown = usePart<TextPart>(TextPartType)
-  const sources = useAllParts<SourceData>(SourcesPartType)
+  const markdown = useCurrentPart<TextPart>(TextPartType)
+  const sources = getAllParts<SourceData>(message, SourcesPartType)
 
   const nodes =
     sources
