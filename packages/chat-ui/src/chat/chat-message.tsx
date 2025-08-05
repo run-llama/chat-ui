@@ -10,6 +10,7 @@ import { ChatPartProvider } from './message-parts/context.js'
 import {
   EventPart,
   FilePart,
+  ArtifactPart,
   MarkdownPart,
   SourcesPart,
   SuggestionPart,
@@ -82,6 +83,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
       <FilePart />
       <EventPart />
       <MarkdownPart />
+      <ArtifactPart />
       <SourcesPart />
       <SuggestionPart />
     </>
@@ -155,6 +157,7 @@ type ComposibleChatMessagePart = typeof ChatMessageContent & {
   Markdown: typeof MarkdownPart
   Source: typeof SourcesPart
   Suggestion: typeof SuggestionPart
+  Artifact: typeof ArtifactPart
 }
 
 type ComposibleChatMessage = typeof ChatMessage & {
@@ -181,6 +184,7 @@ PrimiviteChatMessage.Part.File = FilePart
 PrimiviteChatMessage.Part.Markdown = MarkdownPart
 PrimiviteChatMessage.Part.Source = SourcesPart
 PrimiviteChatMessage.Part.Suggestion = SuggestionPart
+PrimiviteChatMessage.Part.Artifact = ArtifactPart
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions

@@ -104,6 +104,7 @@ function CustomChatMessages() {
             <ChatMessage.Part.File />
             <ChatMessage.Part.Event />
             <ChatMessage.Part.Markdown />
+            <ChatMessage.Part.Artifact />
             <ChatMessage.Part.Source />
             <ChatMessage.Part.Suggestion />
             <WikiPart />

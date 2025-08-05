@@ -122,6 +122,18 @@ First, let analyze the uploaded file:
       windSpeed: 12,
     },
   },
+  'Let me generate a code artifact:',
+  {
+    type: 'artifact',
+    data: {
+      type: 'code',
+      data: {
+        file_name: 'code.py',
+        code: 'print("Hello, world!")',
+        language: 'python',
+      },
+    },
+  },
   'Let me show the sources:',
   {
     type: 'sources',

@@ -1,4 +1,7 @@
 import { Message } from '../chat.interface'
+import { extractAllPartData } from '../message-parts'
+
+export const ArtifactPartType = 'data-artifact' as const
 
 // check if two artifacts are equal by comparing their type and created time
 export function isEqualArtifact(a: Artifact, b: Artifact) {
@@ -13,7 +16,7 @@ export function extractArtifactsFromAllMessages(messages: Message[]) {
 }
 
 export function extractArtifactsFromMessage(message: Message): Artifact[] {
-  return []
+  return extractAllPartData<Artifact>(message, ArtifactPartType)
 }
 
 export type CodeArtifactError = {

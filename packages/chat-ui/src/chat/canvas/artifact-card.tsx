@@ -19,10 +19,12 @@ export function ArtifactCard({
   data,
   getTitle = getCardTitle,
   iconMap = IconMap,
+  className,
 }: {
   data: Artifact
   getTitle?: (data: Artifact) => string
   iconMap?: Record<Artifact['type'], LucideIcon>
+  className?: string
 }) {
   const {
     openArtifactInCanvas,
@@ -41,7 +43,8 @@ export function ArtifactCard({
     <div
       className={cn(
         'border-border hover:border-primary flex w-full max-w-72 cursor-pointer items-center justify-between gap-2 rounded-lg border-2 p-2',
-        isDisplayed && 'border-primary'
+        isDisplayed && 'border-primary',
+        className
       )}
       onClick={() => openArtifactInCanvas(data)}
     >
