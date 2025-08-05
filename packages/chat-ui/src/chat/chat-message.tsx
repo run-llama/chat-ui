@@ -50,13 +50,6 @@ interface ChatMessageActionsProps extends React.PropsWithChildren {
   className?: string
 }
 
-interface ChatMarkdownProps extends React.PropsWithChildren {
-  citationComponent?: ComponentType<CitationComponentProps>
-  className?: string
-  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
-  annotationRenderers?: Record<string, ComponentType<{ data: any }>>
-}
-
 function ChatMessage(props: ChatMessageProps) {
   const textParts = props.message.parts.filter(
     (part): part is TextPart => part.type === TextPartType

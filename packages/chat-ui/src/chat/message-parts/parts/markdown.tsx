@@ -8,9 +8,9 @@ import {
   SourceData,
 } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
-import { TextPart } from '../../chat.interface.js'
-import { MessagePartType } from '../types.js'
+import { TextPart, TextPartType } from '../../chat.interface.js'
 import { useAllParts, usePart } from '../context.js'
+import { SourcesPartType } from './sources.js'
 
 interface ChatMarkdownProps extends React.PropsWithChildren {
   citationComponent?: ComponentType<CitationComponentProps>
@@ -23,16 +23,16 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
  */
 export function MarkdownPart(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
-  const sources = useAllParts<SourceData>(MessagePartType.SOURCES)
+  const markdown = usePart<TextPart>(TextPartType)
+  const sources = useAllParts<SourceData>(SourcesPartType)
 
-  const nodes = sources
-    .map(item => ({
-      ...item,
-      nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
-    }))
-    .flatMap(item => item.nodes)
-
-  const markdown = usePart<TextPart>(MessagePartType.TEXT)
+  const nodes =
+    sources
+      ?.map(item => ({
+        ...item,
+        nodes: item.nodes ? preprocessSourceNodes(item.nodes) : [],
+      }))
+      .flatMap(item => item.nodes) ?? []
 
   if (!markdown) return null
   return (
