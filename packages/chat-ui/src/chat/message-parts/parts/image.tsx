@@ -14,8 +14,6 @@ export const ImagePartType = 'data-image' as const
 export function ImagePart({ className }: ImagePartProps) {
   const image = usePartData<ImageData>(ImagePartType)
 
-  console.log('image', image)
-
   if (!image) return null
   return <ChatImage data={image} className={className} />
 }

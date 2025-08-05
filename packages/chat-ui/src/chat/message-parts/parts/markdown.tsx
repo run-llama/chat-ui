@@ -8,7 +8,7 @@ import {
   SourceData,
 } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
-import { TextPart, TextPartType } from '../../chat.interface.js'
+import { TextPartType } from '../../chat.interface.js'
 import { getAllParts, usePartData } from '../context.js'
 import { SourcesPartType } from './sources.js'
 

@@ -16,10 +16,8 @@ export interface Message {
 
 /**
  * Chat-UI MessagePart contract, have two types of parts:
- * - text parts: will be accumulated to one or more message content
- * - data parts: basically our current annotations
- *
- * message.parts = textParts + dataParts (annotations)
+ * - text parts: will be rendered as one or multiple markdown blocks
+ * - data parts: additional data blocks
  */
 export type MessagePart = TextPart | DataPart
 
@@ -31,7 +29,7 @@ export type TextPart = {
 }
 
 export type DataPart = {
-  id?: string // TODO: support optional id, only last data event with the same id will be used.
+  id?: string // if id is provided, only last data part with the same id will be existed in message.parts
   type: string
   data?: any
 }
