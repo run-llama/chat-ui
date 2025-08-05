@@ -2,9 +2,10 @@ import { cn } from '../lib/utils'
 
 export type FileData = {
   name: string // e.g. 'cat.png'
+  url?: string // e.g. 'https://example.com/cat.png'
   size?: number // in bytes
   mimeType?: string // e.g. 'image/png'
-  base64: string // base64 encoded data
+  data?: string // base64 encoded data
 }
 
 export function ChatFile({
@@ -19,22 +20,24 @@ export function ChatFile({
 
   if (isImage) {
     // For images: show image preview with filename and size
-    const imageUrl = `data:${file.mimeType};base64,${file.base64}`
+    const imageUrl = file.url
 
     return (
       <div className={cn('flex max-w-xs flex-col gap-2', className)}>
-        <div className="bg-secondary overflow-hidden rounded-lg shadow-md">
-          <img
-            src={imageUrl}
-            alt={file.name}
-            className="h-auto max-h-64 w-full object-contain"
-          />
-        </div>
+        {file.url && (
+          <div className="bg-secondary overflow-hidden rounded-lg shadow-md">
+            <img
+              src={imageUrl}
+              alt={file.name}
+              className="h-auto max-h-64 w-full object-contain"
+            />
+          </div>
+        )}
         <div className="text-sm">
-          <div className="truncate font-medium">
+          <div className="text-muted-foreground truncate">
             {file.name}
             {fileSize && (
-              <span className="text-muted-foreground ml-1">({fileSize})</span>
+              <span className="text-muted-foreground ml-1"> ({fileSize}) </span>
             )}
           </div>
         </div>
@@ -50,7 +53,7 @@ export function ChatFile({
       <div className="truncate font-medium">
         {file.name}
         {fileSize && (
-          <span className="text-muted-foreground ml-1">({fileSize})</span>
+          <span className="text-muted-foreground ml-1"> ({fileSize}) </span>
         )}
       </div>
     </div>

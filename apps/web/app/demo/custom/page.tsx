@@ -122,9 +122,12 @@ const initialMessages: Message[] = [
         text: 'Got it! Here is the logo for LlamaIndex. The logo features a friendly llama mascot that represents our AI-powered document indexing and chat capabilities.',
       },
       {
-        type: 'data-image',
+        type: 'data-file',
         data: {
+          name: 'llama.png',
           url: '/llama.png',
+          mimeType: 'image/png',
+          size: 1000,
         },
       },
     ],
@@ -143,15 +146,12 @@ const initialMessages: Message[] = [
         text: 'Got it! Here is a sample PDF file that demonstrates PDF handling capabilities. This PDF contains some basic text and formatting examples that you can use to test PDF viewing functionality.',
       },
       {
-        type: 'data-document-file',
+        type: 'data-file',
         data: {
-          files: [
-            {
-              id: '1',
-              name: 'sample.pdf',
-              url: 'https://pdfobject.com/pdf/sample.pdf',
-            },
-          ],
+          name: 'sample.pdf',
+          url: 'https://pdfobject.com/pdf/sample.pdf',
+          mimeType: 'application/pdf',
+          size: 1000,
         },
       },
     ],
@@ -177,10 +177,9 @@ export default function Page(): JSX.Element {
 
 function CustomChat() {
   const handler = useChat({ messages: initialMessages })
-  const { imageUrl, getAnnotations, uploadFile, reset } = useFile({
+  const { imageUrl, uploadFile, reset } = useFile({
     uploadAPI: '/chat/upload',
   })
-  const annotations = getAnnotations()
   const handleUpload = async (file: File) => {
     try {
       await uploadFile(file)
@@ -218,7 +217,7 @@ function CustomChat() {
 }
 
 function CustomChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
   return (
     <ChatMessages>
       <ChatMessages.List className="px-0 md:px-16">
@@ -243,10 +242,9 @@ function CustomChatMessages() {
                     src="/llama.png"
                   />
                 </ChatMessage.Avatar>
-                <ChatMessage.Content isLoading={isLoading} append={append}>
-                  <ChatMessage.Content.Image />
+                <ChatMessage.Content>
+                  <ChatMessage.Content.File />
                   <ChatMessage.Content.Markdown />
-                  <ChatMessage.Content.DocumentFile />
                 </ChatMessage.Content>
                 <ChatMessage.Actions />
               </ChatMessage>

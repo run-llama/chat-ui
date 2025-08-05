@@ -1,16 +1,9 @@
 import { cn } from '../../../lib/utils'
-import { ChatFile } from '../../../widgets/chat-file'
+import { ChatFile, FileData } from '../../../widgets/chat-file'
 import { useChatMessage } from '../../chat-message.context.js'
 import { usePartData } from '../context.js'
 
 export const FilePartType = 'data-file' as const
-
-export type FileData = {
-  name: string // e.g. 'cat.png'
-  size?: number // in bytes
-  mimeType?: string // e.g. 'image/png'
-  base64: string // base64 encoded data
-}
 
 /**
  * Render a file part inside a ChatMessage, return null if current part is not file type
