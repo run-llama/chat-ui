@@ -4,11 +4,9 @@
  * This is a simple example demonstrating:
  * - Text streaming with token-by-token delivery
  * - Basic markdown content with code blocks
- * - Custom annotations (weather) sent after text completion
- * - Standard annotations (sources) sent after text completion
+ * - Standard parts (sources) sent after text completion
+ * - Custom parts (weather) sent after text completion
  *
- * Use this example as a starting point for implementing basic chat functionality
- * with \@llamaindex/chat-ui components.
  */
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -67,7 +65,22 @@ console.log(c)
 
 `
 const SAMPLE_PARTS = [
-  'Let analyze the uploaded file:',
+  `
+  Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
+
+### Markdown with code block
+
+\`\`\`js
+const a = 1
+const b = 2
+const c = a + b
+console.log(c)
+\`\`\`
+
+### Parts with files, events, weather, sources, and suggestions
+
+First, let analyze the uploaded file:
+  `,
   {
     type: 'file',
     data: { name: 'upload.pdf', url: '/upload.pdf' },
@@ -141,7 +154,7 @@ const fakeChatStream = (query: string): ReadableStream => {
         )
       }
 
-      async function writeTextMessage(content: string) {
+      async function writeText(content: string) {
         // init a unique message id
         const messageId = crypto.randomUUID()
 
@@ -181,15 +194,14 @@ const fakeChatStream = (query: string): ReadableStream => {
       }
 
       // show the query message
-      await writeTextMessage(query)
+      await writeText(query)
 
       // show the sample text message
-      await writeTextMessage(SAMPLE_TEXT)
+      await writeText(SAMPLE_TEXT)
 
-      // show the sample annotations
       for (const item of SAMPLE_PARTS) {
         if (typeof item === 'string') {
-          await writeTextMessage(item)
+          await writeText(item)
         } else {
           await writeData(item)
         }
