@@ -1,16 +1,17 @@
 import { ChatContext } from '../chat/chat.interface'
-import { cn } from "../lib/utils"
+import { cn } from '../lib/utils'
+import { v4 as uuidv4 } from 'uuid'
 
 export type SuggestedQuestionsData = string[]
 
 export function SuggestedQuestions({
   questions,
-  append,
+  sendMessage,
   requestData,
   className,
 }: {
   questions: SuggestedQuestionsData
-  append: ChatContext['append']
+  sendMessage: ChatContext['sendMessage']
   requestData?: any
   className?: string
 }) {
@@ -22,7 +23,14 @@ export function SuggestedQuestions({
           <a
             key={index}
             onClick={() => {
-              append({ role: 'user', content: question }, { data: requestData })
+              sendMessage(
+                {
+                  id: uuidv4(),
+                  role: 'user',
+                  parts: [{ type: 'text', text: question }],
+                },
+                { body: requestData }
+              )
             }}
             className="cursor-pointer text-sm italic hover:underline"
           >

@@ -1,10 +1,11 @@
 import { ChatContext } from '../chat/chat.interface'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
+import { v4 as uuidv4 } from 'uuid'
 
 interface StarterQuestionsProps {
   questions: string[]
-  append: ChatContext['append']
+  sendMessage: ChatContext['sendMessage']
   className?: string
 }
 
@@ -16,7 +17,13 @@ export function StarterQuestions(props: StarterQuestionsProps) {
           <Button
             key={i}
             variant="outline"
-            onClick={() => props.append({ role: 'user', content: question })}
+            onClick={() =>
+              props.sendMessage({
+                id: uuidv4(),
+                role: 'user',
+                parts: [{ type: 'text', text: question }],
+              })
+            }
             className="h-auto whitespace-break-spaces"
           >
             {question}

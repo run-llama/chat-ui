@@ -91,6 +91,7 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "remark-parse": "^11.0.0",
+    "uuid": "^11.1.0",
     "unist-util-visit": "^5.0.0",
     "tailwind-merge": "^2.1.0",
     "vaul": "^0.9.1"

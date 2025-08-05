@@ -14,18 +14,18 @@ export const SuggestedQuestionsPartType = 'data-suggested-questions' as const
  * @param props.className - custom styles for the suggested questions
  */
 export function SuggestedQuestionsPart({ className }: { className?: string }) {
-  const { append, requestData } = useChatUI()
+  const { sendMessage, requestData } = useChatUI()
   const { isLast } = useChatMessage()
   const suggestedQuestions = usePartData<SuggestedQuestionsData>(
     SuggestedQuestionsPartType
   )
 
-  if (!isLast || !append || !suggestedQuestions) return null
+  if (!isLast || !sendMessage || !suggestedQuestions) return null
 
   return (
     <SuggestedQuestions
       questions={suggestedQuestions}
-      append={append}
+      sendMessage={sendMessage}
       requestData={requestData}
       className={className}
     />

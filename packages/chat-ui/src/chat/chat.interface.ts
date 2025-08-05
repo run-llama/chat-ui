@@ -67,21 +67,4 @@ export type ChatContext = ChatHandler & {
 
   // computed state from status
   isLoading: boolean
-} & {
-  /**
-   * @deprecated Use `regenerate` instead
-   */
-  reload?: (chatRequestOptions?: { data?: any }) => void
-
-  /**
-   * @deprecated Use `sendMessage` instead
-   */
-  append: (
-    message: {
-      role: Message['role']
-      content: string
-      annotations?: any
-    },
-    chatRequestOptions?: { data?: any }
-  ) => Promise<string | null | undefined>
 }

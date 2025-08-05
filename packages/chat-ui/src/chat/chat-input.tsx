@@ -6,6 +6,7 @@ import { Textarea } from '../ui/textarea'
 import { FileUploader } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { useChatUI } from './chat.context'
 import { Message, MessagePart } from './chat.interface'
+import { v4 as uuidv4 } from 'uuid'
 
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
@@ -61,7 +62,7 @@ function ChatInput(props: ChatInputProps) {
 
   const submit = async () => {
     const newMessage: Message = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       role: 'user',
       parts: [
         { type: 'text', text: input },

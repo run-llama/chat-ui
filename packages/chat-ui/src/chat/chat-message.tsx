@@ -99,14 +99,14 @@ function ChatMessageContent(props: ChatMessageContentProps) {
 }
 
 function ChatMessageActions(props: ChatMessageActionsProps) {
-  const { reload, requestData, isLoading } = useChatUI()
+  const { regenerate, requestData, isLoading } = useChatUI()
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   const { message, isLast } = useChatMessage()
 
   if (message.role !== 'assistant') return null
 
   const isLastMessageFromAssistant = message.role === 'assistant' && isLast
-  const showReload = reload && !isLoading && isLastMessageFromAssistant
+  const showReload = regenerate && !isLoading && isLastMessageFromAssistant
 
   // content to copy is all text parts joined by newlines
   const messageTextContent = message.parts
@@ -134,7 +134,7 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
           title="Regenerate"
           variant="outline"
           size="icon"
-          onClick={() => reload?.({ data: requestData })}
+          onClick={() => regenerate?.({ body: requestData })}
           className="h-8 w-8"
         >
           <RefreshCw className="h-4 w-4" />

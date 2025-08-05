@@ -20,26 +20,6 @@ export default function ChatSection(props: ChatSectionProps) {
   const [input, setInput] = useState('')
   const [requestData, setRequestData] = useState<any>()
 
-  // @deprecated: keep `reload`, `append` and `isLoading` for backward compatibility
-  // should use `regenerate`, `sendMessage` and `status` instead
-  const reload = (data: any) => handler.regenerate?.({ body: data })
-  const append = async (
-    message: { role: Message['role']; content: string; annotations?: any },
-    data: any
-  ) => {
-    await handler.sendMessage(
-      {
-        id: crypto.randomUUID(),
-        role: message.role,
-        parts: [
-          { type: 'text', text: message.content },
-          ...(message.annotations ?? []),
-        ],
-      },
-      { body: data }
-    )
-    return null
-  }
   const isLoading = handler.status === 'streaming'
 
   const children = props.children ?? (
@@ -57,8 +37,6 @@ export default function ChatSection(props: ChatSectionProps) {
         setInput,
         requestData,
         setRequestData,
-        reload,
-        append,
         isLoading,
       }}
     >
