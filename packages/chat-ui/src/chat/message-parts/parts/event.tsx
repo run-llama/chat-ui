@@ -9,6 +9,8 @@ export const EventPartType = 'data-event' as const
 
 /**
  * Render an event inside a ChatMessage, return null if current part is not event type
+ * This component is useful to show an event from the assistant.
+ * Normally, it will start with "Loading" status and then change to "Success" with a result
  * @param props.className - custom styles for the event
  */
 export function EventPart({ className }: EventPartProps) {

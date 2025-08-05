@@ -19,7 +19,7 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
 }
 
 /**
- * Render a markdown part as a Markdown component.
+ * Render TextPart as a Markdown component.
  */
 export function MarkdownPart(props: ChatMarkdownProps) {
   const { message } = useChatMessage()

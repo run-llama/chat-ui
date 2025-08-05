@@ -14,6 +14,7 @@ export type FileData = {
 
 /**
  * Render a file part inside a ChatMessage, return null if current part is not file type
+ * This component is useful to show an uploaded file from the user or generated file from the assistant
  * @param props.className - custom styles for the file
  */
 export function FilePart({ className }: { className?: string }) {
