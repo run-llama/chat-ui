@@ -5,7 +5,7 @@ import {
 } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
 import { useChatUI } from '../../chat.context.js'
-import { useCurrentPart } from '../context.js'
+import { usePartData } from '../context.js'
 import { MessagePartType } from '../types.js'
 
 /**
@@ -17,7 +17,7 @@ export function SuggestedQuestionsPart({ className }: { className?: string }) {
   const { isLast } = useChatMessage()
   if (!isLast || !append) return null
 
-  const suggestedQuestions = useCurrentPart<SuggestedQuestionsData>(
+  const suggestedQuestions = usePartData<SuggestedQuestionsData>(
     MessagePartType.SUGGESTED_QUESTIONS
   )
 

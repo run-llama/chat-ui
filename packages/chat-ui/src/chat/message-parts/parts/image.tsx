@@ -1,5 +1,5 @@
 import { ImageData, ChatImage } from '../../../widgets'
-import { useCurrentPart } from '../context.js'
+import { usePartData } from '../context.js'
 
 export interface ImagePartProps {
   className?: string
@@ -12,7 +12,9 @@ export const ImagePartType = 'data-image' as const
  * @param props.className - custom styles for the image
  */
 export function ImagePart({ className }: ImagePartProps) {
-  const image = useCurrentPart<ImageData>(ImagePartType)
+  const image = usePartData<ImageData>(ImagePartType)
+
+  console.log('image', image)
 
   if (!image) return null
   return <ChatImage data={image} className={className} />

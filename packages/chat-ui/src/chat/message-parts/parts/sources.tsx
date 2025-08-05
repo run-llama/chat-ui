@@ -3,7 +3,7 @@ import {
   preprocessSourceNodes,
   SourceData,
 } from '../../../widgets/index.js'
-import { useCurrentPart } from '../context.js'
+import { usePartData } from '../context.js'
 
 export const SourcesPartType = 'data-sources' as const
 
@@ -12,7 +12,7 @@ export const SourcesPartType = 'data-sources' as const
  * @param props.className - custom styles for the sources
  */
 export function SourcesPart({ className }: { className?: string }) {
-  const sources = useCurrentPart<SourceData[]>(SourcesPartType)
+  const sources = usePartData<SourceData[]>(SourcesPartType)
   const nodes =
     sources
       ?.map(item => ({

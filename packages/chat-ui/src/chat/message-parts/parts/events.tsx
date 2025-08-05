@@ -1,6 +1,6 @@
 import { ChatEvents, EventData } from '../../../widgets'
 import { useChatMessage } from '../../chat-message.context.js'
-import { useCurrentPart } from '../context.js'
+import { usePartData } from '../context.js'
 
 export interface EventsPartProps {
   className?: string
@@ -13,7 +13,7 @@ export const EventsPartType = 'data-events' as const
  * @param props.className - custom styles for the events
  */
 export function EventsPart({ className }: EventsPartProps) {
-  const events = useCurrentPart<EventData[]>(EventsPartType)
+  const events = usePartData<EventData[]>(EventsPartType)
 
   // TODO: this loading should be from backend
   const { isLast, isLoading } = useChatMessage()

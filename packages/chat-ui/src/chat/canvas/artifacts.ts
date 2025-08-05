@@ -13,7 +13,7 @@ export function extractArtifactsFromAllMessages(messages: Message[]) {
 }
 
 export function extractArtifactsFromMessage(message: Message): Artifact[] {
-
+  return []
 }
 
 export type CodeArtifactError = {

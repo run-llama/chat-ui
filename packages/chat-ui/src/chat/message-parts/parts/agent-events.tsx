@@ -1,4 +1,4 @@
-import { useCurrentPart } from '../context.js'
+import { usePartData } from '../context.js'
 import { AgentEventData, ChatAgentEvents } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
 
@@ -9,7 +9,7 @@ export const AgentEventsPartType = 'data-agent-events' as const
  * @param props.className - custom styles for the agent events
  */
 export function AgentEventsPart({ className }: { className?: string }) {
-  const agentEvents = useCurrentPart<AgentEventData[]>(AgentEventsPartType)
+  const agentEvents = usePartData<AgentEventData[]>(AgentEventsPartType)
 
   // TODO: this status should be from backend
   const { isLast, textParts } = useChatMessage()

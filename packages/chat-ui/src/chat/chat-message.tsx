@@ -1,12 +1,8 @@
 import { Bot, Check, Copy, RefreshCw } from 'lucide-react'
-import { ComponentType, memo } from 'react'
+import { memo } from 'react'
 import { useCopyToClipboard } from '../hook/use-copy-to-clipboard'
 import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
-import {
-  CitationComponentProps,
-  LanguageRendererProps,
-} from '../widgets/index.js'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
 import {
@@ -16,6 +12,7 @@ import {
   TextPart,
   TextPartType,
 } from './chat.interface'
+import { ChatPartProvider } from './message-parts/context.js'
 import {
   AgentEventsPart,
   DocumentFilePart,
@@ -25,7 +22,6 @@ import {
   SourcesPart,
   SuggestedQuestionsPart,
 } from './message-parts/index.js'
-import { ChatPartProvider } from './message-parts/context.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -105,6 +101,7 @@ function ChatMessageAvatar(props: ChatMessageAvatarProps) {
 }
 
 function ChatMessageContent(props: ChatMessageContentProps) {
+  const { message } = useChatMessage()
   const children = props.children ?? (
     <>
       <EventsPart />
@@ -119,7 +116,7 @@ function ChatMessageContent(props: ChatMessageContentProps) {
 
   return (
     <div className={cn('flex min-w-0 flex-1 flex-col gap-4', props.className)}>
-      {props.message?.parts.map((part, index) => (
+      {(props.message ?? message).parts.map((part, index) => (
         <ChatPartProvider key={index} value={{ part }}>
           {children}
         </ChatPartProvider>

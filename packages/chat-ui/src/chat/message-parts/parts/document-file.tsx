@@ -1,5 +1,5 @@
 import { ChatFiles, DocumentFileData } from '../../../widgets/chat-files.js'
-import { useCurrentPart } from '../context.js'
+import { usePartData } from '../context.js'
 import { useChatMessage } from '../../chat-message.context.js'
 import { cn } from '../../../lib/utils'
 
@@ -11,7 +11,7 @@ export const DocumentFilePartType = 'data-document-file' as const
  */
 export function DocumentFilePart({ className }: { className?: string }) {
   const { message } = useChatMessage()
-  const documentFile = useCurrentPart<DocumentFileData>(DocumentFilePartType)
+  const documentFile = usePartData<DocumentFileData>(DocumentFilePartType)
   if (!documentFile) return null
 
   const alignmentClass = message.role === 'user' ? 'ml-auto' : 'mr-auto'

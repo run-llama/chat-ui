@@ -1,8 +1,4 @@
-import {
-  MessageAnnotation,
-  MessageAnnotationType,
-  toInlineAnnotation,
-} from '../../chat/annotations'
+
 import { JSONValue } from '../../chat/chat.interface'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
 import {
