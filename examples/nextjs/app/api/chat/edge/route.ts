@@ -27,7 +27,7 @@ console.log(c)
 
 ### Parts:
   `,
-  
+
   'Let me show the sources (type=sources):',
   {
     type: 'sources',
