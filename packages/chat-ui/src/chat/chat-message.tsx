@@ -162,7 +162,7 @@ type ComposibleChatMessagePart = typeof ChatMessageContent & {
 
 type ComposibleChatMessage = typeof ChatMessage & {
   Avatar: typeof ChatMessageAvatar
-  Parts: ComposibleChatMessagePart
+  Content: ComposibleChatMessagePart
   Part: ComposibleChatMessagePart
   Actions: typeof ChatMessageActions
 }
@@ -175,7 +175,7 @@ const PrimiviteChatMessage = memo(ChatMessage, (prevProps, nextProps) => {
   )
 }) as unknown as ComposibleChatMessage
 
-PrimiviteChatMessage.Parts = ChatMessageContent as ComposibleChatMessagePart
+PrimiviteChatMessage.Content = ChatMessageContent as ComposibleChatMessagePart
 
 // create alias Part with available built-in parts
 PrimiviteChatMessage.Part = ChatMessageContent as ComposibleChatMessagePart

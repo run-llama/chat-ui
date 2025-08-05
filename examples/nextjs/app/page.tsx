@@ -101,7 +101,7 @@ function CustomChatMessages() {
               {message.role === 'user' ? 'U' : 'AI'}
             </div>
           </ChatMessage.Avatar>
-          <ChatMessage.Parts>
+          <ChatMessage.Content>
             <ChatMessage.Part.File />
             <ChatMessage.Part.Event />
             <ChatMessage.Part.Markdown />
@@ -110,7 +110,7 @@ function CustomChatMessages() {
             <ChatMessage.Part.Suggestion />
             <WikiPart />
             <WeatherPart />
-          </ChatMessage.Parts>
+          </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>
       ))}
