@@ -85,7 +85,6 @@ function ChatExample() {
 
 function CustomChatMessages() {
   const { messages } = useChatUI()
-  console.log(messages)
 
   return (
     <>
