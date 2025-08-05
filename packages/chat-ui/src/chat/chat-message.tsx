@@ -149,7 +149,7 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
   )
 }
 
-type ComposibleChatMessageContent = typeof ChatMessageContent & {
+type ComposibleChatMessagePart = typeof ChatMessageContent & {
   File: typeof FilePart
   Event: typeof EventPart
   Markdown: typeof MarkdownPart
@@ -159,7 +159,8 @@ type ComposibleChatMessageContent = typeof ChatMessageContent & {
 
 type ComposibleChatMessage = typeof ChatMessage & {
   Avatar: typeof ChatMessageAvatar
-  Content: ComposibleChatMessageContent
+  Parts: ComposibleChatMessagePart
+  Part: ComposibleChatMessagePart
   Actions: typeof ChatMessageActions
 }
 
@@ -171,14 +172,15 @@ const PrimiviteChatMessage = memo(ChatMessage, (prevProps, nextProps) => {
   )
 }) as unknown as ComposibleChatMessage
 
-PrimiviteChatMessage.Content =
-  ChatMessageContent as ComposibleChatMessageContent
+PrimiviteChatMessage.Parts = ChatMessageContent as ComposibleChatMessagePart
 
-PrimiviteChatMessage.Content.Event = EventPart
-PrimiviteChatMessage.Content.File = FilePart
-PrimiviteChatMessage.Content.Markdown = MarkdownPart
-PrimiviteChatMessage.Content.Source = SourcesPart
-PrimiviteChatMessage.Content.Suggestion = SuggestionPart
+// create alias Part with available built-in parts
+PrimiviteChatMessage.Part = ChatMessageContent as ComposibleChatMessagePart
+PrimiviteChatMessage.Part.Event = EventPart
+PrimiviteChatMessage.Part.File = FilePart
+PrimiviteChatMessage.Part.Markdown = MarkdownPart
+PrimiviteChatMessage.Part.Source = SourcesPart
+PrimiviteChatMessage.Part.Suggestion = SuggestionPart
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions

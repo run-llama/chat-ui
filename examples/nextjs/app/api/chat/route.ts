@@ -13,6 +13,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 const TOKEN_DELAY = 30 // 30ms delay between tokens
+const PART_DELAY = 1000 // 1s delay between parts
 const DATA_PREFIX = 'data: ' // use data: prefix for SSE format
 
 interface TextChunk {
@@ -22,6 +23,7 @@ interface TextChunk {
 }
 
 interface DataChunk {
+  id?: string // optional id for data parts. Only the last data part with that id will be shown
   type: `data-${string}` // requires `data-` prefix when sending data parts
   data: Record<string, any>
 }
@@ -61,10 +63,42 @@ const c = a + b
 console.log(c)
 \`\`\`
 
-### Annotations
+### Parts
 
 `
-const SAMPLE_ANNOTATIONS = [
+const SAMPLE_PARTS = [
+  'Let analyze the uploaded file:',
+  {
+    type: 'file',
+    data: { name: 'upload.pdf', url: '/upload.pdf' },
+  },
+  'Then, let me call a tool to get the weather in San Francisco:',
+  {
+    id: 'demo_sample_event_id',
+    type: 'event',
+    data: {
+      title: 'Calling tool `get_weather` with input `San Francisco, CA`',
+      status: 'pending',
+    },
+  },
+  'Get the result from the tool:',
+  {
+    id: 'demo_sample_event_id', // use the same id to override the previous part
+    type: 'event',
+    data: {
+      title:
+        'Got response from tool `get_weather` with input `San Francisco, CA`',
+      status: 'success',
+      data: {
+        location: 'San Francisco, CA',
+        temperature: 22,
+        condition: 'sunny',
+        humidity: 65,
+        windSpeed: 12,
+      },
+    },
+  },
+  'Let me show a weather card:',
   {
     type: 'weather',
     data: {
@@ -75,6 +109,7 @@ const SAMPLE_ANNOTATIONS = [
       windSpeed: 12,
     },
   },
+  'Let me show the sources:',
   {
     type: 'sources',
     data: {
@@ -83,6 +118,15 @@ const SAMPLE_ANNOTATIONS = [
         { id: '2', url: '/sample.pdf' },
       ],
     },
+  },
+  'Let me show a suggestion:',
+  {
+    type: 'suggested-questions',
+    data: [
+      'I think you should go to the beach',
+      'I think you should go to the mountains',
+      'I think you should go to the city',
+    ],
   },
 ]
 
@@ -122,12 +166,18 @@ const fakeChatStream = (query: string): ReadableStream => {
         writeStream(endChunk)
       }
 
-      async function writeAnnotation(anno: { type: string; data: any }) {
+      async function writeData(data: {
+        type: string
+        data?: any
+        id?: string
+      }) {
         const chunk: DataChunk = {
-          type: `data-${anno.type}`,
-          data: anno.data,
+          id: data.id,
+          type: `data-${data.type}`,
+          data: data.data,
         }
         writeStream(chunk)
+        await new Promise(resolve => setTimeout(resolve, PART_DELAY))
       }
 
       // show the query message
@@ -137,8 +187,12 @@ const fakeChatStream = (query: string): ReadableStream => {
       await writeTextMessage(SAMPLE_TEXT)
 
       // show the sample annotations
-      for (const item of SAMPLE_ANNOTATIONS) {
-        await writeAnnotation(item)
+      for (const item of SAMPLE_PARTS) {
+        if (typeof item === 'string') {
+          await writeTextMessage(item)
+        } else {
+          await writeData(item)
+        }
       }
 
       controller.close()

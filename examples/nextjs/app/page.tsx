@@ -84,7 +84,8 @@ function ChatExample() {
 }
 
 function CustomChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
+  console.log(messages)
 
   return (
     <>
@@ -100,14 +101,15 @@ function CustomChatMessages() {
               {message.role === 'user' ? 'U' : 'AI'}
             </div>
           </ChatMessage.Avatar>
-          <ChatMessage.Content isLoading={isLoading} append={append}>
-            {/* <ChatCanvas.Artifact /> */}
-            <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Source />
-
+          <ChatMessage.Parts>
+            <ChatMessage.Part.File />
+            <ChatMessage.Part.Event />
+            <ChatMessage.Part.Markdown />
+            <ChatMessage.Part.Source />
+            <ChatMessage.Part.Suggestion />
             <WikiPart />
             <WeatherPart />
-          </ChatMessage.Content>
+          </ChatMessage.Parts>
           <ChatMessage.Actions />
         </ChatMessage>
       ))}
