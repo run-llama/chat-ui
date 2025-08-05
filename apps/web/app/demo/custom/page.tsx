@@ -26,10 +26,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export function CustomChat() {
   const handler = useChat()
-  const { imageUrl, getAnnotations, uploadFile, reset } = useFile({
+  const { image, uploadFile, reset, getAttachmentParts } = useFile({
     uploadAPI: '/chat/upload',
   })
-  const annotations = getAnnotations()
   const handleUpload = async (file: File) => {
     try {
       await uploadFile(file)
@@ -37,18 +36,22 @@ export function CustomChat() {
       console.error(error)
     }
   }
+  const attachments = getAttachmentParts()
   return (
     <ChatSection
       handler={handler}
-      className="mx-auto h-screen max-w-3xl overflow-hidden"
+      className="h-screen overflow-hidden p-0 md:p-5"
     >
       <CustomChatMessages />
-      <ChatInput annotations={annotations} resetUploadedFiles={reset}>
+      <ChatInput
+        additionalMessageParts={attachments}
+        resetUploadedFiles={reset}
+      >
         <div>
-          {imageUrl ? (
+          {image ? (
             <img
               className="max-h-[100px] object-contain"
-              src={imageUrl}
+              src={image.url}
               alt="uploaded"
             />
           ) : null}
@@ -56,6 +59,7 @@ export function CustomChat() {
         <ChatInput.Form>
           <ChatInput.Field />
           <ChatInput.Upload
+            allowedExtensions={['jpg', 'png', 'jpeg']}
             onUpload={handleUpload}
           />
           <ChatInput.Submit />
@@ -66,7 +70,7 @@ export function CustomChat() {
 }
 
 function CustomChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
   return (
     <ChatMessages>
       <ChatMessages.List className="px-0 md:px-16">
@@ -91,10 +95,9 @@ function CustomChatMessages() {
                     src="/llama.png"
                   />
                 </ChatMessage.Avatar>
-                <ChatMessage.Content isLoading={isLoading} append={append}>
-                  <ChatMessage.Content.Image />
+                <ChatMessage.Content>
+                  <ChatMessage.Content.File />
                   <ChatMessage.Content.Markdown />
-                  <ChatMessage.Content.DocumentFile />
                 </ChatMessage.Content>
                 <ChatMessage.Actions />
               </ChatMessage>
@@ -177,7 +180,7 @@ export default function Page(): JSX.Element {
 
 function CustomChat() {
   const handler = useChat({ messages: initialMessages })
-  const { imageUrl, uploadFile, reset } = useFile({
+  const { image, uploadFile, reset, getAttachmentParts } = useFile({
     uploadAPI: '/chat/upload',
   })
   const handleUpload = async (file: File) => {
@@ -187,18 +190,22 @@ function CustomChat() {
       console.error(error)
     }
   }
+  const attachments = getAttachmentParts()
   return (
     <ChatSection
       handler={handler}
       className="h-screen overflow-hidden p-0 md:p-5"
     >
       <CustomChatMessages />
-      <ChatInput resetUploadedFiles={reset}>
+      <ChatInput
+        additionalMessageParts={attachments}
+        resetUploadedFiles={reset}
+      >
         <div>
-          {imageUrl ? (
+          {image ? (
             <img
               className="max-h-[100px] object-contain"
-              src={imageUrl}
+              src={image.url}
               alt="uploaded"
             />
           ) : null}

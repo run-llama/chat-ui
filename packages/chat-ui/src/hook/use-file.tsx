@@ -1,10 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { DocumentFile } from '../widgets'
+import { DocumentFile, FileData } from '../widgets'
+import { MessagePart } from '../chat/chat.interface'
+import { FilePartType } from '../chat/message-parts'
 
 export function useFile({ uploadAPI }: { uploadAPI: string }) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [image, setImage] = useState<{
+    name: string
+    url: string
+    size: number
+  } | null>(null)
   const [files, setFiles] = useState<DocumentFile[]>([])
 
   const addDoc = (file: DocumentFile) => {
@@ -21,7 +27,7 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
   }
 
   const reset = () => {
-    imageUrl && setImageUrl(null)
+    image && setImage(null)
     files.length && setFiles([])
   }
 
@@ -45,21 +51,31 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
     return (await response.json()) as DocumentFile
   }
 
-  const getAnnotations = () => {
-    const annotations = []
-    if (imageUrl) {
-      annotations.push({
-        type: 'image',
-        data: { url: imageUrl },
+  const getAttachmentParts = (): MessagePart[] => {
+    const parts = []
+    if (image) {
+      parts.push({
+        type: FilePartType,
+        data: {
+          name: image.name,
+          url: image.url,
+          size: image.size,
+        } as FileData,
       })
     }
     if (files.length > 0) {
-      annotations.push({
-        type: 'document_file',
-        data: { files },
-      })
+      parts.push(
+        ...files.map(file => ({
+          type: FilePartType,
+          data: {
+            name: file.name,
+            size: file.size,
+            url: file.url,
+          } as FileData,
+        }))
+      )
     }
-    return annotations
+    return parts
   }
 
   const readContent = async (input: {
@@ -83,7 +99,11 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
   const uploadFile = async (file: File, requestParams: any = {}) => {
     if (file.type.startsWith('image/')) {
       const base64 = await readContent({ file, asUrl: true })
-      return setImageUrl(base64)
+      return setImage({
+        name: file.name,
+        url: base64,
+        size: file.size,
+      })
     }
 
     // Upload any non-image file as a document
@@ -92,12 +112,12 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
   }
 
   return {
-    imageUrl,
-    setImageUrl,
+    image,
+    setImage,
     files,
     removeDoc,
     reset,
-    getAnnotations,
+    getAttachmentParts,
     uploadFile,
   }
 }

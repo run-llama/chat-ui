@@ -29,7 +29,7 @@ import { useChat } from '@ai-sdk/react'
 import { Image } from 'lucide-react'
 
 export function CustomChat() {
-  const handler = useChat({ messages: [] })
+  const handler = useChat()
 
   return (
     <ChatSection
@@ -103,28 +103,14 @@ function CustomChatMessages() {
           >
             <ChatMessage.Avatar />
             <ChatMessage.Content>
-              <ChatMessage.Content.Markdown
-                annotationRenderers={{
-                  artifact: CustomArtifactCard,
-                }}
-              />
+              <ChatMessage.Part.Markdown />
+              <ChatMessage.Part.Artifact />
             </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>
         ))}
       </ChatMessages.List>
     </ChatMessages>
-  )
-}
-
-// custom artifact card for image artifacts
-function CustomArtifactCard({ data }: { data: Artifact }) {
-  return (
-    <ChatCanvas.Artifact
-      data={data}
-      getTitle={artifact => (artifact as ImageArtifact).data.caption}
-      iconMap={{ image: Image }}
-    />
   )
 }
 `
@@ -293,16 +279,5 @@ function CustomChatMessages() {
         ))}
       </ChatMessages.List>
     </ChatMessages>
-  )
-}
-
-// custom artifact card for image artifacts
-function CustomArtifactCard({ data }: { data: Artifact }) {
-  return (
-    <ChatCanvas.Artifact
-      data={data}
-      getTitle={artifact => (artifact as ImageArtifact).data.caption}
-      iconMap={{ image: Image }}
-    />
   )
 }

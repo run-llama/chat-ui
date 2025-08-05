@@ -21,7 +21,7 @@ import {
 import { useChat } from '@ai-sdk/react'
 
 export function CustomChat() {
-  const handler = useChat({ initialMessages: [] })
+  const handler = useChat({ messages: [] })
 
   return (
     <ChatSection
