@@ -1,14 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { JSONValue, Message } from '../../chat/chat.interface'
-import { useWorkflow } from '../use-workflow'
+import {
+  ChatHandler,
+  JSONValue,
+  Message,
+  MessagePart,
+  TextPart,
+  TextPartType,
+} from '../../chat/chat.interface'
+import { RunStatus, useWorkflow } from '../use-workflow'
 import { transformEventToMessageParts } from './helper'
 import {
   ChatEvent,
   ChatWorkflowHookHandler,
   ChatWorkflowHookParams,
 } from './types'
+
+const runStatusToChatStatus: Record<RunStatus, ChatHandler['status']> = {
+  idle: 'ready',
+  running: 'streaming',
+  complete: 'submitted',
+  error: 'error',
+}
 
 export function useChatWorkflow({
   deployment,
@@ -17,33 +31,38 @@ export function useChatWorkflow({
   onError,
   fileServerUrl,
 }: ChatWorkflowHookParams): ChatWorkflowHookHandler {
-  const [input, setInput] = useState<string>('')
   const [messages, setMessages] = useState<Message[]>([])
 
-  const updateLastMessage = ({
-    delta = '',
-    annotations = [],
-  }: {
-    delta?: string // render events inline in markdown
-    annotations?: JSONValue[] // render events in annotations components
-  }) => {
+  const updateLastMessage = (parts: MessagePart[]) => {
     setMessages(prev => {
       const lastMessage = prev[prev.length - 1]
 
       // if last message is assistant message, update its content
       if (lastMessage?.role === 'assistant') {
+        const updatedParts = [...lastMessage.parts, ...parts]
+
+        const textParts = updatedParts.filter(
+          (part): part is TextPart => part.type === TextPartType
+        )
+        const dataParts = updatedParts.filter(
+          part => part.type !== TextPartType
+        )
+
+        const content = textParts.map(part => part.text).join('') // join text delta parts into one
+        const newParts = [{ type: TextPartType, text: content }, ...dataParts]
+
+        // merge text parts into one, keep other parts as it is
         return [
           ...prev.slice(0, -1),
           {
             ...lastMessage,
-            content: (lastMessage.content || '') + delta,
-            annotations: [...(lastMessage.annotations || []), ...annotations],
+            parts: newParts,
           },
-        ]
+        ] as Message[]
       }
 
       // if last message is user message, add a new assistant message
-      return [...prev, { content: delta, role: 'assistant', annotations }]
+      return [...prev, { role: 'assistant', parts } as Message]
     })
   }
 
@@ -52,24 +71,27 @@ export function useChatWorkflow({
     workflow,
     baseUrl,
     onData: event => {
-      const { delta, annotations } = transformEventToMessageParts(
-        event,
-        fileServerUrl
-      )
-      updateLastMessage({ delta, annotations })
+      const parts = transformEventToMessageParts(event, fileServerUrl)
+      updateLastMessage(parts)
     },
   })
 
   const append = async (newMessage: Message) => {
     setMessages(prev => [...prev, newMessage])
 
+    const newMessageContent = newMessage.parts.find(
+      (part): part is TextPart => part.type === TextPartType
+    )?.text
+
+    if (!newMessageContent) return
+
     try {
-      await start({ user_msg: newMessage.content, chat_history: messages })
+      await start({ user_msg: newMessageContent, chat_history: messages })
     } catch (error) {
       onError?.(error)
     }
 
-    return newMessage.content
+    return newMessageContent
   }
 
   const handleStop = async () => {
@@ -87,8 +109,14 @@ export function useChatWorkflow({
     setMessages([...chatHistory, lastUserMessage])
 
     try {
+      const lastUserMessageContent = lastUserMessage.parts.find(
+        (part): part is TextPart => part.type === TextPartType
+      )?.text
+
+      if (!lastUserMessageContent) return
+
       await start({
-        user_msg: lastUserMessage.content,
+        user_msg: lastUserMessageContent,
         chat_history: chatHistory,
       })
     } catch (error) {
@@ -105,17 +133,17 @@ export function useChatWorkflow({
     }
   }
 
-  const isLoading = status === 'running'
-
   return {
-    input,
-    setInput,
-    isLoading,
-    append,
+    status: runStatusToChatStatus[status || 'idle'],
     messages,
     setMessages,
     stop: handleStop,
-    reload: handleReload,
+    sendMessage: async (message: Message) => {
+      await append(message)
+    },
+    regenerate: async () => {
+      await handleReload()
+    },
     resume: handleResume,
   }
 }

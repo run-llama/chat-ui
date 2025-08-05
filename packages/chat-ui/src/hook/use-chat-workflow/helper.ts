@@ -1,5 +1,7 @@
-
-import { JSONValue } from '../../chat/chat.interface'
+import { ArtifactPartType } from '../../chat/canvas/artifacts'
+import { JSONValue, MessagePart } from '../../chat/chat.interface'
+import { EventPartType, SourcesPartType } from '../../chat/message-parts'
+import { ChatEvent, SourceNode } from '../../widgets'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
 import {
   AgentStreamEvent,
@@ -9,7 +11,6 @@ import {
   ToolCallResultEvent,
   UIEvent,
 } from './types'
-import { AgentEventData, SourceNode } from '../../widgets'
 
 /**
  * Transform a workflow event to message parts
@@ -22,23 +23,12 @@ import { AgentEventData, SourceNode } from '../../widgets'
 export function transformEventToMessageParts(
   event: WorkflowEvent,
   fileServerUrl?: string
-): {
-  delta: string
-  annotations: MessageAnnotation<JSONValue>[]
-} {
+): MessagePart[] {
   if (isAgentStreamEvent(event)) {
-    return { delta: event.data.delta, annotations: [] }
+    return [{ type: 'text', text: event.data.delta }]
   }
 
-  if (isInlineEvent(event)) {
-    return {
-      delta: toInlineAnnotation(event.data as MessageAnnotation),
-      annotations: [],
-    }
-  }
-
-  const annotations = toVercelAnnotations(event, fileServerUrl)
-  return { delta: '', annotations }
+  return toMessageParts(event, fileServerUrl)
 }
 
 function isAgentStreamEvent(event: WorkflowEvent): event is AgentStreamEvent {
@@ -50,15 +40,20 @@ function isAgentStreamEvent(event: WorkflowEvent): event is AgentStreamEvent {
   return event.type === WorkflowEventType.AgentStream.toString() && hasDelta
 }
 
-function isInlineEvent(event: WorkflowEvent) {
-  const inlineEventTypes = [WorkflowEventType.ArtifactEvent.toString()]
-  const hasInlineData = typeof event.data === 'object' && event.data !== null
-
-  return inlineEventTypes.includes(event.type) && hasInlineData
-}
-
-function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
+function toMessageParts(
+  event: WorkflowEvent,
+  fileServerUrl?: string
+): MessagePart[] {
   switch (event.type) {
+    case WorkflowEventType.ArtifactEvent.toString(): {
+      return [
+        {
+          type: ArtifactPartType,
+          data: event.data,
+        },
+      ]
+    }
+
     // convert source nodes event to source nodes annotation
     case WorkflowEventType.SourceNodesEvent.toString(): {
       const nodes = (event as SourceNodesEvent).data?.nodes || []
@@ -72,7 +67,7 @@ function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
 
       return [
         {
-          type: MessageAnnotationType.SOURCES,
+          type: SourcesPartType,
           data: {
             nodes: nodes.map(rawNode =>
               convertRawNodeToSourceNode(rawNode, fileServerUrl)
@@ -106,11 +101,11 @@ function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
 
         return [
           {
-            type: MessageAnnotationType.AGENT_EVENTS,
+            type: EventPartType,
             data: {
-              agent: 'Agent',
-              text: `Calling tool: ${tool_name} with: ${JSON.stringify(tool_kwargs)}`,
-            } as AgentEventData,
+              title: 'Agent',
+              description: `Calling tool: ${tool_name} with: ${JSON.stringify(tool_kwargs)}`,
+            } as ChatEvent,
           },
         ]
       }
@@ -142,7 +137,7 @@ function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
           const rawNodes = raw_output.source_nodes as RawNodeWithScore[]
           return [
             {
-              type: MessageAnnotationType.SOURCES,
+              type: SourcesPartType,
               data: {
                 nodes: rawNodes.map(rawNode =>
                   convertRawNodeToSourceNode(rawNode, fileServerUrl)
@@ -166,7 +161,7 @@ function toVercelAnnotations(event: WorkflowEvent, fileServerUrl?: string) {
     default: {
       return [
         {
-          type: event.type,
+          type: `data-${event.type}`,
           data: event.data as JSONValue,
         },
       ]
