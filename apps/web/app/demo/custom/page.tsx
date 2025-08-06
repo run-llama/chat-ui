@@ -26,7 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export function CustomChat() {
   const handler = useChat()
-  const { image, uploadFile, reset, getAttachmentParts } = useFile({
+  const { image, uploadFile, reset, getAttachments } = useFile({
     uploadAPI: '/chat/upload',
   })
   const handleUpload = async (file: File) => {
@@ -36,7 +36,7 @@ export function CustomChat() {
       console.error(error)
     }
   }
-  const attachments = getAttachmentParts()
+  const attachments = getAttachments()
   return (
     <ChatSection
       handler={handler}
@@ -180,7 +180,7 @@ export default function Page(): JSX.Element {
 
 function CustomChat() {
   const handler = useChat({ messages: initialMessages })
-  const { image, uploadFile, reset, getAttachmentParts } = useFile({
+  const { image, uploadFile, reset, getAttachments } = useFile({
     uploadAPI: '/chat/upload',
   })
   const handleUpload = async (file: File) => {
@@ -190,7 +190,7 @@ function CustomChat() {
       console.error(error)
     }
   }
-  const attachments = getAttachmentParts()
+  const attachments = getAttachments()
   return (
     <ChatSection
       handler={handler}

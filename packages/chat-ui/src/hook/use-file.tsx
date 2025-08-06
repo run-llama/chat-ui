@@ -51,7 +51,7 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
     return (await response.json()) as DocumentFile
   }
 
-  const getAttachmentParts = (): MessagePart[] => {
+  const getAttachments = (): MessagePart[] => {
     const parts = []
     if (image) {
       parts.push({
@@ -117,7 +117,7 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
     files,
     removeDoc,
     reset,
-    getAttachmentParts,
+    getAttachments,
     uploadFile,
   }
 }
