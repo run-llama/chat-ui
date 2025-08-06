@@ -1,6 +1,6 @@
 'use client'
 
-import { usePartData } from '@llamaindex/chat-ui'
+import { usePart } from '@llamaindex/chat-ui'
 
 interface WikiData {
   title: string
@@ -12,8 +12,13 @@ interface WikiData {
 
 const WikiPartType = 'data-wiki'
 
+type WikiPart = {
+  type: typeof WikiPartType
+  data: WikiData
+}
+
 export function WikiPart() {
-  const wikiData = usePartData<WikiData>(WikiPartType)
+  const wikiData = usePart<WikiPart>(WikiPartType)?.data
   if (!wikiData) return null
   return <WikiCard data={wikiData} />
 }

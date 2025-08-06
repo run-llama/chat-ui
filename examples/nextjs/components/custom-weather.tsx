@@ -1,6 +1,6 @@
 'use client'
 
-import { usePartData } from '@llamaindex/chat-ui'
+import { usePart } from '@llamaindex/chat-ui'
 
 interface WeatherData {
   location: string
@@ -12,9 +12,14 @@ interface WeatherData {
 
 const WeatherPartType = 'data-weather'
 
+type WeatherPart = {
+  type: typeof WeatherPartType
+  data: WeatherData
+}
+
 // A custom part component that is used to display weather information in a chat message
 export function WeatherPart() {
-  const weatherData = usePartData<WeatherData>(WeatherPartType)
+  const weatherData = usePart<WeatherPart>(WeatherPartType)?.data
   if (!weatherData) return null
   return <WeatherCard data={weatherData} />
 }
