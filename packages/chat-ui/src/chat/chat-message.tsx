@@ -5,16 +5,18 @@ import { cn } from '../lib/utils'
 import { Button } from '../ui/button'
 import { ChatMessageProvider, useChatMessage } from './chat-message.context.js'
 import { useChatUI } from './chat.context.js'
-import { Message, TextPart, TextPartType } from './chat.interface'
-import { ChatPartProvider } from './message-parts/context.js'
+import { Message } from './chat.interface'
 import {
-  EventPart,
-  FilePart,
-  ArtifactPart,
-  MarkdownPart,
-  SourcesPart,
-  SuggestionPart,
-} from './message-parts/index.js'
+  ArtifactPartUI,
+  EventPartUI,
+  FilePartUI,
+  MarkdownPartUI,
+  SourcesPartUI,
+  SuggestionPartUI,
+  TextPart,
+  TextPartType,
+} from './message-parts'
+import { ChatPartProvider } from './message-parts/context.js'
 
 interface ChatMessageProps extends React.PropsWithChildren {
   message: Message
@@ -80,12 +82,12 @@ function ChatMessageContent(props: ChatMessageContentProps) {
   const { message } = useChatMessage()
   const children = props.children ?? (
     <>
-      <FilePart />
-      <EventPart />
-      <MarkdownPart />
-      <ArtifactPart />
-      <SourcesPart />
-      <SuggestionPart />
+      <FilePartUI />
+      <EventPartUI />
+      <MarkdownPartUI />
+      <ArtifactPartUI />
+      <SourcesPartUI />
+      <SuggestionPartUI />
     </>
   )
 
@@ -152,12 +154,12 @@ function ChatMessageActions(props: ChatMessageActionsProps) {
 }
 
 type ComposibleChatMessagePart = typeof ChatMessageContent & {
-  File: typeof FilePart
-  Event: typeof EventPart
-  Markdown: typeof MarkdownPart
-  Source: typeof SourcesPart
-  Suggestion: typeof SuggestionPart
-  Artifact: typeof ArtifactPart
+  File: typeof FilePartUI
+  Event: typeof EventPartUI
+  Markdown: typeof MarkdownPartUI
+  Source: typeof SourcesPartUI
+  Suggestion: typeof SuggestionPartUI
+  Artifact: typeof ArtifactPartUI
 }
 
 type ComposibleChatMessage = typeof ChatMessage & {
@@ -179,12 +181,12 @@ PrimiviteChatMessage.Content = ChatMessageContent as ComposibleChatMessagePart
 
 // create alias Part with available built-in parts
 PrimiviteChatMessage.Part = ChatMessageContent as ComposibleChatMessagePart
-PrimiviteChatMessage.Part.Event = EventPart
-PrimiviteChatMessage.Part.File = FilePart
-PrimiviteChatMessage.Part.Markdown = MarkdownPart
-PrimiviteChatMessage.Part.Source = SourcesPart
-PrimiviteChatMessage.Part.Suggestion = SuggestionPart
-PrimiviteChatMessage.Part.Artifact = ArtifactPart
+PrimiviteChatMessage.Part.Event = EventPartUI
+PrimiviteChatMessage.Part.File = FilePartUI
+PrimiviteChatMessage.Part.Markdown = MarkdownPartUI
+PrimiviteChatMessage.Part.Source = SourcesPartUI
+PrimiviteChatMessage.Part.Suggestion = SuggestionPartUI
+PrimiviteChatMessage.Part.Artifact = ArtifactPartUI
 
 PrimiviteChatMessage.Avatar = ChatMessageAvatar
 PrimiviteChatMessage.Actions = ChatMessageActions

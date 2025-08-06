@@ -5,8 +5,9 @@ import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
 import { FileUploader } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { useChatUI } from './chat.context'
-import { Message, MessagePart } from './chat.interface'
+import { Message } from './chat.interface'
 import { v4 as uuidv4 } from 'uuid'
+import { MessagePart } from './message-parts'
 
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string

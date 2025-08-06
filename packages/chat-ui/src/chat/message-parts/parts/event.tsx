@@ -1,12 +1,11 @@
 import { ChatEvent } from '../../../widgets'
-import { usePartData } from '../context.js'
+import { usePart } from '../context.js'
+import { EventPartType } from '../types.js'
 
 export interface EventPartProps {
   className?: string
   renderData?: (data: ChatEvent['data']) => React.ReactNode
 }
-
-export const EventPartType = 'data-event' as const
 
 /**
  * Render an event inside a ChatMessage, return null if current part is not event type
@@ -14,10 +13,14 @@ export const EventPartType = 'data-event' as const
  * Normally, it will start with "Loading" status and then change to "Success" with a result
  * @param props.className - custom styles for the event
  */
-export function EventPart({ className, renderData }: EventPartProps) {
-  const event = usePartData<ChatEvent>(EventPartType)
-  if (!event) return null
+export function EventPartUI({ className, renderData }: EventPartProps) {
+  const part = usePart(EventPartType)
+  if (!part) return null
   return (
-    <ChatEvent event={event} className={className} renderData={renderData} />
+    <ChatEvent
+      event={part.data}
+      className={className}
+      renderData={renderData}
+    />
   )
 }

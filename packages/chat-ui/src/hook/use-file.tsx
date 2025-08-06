@@ -2,14 +2,13 @@
 
 import { useState } from 'react'
 import { DocumentFile, FileData } from '../widgets'
-import { MessagePart } from '../chat/chat.interface'
-import { FilePartType } from '../chat/message-parts'
+import { FilePartType, MessagePart } from '../chat/message-parts'
 
 export function useFile({ uploadAPI }: { uploadAPI: string }) {
   const [image, setImage] = useState<{
-    name: string
+    filename: string
+    mediaType: string
     url: string
-    size: number
   } | null>(null)
   const [files, setFiles] = useState<DocumentFile[]>([])
 
@@ -54,22 +53,15 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
   const getAttachments = (): MessagePart[] => {
     const parts = []
     if (image) {
-      parts.push({
-        type: FilePartType,
-        data: {
-          name: image.name,
-          url: image.url,
-          size: image.size,
-        } as FileData,
-      })
+      parts.push({ type: FilePartType, data: image })
     }
     if (files.length > 0) {
       parts.push(
         ...files.map(file => ({
           type: FilePartType,
           data: {
-            name: file.name,
-            size: file.size,
+            filename: file.name,
+            mediaType: file.type,
             url: file.url,
           } as FileData,
         }))
@@ -100,9 +92,9 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
     if (file.type.startsWith('image/')) {
       const base64 = await readContent({ file, asUrl: true })
       return setImage({
-        name: file.name,
+        filename: file.name,
+        mediaType: file.type,
         url: base64,
-        size: file.size,
       })
     }
 

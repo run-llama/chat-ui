@@ -3,17 +3,16 @@ import {
   preprocessSourceNodes,
   SourceData,
 } from '../../../widgets/index.js'
-import { usePartData } from '../context.js'
-
-export const SourcesPartType = 'data-sources' as const
+import { usePart } from '../context.js'
+import { SourcesPartType } from '../types.js'
 
 /**
  * Render a list of sources inside a ChatMessage, return null if current part is not sources type
  * This component is useful to show a list of sources from the assistant.
  * @param props.className - custom styles for the sources
  */
-export function SourcesPart({ className }: { className?: string }) {
-  const sources = usePartData<SourceData>(SourcesPartType)
+export function SourcesPartUI({ className }: { className?: string }) {
+  const sources = usePart(SourcesPartType)?.data
   const nodes = preprocessSourceNodes(sources?.nodes ?? [])
 
   if (nodes.length === 0) return null

@@ -8,9 +8,9 @@ import {
   SourceData,
 } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
-import { TextPartType } from '../../chat.interface.js'
-import { extractAllPartData, usePartData } from '../context.js'
-import { SourcesPartType } from './sources.js'
+import { SourcesPartType, TextPartType } from '../types.js'
+import { usePart } from '../context.js'
+import { getParts } from '../utils.js'
 
 interface ChatMarkdownProps extends React.PropsWithChildren {
   citationComponent?: ComponentType<CitationComponentProps>
@@ -21,11 +21,12 @@ interface ChatMarkdownProps extends React.PropsWithChildren {
 /**
  * Render TextPart as a Markdown component.
  */
-export function MarkdownPart(props: ChatMarkdownProps) {
+export function MarkdownPartUI(props: ChatMarkdownProps) {
   const { message } = useChatMessage()
-  const markdown = usePartData<string>(TextPartType)
+  const markdown = usePart(TextPartType)?.text
 
-  const sources = extractAllPartData<SourceData>(message, SourcesPartType)
+  const sourceParts = getParts(message, SourcesPartType)
+  const sources = sourceParts.map(part => part.data)
 
   const nodes =
     sources

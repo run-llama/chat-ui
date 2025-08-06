@@ -1,6 +1,10 @@
-import { ArtifactPartType } from '../../chat/canvas/artifacts'
-import { JSONValue, MessagePart } from '../../chat/chat.interface'
-import { EventPartType, SourcesPartType } from '../../chat/message-parts'
+import { JSONValue } from '../../chat/chat.interface'
+import {
+  ArtifactPartType,
+  EventPartType,
+  SourcesPartType,
+  MessagePart,
+} from '../../chat/message-parts'
 import { ChatEvent, SourceNode } from '../../widgets'
 import { WorkflowEvent, WorkflowEventType } from '../use-workflow'
 import {

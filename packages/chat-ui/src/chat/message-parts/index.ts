@@ -6,3 +6,5 @@ export * from './parts/suggestion.js'
 export * from './parts/artifact.js'
 
 export * from './context.js'
+export * from './types.js'
+export * from './utils.js'

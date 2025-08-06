@@ -1,18 +1,17 @@
 import { cn } from '../../../lib/utils'
 import { ChatFile, FileData } from '../../../widgets/chat-file'
 import { useChatMessage } from '../../chat-message.context.js'
-import { usePartData } from '../context.js'
-
-export const FilePartType = 'data-file' as const
+import { usePart } from '../context.js'
+import { FilePartType } from '../types.js'
 
 /**
  * Render a file part inside a ChatMessage, return null if current part is not file type
  * This component is useful to show an uploaded file from the user or generated file from the assistant
  * @param props.className - custom styles for the file
  */
-export function FilePart({ className }: { className?: string }) {
+export function FilePartUI({ className }: { className?: string }) {
   const { message } = useChatMessage()
-  const file = usePartData<FileData>(FilePartType)
+  const file = usePart(FilePartType)
   if (!file) return null
 
   const alignmentClass = message.role === 'user' ? 'ml-auto' : 'mr-auto'

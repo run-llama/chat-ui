@@ -1,14 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  ChatHandler,
-  JSONValue,
-  Message,
-  MessagePart,
-  TextPart,
-  TextPartType,
-} from '../../chat/chat.interface'
+import { ChatHandler, Message } from '../../chat/chat.interface'
 import { RunStatus, useWorkflow } from '../use-workflow'
 import { transformEventToMessageParts } from './helper'
 import {
@@ -16,6 +9,7 @@ import {
   ChatWorkflowHookHandler,
   ChatWorkflowHookParams,
 } from './types'
+import { MessagePart, TextPart, TextPartType } from '../../chat/message-parts'
 
 const runStatusToChatStatus: Record<RunStatus, ChatHandler['status']> = {
   idle: 'ready',

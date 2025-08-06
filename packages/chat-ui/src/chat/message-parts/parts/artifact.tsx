@@ -1,13 +1,13 @@
 import { ArtifactCard } from '../../canvas/artifact-card.js'
-import { Artifact, ArtifactPartType } from '../../canvas/artifacts.js'
-import { usePartData } from '../context.js'
+import { usePart } from '../context.js'
+import { ArtifactPartType } from '../types.js'
 
 /**
  * Display an artifact card in the chat message when artifact part is available
  * @param props.className - custom styles for the artifact
  */
-export function ArtifactPart({ className }: { className?: string }) {
-  const artifact = usePartData<Artifact>(ArtifactPartType)
-  if (!artifact) return null
-  return <ArtifactCard data={artifact} className={className} />
+export function ArtifactPartUI({ className }: { className?: string }) {
+  const part = usePart(ArtifactPartType)
+  if (!part) return null
+  return <ArtifactCard data={part.data} className={className} />
 }

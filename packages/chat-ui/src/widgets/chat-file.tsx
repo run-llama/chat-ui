@@ -4,12 +4,9 @@ import { DocxIcon } from '../ui/icons/docx'
 import { PDFIcon } from '../ui/icons/pdf'
 import { SheetIcon } from '../ui/icons/sheet'
 import { TxtIcon } from '../ui/icons/txt'
+import { FilePart } from '../chat/message-parts/types.js'
 
-export type FileData = {
-  name: string // e.g. 'cat.png'
-  url?: string // e.g. 'https://example.com/cat.png'
-  size?: number // in bytes
-}
+export type FileData = Omit<FilePart, 'type'>
 
 const FileIconMap: Record<string, React.ReactNode> = {
   csv: <SheetIcon />,
@@ -25,9 +22,8 @@ export function ChatFile({
   file: FileData
   className?: string
 }) {
-  const isImage = isImageFile(file.name)
-  const fileSize = file.size ? formatFileSize(file.size) : null
-  const fileExtension = getFileExtension(file.name)
+  const isImage = isImageFile(file)
+  const fileExtension = getFileExtension(file.filename)
 
   const handleClick = () => {
     if (file.url) {
@@ -48,7 +44,7 @@ export function ChatFile({
         {file.url && isImage ? (
           <img
             src={file.url}
-            alt={file.name}
+            alt="image"
             className="h-full w-full object-cover"
           />
         ) : (
@@ -57,26 +53,14 @@ export function ChatFile({
           </div>
         )}
       </div>
-      <div className="truncate font-medium">
-        {file.name}
-        {fileSize && (
-          <span className="text-muted-foreground ml-1"> ({fileSize}) </span>
-        )}
-      </div>
+      <div className="truncate font-medium">{file.filename}</div>
     </div>
   )
 }
 
-// Helper function to format file size
-function formatFileSize(bytes: number): string {
-  const kb = Math.round((bytes / 1024) * 10) / 10
-  return `${kb} KB`
-}
-
 // Helper function to check if file is an image
-function isImageFile(fileName: string): boolean {
-  const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-  return imageExtensions.some(ext => fileName.toLowerCase().endsWith(ext))
+function isImageFile(file: FileData): boolean {
+  return file.mediaType.startsWith('image/')
 }
 
 // Helper function to get file extension
