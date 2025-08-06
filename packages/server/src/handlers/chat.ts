@@ -1,11 +1,10 @@
-import { stopAgentEvent } from '@llamaindex/workflow'
 import { type UIMessage as Message } from '@ai-sdk/react'
+import { stopAgentEvent } from '@llamaindex/workflow'
+import type { UIDataTypes, UIMessagePart, UITools } from 'ai'
 import { IncomingMessage, ServerResponse } from 'http'
 import type {
   ChatMessage,
   MessageContentDetail,
-  MessageContentFileDetail,
-  MessageContentImageDetail,
   MessageContentTextDetail,
   MessageType,
 } from 'llamaindex'
@@ -19,7 +18,6 @@ import {
 } from '../utils/request'
 import { toDataStream } from '../utils/stream'
 import { processWorkflowStream, runWorkflow } from '../utils/workflow'
-import type { UIDataTypes, UIMessagePart, UITools } from 'ai'
 
 export const handleChat = async (
   req: IncomingMessage,
@@ -107,9 +105,5 @@ function aiMessagePartToLlamaIndexMessageContentDetail(
 
   // TODO: add more to adapt to other part types
 
-  console.warn(
-    'Failed to convert to LLamaIndex message. Unsupported part type:',
-    part
-  )
   return null
 }
