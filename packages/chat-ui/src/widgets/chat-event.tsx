@@ -24,9 +24,11 @@ export type ChatEvent = {
 export function ChatEvent({
   event,
   className,
+  renderData,
 }: {
   event: ChatEvent
   className?: string
+  renderData?: (data: ChatEvent['data']) => React.ReactNode
 }) {
   const [isDataOpen, setIsDataOpen] = useState(false)
 
@@ -55,7 +57,7 @@ export function ChatEvent({
   return (
     <div className={cn('border-l-2 py-2 pl-4', getStatusColor(), className)}>
       {/* Header with title and status */}
-      <div className="flex items-start justify-between">
+      <div className="chat-event-header flex items-start justify-between">
         <div className="flex-1">
           <h3 className="text-sm font-medium">{event.title}</h3>
           {event.description && (
@@ -72,7 +74,7 @@ export function ChatEvent({
 
       {/* Data section if data exists */}
       {event.data && (
-        <div className="mt-3">
+        <div className="chat-event-data mt-3">
           <Collapsible open={isDataOpen} onOpenChange={setIsDataOpen}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
@@ -85,9 +87,13 @@ export function ChatEvent({
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <pre className="bg-muted mt-2 max-h-40 overflow-auto rounded p-2 text-xs">
-                {JSON.stringify(event.data, null, 2)}
-              </pre>
+              {renderData ? (
+                renderData(event.data)
+              ) : (
+                <pre className="bg-muted mt-2 max-h-40 overflow-auto rounded p-2 text-xs">
+                  {JSON.stringify(event.data, null, 2)}
+                </pre>
+              )}
             </CollapsibleContent>
           </Collapsible>
         </div>

@@ -3,6 +3,7 @@ import { usePartData } from '../context.js'
 
 export interface EventPartProps {
   className?: string
+  renderData?: (data: ChatEvent['data']) => React.ReactNode
 }
 
 export const EventPartType = 'data-event' as const
@@ -13,8 +14,10 @@ export const EventPartType = 'data-event' as const
  * Normally, it will start with "Loading" status and then change to "Success" with a result
  * @param props.className - custom styles for the event
  */
-export function EventPart({ className }: EventPartProps) {
+export function EventPart({ className, renderData }: EventPartProps) {
   const event = usePartData<ChatEvent>(EventPartType)
   if (!event) return null
-  return <ChatEvent event={event} className={className} />
+  return (
+    <ChatEvent event={event} className={className} renderData={renderData} />
+  )
 }
