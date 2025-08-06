@@ -1,17 +1,16 @@
 import type { UIMessage } from '@ai-sdk/react'
-import type { FileUIPart, TextPart } from 'ai'
+import type { TextPart } from 'ai'
 import type {
   ChatMessage,
   JSONValue,
   MessageContentDetail,
-  MessageContentFileDetail,
   MessageContentTextDetail,
 } from 'llamaindex'
 import type { Artifact } from './events'
 import type { HumanResponseEventData } from './hitl'
 
 export const ARTIFACT_PART_TYPE = 'data-artifact' as const
-export const FILE_PART_TYPE = 'file' as const
+export const FILE_PART_TYPE = 'data-file' as const
 export const HUMAN_PART_TYPE = 'data-human' as const
 
 export type ArtifactPart = {
@@ -22,6 +21,17 @@ export type ArtifactPart = {
 export type HumanResponsePart = {
   type: typeof HUMAN_PART_TYPE
   data: JSONValue
+}
+
+export type FileData = {
+  mediaType: string
+  filename: string
+  url: string
+}
+
+export type FilePart = {
+  type: typeof FILE_PART_TYPE
+  data: FileData
 }
 
 type UIMessagePart = UIMessage['parts'][number]
@@ -48,7 +58,7 @@ export class ServerMessage {
     return this.artifacts[this.artifacts.length - 1]
   }
 
-  get attachments(): FileUIPart[] {
+  get attachments(): FilePart[] {
     return this.uiMessage.parts.filter(this.isFilePart)
   }
 
@@ -77,15 +87,6 @@ export class ServerMessage {
       } satisfies MessageContentTextDetail
     }
 
-    // convert vercel ai file part to LlamaIndex file part
-    if (this.isFilePart(part)) {
-      return {
-        type: 'file',
-        mimeType: part.mediaType,
-        data: part.url,
-      } satisfies MessageContentFileDetail
-    }
-
     // for other part types, no need to convert to LlamaIndex message part
     return null
   }
@@ -94,7 +95,7 @@ export class ServerMessage {
     return part.type === 'text' && 'text' in part
   }
 
-  isFilePart(part: UIMessagePart): part is FileUIPart {
+  isFilePart(part: UIMessagePart): part is FilePart {
     return (
       part.type === FILE_PART_TYPE && this.hasFields(part, ['mediaType', 'url'])
     )
