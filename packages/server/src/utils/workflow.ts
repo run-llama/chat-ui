@@ -14,11 +14,11 @@ import {
   type NodeWithScore,
 } from 'llamaindex'
 import {
+  runEvent,
   sourceEvent,
-  toAgentRunEvent,
   toSourceEvent,
   type SourceEventNode,
-} from './events'
+} from './parts'
 import { downloadFile } from './file'
 import {
   resumeWorkflowFromHumanResponses,
@@ -73,10 +73,14 @@ export function processWorkflowStream(
           // Handle agent events from AgentToolCall
           if (agentToolCallEvent.include(event)) {
             const inputString = JSON.stringify(event.data.toolKwargs)
-            transformedEvent = toAgentRunEvent({
-              agent: event.data.agentName,
-              text: `Using tool: '${event.data.toolName}' with inputs: '${inputString}'`,
-              type: 'text',
+            transformedEvent = runEvent.with({
+              type: 'data-event',
+              data: {
+                title: `Agent Tool Call: ${event.data.agentName}`,
+                description: `Using tool: '${event.data.toolName}' with inputs: '${inputString}'`,
+                status: 'pending',
+                data: event.data,
+              },
             })
           }
           // Handle source nodes from AgentToolCallResult

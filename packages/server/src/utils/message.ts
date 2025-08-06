@@ -2,39 +2,26 @@ import type { UIMessage } from '@ai-sdk/react'
 import type { TextPart } from 'ai'
 import type {
   ChatMessage,
-  JSONValue,
   MessageContentDetail,
   MessageContentTextDetail,
 } from 'llamaindex'
-import type { Artifact } from './events'
-import type { HumanResponseEventData } from './hitl'
+import {
+  HUMAN_RESPONSE_PART_TYPE,
+  type HumanResponseEventData,
+  type HumanResponsePart,
+} from './hitl'
+import {
+  ARTIFACT_PART_TYPE,
+  FILE_PART_TYPE,
+  type Artifact,
+  type ArtifactPart,
+  type ArtifactType,
+  type CodeArtifact,
+  type DocumentArtifact,
+  type FilePart,
+} from './parts'
 
-export const ARTIFACT_PART_TYPE = 'data-artifact' as const
-export const FILE_PART_TYPE = 'data-file' as const
-export const HUMAN_PART_TYPE = 'data-human' as const
-
-export type ArtifactPart = {
-  type: typeof ARTIFACT_PART_TYPE
-  data: Artifact
-}
-
-export type HumanResponsePart = {
-  type: typeof HUMAN_PART_TYPE
-  data: JSONValue
-}
-
-export type FileData = {
-  mediaType: string
-  filename: string
-  url: string
-}
-
-export type FilePart = {
-  type: typeof FILE_PART_TYPE
-  data: FileData
-}
-
-type UIMessagePart = UIMessage['parts'][number]
+type UIMessagePart = UIMessage['parts'][number] // inter from Vercel Message type
 
 /**
  * The central class for handling messages in the LlamaIndex Server.
@@ -54,8 +41,10 @@ export class ServerMessage {
       .map(part => part.data)
   }
 
-  get lastArtifact(): Artifact | undefined {
-    return this.artifacts[this.artifacts.length - 1]
+  getLastArtifact(type: 'code'): CodeArtifact | undefined
+  getLastArtifact(type: 'document'): DocumentArtifact | undefined
+  getLastArtifact(type: ArtifactType): Artifact | undefined {
+    return this.artifacts.reverse().find(artifact => artifact.type === type)
   }
 
   get attachments(): FilePart[] {
@@ -63,10 +52,7 @@ export class ServerMessage {
   }
 
   get humanResponse(): HumanResponseEventData[] {
-    return this.uiMessage.parts.filter(this.isHumanResponsePart).map(part => ({
-      type: 'human_response',
-      data: part.data,
-    }))
+    return this.uiMessage.parts.filter(this.isHumanResponsePart)
   }
 
   get llamaindexMessage(): ChatMessage {
@@ -106,7 +92,9 @@ export class ServerMessage {
   }
 
   isHumanResponsePart(part: UIMessagePart): part is HumanResponsePart {
-    return part.type === HUMAN_PART_TYPE && this.hasFields(part, ['data'])
+    return (
+      part.type === HUMAN_RESPONSE_PART_TYPE && this.hasFields(part, ['data'])
+    )
   }
 
   hasFields(part: UIMessagePart, fields: string[]): boolean {

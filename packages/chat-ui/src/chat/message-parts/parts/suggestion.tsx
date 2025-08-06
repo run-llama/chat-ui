@@ -1,7 +1,4 @@
-import {
-  SuggestedQuestions,
-  SuggestedQuestionsData,
-} from '../../../widgets/index.js'
+import { SuggestedQuestions } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
 import { useChatUI } from '../../chat.context.js'
 import { usePart } from '../context.js'

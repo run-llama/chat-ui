@@ -3,9 +3,9 @@ import {
   type WorkflowEventData,
   workflowEvent,
 } from '@llamaindex/workflow'
-import type { UIMessage as Message } from '@ai-sdk/react'
 import type { JSONValue } from 'llamaindex'
-import z from 'zod'
+
+export const HUMAN_RESPONSE_PART_TYPE = 'data-human_response' as const
 
 export type HumanInputEventData = {
   type: string
@@ -16,9 +16,11 @@ export type HumanInputEventData = {
 export const humanInputEvent = workflowBaseEvent<HumanInputEventData>()
 
 export type HumanResponseEventData = {
-  type: 'human_response'
-  data?: JSONValue
+  type: typeof HUMAN_RESPONSE_PART_TYPE
+  data: JSONValue
 }
+
+export type HumanResponsePart = HumanResponseEventData // keep for backward compatibility
 
 export const humanResponseEvent = workflowBaseEvent<HumanResponseEventData>()
 
