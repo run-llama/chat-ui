@@ -44,7 +44,7 @@ export function CustomChat() {
     >
       <CustomChatMessages />
       <ChatInput
-        additionalMessageParts={attachments}
+        attachments={attachments}
         resetUploadedFiles={reset}
       >
         <div>
@@ -197,10 +197,7 @@ function CustomChat() {
       className="h-screen overflow-hidden p-0 md:p-5"
     >
       <CustomChatMessages />
-      <ChatInput
-        additionalMessageParts={attachments}
-        resetUploadedFiles={reset}
-      >
+      <ChatInput attachments={attachments} resetUploadedFiles={reset}>
         <div>
           {image ? (
             <img

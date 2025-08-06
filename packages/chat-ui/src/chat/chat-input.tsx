@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
   resetUploadedFiles?: () => void
-  additionalMessageParts?: MessagePart[]
+  attachments?: MessagePart[]
 }
 
 interface ChatInputFormProps extends React.PropsWithChildren {
@@ -64,10 +64,7 @@ function ChatInput(props: ChatInputProps) {
     const newMessage: Message = {
       id: uuidv4(),
       role: 'user',
-      parts: [
-        { type: 'text', text: input },
-        ...(props.additionalMessageParts ?? []),
-      ],
+      parts: [{ type: 'text', text: input }, ...(props.attachments ?? [])],
     }
 
     setInput('') // Clear the input
