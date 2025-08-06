@@ -55,6 +55,5 @@ module.exports = {
     '@next/next/no-img-element': 'off',
     'react/jsx-sort-props': 'off',
     'no-template-curly-in-string': 'off',
-    '@typescript-eslint/no-misused-promises': 'off',
   },
 }
