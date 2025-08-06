@@ -3,7 +3,6 @@
 import { ChatMessage } from '@llamaindex/chat-ui'
 import { DynamicEvents } from './custom/events/dynamic-events'
 import { ComponentDef } from './custom/events/types'
-import { ToolAnnotations } from './tools/chat-tools'
 
 export function ChatMessageContent({
   componentDefs,
@@ -14,15 +13,13 @@ export function ChatMessageContent({
 }) {
   return (
     <ChatMessage.Content>
-      <ChatMessage.Content.Event />
-      <ChatMessage.Content.AgentEvent />
-      <ToolAnnotations />
-      <ChatMessage.Content.Image />
       <DynamicEvents componentDefs={componentDefs} appendError={appendError} />
-      <ChatMessage.Content.Markdown />
-      <ChatMessage.Content.DocumentFile />
-      <ChatMessage.Content.Source />
-      <ChatMessage.Content.SuggestedQuestions />
+      <ChatMessage.Part.Event />
+      <ChatMessage.Part.File />
+      <ChatMessage.Part.Markdown />
+      <ChatMessage.Part.Artifact />
+      <ChatMessage.Part.Source />
+      <ChatMessage.Part.Suggestion />
     </ChatMessage.Content>
   )
 }

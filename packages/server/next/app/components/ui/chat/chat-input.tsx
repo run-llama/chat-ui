@@ -14,13 +14,13 @@ export default function CustomChatInput() {
       ? '/api/chat/config/llamacloud'
       : '')
   const {
-    imageUrl,
-    setImageUrl,
+    image,
+    setImage,
     uploadFile,
     files,
     removeDoc,
     reset,
-    getAnnotations,
+    getAttachments,
   } = useFile({ uploadAPI })
 
   /**
@@ -29,7 +29,7 @@ export default function CustomChatInput() {
    */
   const handleUploadFile = async (file: File) => {
     // There's already an image uploaded, only allow one image at a time
-    if (imageUrl) {
+    if (image) {
       alert('You can only upload one image at a time.')
       return
     }
@@ -46,13 +46,13 @@ export default function CustomChatInput() {
   }
 
   // Get references to the upload files in message annotations format, see https://github.com/run-llama/chat-ui/blob/main/packages/chat-ui/src/hook/use-file.tsx#L56
-  const annotations = getAnnotations()
+  const attachments = getAttachments()
 
   return (
-    <ChatInput resetUploadedFiles={reset} annotations={annotations}>
+    <ChatInput resetUploadedFiles={reset} attachments={attachments}>
       {/* Image preview section */}
-      {imageUrl && (
-        <ImagePreview url={imageUrl} onRemove={() => setImageUrl(null)} />
+      {image && (
+        <ImagePreview url={image.url} onRemove={() => setImage(null)} />
       )}
       {/* Document previews section */}
       {files.length > 0 && (
@@ -73,7 +73,7 @@ export default function CustomChatInput() {
         {llamaCloudAPI && <LlamaCloudSelector />}
         <ChatInput.Submit
           disabled={
-            isLoading || (!input.trim() && files.length === 0 && !imageUrl)
+            isLoading || (!input.trim() && files.length === 0 && !image)
           }
         />
       </ChatInput.Form>
