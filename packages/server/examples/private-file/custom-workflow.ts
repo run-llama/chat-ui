@@ -1,5 +1,7 @@
 import { ChatMemoryBuffer, MessageContent, Settings } from 'llamaindex'
 
+import { UIMessage } from '@ai-sdk/react'
+import { FileData, ServerMessage } from '@llamaindex/server'
 import {
   agentStreamEvent,
   createStatefulMiddleware,
@@ -8,13 +10,10 @@ import {
   stopAgentEvent,
   workflowEvent,
 } from '@llamaindex/workflow'
-import { UIMessage } from '@ai-sdk/react'
-import { promises as fsPromises } from 'node:fs'
-import { ServerMessage } from '@llamaindex/server'
 
 const fileHelperEvent = workflowEvent<{
   userInput: MessageContent
-  fileContent: string
+  uploadedFile: FileData
 }>()
 
 /**
@@ -23,21 +22,19 @@ const fileHelperEvent = workflowEvent<{
 export function workflowFactory(reqBody: { messages: UIMessage[] }) {
   const llm = Settings.llm
 
-  // First, extract the uploaded file from the messages
-  const serverMessages = reqBody.messages.map(
-    message => new ServerMessage(message)
-  )
-  const attachments = serverMessages.flatMap(message => message.attachments)
+  // First, extract the last attachment from the last message
+  const lastMessage = reqBody.messages[reqBody.messages.length - 1]
+  const serverMessage = new ServerMessage(lastMessage)
+  const uploadedFile = serverMessage.attachments[0]?.data
 
-  if (attachments.length === 0) {
+  if (!uploadedFile) {
     throw new Error('Please upload a file to start')
   }
 
-  // Then, add the uploaded file info to the workflow state
   const { withState, getContext } = createStatefulMiddleware(() => {
     return {
       memory: new ChatMemoryBuffer({ llm }),
-      uploadedFile: attachments[attachments.length - 1],
+      uploadedFile,
     }
   })
   const workflow = withState(createWorkflow())
@@ -52,15 +49,9 @@ export function workflowFactory(reqBody: { messages: UIMessage[] }) {
     }
     state.memory.put({ role: 'user', content: userInput })
 
-    // Read file content
-    const fileContent = await fsPromises.readFile(
-      state.uploadedFile.path,
-      'utf8'
-    )
-
     return fileHelperEvent.with({
       userInput,
-      fileContent,
+      uploadedFile,
     })
   })
 
@@ -71,15 +62,27 @@ export function workflowFactory(reqBody: { messages: UIMessage[] }) {
     const prompt = `
 You are a helpful assistant that can help the user with their file.
 
-Here is the provided file content:
-${data.fileContent}
-
 Now, let help the user with this request:
 ${data.userInput}
 `
 
-    const response = await llm.complete({
-      prompt,
+    const response = await llm.chat({
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: prompt,
+            },
+            {
+              type: 'file',
+              mimeType: data.uploadedFile.mediaType,
+              data: data.uploadedFile.url,
+            },
+          ],
+        },
+      ],
       stream: true,
     })
 
@@ -87,8 +90,8 @@ ${data.userInput}
     for await (const chunk of response) {
       sendEvent(
         agentStreamEvent.with({
-          delta: chunk.text,
-          response: chunk.text,
+          delta: chunk.delta,
+          response: chunk.delta,
           currentAgentName: 'agent',
           raw: chunk.raw,
         })
