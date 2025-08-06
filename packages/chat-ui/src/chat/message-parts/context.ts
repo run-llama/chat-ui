@@ -62,7 +62,7 @@ export const usePartData = <T>(
  */
 export function extractAllPartData<T>(
   message: Message,
-  partType: 'text' | `data-${string}`,
+  partType: 'text' | `data-${string}` | string,
   extractData: (
     part: MessagePart
   ) => T | null = extractDataFromTextPartOrDataPart

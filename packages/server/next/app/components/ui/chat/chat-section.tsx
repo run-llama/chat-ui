@@ -1,7 +1,8 @@
 'use client'
 
 import { ChatSection as ChatUI, useChatWorkflow } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { useEffect, useMemo, useState } from 'react'
 import { getConfig } from '../lib/utils'
 import { ResizablePanel, ResizablePanelGroup } from '../resizable'
@@ -32,7 +33,9 @@ export default function ChatSection() {
   }
 
   const useChatHandler = useChat({
-    api: getConfig('CHAT_API') || '/api/chat',
+    transport: new DefaultChatTransport({
+      api: getConfig('CHAT_API') || '/api/chat',
+    }),
     onError: handleError,
     experimental_throttle: 100,
   })

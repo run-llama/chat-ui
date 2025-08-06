@@ -5,7 +5,7 @@ import { StarterQuestions } from '@llamaindex/chat-ui/widgets'
 import { getConfig } from '../lib/utils'
 
 export function ChatStarter({ className }: { className?: string }) {
-  const { append, messages, requestData } = useChatUI()
+  const { sendMessage, messages, requestData } = useChatUI()
   const starterQuestionsFromConfig = getConfig('STARTER_QUESTIONS')
 
   const starterQuestions =
@@ -17,7 +17,7 @@ export function ChatStarter({ className }: { className?: string }) {
   if (starterQuestions.length === 0 || messages.length > 0) return null
   return (
     <StarterQuestions
-      append={message => append(message, { data: requestData })}
+      sendMessage={message => sendMessage(message, { body: requestData })}
       questions={starterQuestions}
       className={className}
     />
