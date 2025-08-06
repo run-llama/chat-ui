@@ -1,7 +1,14 @@
 import { stopAgentEvent } from '@llamaindex/workflow'
-import { type Message } from 'ai'
+import { type UIMessage as Message } from '@ai-sdk/react'
 import { IncomingMessage, ServerResponse } from 'http'
-import type { MessageType } from 'llamaindex'
+import type {
+  ChatMessage,
+  MessageContentDetail,
+  MessageContentFileDetail,
+  MessageContentImageDetail,
+  MessageContentTextDetail,
+  MessageType,
+} from 'llamaindex'
 import { type WorkflowFactory } from '../types'
 import { sendSuggestedQuestionsEvent } from '../utils'
 import { getHumanResponsesFromMessage, pauseForHumanInput } from '../utils/hitl'
@@ -12,6 +19,7 @@ import {
 } from '../utils/request'
 import { toDataStream } from '../utils/stream'
 import { processWorkflowStream, runWorkflow } from '../utils/workflow'
+import type { UIDataTypes, UIMessagePart, UITools } from 'ai'
 
 export const handleChat = async (
   req: IncomingMessage,
@@ -31,20 +39,18 @@ export const handleChat = async (
     }
 
     const lastMessage = messages[messages.length - 1]
-    if (lastMessage?.role !== 'user' || !lastMessage.content) {
+    if (lastMessage?.role !== 'user' || !lastMessage.parts.length) {
       return sendJSONResponse(res, 400, {
         error: 'Messages cannot be empty and last message must be from user',
       })
     }
 
-    const chatHistory = messages.map(message => ({
-      role: message.role as MessageType,
-      content: message.content,
-    }))
+    const userInput = aiMessageToLLaIndexMessage(lastMessage).content
+    const chatHistory: ChatMessage[] = messages.map(aiMessageToLLaIndexMessage)
 
     const context = await runWorkflow({
       workflow: await workflowFactory(body),
-      input: { userInput: lastMessage.content, chatHistory },
+      input: { userInput, chatHistory },
       human: {
         snapshotId: requestId, // use requestId to restore snapshot
         responses: getHumanResponsesFromMessage(lastMessage),
@@ -81,4 +87,29 @@ export const handleChat = async (
       detail: (error as Error).message || 'Internal server error',
     })
   }
+}
+
+function aiMessageToLLaIndexMessage(message: Message): ChatMessage {
+  return {
+    role: message.role as MessageType,
+    content: message.parts
+      .map(aiMessagePartToLlamaIndexMessageContentDetail)
+      .filter(Boolean) as MessageContentDetail[],
+  }
+}
+
+function aiMessagePartToLlamaIndexMessageContentDetail(
+  part: UIMessagePart<UIDataTypes, UITools>
+): MessageContentDetail | null {
+  if (part.type === 'text') {
+    return { type: 'text', text: part.text } as MessageContentTextDetail
+  }
+
+  // TODO: add more to adapt to other part types
+
+  console.warn(
+    'Failed to convert to LLamaIndex message. Unsupported part type:',
+    part
+  )
+  return null
 }

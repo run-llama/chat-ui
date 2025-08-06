@@ -37,8 +37,8 @@ export type DataPart = {
   data: any
 }
 
-// User can have various parts, so we need to allow any parts
-// See many specific MessagePart types from Vercel AI SDK here:
+// User can have other parts that are not in type 'text' or 'data'.
+// Example: dynamic events (type = 'ui_event') or specific parts from Vercel AI SDK. See more details here:
 // https://github.com/vercel/ai/blob/7948ec215d21675c1100edf58af8bb03a1f1dbe4/packages/ai/src/ui/ui-messages.ts#L75-L272
 export type AnyPart<T extends string = any> = {
   id?: string
