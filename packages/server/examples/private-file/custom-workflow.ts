@@ -9,7 +9,7 @@ import {
   stopAgentEvent,
   workflowEvent,
 } from '@llamaindex/workflow'
-import { Message } from 'ai'
+import { UIMessage as Message } from '@ai-sdk/react'
 import { promises as fsPromises } from 'node:fs'
 
 const fileHelperEvent = workflowEvent<{
@@ -24,6 +24,7 @@ export function workflowFactory(reqBody: { messages: Message[] }) {
   const llm = Settings.llm
 
   // First, extract the uploaded file from the messages
+  // TODO: remove. file should be a part of message parts
   const attachments = extractFileAttachments(reqBody.messages)
 
   if (attachments.length === 0) {

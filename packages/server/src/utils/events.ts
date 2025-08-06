@@ -1,6 +1,6 @@
+import type { UIMessage as Message } from '@ai-sdk/react'
 import { randomUUID } from '@llamaindex/env'
 import { workflowEvent } from '@llamaindex/workflow'
-import type { Message } from 'ai'
 import {
   MetadataMode,
   type ChatMessage,
@@ -224,26 +224,15 @@ export function extractLastArtifact(
   return artifacts[artifacts.length - 1]
 }
 
-export const fileAnnotationSchema = z.object({
-  id: z.string(),
-  size: z.number(),
-  type: z.string(),
-  url: z.string(),
-})
-
-export const documentFileAnnotationSchema = z.object({
-  type: z.literal('document_file'),
-  data: z.object({
-    files: z.array(fileAnnotationSchema),
-  }),
-})
-type DocumentFileAnnotation = z.infer<typeof documentFileAnnotationSchema>
-
-export type FileAnnotation = z.infer<typeof fileAnnotationSchema>
-
-export type ServerFile = FileAnnotation & {
+export type ServerFile = {
   path: string
+  id: string
+  size: number
+  type: string
+  url: string
 }
+
+const FilePartType = 'data-file'
 
 /**
  * Extract file attachments from an user message.
@@ -254,16 +243,17 @@ export function extractFileAttachmentsFromMessage(
   message: Message
 ): ServerFile[] {
   const fileAttachments: ServerFile[] = []
-  if (message.role === 'user' && message.annotations) {
-    for (const annotation of message.annotations) {
-      if (documentFileAnnotationSchema.safeParse(annotation).success) {
-        const { data } = annotation as DocumentFileAnnotation
-        for (const file of data.files) {
-          fileAttachments.push({
-            ...file,
-            path: getStoredFilePath({ id: file.id }),
-          })
-        }
+  if (message.role === 'user' && message.parts.length) {
+    for (const part of message.parts) {
+      if (part.type === FilePartType) {
+        const file = part.data as ServerFile
+        fileAttachments.push({
+          id: file.id,
+          size: file.size,
+          type: file.type,
+          url: file.url,
+          path: getStoredFilePath({ id: file.id }),
+        })
       }
     }
   }

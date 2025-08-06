@@ -1,6 +1,6 @@
 import { extractFileAttachments, getStoredFilePath } from '@llamaindex/server'
 import { agent } from '@llamaindex/workflow'
-import { type Message } from 'ai'
+import { type UIMessage as Message } from '@ai-sdk/react'
 import { tool } from 'llamaindex'
 import { promises as fsPromises } from 'node:fs'
 import { z } from 'zod'
