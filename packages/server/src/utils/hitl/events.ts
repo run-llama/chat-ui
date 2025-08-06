@@ -20,7 +20,9 @@ export type HumanResponseEventData = {
   data: JSONValue
 }
 
-export type HumanResponsePart = HumanResponseEventData // keep for backward compatibility
+export type HumanResponsePart = HumanResponseEventData & {
+  id?: string
+}
 
 export const humanResponseEvent = workflowBaseEvent<HumanResponseEventData>()
 

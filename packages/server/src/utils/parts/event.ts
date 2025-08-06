@@ -10,6 +10,7 @@ export type EventData = {
 }
 
 export type EventPart = {
+  id?: string
   type: typeof EVENT_PART_TYPE
   data: EventData
 }

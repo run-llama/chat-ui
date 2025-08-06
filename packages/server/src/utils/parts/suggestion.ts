@@ -7,6 +7,7 @@ export const SUGGESTION_PART_TYPE = `data-suggested_questions` as const
 export type SuggestionData = string[]
 
 export type SuggestionPart = {
+  id?: string
   type: typeof SUGGESTION_PART_TYPE
   data: SuggestionData
 }

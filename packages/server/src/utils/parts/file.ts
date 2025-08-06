@@ -9,6 +9,7 @@ export type FileData = {
 }
 
 export type FilePart = {
+  id?: string
   type: typeof FILE_PART_TYPE
   data: FileData
 }

@@ -11,6 +11,7 @@ export type Artifact<T = unknown> = {
 }
 
 export type ArtifactPart = {
+  id?: string
   type: typeof ARTIFACT_PART_TYPE
   data: Artifact
 }

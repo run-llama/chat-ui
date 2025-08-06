@@ -17,10 +17,13 @@ export type SourceEvent = {
   nodes: SourceEventNode[]
 }
 
-export const sourceEvent = workflowEvent<{
+export type SourceEventPart = {
+  id?: string
   type: typeof SOURCE_EVENT_TYPE
   data: SourceEvent
-}>()
+}
+
+export const sourceEvent = workflowEvent<SourceEventPart>()
 
 export function toSourceEvent(
   sourceNodes: NodeWithScore<Metadata>[] = [],
