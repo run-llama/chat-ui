@@ -15,5 +15,5 @@ export function FilePartUI({ className }: { className?: string }) {
   if (!file) return null
 
   const alignmentClass = message.role === 'user' ? 'ml-auto' : 'mr-auto'
-  return <ChatFile file={file} className={cn(alignmentClass, className)} />
+  return <ChatFile file={file.data} className={cn(alignmentClass, className)} />
 }

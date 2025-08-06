@@ -59,7 +59,11 @@ You can also create your own custom parts.
   '**file**: Here is the demo of a file part',
   {
     type: 'file',
-    data: { name: 'upload.pdf', url: 'https://pdfobject.com/pdf/sample.pdf' },
+    data: {
+      filename: 'upload.pdf',
+      mediaType: 'application/pdf',
+      url: 'https://pdfobject.com/pdf/sample.pdf',
+    },
   },
 
   '**event**: Here is the demo of event parts. The second event part will override the first one because they have the same id',

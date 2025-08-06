@@ -127,10 +127,9 @@ const initialMessages: Message[] = [
       {
         type: 'data-file',
         data: {
-          name: 'llama.png',
+          filename: 'llama.png',
+          mediaType: 'image/png',
           url: '/llama.png',
-          mimeType: 'image/png',
-          size: 1000,
         },
       },
     ],
@@ -151,10 +150,9 @@ const initialMessages: Message[] = [
       {
         type: 'data-file',
         data: {
-          name: 'sample.pdf',
+          filename: 'sample.pdf',
+          mediaType: 'application/pdf',
           url: 'https://pdfobject.com/pdf/sample.pdf',
-          mimeType: 'application/pdf',
-          size: 1000,
         },
       },
     ],

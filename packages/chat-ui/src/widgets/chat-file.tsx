@@ -4,9 +4,12 @@ import { DocxIcon } from '../ui/icons/docx'
 import { PDFIcon } from '../ui/icons/pdf'
 import { SheetIcon } from '../ui/icons/sheet'
 import { TxtIcon } from '../ui/icons/txt'
-import { FilePart } from '../chat/message-parts/types.js'
 
-export type FileData = Omit<FilePart, 'type'>
+export type FileData = {
+  filename: string
+  mediaType: string // https://www.iana.org/assignments/media-types/media-types.xhtml
+  url: string // can be a URL to a hosted file or a [Data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs).
+}
 
 const FileIconMap: Record<string, React.ReactNode> = {
   csv: <SheetIcon />,
