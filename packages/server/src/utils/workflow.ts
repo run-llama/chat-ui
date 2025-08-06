@@ -14,7 +14,6 @@ import {
   type NodeWithScore,
 } from 'llamaindex'
 import {
-  artifactEvent,
   sourceEvent,
   toAgentRunEvent,
   toSourceEvent,
@@ -25,7 +24,6 @@ import {
   resumeWorkflowFromHumanResponses,
   type HumanResponseEventData,
 } from './hitl/index'
-import { toInlineAnnotationEvent } from './inline'
 
 export async function runWorkflow({
   workflow,
@@ -93,10 +91,6 @@ export function processWorkflowStream(
                 rawOutput.sourceNodes as unknown as NodeWithScore<Metadata>[]
               transformedEvent = toSourceEvent(sourceNodes, llamaCloudOutputDir)
             }
-          }
-          // Handle artifact events, transform to agentStreamEvent
-          else if (artifactEvent.include(event)) {
-            transformedEvent = toInlineAnnotationEvent(event)
           }
           // Post-process for llama-cloud files
           if (sourceEvent.include(transformedEvent)) {

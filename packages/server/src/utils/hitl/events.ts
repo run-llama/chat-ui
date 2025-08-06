@@ -3,7 +3,7 @@ import {
   type WorkflowEventData,
   workflowEvent,
 } from '@llamaindex/workflow'
-import type { Message } from 'ai'
+import type { UIMessage as Message } from '@ai-sdk/react'
 import type { JSONValue } from 'llamaindex'
 import z from 'zod'
 
@@ -22,16 +22,6 @@ export type HumanResponseEventData = {
 
 export const humanResponseEvent = workflowBaseEvent<HumanResponseEventData>()
 
-// helper function to extract human responses from message annotations
-export const getHumanResponsesFromMessage = (message: Message) => {
-  const schema = z.object({ type: z.literal('human_response'), data: z.any() })
-  return (
-    message.annotations?.filter(
-      (annotation): annotation is z.infer<typeof schema> =>
-        schema.safeParse(annotation).success
-    ) ?? []
-  )
-}
 // TODO: move to llama-flow package
 export type BaseEvent<K> = (<T extends K>() => WorkflowEvent<T>) &
   WorkflowEvent<K>

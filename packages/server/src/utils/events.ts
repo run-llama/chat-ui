@@ -1,15 +1,9 @@
-import type { UIMessage as Message } from '@ai-sdk/react'
+import type { UIMessage as Message, UIMessage } from '@ai-sdk/react'
 import { randomUUID } from '@llamaindex/env'
 import { workflowEvent } from '@llamaindex/workflow'
-import {
-  MetadataMode,
-  type ChatMessage,
-  type Metadata,
-  type NodeWithScore,
-} from 'llamaindex'
+import { MetadataMode, type Metadata, type NodeWithScore } from 'llamaindex'
 import { z } from 'zod'
 import { getStoredFilePath } from './file'
-import { getInlineAnnotations } from './inline'
 
 // Events that appended to stream as annotations
 export type SourceEventNode = {
@@ -162,18 +156,21 @@ export const artifactAnnotationSchema = z.object({
   data: artifactSchema,
 })
 
-export function extractArtifactsFromMessage(message: ChatMessage): Artifact[] {
-  const inlineAnnotations = getInlineAnnotations(message)
-  const artifacts = inlineAnnotations.filter(
-    (annotation): annotation is z.infer<typeof artifactAnnotationSchema> => {
-      return artifactAnnotationSchema.safeParse(annotation).success
-    }
-  )
-  return artifacts.map(artifact => artifact.data)
+const ArtifactPartType = 'data-artifact'
+
+type ArtifactPart = {
+  type: typeof ArtifactPartType
+  data: Artifact
+}
+
+export function extractArtifactsFromMessage(message: UIMessage): Artifact[] {
+  return message.parts
+    .filter((part): part is ArtifactPart => part.type === ArtifactPartType)
+    .map(part => part.data)
 }
 
 export function extractArtifactsFromAllMessages(
-  messages: ChatMessage[]
+  messages: UIMessage[]
 ): Artifact[] {
   return messages
     .flatMap(message => extractArtifactsFromMessage(message))
@@ -199,7 +196,7 @@ export function extractLastArtifact(
   requestBody: unknown,
   type?: ArtifactType
 ): CodeArtifact | DocumentArtifact | Artifact | undefined {
-  const { messages } = (requestBody as { messages?: ChatMessage[] }) ?? {}
+  const { messages } = (requestBody as { messages?: UIMessage[] }) ?? {}
   if (!messages) return undefined
 
   const artifacts = extractArtifactsFromAllMessages(messages)

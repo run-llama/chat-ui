@@ -1,4 +1,3 @@
-import { extractFileAttachments } from '@llamaindex/server'
 import { ChatMemoryBuffer, MessageContent, Settings } from 'llamaindex'
 
 import {
@@ -9,8 +8,9 @@ import {
   stopAgentEvent,
   workflowEvent,
 } from '@llamaindex/workflow'
-import { UIMessage as Message } from '@ai-sdk/react'
+import { UIMessage } from '@ai-sdk/react'
 import { promises as fsPromises } from 'node:fs'
+import { ServerMessage } from '@llamaindex/server'
 
 const fileHelperEvent = workflowEvent<{
   userInput: MessageContent
@@ -20,12 +20,14 @@ const fileHelperEvent = workflowEvent<{
 /**
  * This is an simple workflow to demonstrate how to use uploaded files in the workflow.
  */
-export function workflowFactory(reqBody: { messages: Message[] }) {
+export function workflowFactory(reqBody: { messages: UIMessage[] }) {
   const llm = Settings.llm
 
   // First, extract the uploaded file from the messages
-  // TODO: remove. file should be a part of message parts
-  const attachments = extractFileAttachments(reqBody.messages)
+  const serverMessages = reqBody.messages.map(
+    message => new ServerMessage(message)
+  )
+  const attachments = serverMessages.flatMap(message => message.attachments)
 
   if (attachments.length === 0) {
     throw new Error('Please upload a file to start')

@@ -1,23 +1,21 @@
-import { type UIMessage as Message } from '@ai-sdk/react'
+import { type UIMessage } from '@ai-sdk/react'
 import { stopAgentEvent } from '@llamaindex/workflow'
-import type { UIDataTypes, UIMessagePart, UITools } from 'ai'
 import { IncomingMessage, ServerResponse } from 'http'
-import type {
-  ChatMessage,
-  MessageContentDetail,
-  MessageContentTextDetail,
-  MessageType,
-} from 'llamaindex'
+import type { ChatMessage, MessageType } from 'llamaindex'
 import { type WorkflowFactory } from '../types'
-import { sendSuggestedQuestionsEvent } from '../utils'
-import { getHumanResponsesFromMessage, pauseForHumanInput } from '../utils/hitl'
+import {
+  processWorkflowStream,
+  runWorkflow,
+  sendSuggestedQuestionsEvent,
+  ServerMessage,
+  toDataStream,
+} from '../utils'
+import { pauseForHumanInput } from '../utils/hitl'
 import {
   parseRequestBody,
   pipeStreamToResponse,
   sendJSONResponse,
 } from '../utils/request'
-import { toDataStream } from '../utils/stream'
-import { processWorkflowStream, runWorkflow } from '../utils/workflow'
 
 export const handleChat = async (
   req: IncomingMessage,
@@ -32,7 +30,7 @@ export const handleChat = async (
   try {
     const body = await parseRequestBody(req)
     const { messages, id: requestId } = body as {
-      messages: Message[]
+      messages: UIMessage[]
       id?: string
     }
 
@@ -43,15 +41,19 @@ export const handleChat = async (
       })
     }
 
-    const userInput = aiMessageToLLaIndexMessage(lastMessage).content
-    const chatHistory: ChatMessage[] = messages.map(aiMessageToLLaIndexMessage)
+    const serverMessage = new ServerMessage(lastMessage)
+
+    const userInput = serverMessage.llamaindexMessage.content
+    const chatHistory: ChatMessage[] = messages.map(
+      message => new ServerMessage(message).llamaindexMessage
+    )
 
     const context = await runWorkflow({
       workflow: await workflowFactory(body),
       input: { userInput, chatHistory },
       human: {
         snapshotId: requestId, // use requestId to restore snapshot
-        responses: getHumanResponsesFromMessage(lastMessage),
+        responses: serverMessage.humanResponse,
       },
     })
 
@@ -85,25 +87,4 @@ export const handleChat = async (
       detail: (error as Error).message || 'Internal server error',
     })
   }
-}
-
-function aiMessageToLLaIndexMessage(message: Message): ChatMessage {
-  return {
-    role: message.role as MessageType,
-    content: message.parts
-      .map(aiMessagePartToLlamaIndexMessageContentDetail)
-      .filter(Boolean) as MessageContentDetail[],
-  }
-}
-
-function aiMessagePartToLlamaIndexMessageContentDetail(
-  part: UIMessagePart<UIDataTypes, UITools>
-): MessageContentDetail | null {
-  if (part.type === 'text') {
-    return { type: 'text', text: part.text } as MessageContentTextDetail
-  }
-
-  // TODO: add more to adapt to other part types
-
-  return null
 }
