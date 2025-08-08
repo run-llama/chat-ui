@@ -1,16 +1,13 @@
 import { type UIMessage } from '@ai-sdk/react'
 import { stopAgentEvent } from '@llamaindex/workflow'
 import { IncomingMessage, ServerResponse } from 'http'
-import type { ChatMessage, MessageType } from 'llamaindex'
+import type { ChatMessage } from 'llamaindex'
 import { type WorkflowFactory } from '../types'
 import {
-  processWorkflowStream,
+  llamaindexWorkflowEventsToSSE,
   runWorkflow,
-  sendSuggestedQuestionsEvent,
   ServerMessage,
-  toDataStream,
 } from '../utils'
-import { pauseForHumanInput } from '../utils/hitl'
 import {
   parseRequestBody,
   pipeStreamToResponse,
@@ -48,6 +45,7 @@ export const handleChat = async (
       message => new ServerMessage(message).llamaindexMessage
     )
 
+    // run workflow
     const context = await runWorkflow({
       workflow: await workflowFactory(body),
       input: { userInput, chatHistory },
@@ -57,30 +55,35 @@ export const handleChat = async (
       },
     })
 
-    const stream = processWorkflowStream(
-      context.stream,
-      llamaCloudOutputDir
-    ).until(
+    // get workflow stream
+    const workflowStream = context.stream.until(
       event => abortController.signal.aborted || stopAgentEvent.include(event)
     )
 
-    const dataStream = toDataStream(stream, {
-      callbacks: {
-        onPauseForHumanInput: async responseEvent => {
-          await pauseForHumanInput(context, responseEvent, requestId) // use requestId to save snapshot
-        },
-        onFinal: async (completion, dataStreamWriter) => {
-          chatHistory.push({
-            role: 'assistant' as MessageType,
-            content: completion,
-          })
-          if (suggestNextQuestions) {
-            await sendSuggestedQuestionsEvent(dataStreamWriter, chatHistory)
-          }
-        },
-      },
-    })
-    pipeStreamToResponse(res, dataStream)
+    // transform workflow stream to SSE stream
+    const sseStream = workflowStream.pipeThrough(
+      llamaindexWorkflowEventsToSSE()
+    )
+
+    // pipe sse stream to response
+    pipeStreamToResponse(res, sseStream)
+
+    // const dataStream = toDataStream(stream, {
+    //   callbacks: {
+    //     onPauseForHumanInput: async responseEvent => {
+    //       await pauseForHumanInput(context, responseEvent, requestId) // use requestId to save snapshot
+    //     },
+    //     onFinal: async (completion, dataStreamWriter) => {
+    //       chatHistory.push({
+    //         role: 'assistant' as MessageType,
+    //         content: completion,
+    //       })
+    //       if (suggestNextQuestions) {
+    //         await sendSuggestedQuestionsEvent(dataStreamWriter, chatHistory)
+    //       }
+    //     },
+    //   },
+    // })
   } catch (error) {
     console.error('Chat handler error:', error)
     return sendJSONResponse(res, 500, {

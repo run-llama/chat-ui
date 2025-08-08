@@ -151,55 +151,6 @@ export function llamaindexWorkflowEventsToSSE(
   })
 }
 
-export function processWorkflowStream(
-  stream: WorkflowStream<WorkflowEventData<unknown>>,
-  llamaCloudOutputDir?: string
-) {
-  return stream.pipeThrough(
-    new TransformStream<WorkflowEventData<unknown>, WorkflowEventData<unknown>>(
-      {
-        async transform(event, controller) {
-          let transformedEvent = event
-
-          // Handle agent events from AgentToolCall
-          if (agentToolCallEvent.include(event)) {
-            const inputString = JSON.stringify(event.data.toolKwargs)
-            transformedEvent = runEvent.with({
-              type: 'data-event',
-              data: {
-                title: `Agent Tool Call: ${event.data.agentName}`,
-                description: `Using tool: '${event.data.toolName}' with inputs: '${inputString}'`,
-                status: 'pending',
-                data: event.data,
-              },
-            })
-          }
-          // Handle source nodes from AgentToolCallResult
-          else if (agentToolCallResultEvent.include(event)) {
-            const rawOutput = event.data.raw
-            if (
-              rawOutput &&
-              typeof rawOutput === 'object' &&
-              'sourceNodes' in rawOutput // TODO: better use Zod to validate and extract sourceNodes from toolCallResult
-            ) {
-              const sourceNodes =
-                rawOutput.sourceNodes as unknown as NodeWithScore<Metadata>[]
-              transformedEvent = toSourceEvent(sourceNodes, llamaCloudOutputDir)
-            }
-          }
-          // Post-process for llama-cloud files
-          if (sourceEvent.include(transformedEvent)) {
-            const sourceNodesForDownload = transformedEvent.data.data.nodes // These are SourceEventNode[]
-            downloadLlamaCloudFilesFromNodes(sourceNodesForDownload) // download files in background
-          }
-
-          controller.enqueue(transformedEvent)
-        },
-      }
-    )
-  )
-}
-
 async function downloadLlamaCloudFilesFromNodes(nodes: SourceEventNode[]) {
   const downloadedFiles: string[] = []
 
