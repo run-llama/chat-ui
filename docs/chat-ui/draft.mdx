@@ -22,7 +22,7 @@ export const artifactEvent = workflowEvent<ArtifactPart>()
 4. Process workflow stream to transform events to SSE format (content-type: text/event-stream)
 
 ```ts
-;`data: JSON.stringify(part)\n\n`
+`data: JSON.stringify(part)\n\n`
 ```
 
 5. Vercel AI SDK will parse the stream and convert event back to parts inside new assistant message.
