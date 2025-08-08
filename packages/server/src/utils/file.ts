@@ -1,6 +1,8 @@
+import { LLamaCloudFileService } from 'llamaindex'
 import fs from 'node:fs'
 import https from 'node:https'
 import path from 'node:path'
+import type { SourceEventNode } from './parts'
 
 export async function downloadFile(
   urlToDownload: string,
@@ -67,4 +69,26 @@ export function getStoredFilePath({
   // Use path.join to construct the default directory for cross-platform compatibility
   const directory = saveDir ?? path.join('output', 'uploaded')
   return path.join(directory, id)
+}
+
+export async function downloadLlamaCloudFilesFromNodes(
+  nodes: SourceEventNode[]
+) {
+  const downloadedFiles: string[] = []
+
+  for (const node of nodes) {
+    if (!node.url || !node.filePath) continue // skip if url or filePath is not available
+    if (downloadedFiles.includes(node.filePath)) continue // skip if file already downloaded
+    if (!node.metadata.pipeline_id) continue // only download files from LlamaCloud
+
+    const downloadUrl = await LLamaCloudFileService.getFileUrl(
+      node.metadata.pipeline_id,
+      node.fileName
+    )
+    if (!downloadUrl) continue
+
+    await downloadFile(downloadUrl, node.filePath)
+
+    downloadedFiles.push(node.filePath)
+  }
 }

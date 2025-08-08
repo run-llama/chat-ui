@@ -1,5 +1,10 @@
 import { workflowEvent } from '@llamaindex/workflow'
-import { MetadataMode, type Metadata, type NodeWithScore } from 'llamaindex'
+import {
+  MetadataMode,
+  type JSONValue,
+  type Metadata,
+  type NodeWithScore,
+} from 'llamaindex'
 
 export const SOURCE_EVENT_TYPE = `data-sources` as const
 
@@ -24,6 +29,20 @@ export type SourceEventPart = {
 }
 
 export const sourceEvent = workflowEvent<SourceEventPart>()
+
+export function getSourceNodesFromToolOutput(
+  toolOutput: JSONValue
+): NodeWithScore<Metadata>[] {
+  if (
+    toolOutput != null &&
+    typeof toolOutput === 'object' &&
+    'sourceNodes' in toolOutput &&
+    Array.isArray(toolOutput.sourceNodes)
+  ) {
+    return toolOutput.sourceNodes as unknown as NodeWithScore<Metadata>[]
+  }
+  return []
+}
 
 export function toSourceEvent(
   sourceNodes: NodeWithScore<Metadata>[] = [],

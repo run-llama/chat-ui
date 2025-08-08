@@ -4,7 +4,8 @@ import { IncomingMessage, ServerResponse } from 'http'
 import type { ChatMessage } from 'llamaindex'
 import { type WorkflowFactory } from '../types'
 import {
-  llamaindexWorkflowEventsToSSE,
+  downloadLlamaCloudFilesFromNodes,
+  pauseForHumanInput,
   runWorkflow,
   ServerMessage,
 } from '../utils'
@@ -13,6 +14,7 @@ import {
   pipeStreamToResponse,
   sendJSONResponse,
 } from '../utils/request'
+import { AgentWorkflowAdapter, LlamaIndexServerAdapter } from '../utils/stream'
 
 export const handleChat = async (
   req: IncomingMessage,
@@ -55,35 +57,31 @@ export const handleChat = async (
       },
     })
 
-    // get workflow stream
+    // get workflow stream from workflow context
     const workflowStream = context.stream.until(
       event => abortController.signal.aborted || stopAgentEvent.include(event)
     )
 
     // transform workflow stream to SSE stream
-    const sseStream = workflowStream.pipeThrough(
-      llamaindexWorkflowEventsToSSE()
-    )
+    const stream = workflowStream
+      .pipeThrough(AgentWorkflowAdapter.processAgentStreamEvents())
+      .pipeThrough(AgentWorkflowAdapter.processAgentToolCallEvents())
+      .pipeThrough(
+        AgentWorkflowAdapter.processSourceNodesFromToolResult({
+          onDetectSourceNodes: downloadLlamaCloudFilesFromNodes,
+        })
+      )
+      .pipeThrough(
+        LlamaIndexServerAdapter.processHumanEvents({
+          onPause: async responseEvent => {
+            await pauseForHumanInput(context, responseEvent, requestId) // use requestId to save snapshot
+          },
+        })
+      )
+      .pipeThrough(LlamaIndexServerAdapter.toSSE())
 
-    // pipe sse stream to response
-    pipeStreamToResponse(res, sseStream)
-
-    // const dataStream = toDataStream(stream, {
-    //   callbacks: {
-    //     onPauseForHumanInput: async responseEvent => {
-    //       await pauseForHumanInput(context, responseEvent, requestId) // use requestId to save snapshot
-    //     },
-    //     onFinal: async (completion, dataStreamWriter) => {
-    //       chatHistory.push({
-    //         role: 'assistant' as MessageType,
-    //         content: completion,
-    //       })
-    //       if (suggestNextQuestions) {
-    //         await sendSuggestedQuestionsEvent(dataStreamWriter, chatHistory)
-    //       }
-    //     },
-    //   },
-    // })
+    // pipe stream to response
+    pipeStreamToResponse(res, stream)
   } catch (error) {
     console.error('Chat handler error:', error)
     return sendJSONResponse(res, 500, {
