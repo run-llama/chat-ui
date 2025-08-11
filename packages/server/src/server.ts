@@ -101,8 +101,8 @@ export default {
     // so that we need to update basePath for them
     const constantsContent = fs.readFileSync(constantsFile, 'utf8')
     const newConstantsContent = constantsContent.replace(
-      'export const BASE_PATH = ""',
-      `export const BASE_PATH = "${basePath}"`
+      "export const BASE_PATH = ''",
+      `export const BASE_PATH = '${basePath}'`
     )
     fs.writeFileSync(constantsFile, newConstantsContent, 'utf8')
   }
