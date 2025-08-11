@@ -1,12 +1,19 @@
 'use client'
 
 import { getParts, JSONValue, useChatMessage } from '@llamaindex/chat-ui'
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { DynamicComponentErrorBoundary } from './error-boundary'
 import { ComponentDef } from './types'
 
 type EventComponent = ComponentDef & {
   events: JSONValue[]
+}
+
+const DYNAMIC_EVENT_TYPE_PREFIX = 'data-'
+
+type DynamicEventPart = {
+  type: `data-${string}`
+  data: JSONValue
 }
 
 export const DynamicEvents = ({
@@ -26,10 +33,14 @@ export const DynamicEvents = ({
   }
 
   const components: EventComponent[] = componentDefs
+    .map(comp => ({
+      ...comp,
+      type: `${DYNAMIC_EVENT_TYPE_PREFIX}${comp.type}`, // adding data- prefix to make it a data part
+    }))
     .map(comp => {
-      const events = getParts(message, comp.type)
-      if (!events?.length) return null
-      return { ...comp, events }
+      const dynamicEventParts = getParts<DynamicEventPart>(message, comp.type)
+      if (!dynamicEventParts?.length) return null
+      return { ...comp, events: dynamicEventParts.map(part => part.data) }
     })
     .filter(comp => comp !== null)
 
