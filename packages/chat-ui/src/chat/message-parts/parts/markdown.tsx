@@ -5,7 +5,6 @@ import {
   LanguageRendererProps,
   Markdown,
   preprocessSourceNodes,
-  SourceData,
 } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
 import { SourcesPartType, TextPartType } from '../types.js'

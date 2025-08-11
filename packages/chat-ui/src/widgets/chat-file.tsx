@@ -47,7 +47,7 @@ export function ChatFile({
         {file.url && isImage ? (
           <img
             src={file.url}
-            alt="image"
+            alt="uploaded-image"
             className="h-full w-full object-cover"
           />
         ) : (

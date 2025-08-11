@@ -1,9 +1,7 @@
 import { Message } from '../chat.interface'
 import {
-  AnyPart,
   ArtifactPart,
   ArtifactPartType,
-  DataPart,
   EventPart,
   EventPartType,
   FilePart,
@@ -16,42 +14,6 @@ import {
   TextPart,
   TextPartType,
 } from './types'
-
-export class PartValidator {
-  static isTextPart(part: MessagePart): part is TextPart {
-    return part.type === TextPartType && 'text' in part
-  }
-
-  static isFilePart(part: MessagePart): part is FilePart {
-    return part.type === FilePartType && 'mediaType' in part && 'url' in part
-  }
-
-  static isDataPart(part: MessagePart): part is DataPart {
-    return part.type.startsWith('data-') && 'data' in part
-  }
-
-  static isArtifactPart(part: MessagePart): part is ArtifactPart {
-    return this.isDataPart(part) && part.type === ArtifactPartType
-  }
-
-  static isEventPart(part: MessagePart): part is EventPart {
-    return this.isDataPart(part) && part.type === EventPartType
-  }
-
-  static isSourcesPart(part: MessagePart): part is SourcesPart {
-    return this.isDataPart(part) && part.type === SourcesPartType
-  }
-
-  static isSuggestionPart(part: MessagePart): part is SuggestionPart {
-    return this.isDataPart(part) && part.type === SuggestionPartType
-  }
-
-  static isAnyPart(part: MessagePart): part is AnyPart {
-    return (
-      !this.isTextPart(part) && !this.isFilePart(part) && !this.isDataPart(part)
-    )
-  }
-}
 
 // Function overloads for automatic type inference
 export function getParts(

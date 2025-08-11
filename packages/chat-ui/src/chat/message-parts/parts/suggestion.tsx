@@ -7,7 +7,7 @@ import { SuggestionPartType } from '../types.js'
 /**
  * Render a suggested questions part inside a ChatMessage, return null if current part is not suggested questions type
  * This component is useful to show a list of suggested questions from the assistant.
- * @param props.className - custom styles for the suggested questions
+ * @param className - custom styles for the suggested questions
  */
 export function SuggestionPartUI({ className }: { className?: string }) {
   const { sendMessage, requestData } = useChatUI()
