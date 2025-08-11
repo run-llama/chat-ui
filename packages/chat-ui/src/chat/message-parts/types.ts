@@ -1,10 +1,8 @@
-import {
-  ChatEvent,
-  SourceData,
-  SuggestedQuestionsData,
-  FileData,
-} from '../../widgets'
-import { Artifact } from '../canvas/artifacts'
+import { type FileData } from '../../widgets/chat-file'
+import { type Artifact } from '../canvas/artifacts'
+import { type ChatEvent } from '../../widgets/chat-event'
+import { type SourceData } from '../../widgets/chat-sources'
+import { type SuggestedQuestionsData } from '../../widgets/suggested-questions'
 
 export type MessagePart = TextPart | DataPart | FilePart | AnyPart
 
