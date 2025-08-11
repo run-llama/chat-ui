@@ -1,11 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ArtifactPartType, SourcesPartType } from '../../chat/message-parts'
 import { transformEventToMessageParts } from '../../hook/use-chat-workflow/helper'
-import { WorkflowEventType, WorkflowEvent } from '../../hook/use-workflow/types'
-import {
-  ArtifactPartType,
-  EventPartType,
-  SourcesPartType,
-} from '../../chat/message-parts'
+import { WorkflowEvent, WorkflowEventType } from '../../hook/use-workflow/types'
 
 describe('useChatWorkflow - transformEventToMessageParts', () => {
   beforeEach(() => {
