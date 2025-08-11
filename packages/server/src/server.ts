@@ -13,8 +13,8 @@ import type {
   LlamaIndexServerOptions,
 } from './types'
 
-const nextDir = path.join(__dirname, '..', 'server')
-const configFile = path.join(__dirname, '..', 'server', 'public', 'config.js')
+const nextDir = path.join(__dirname, '..', 'next')
+const configFile = path.join(__dirname, '..', 'next', 'public', 'config.js')
 const nextConfigFile = path.join(nextDir, 'next.config.ts')
 const constantsFile = path.join(nextDir, 'app', 'constants.ts')
 const dev = process.env.NODE_ENV !== 'production'

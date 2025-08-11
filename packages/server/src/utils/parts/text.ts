@@ -1,6 +1,11 @@
 import { randomUUID } from '@llamaindex/env'
 import { workflowEvent, type WorkflowEventData } from '@llamaindex/workflow'
-import type { ChatResponseChunk } from 'llamaindex'
+import type {
+  ChatMessage,
+  ChatResponseChunk,
+  MessageContent,
+  MessageContentTextDetail,
+} from 'llamaindex'
 
 export const TEXT_START_PART_TYPE = 'text-start'
 export const TEXT_DELTA_PART_TYPE = 'text-delta'
@@ -64,4 +69,19 @@ export async function streamText(
   }
 
   return response
+}
+
+/**
+ * Extract the text content from LlamaIndex message content
+ * @param message - The LlamaIndex message
+ * @returns The text content of the message
+ */
+export function getMessageTextContent(message: MessageContent) {
+  if (typeof message === 'string') {
+    return message
+  }
+  return message
+    .filter((part): part is MessageContentTextDetail => part.type === 'text')
+    .map(part => part.text)
+    .join('\n\n')
 }

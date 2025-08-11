@@ -1,4 +1,8 @@
-import { artifactEvent, ServerMessage } from '@llamaindex/server'
+import {
+  artifactEvent,
+  getMessageTextContent,
+  ServerMessage,
+} from '@llamaindex/server'
 import { ChatMemoryBuffer, MessageContent, Settings } from 'llamaindex'
 
 import {
@@ -23,7 +27,7 @@ export const RequirementSchema = z.object({
 export type Requirement = z.infer<typeof RequirementSchema>
 
 export const UIEventSchema = z.object({
-  type: z.literal('ui_event'),
+  type: z.literal('data-ui_event'),
   data: z.object({
     state: z
       .enum(['plan', 'generate', 'completed'])
@@ -94,13 +98,13 @@ export function workflowFactory(reqBody: { messages: UIMessage[] }) {
     const { state } = getContext()
     sendEvent(
       uiEvent.with({
-        type: 'ui_event',
+        type: 'data-ui_event',
         data: {
           state: 'plan',
         },
       })
     )
-    const user_msg = planData.userInput
+    const user_msg = getMessageTextContent(planData.userInput)
     const context = planData.context
       ? `## The context is: \n${planData.context}\n`
       : ''
@@ -190,7 +194,7 @@ ${user_msg}
 
     sendEvent(
       uiEvent.with({
-        type: 'ui_event',
+        type: 'data-ui_event',
         data: {
           state: 'generate',
           requirement: planData.requirement.requirement,
@@ -275,7 +279,7 @@ ${user_msg}
     // To show the Canvas panel for the artifact
     sendEvent(
       artifactEvent.with({
-        type: 'artifact',
+        type: 'data-artifact',
         data: {
           type: 'code',
           created_at: Date.now(),
@@ -315,7 +319,7 @@ ${user_msg}
 
     sendEvent(
       uiEvent.with({
-        type: 'ui_event',
+        type: 'data-ui_event',
         data: {
           state: 'completed',
         },
