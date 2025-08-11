@@ -46,7 +46,7 @@ Beside text, you can also display parts in the chat. Parts can be displayed befo
 - **event** -> display a event with title, status, and data
 - **artifact** -> display a code artifact
 - **sources** -> display a list of sources
-- **suggested-questions** -> display a list of suggested questions
+- **suggested_questions** -> display a list of suggested questions
 
 **Custom parts**
 
@@ -140,9 +140,9 @@ You can also create your own custom parts.
     },
   },
 
-  '**suggested-questions**: Here is the demo of a suggested-questions part',
+  '**suggested_questions**: Here is the demo of a suggested_questions part',
   {
-    type: 'suggested-questions',
+    type: 'suggested_questions',
     data: [
       'I think you should go to the beach',
       'I think you should go to the mountains',

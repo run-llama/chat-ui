@@ -73,7 +73,7 @@ const initialMessages: Message[] = [
         },
       },
       {
-        type: 'data-suggested-questions',
+        type: 'data-suggested_questions',
         data: [
           'How does the binary search algorithm work?',
           'Can you provide an example of how to implement binary search in Python?',
@@ -118,7 +118,7 @@ const initialMessages: Message[] = [
         },
       },
       {
-        type: 'data-suggested-questions',
+        type: 'data-suggested_questions',
         data: [
           'Can you explain how the binary search algorithm works?',
           'What are the time and space complexities of the binary search algorithm?',
