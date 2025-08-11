@@ -1,9 +1,5 @@
 import { randomUUID } from '@llamaindex/env'
-import {
-  agentStreamEvent,
-  workflowEvent,
-  type WorkflowEventData,
-} from '@llamaindex/workflow'
+import { workflowEvent, type WorkflowEventData } from '@llamaindex/workflow'
 import type { ChatResponseChunk } from 'llamaindex'
 
 export const TEXT_START_PART_TYPE = 'text-start'

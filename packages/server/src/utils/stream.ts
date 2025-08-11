@@ -40,7 +40,7 @@ export class AgentWorkflowAdapter {
 
     return new TransformStream({
       async transform(event, controller) {
-        if (agentStreamEvent.include(event)) {
+        if (agentStreamEvent.include(event) && event.data.delta) {
           if (!hasStarted) {
             // send text start event if not sent
             hasStarted = true
@@ -60,16 +60,21 @@ export class AgentWorkflowAdapter {
               delta: event.data.delta,
             })
           )
-        } else {
-          // if stream has started and this event is not agentStreamEvent, means stream has ended
-          // send a text end event if it's not sent
-          if (!hasEnded && hasEnded) {
-            hasEnded = true
-            controller.enqueue(
-              textEndEvent.with({ id: agentStreamId, type: TEXT_END_PART_TYPE })
-            )
-          }
+
+          return
         }
+
+        // if stream has started and this event is not agentStreamEvent, means stream has ended
+        // send a text end event if it's not sent
+        if (!hasEnded && hasEnded) {
+          hasEnded = true
+          controller.enqueue(
+            textEndEvent.with({ id: agentStreamId, type: TEXT_END_PART_TYPE })
+          )
+        }
+
+        // enqueue the event (not agentStreamEvent) to process by other stream pipelines
+        controller.enqueue(event)
       },
     })
   }
@@ -224,6 +229,8 @@ export class ServerAdapter {
         controller.enqueue(event)
       },
       async flush(controller) {
+        if (Object.keys(accumulatedTextParts).length === 0) return
+
         const newMessage: ChatMessage = {
           role: 'assistant',
           content: Object.values(accumulatedTextParts),
@@ -250,9 +257,44 @@ export class ServerAdapter {
   static transformToSSE() {
     return new TransformStream<WorkflowEventData<unknown>>({
       async transform(event, controller) {
-        controller.enqueue(ServerAdapter.toSSE(event.data))
+        if (ServerAdapter.isValidUIEvent(event)) {
+          controller.enqueue(ServerAdapter.toSSE(event.data))
+        }
       },
     })
+  }
+
+  /**
+   * useChat will stop stream immediately if it's not valid (only support text parts or data-* parts)
+   * Therefore, we need to filter out the events that are not valid with Vercel AI SDK contract
+   * See how Vercel AI SDK useChat validate the parts here:
+   * https://github.com/vercel/ai/blob/d583b8487450f0c0f12508cc2a8309c676653357/packages/ai/src/ui/process-ui-message-stream.ts#L630-L636
+   */
+  private static isValidUIEvent(event: WorkflowEventData<unknown>) {
+    if (
+      typeof event.data === 'object' &&
+      event.data !== null &&
+      'type' in event.data &&
+      typeof event.data.type === 'string'
+    ) {
+      const { type } = event.data
+
+      if (
+        [
+          TEXT_DELTA_PART_TYPE,
+          TEXT_START_PART_TYPE,
+          TEXT_END_PART_TYPE,
+        ].includes(type)
+      ) {
+        return true
+      }
+
+      if (type.startsWith('data-') && 'data' in event.data) {
+        return true
+      }
+    }
+
+    return false
   }
 
   private static toSSE<T>(data: T) {
