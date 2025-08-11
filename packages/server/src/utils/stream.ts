@@ -94,7 +94,10 @@ export class AgentWorkflowAdapter {
               },
             })
           )
+          return
         }
+
+        controller.enqueue(event)
       },
     })
   }
@@ -131,7 +134,11 @@ export class AgentWorkflowAdapter {
               controller.enqueue(workflowEvent)
             }
           })
+
+          return
         }
+
+        controller.enqueue(event)
       },
     })
   }
@@ -153,7 +160,10 @@ export class ServerAdapter {
           // if source event is detected and having llamaCloud files, download them in background
           controller.enqueue(sourceEvent)
           downloadLlamaCloudFilesFromNodes(event.data.data.nodes)
+          return
         }
+
+        controller.enqueue(event)
       },
     })
   }
@@ -176,7 +186,10 @@ export class ServerAdapter {
           controller.enqueue(humanInputEvent.with(event.data))
           await pauseForHumanInput(context, event.data.response, requestId)
           controller.terminate()
+          return
         }
+
+        controller.enqueue(event)
       },
     })
   }
@@ -194,7 +207,7 @@ export class ServerAdapter {
     const accumulatedTextParts: Record<string, MessageContentTextDetail> = {}
 
     return new TransformStream({
-      async transform(event) {
+      async transform(event, controller) {
         if (textDeltaEvent.include(event)) {
           const textPart = accumulatedTextParts[event.data.id]
           if (textPart) {
@@ -208,6 +221,7 @@ export class ServerAdapter {
             }
           }
         }
+        controller.enqueue(event)
       },
       async flush(controller) {
         const newMessage: ChatMessage = {
