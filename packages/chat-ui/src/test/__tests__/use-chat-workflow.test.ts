@@ -219,11 +219,11 @@ describe('useChatWorkflow - transformEventToMessageParts', () => {
   })
 
   describe('UIEvent handling', () => {
-    it('should convert UI events to vercel annotations', () => {
+    it('should convert UI events to message parts', () => {
       const event: WorkflowEvent = {
         type: WorkflowEventType.UIEvent.toString(),
         data: {
-          type: 'weather',
+          type: 'data-weather',
           data: {
             location: 'San Francisco',
             temperature: 22,
@@ -238,7 +238,7 @@ describe('useChatWorkflow - transformEventToMessageParts', () => {
 
       expect(result).toEqual([
         {
-          type: EventPartType,
+          type: 'data-weather',
           data: {
             location: 'San Francisco',
             temperature: 22,
