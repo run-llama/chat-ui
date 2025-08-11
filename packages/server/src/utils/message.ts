@@ -37,7 +37,7 @@ export class ServerMessage {
 
   get artifacts(): Artifact[] {
     return this.uiMessage.parts
-      .filter(this.isArtifactPart)
+      .filter(part => this.isArtifactPart(part))
       .map(part => part.data)
   }
 
@@ -48,18 +48,18 @@ export class ServerMessage {
   }
 
   get attachments(): FilePart[] {
-    return this.uiMessage.parts.filter(this.isFilePart)
+    return this.uiMessage.parts.filter(part => this.isFilePart(part))
   }
 
   get humanResponse(): HumanResponseEventData[] {
-    return this.uiMessage.parts.filter(this.isHumanResponsePart)
+    return this.uiMessage.parts.filter(part => this.isHumanResponsePart(part))
   }
 
   get llamaindexMessage(): ChatMessage {
     return {
       role: this.uiMessage.role,
       content: this.uiMessage.parts
-        .map(this.toLlamaIndexMessagePart)
+        .map(part => this.toLlamaIndexMessagePart(part))
         .filter(Boolean) as MessageContentDetail[],
     }
   }
