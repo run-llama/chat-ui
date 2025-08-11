@@ -1,6 +1,10 @@
 import { getEnv } from '@llamaindex/env'
 import { workflowEvent } from '@llamaindex/workflow'
-import { type ChatMessage, Settings } from 'llamaindex'
+import {
+  type ChatMessage,
+  type MessageContentTextDetail,
+  Settings,
+} from 'llamaindex'
 
 export const SUGGESTION_PART_TYPE = `data-suggested_questions` as const
 
@@ -31,7 +35,7 @@ Your answer should be wrapped in three sticks which follows the following format
 
 export async function generateNextQuestions(conversation: ChatMessage[]) {
   const conversationText = conversation
-    .map(message => `${message.role}: ${message.content}`)
+    .map(message => `${message.role}: ${getMessageTextContent(message)}`)
     .join('\n')
   const promptTemplate = getEnv('NEXT_QUESTION_PROMPT') || NEXT_QUESTION_PROMPT
   const message = promptTemplate.replace('{conversation}', conversationText)
@@ -44,6 +48,16 @@ export async function generateNextQuestions(conversation: ChatMessage[]) {
     console.error('Error when generating the next questions: ', error)
     return []
   }
+}
+
+function getMessageTextContent(message: ChatMessage) {
+  if (typeof message.content === 'string') {
+    return message.content
+  }
+  return message.content
+    .filter((part): part is MessageContentTextDetail => part.type === 'text')
+    .map(part => part.text)
+    .join('\n\n')
 }
 
 function extractQuestions(text: string): string[] {
