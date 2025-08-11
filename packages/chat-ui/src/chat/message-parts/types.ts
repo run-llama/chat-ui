@@ -14,7 +14,7 @@ export const FilePartType = 'data-file' as const
 export const ArtifactPartType = 'data-artifact' as const
 export const EventPartType = 'data-event' as const
 export const SourcesPartType = 'data-sources' as const
-export const SuggestionPartType = 'data-suggested-questions' as const
+export const SuggestionPartType = 'data-suggested_questions' as const
 
 // Text Part: the text content of the message
 // It will be rendered in Markdown component
