@@ -1,7 +1,4 @@
-import {
-  ChatSources,
-  preprocessSourceNodes,
-} from '../../../widgets/index.js'
+import { ChatSources, preprocessSourceNodes } from '../../../widgets/index.js'
 import { usePart } from '../context.js'
 import { SourcesPartType } from '../types.js'
 
