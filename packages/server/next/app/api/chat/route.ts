@@ -86,8 +86,9 @@ export async function POST(req: NextRequest) {
     return new Response(stream, {
       status: 200,
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-Vercel-AI-Data-Stream': 'v1',
+        'Content-Type': 'text/event-stream',
+        Connection: 'keep-alive',
+        'Cache-Control': 'no-cache',
       },
     })
   } catch (error) {
