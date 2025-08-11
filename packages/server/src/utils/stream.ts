@@ -2,19 +2,26 @@ import {
   agentStreamEvent,
   agentToolCallEvent,
   agentToolCallResultEvent,
-  type WorkflowEvent,
+  type WorkflowContext,
 } from '@llamaindex/workflow'
-import { type MessageContentTextDetail } from 'llamaindex'
-import { humanInputEvent, type HumanResponseEventData } from './hitl/index'
+import { type ChatMessage, type MessageContentTextDetail } from 'llamaindex'
+import { downloadLlamaCloudFilesFromNodes } from './file'
+import { humanInputEvent, pauseForHumanInput } from './hitl/index'
 import {
-  getSourceNodesFromToolOutput,
+  EVENT_PART_TYPE,
+  generateNextQuestions,
   runEvent,
+  sourceEvent,
+  SUGGESTION_PART_TYPE,
+  suggestionEvent,
+  TEXT_DELTA_PART_TYPE,
+  TEXT_END_PART_TYPE,
+  TEXT_START_PART_TYPE,
   textDeltaEvent,
   textEndEvent,
   textStartEvent,
-  toSourceEvent,
-  type SourceEventNode,
 } from './parts'
+import type { AgentToolCallResultParser } from './tool'
 
 /**
  * Adapter to transform specific LlamaIndex AgentWorkflow events to standard LlamaIndexServer events
@@ -23,7 +30,7 @@ export class AgentWorkflowAdapter {
   /**
    * Transform agent stream events to a text start event, multiple text delta events, and a text end event
    */
-  static processAgentStreamEvents() {
+  static processStreamEvents() {
     // LlamaIndex AgentWorkflow only produces 1 message content (1 text part) each running.
     // If we support multiple text parts per agent workflow in the future, we should have an unique id for each text part.
     const agentStreamId = 'agent-workflow-stream' // id for text start event, delta events, and end event
@@ -37,7 +44,10 @@ export class AgentWorkflowAdapter {
             // send text start event if not sent
             hasStarted = true
             controller.enqueue(
-              textStartEvent.with({ id: agentStreamId, type: 'text-start' })
+              textStartEvent.with({
+                id: agentStreamId,
+                type: TEXT_START_PART_TYPE,
+              })
             )
           }
 
@@ -45,7 +55,7 @@ export class AgentWorkflowAdapter {
           controller.enqueue(
             textDeltaEvent.with({
               id: agentStreamId,
-              type: 'text-delta',
+              type: TEXT_DELTA_PART_TYPE,
               delta: event.data.delta,
             })
           )
@@ -55,17 +65,18 @@ export class AgentWorkflowAdapter {
           if (!hasEnded) {
             hasEnded = true
             controller.enqueue(
-              textEndEvent.with({ id: agentStreamId, type: 'text-end' })
+              textEndEvent.with({ id: agentStreamId, type: TEXT_END_PART_TYPE })
             )
           }
         }
       },
     })
   }
+
   /**
-   * Transform agent tool call events and agent tool call result events to a running event with result and loading status
+   * Transform agent tool call events to a running event with loading status
    */
-  static processAgentToolCallEvents() {
+  static processToolCallEvents() {
     return new TransformStream({
       async transform(event, controller) {
         // agentToolCallEvent -> send a running event to stream
@@ -74,28 +85,11 @@ export class AgentWorkflowAdapter {
           controller.enqueue(
             runEvent.with({
               id: toolId, // use toolId as id to reconciliation with agentToolCallResultEvent
-              type: 'data-event',
+              type: EVENT_PART_TYPE,
               data: {
                 title: `Agent Tool Call: ${agentName}`,
                 description: `Using tool: '${toolName}' with inputs: '${JSON.stringify(toolKwargs)}'`,
                 status: 'pending',
-              },
-            })
-          )
-        }
-
-        // agentToolCallResultEvent -> send a running event with result to stream
-        if (agentToolCallResultEvent.include(event)) {
-          const { toolName, toolKwargs, toolOutput, toolId } = event.data
-          controller.enqueue(
-            runEvent.with({
-              id: toolId, // use toolId as id to reconciliation with agentToolCallEvent
-              type: 'data-event',
-              data: {
-                title: `Agent Tool Call: ${toolName}`,
-                description: `Using tool: '${toolName}' with inputs: '${JSON.stringify(toolKwargs)}'`,
-                status: 'success',
-                data: toolOutput,
               },
             })
           )
@@ -105,25 +99,37 @@ export class AgentWorkflowAdapter {
   }
 
   /**
-   * Extract source nodes from tool result and send a source event to stream
-   * This is useful when AgentWorkflow was using queryEngineTool and the tool result contains source nodes
+   * Transform agent tool call result events to a running event with result
+   * If the tool result contains source nodes, send a source event to stream
    */
-  static processSourceNodesFromToolResult(options?: {
-    llamaCloudOutputDir?: string
-    onDetectSourceNodes?: (sourceNodes: SourceEventNode[]) => void
-  }) {
-    const { llamaCloudOutputDir, onDetectSourceNodes } = options ?? {}
+  static processToolCallResultEvents(
+    parsers: AgentToolCallResultParser[] = []
+  ) {
     return new TransformStream({
       async transform(event, controller) {
         if (agentToolCallResultEvent.include(event)) {
-          const rawOutput = event.data.raw
-          const sourceNodes = getSourceNodesFromToolOutput(rawOutput)
+          // send a running event with result to stream
+          const toolCallResult = event.data
+          const { toolName, toolKwargs, toolOutput, toolId } = toolCallResult
+          controller.enqueue(
+            runEvent.with({
+              id: toolId, // use toolId as id to reconciliation with agentToolCallEvent
+              type: EVENT_PART_TYPE,
+              data: {
+                title: `Agent Tool Call: ${toolName}`,
+                description: `Using tool: '${toolName}' with inputs: '${JSON.stringify(toolKwargs)}'`,
+                status: 'success',
+                data: toolOutput,
+              },
+            })
+          )
 
-          if (sourceNodes.length > 0) {
-            const sourceEvent = toSourceEvent(sourceNodes, llamaCloudOutputDir)
-            controller.enqueue(sourceEvent)
-            onDetectSourceNodes?.(sourceEvent.data.data.nodes)
-          }
+          parsers.forEach(resultParser => {
+            const workflowEvent = resultParser.toWorkflowEvent(toolCallResult)
+            if (workflowEvent) {
+              controller.enqueue(workflowEvent)
+            }
+          })
         }
       },
     })
@@ -133,47 +139,61 @@ export class AgentWorkflowAdapter {
 /**
  * Responsible for handling specific LlamaIndexServer events in the workflow stream
  */
-export class LlamaIndexServerAdapter {
+export class ServerAdapter {
   static readonly encoder = new TextEncoder()
 
   /**
-   * When human input is detected:
-   * - send a human input event to stream (to display human input in UI)
-   * - trigger the onPause callback to pause the workflow and save the snapshot
-   * - stop the stream
+   * download resources in background if detected
    */
-  static processHumanEvents(options: {
-    onPause: (
-      responseEvent: WorkflowEvent<HumanResponseEventData>
-    ) => Promise<void>
-  }) {
-    const { onPause } = options
-
+  static processDownloadResources() {
     return new TransformStream({
       async transform(event, controller) {
-        if (humanInputEvent.include(event)) {
-          controller.enqueue(humanInputEvent.with(event.data))
-          await onPause(event.data.response)
-          controller.terminate() // stop the stream
+        if (sourceEvent.include(event)) {
+          // if source event is detected and having llamaCloud files, download them in background
+          controller.enqueue(sourceEvent)
+          downloadLlamaCloudFilesFromNodes(event.data.data.nodes)
         }
       },
     })
   }
 
   /**
-   * Transform LlamaIndexServer events to SSE events
-   * This is useful when we want to send events to client in SSE format to work with Vercel v5
+   * When human input is detected:
+   * - send a human input event to stream (to display human input in UI)
+   * - pause the workflow and save the snapshot
+   * - stop the stream
    */
-  static toSSE(options?: {
-    onDone?: (textParts: MessageContentTextDetail[]) => void
+  static processHumanEvents(options: {
+    context: WorkflowContext
+    requestId?: string | undefined
   }) {
-    const { onDone } = options ?? {}
+    const { requestId, context } = options
+
+    return new TransformStream({
+      async transform(event, controller) {
+        if (humanInputEvent.include(event)) {
+          controller.enqueue(humanInputEvent.with(event.data))
+          await pauseForHumanInput(context, event.data.response, requestId)
+          controller.terminate()
+        }
+      },
+    })
+  }
+
+  /**
+   * Accumulate text parts from stream and do post processing such as suggest next questions
+   */
+  static postActions(options?: {
+    chatHistory?: ChatMessage[]
+    enableSuggestion?: boolean
+  }) {
+    const { enableSuggestion, chatHistory } = options ?? {}
 
     // get the text parts from stream
     const accumulatedTextParts: Record<string, MessageContentTextDetail> = {}
 
     return new TransformStream({
-      async transform(event, controller) {
+      async transform(event) {
         if (textDeltaEvent.include(event)) {
           const textPart = accumulatedTextParts[event.data.id]
           if (textPart) {
@@ -187,18 +207,40 @@ export class LlamaIndexServerAdapter {
             }
           }
         }
-
-        // send the event to stream in SSE format
-        controller.enqueue(
-          LlamaIndexServerAdapter.encoder.encode(
-            `data: ${JSON.stringify(event)}\n\n`
-          )
-        )
       },
-      flush() {
-        const textParts = Object.values(accumulatedTextParts)
-        onDone?.(textParts)
+      async flush(controller) {
+        const newMessage: ChatMessage = {
+          role: 'assistant',
+          content: Object.values(accumulatedTextParts),
+        }
+        const conversation: ChatMessage[] = [...(chatHistory ?? []), newMessage]
+
+        if (enableSuggestion) {
+          const nextQuestions = await generateNextQuestions(conversation)
+          controller.enqueue(
+            suggestionEvent.with({
+              type: SUGGESTION_PART_TYPE,
+              data: nextQuestions,
+            })
+          )
+        }
       },
     })
+  }
+
+  /**
+   * Transform LlamaIndexServer events to Server-Sent Events (SSE)
+   * This is useful when we want to send events to client in SSE format to work with Vercel v5
+   */
+  static transformToSSE() {
+    return new TransformStream({
+      async transform(event, controller) {
+        controller.enqueue(ServerAdapter.toSSE(event))
+      },
+    })
+  }
+
+  private static toSSE<T>(data: T) {
+    return ServerAdapter.encoder.encode(`data: ${JSON.stringify(data)}\n\n`)
   }
 }
