@@ -145,7 +145,7 @@ import { ChatSection } from '@llamaindex/chat-ui'
 import { useChat } from '@ai-sdk/react'
 
 function MyChat() {
-  const handler = useChat({ 
+  const handler = useChat({
     transport: new DefaultChatTransport({
       api: '/api/chat',
     }),
