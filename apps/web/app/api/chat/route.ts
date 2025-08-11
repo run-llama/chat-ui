@@ -1,5 +1,4 @@
 import { fakeStreamText } from '@/app/utils'
-import { toUIMessageStream } from '@ai-sdk/llamaindex'
 import { UIMessage as Message } from '@ai-sdk/react'
 import {
   MessageContentDetail,
@@ -14,7 +13,6 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const DATA_PREFIX = 'data: '
-const TOKEN_DELAY = 100
 
 Settings.llm = new OpenAI({ model: 'gpt-4o-mini' })
 Settings.embedModel = new OpenAIEmbedding({
@@ -40,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     const chatEngine = new SimpleChatEngine()
 
-    const messageContent = (lastMessage.parts[0] as { text: string }).text ?? ''
+    const messageContent = (lastMessage.parts[0] as { text: string }).text
 
     const response = await chatEngine.chat({
       message: messageContent,
@@ -50,9 +48,6 @@ export async function POST(request: NextRequest) {
       })),
       stream: true,
     })
-
-    // TODO: `toUIMessageStream` not working as expected now
-    // const sseStream = toUIMessageStream(response)
 
     const sseStream = new ReadableStream({
       async start(controller) {

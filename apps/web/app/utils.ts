@@ -56,7 +56,7 @@ export const fakeStreamText = ({
             const deltaChunk: TextChunk = {
               id: messageId,
               type: 'text-delta',
-              delta: token + ' ',
+              delta: `${token} `,
             }
             writeStream(deltaChunk)
             await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
