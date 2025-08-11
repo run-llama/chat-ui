@@ -1,6 +1,6 @@
 'use client'
 
-import { useChatMessage, getAnnotationData } from '@llamaindex/chat-ui'
+import { usePart } from '@llamaindex/chat-ui'
 
 interface WeatherData {
   location: string
@@ -10,20 +10,36 @@ interface WeatherData {
   windSpeed: number
 }
 
-export function CustomWeatherAnnotation() {
-  const { message } = useChatMessage()
+const WeatherPartType = 'data-weather'
 
-  const weatherData = getAnnotationData<WeatherData>(message, 'weather')
+type WeatherPart = {
+  type: typeof WeatherPartType
+  data: WeatherData
+}
 
-  if (weatherData.length === 0) return null
+// A custom part component that is used to display weather information in a chat message
+export function WeatherPart() {
+  const weatherData = usePart<WeatherPart>(WeatherPartType)?.data
+  if (!weatherData) return null
+  return <WeatherCard data={weatherData} />
+}
 
-  const data = weatherData[0]
+function WeatherCard({ data }: { data: WeatherData }) {
+  const iconMap: Record<string, string> = {
+    sunny: '☀️',
+    cloudy: '☁️',
+    rainy: '🌧️',
+    snowy: '❄️',
+    stormy: '⛈️',
+  }
 
   return (
-    <div className="my-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+    <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-          <WeatherIcon condition={data.condition} />
+          <span className="text-2xl">
+            {iconMap[data.condition.toLowerCase()] || '🌤️'}
+          </span>
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-blue-900">{data.location}</h3>
@@ -44,19 +60,5 @@ export function CustomWeatherAnnotation() {
         </div>
       </div>
     </div>
-  )
-}
-
-function WeatherIcon({ condition }: { condition: string }) {
-  const iconMap: Record<string, string> = {
-    sunny: '☀️',
-    cloudy: '☁️',
-    rainy: '🌧️',
-    snowy: '❄️',
-    stormy: '⛈️',
-  }
-
-  return (
-    <span className="text-2xl">{iconMap[condition.toLowerCase()] || '🌤️'}</span>
   )
 }

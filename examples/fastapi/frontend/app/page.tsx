@@ -8,14 +8,21 @@ import {
   ChatSection,
   useChatUI,
 } from '@llamaindex/chat-ui'
-import { Message, useChat } from 'ai/react'
-import { CustomWeatherAnnotation } from '../components/custom-weather-annotation'
+import { UIMessage, useChat } from '@ai-sdk/react'
+import { WeatherPart } from '../components/custom-weather'
+import { DefaultChatTransport } from 'ai'
+import { WikiPart } from '../components/custom-wiki'
 
-const initialMessages: Message[] = [
+const initialMessages: UIMessage[] = [
   {
     id: '1',
-    content: 'Hello! How can I help you today?',
     role: 'assistant',
+    parts: [
+      {
+        type: 'text',
+        text: 'Hello! How can I help you today?',
+      },
+    ],
   },
 ]
 
@@ -24,7 +31,7 @@ export default function Page(): JSX.Element {
     <div className="flex h-screen flex-col">
       <header className="w-full border-b p-4 text-center">
         <h1 className="text-2xl font-bold">
-          LlamaIndex Chat UI - FastAPI Example
+          LlamaIndex Chat UI - Next.js Example
         </h1>
         <p className="text-gray-600">
           A simple chat interface using @llamaindex/chat-ui
@@ -39,8 +46,17 @@ export default function Page(): JSX.Element {
 
 function ChatExample() {
   const handler = useChat({
-    api: 'http://localhost:8000/api/chat',
-    initialMessages,
+    transport: new DefaultChatTransport({
+      // uncomment this to try advanced example in app/api/chat/advanced/route.ts
+      api: '/api/chat/advanced',
+
+      // uncomment this to try basic example in app/api/chat/route.ts
+      // api: '/api/chat',
+
+      // uncomment this to try edge runtime example in app/api/chat/edge/route.ts
+      // api: '/api/chat/edge',
+    }),
+    messages: initialMessages,
   })
 
   return (
@@ -69,7 +85,7 @@ function ChatExample() {
 }
 
 function CustomChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
 
   return (
     <>
@@ -85,10 +101,15 @@ function CustomChatMessages() {
               {message.role === 'user' ? 'U' : 'AI'}
             </div>
           </ChatMessage.Avatar>
-          <ChatMessage.Content isLoading={isLoading} append={append}>
-            <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Source />
-            <CustomWeatherAnnotation />
+          <ChatMessage.Content>
+            <ChatMessage.Part.File />
+            <ChatMessage.Part.Event />
+            <ChatMessage.Part.Markdown />
+            <ChatMessage.Part.Artifact />
+            <ChatMessage.Part.Source />
+            <ChatMessage.Part.Suggestion />
+            <WikiPart />
+            <WeatherPart />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>
