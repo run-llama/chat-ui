@@ -3,6 +3,7 @@ import {
   agentToolCallEvent,
   agentToolCallResultEvent,
   type WorkflowContext,
+  type WorkflowEventData,
 } from '@llamaindex/workflow'
 import { type ChatMessage, type MessageContentTextDetail } from 'llamaindex'
 import { downloadLlamaCloudFilesFromNodes } from './file'
@@ -62,7 +63,7 @@ export class AgentWorkflowAdapter {
         } else {
           // if stream has started and this event is not agentStreamEvent, means stream has ended
           // send a text end event if it's not sent
-          if (!hasEnded) {
+          if (!hasEnded && hasEnded) {
             hasEnded = true
             controller.enqueue(
               textEndEvent.with({ id: agentStreamId, type: TEXT_END_PART_TYPE })
@@ -233,9 +234,9 @@ export class ServerAdapter {
    * This is useful when we want to send events to client in SSE format to work with Vercel v5
    */
   static transformToSSE() {
-    return new TransformStream({
+    return new TransformStream<WorkflowEventData<unknown>>({
       async transform(event, controller) {
-        controller.enqueue(ServerAdapter.toSSE(event))
+        controller.enqueue(ServerAdapter.toSSE(event.data))
       },
     })
   }
