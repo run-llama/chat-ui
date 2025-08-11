@@ -32,7 +32,9 @@ Your answer should be wrapped in three sticks which follows the following format
 
 export async function generateNextQuestions(conversation: ChatMessage[]) {
   const conversationText = conversation
-    .map(message => `${message.role}: ${getMessageTextContent(message.content)}`)
+    .map(
+      message => `${message.role}: ${getMessageTextContent(message.content)}`
+    )
     .join('\n')
   const promptTemplate = getEnv('NEXT_QUESTION_PROMPT') || NEXT_QUESTION_PROMPT
   const message = promptTemplate.replace('{conversation}', conversationText)
