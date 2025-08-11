@@ -1,10 +1,6 @@
 'use client'
 
-import {
-  extractAllPartData,
-  JSONValue,
-  useChatMessage,
-} from '@llamaindex/chat-ui'
+import { getParts, JSONValue, useChatMessage } from '@llamaindex/chat-ui'
 import React, { useRef, useState } from 'react'
 import { DynamicComponentErrorBoundary } from './error-boundary'
 import { ComponentDef } from './types'
@@ -31,7 +27,7 @@ export const DynamicEvents = ({
 
   const components: EventComponent[] = componentDefs
     .map(comp => {
-      const events = extractAllPartData<JSONValue>(message, comp.type)
+      const events = getParts(message, comp.type)
       if (!events?.length) return null
       return { ...comp, events }
     })
