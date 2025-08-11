@@ -67,7 +67,7 @@ Parts are automatically rendered when using the `ChatMessage.Content` component.
 The rendering system:
 1. Iterates through each part in `message.parts`
 2. Provides each part to all child components via `ChatPartProvider`
-3. Each component uses `usePartData(partType)` to check if it should render
+3. Each component uses `usePart(partType)` to check if it should render
 4. Only the matching component renders, others return `null`
 
 ## Built-in Parts
@@ -173,7 +173,7 @@ def analyze_sales_data(file_path):
 }
 ```
 
-### Suggestion Parts (`data-suggested-questions`)
+### Suggestion Parts (`data-suggested_questions`)
 Provide interactive follow-up questions to guide conversation.
 
 ```typescript
@@ -208,11 +208,11 @@ interface WeatherData {
 ### 2. Create the Component
 
 ```tsx
-import { usePartData } from '@llamaindex/chat-ui'
+import { usePart } from '@llamaindex/chat-ui'
 
 export function WeatherPart() {
-  // usePartData returns data only if current part matches the type
-  const weatherData = usePartData<WeatherData>(WeatherPartType)
+  // usePart returns data only if current part matches the type
+  const weatherData = usePart<WeatherData>(WeatherPartType)
   
   if (!weatherData) return null
   
@@ -447,7 +447,7 @@ const message = {
       }
     },
     {
-      type: 'data-suggested-questions',
+      type: 'data-suggested_questions',
       data: [
         'Can you explain the quarterly trends?',
         'What about the seasonal patterns?',
@@ -460,17 +460,17 @@ const message = {
 
 ## Utility Functions
 
-### usePartData Hook
+### usePart Hook
 
 Extract part data by type within part components:
 
 ```tsx
-import { usePartData } from '@llamaindex/chat-ui'
+import { usePart } from '@llamaindex/chat-ui'
 
 function CustomPartComponent() {
   // Returns data only if current part matches type, null otherwise
-  const weatherData = usePartData<WeatherData>('data-weather')
-  const textContent = usePartData<string>('text')
+  const weatherData = usePart<WeatherData>('data-weather')
+  const textContent = usePart<string>('text')
   
   // Component logic...
 }

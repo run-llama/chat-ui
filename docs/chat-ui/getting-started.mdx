@@ -235,7 +235,7 @@ Additionally, you can also override each component's styles by setting custom cl
 
 ```tsx
 import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 
 const ChatExample = () => {
   const handler = useChat()
@@ -270,7 +270,11 @@ import {
 } from '@llamaindex/chat-ui'
 
 function CustomChat() {
-  const handler = useChat({ api: '/api/chat' })
+  const handler = useChat({ 
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+  })
 
   return (
     <ChatSection handler={handler} className="flex-row gap-4">
@@ -291,7 +295,7 @@ Provide initial context or welcome messages:
 ```tsx
 const handler = useChat({
   api: '/api/chat',
-  initialMessages: [
+  messages: [
     {
       id: '1',
       role: 'assistant',

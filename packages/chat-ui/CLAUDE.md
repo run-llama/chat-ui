@@ -142,10 +142,14 @@ type ChatHandler = {
 
 ```typescript
 import { ChatSection } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 
 function MyChat() {
-  const chatHandler = useChat({ api: '/api/chat' })
+  const handler = useChat({ 
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+  })
   return <ChatSection handler={chatHandler} />
 }
 ```

@@ -96,8 +96,8 @@ function CustomChatMessages() {
                   />
                 </ChatMessage.Avatar>
                 <ChatMessage.Content>
-                  <ChatMessage.Content.File />
-                  <ChatMessage.Content.Markdown />
+                  <ChatMessage.Part.File />
+                  <ChatMessage.Part.Markdown />
                 </ChatMessage.Content>
                 <ChatMessage.Actions />
               </ChatMessage>
@@ -245,8 +245,8 @@ function CustomChatMessages() {
                   />
                 </ChatMessage.Avatar>
                 <ChatMessage.Content>
-                  <ChatMessage.Content.File />
-                  <ChatMessage.Content.Markdown />
+                  <ChatMessage.Part.File />
+                  <ChatMessage.Part.Markdown />
                 </ChatMessage.Content>
                 <ChatMessage.Actions />
               </ChatMessage>

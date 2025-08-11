@@ -8,7 +8,7 @@ LlamaIndex Chat UI is a comprehensive React component library designed for build
 ## Key Features
 
 - **Complete Chat Interface** - Full-featured chat components with message history, input, and OpenAI-style canvas
-- **Rich Annotations** - Support for images, files, sources, events, and custom annotations
+- **Rich Parts** - Support for images, files, sources, events, and custom parts
 - **Interactive Artifacts** - Code and document artifacts with editing and version management
 - **File Upload Support** - Built-in handling for multiple file types (PDF, images, documents)
 - **Beautiful** - Built on shadcn/ui for beautiful UI
@@ -29,7 +29,7 @@ LlamaIndex Chat UI is a comprehensive React component library designed for build
 The library includes a comprehensive widget system for handling various content types:
 
 - **Content Widgets** - Markdown, code blocks, image display
-- **Annotation Widgets** - Sources, events, suggested questions
+- **Widgets for Part Rendering** - Sources, events, suggested questions
 - **Interactive Widgets** - File upload, document editing, code editing
 
 ## Getting Started
@@ -46,7 +46,7 @@ For more information on configuration, please see detailed guide in [Getting Sta
 
 ```tsx
 import { ChatSection } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 
 export default function MyChat() {
   const handler = useChat({
@@ -62,7 +62,7 @@ This creates a complete chat interface with:
 - Message history display
 - User input with file upload
 - Loading states and error handling
-- Support for rich content and annotations
+- Support for rich content and parts
 
 ## Architecture
 
@@ -71,7 +71,7 @@ The library follows a composable architecture where you can:
 1. **Use the complete solution** - `ChatSection` provides everything out of the box
 2. **Compose custom layouts** - Mix and match components for custom designs
 3. **Extend with widgets** - Add specialized content handling
-4. **Create custom annotations** - Build domain-specific content types
+4. **Create custom parts** - Build domain-specific content types
 
 ## Integration
 

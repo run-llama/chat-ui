@@ -28,9 +28,9 @@ Code artifacts provide interactive code editing with full syntax highlighting an
 ### Creating Code Artifacts
 
 ```typescript
-// Server-side: Create code artifact annotation
+// Server-side: Create code artifact part
 const codeArtifact = {
-  type: 'artifact',
+  type: 'data-artifact',
   data: {
     type: 'code',
     data: {
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
 
       // Send code artifact
       const artifact = {
-        type: 'artifact',
+        type: 'data-artifact',
         data: {
           type: 'code',
           data: {
@@ -118,11 +118,8 @@ export async function POST(request: Request) {
         },
       }
 
-      // wrap the annotation in a code block with the language key is 'annotation'
-      const codeBlock = `\n\`\`\`annotation\n${JSON.stringify(codeArtifact)}\n\`\`\`\n`
-
-      // send the artifact with the 0: prefix to make it inline
-      controller.enqueue(encoder.encode(`0:${JSON.stringify(codeBlock)}\\n`))
+      // send the artifact with the data: prefix for SSE format
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify(artifact)}\\n`))
 
       // Send follow-up text
       controller.enqueue(
@@ -137,8 +134,8 @@ export async function POST(request: Request) {
 
   return new Response(stream, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'X-Vercel-AI-Data-Stream': 'v1',
+      'Content-Type': 'text/event-stream',
+      'Connection': 'keep-alive',
     },
   })
 }
@@ -178,7 +175,7 @@ Document artifacts provide rich text editing with markdown support and real-time
 
 ```typescript
 const documentArtifact = {
-  type: 'artifact',
+  type: 'data-artifact',
   data: {
     type: 'document',
     data: {
@@ -372,7 +369,11 @@ Document artifacts provide:
 import { ChatSection, ChatCanvas } from '@llamaindex/chat-ui'
 
 function ChatWithCanvas() {
-  const handler = useChat({ api: '/api/chat' })
+  const handler = useChat({ 
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+  })
 
   return (
     <ChatSection handler={handler} className="flex h-full">
@@ -469,7 +470,7 @@ function CustomChat() {
 }
 ```
 
-You can also custom ArtifactCard for your artifact type.
+You can also customize ArtifactCard for your artifact type:
 
 ```tsx
 import { Image } from 'lucide-react'
@@ -484,37 +485,27 @@ function CustomArtifactCard({ data }: { data: Artifact }) {
     />
   )
 }
-
-// update markdown annotation renderers to use your custom artifact card
-<ChatMessage.Content>
-  <ChatMessage.Content.Markdown
-    annotationRenderers={{
-      artifact: CustomArtifactCard,
-    }}
-  />
-</ChatMessage.Content>
 ```
 
-To trigger your custom artifact viewer, the AI response should include an annotation with the matching artifact type:
+To trigger your custom artifact viewer, the AI response should include a part with the matching artifact type:
 
-```tsx
-// Example of how to create an artifact in AI response
-const response = `Here is your image!
-
-\`\`\`annotation
-${JSON.stringify({
-  type: 'artifact',
-  data: {
-    type: 'image', // This matches your viewer's check
-    data: {
-      imageUrl: 'https://example.com/image.jpg',
-      caption: 'A beautiful landscape'
-    },
-    created_at: Date.now(),
-  },
-})}
-\`\`\`
-`
+```ts
+message = {
+  parts: [
+    {
+      type: 'data-artifact',
+      data: {
+        type: 'code',
+        data: {
+          title: 'Data Visualization Script',
+          file_name: 'visualize_data.py',
+          language: 'python',
+          code: 'import matplotlib.pyplot as plt\n# Code...',
+        },
+      }
+    }
+  ]
+} 
 ```
 
 You can create multiple custom artifact viewers for different content types:
@@ -536,7 +527,7 @@ For a complete working example of custom artifact viewers, check out the demo im
 
 - Custom `ImageArtifactViewer` implementation
 - Integration with existing chat components
-- Sample messages with artifact annotations
+- Sample messages with artifact parts
 - Copy-to-clipboard functionality for the code
 
 ### Canvas Auto-Show
@@ -547,7 +538,7 @@ The canvas automatically appears when artifacts are present:
 // Canvas appears automatically when message contains artifacts
 <ChatMessage message={messageWithArtifact}>
   <ChatMessage.Content>
-    <ChatMessage.Content.Markdown />
+    <ChatMessage.Part.Artifact />
   </ChatMessage.Content>
 </ChatMessage>
 ```
@@ -732,4 +723,4 @@ function CopyArtifact() {
 - [Examples](./examples.mdx) - See complete artifact implementations
 - [Customization](./customization.mdx) - Style and customize artifact appearance
 - [Widgets](./widgets.mdx) - Explore related widget functionality
-- [Annotations](./annotations.mdx) - Understand the annotation system
+- [Parts](./parts.mdx) - Understand the message parts system

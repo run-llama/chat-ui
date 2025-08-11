@@ -310,6 +310,7 @@ This will send the artifact to the LlamaIndex Server UI, where it will be render
 ### Other Event Types
 
 You can send any event type that starts with `data-` to create custom UI experiences. For example:
+
 - `data-file` for file content
 - `data-image` for image content
 - `data-*` for your own custom components

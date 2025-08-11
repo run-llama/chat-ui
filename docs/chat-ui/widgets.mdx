@@ -3,7 +3,7 @@ title: Widgets
 description: Comprehensive guide to specialized content widgets for rich chat experiences
 ---
 
-Widgets are specialized components for displaying and interacting with rich content in chat messages. They provide functionality beyond simple text, enabling multimedia, interactive elements, and custom annotations.
+Widgets are specialized components for displaying and interacting with rich content in chat messages. They provide functionality beyond simple text, enabling multimedia, interactive elements, and custom parts.
 
 This section describes how to use them standalone.
 
@@ -155,9 +155,9 @@ export default function Home() {
 - **Image Support** - Embed images
 - **Live Preview** - Real-time markdown preview
 
-## Annotation Widgets
+## Other Widgets
 
-Used for rendering additional rich content in a chat message. See [Annotations](./annotations.mdx) for more information on how to add annotations to a message.
+Used for rendering additional rich content in a chat message. See [Parts](./parts.mdx) for more information on how to add parts to a message.
 
 ### ChatImage
 
@@ -311,7 +311,7 @@ Interactive follow-up question suggestions.
 ```tsx
 import { SuggestedQuestions } from '@llamaindex/chat-ui/widgets'
 
-function QuestionSuggestions({ append, requestData }) {
+function QuestionSuggestions({ regenerate, requestData }) {
   return (
     <SuggestedQuestions
       questions={[
@@ -319,7 +319,7 @@ function QuestionSuggestions({ append, requestData }) {
         'What are the practical applications?',
         'How does this compare to other approaches?',
       ]}
-      append={append}
+      regenerate={regenerate}
       requestData={requestData}
     />
   )
@@ -451,7 +451,7 @@ function CitationLink({ source, index }) {
 
 ### Automatic Rendering
 
-Annotation widgets render based on message annotations through dedicated annotation components:
+Other widgets render based on message parts through dedicated components:
 
 ```tsx
 import { ChatMessage } from '@llamaindex/chat-ui'
@@ -460,17 +460,17 @@ function MessageWithWidgets({ message }) {
   return (
     <ChatMessage message={message}>
       <ChatMessage.Content>
-        <ChatMessage.Content.Markdown />
-        <ChatMessage.Content.Image /> {/* Renders ChatImage */}
-        <ChatMessage.Content.Source /> {/* Renders ChatSources */}
-        <ChatMessage.Content.Event /> {/* Renders ChatEvents */}
+        <ChatMessage.Part.Markdown />
+        <ChatMessage.Part.Image /> {/* Renders ChatImage */}
+        <ChatMessage.Part.Source /> {/* Renders ChatSources */}
+        <ChatMessage.Part.Event /> {/* Renders ChatEvents */}
       </ChatMessage.Content>
     </ChatMessage>
   )
 }
 ```
 
-The `ChatMessage.Content.*` components internally use the annotation pattern described in [Annotations](./annotations.mdx), extracting data with `getAnnotationData` and passing it to the respective widgets.
+The `ChatMessage.Part.*` components internally use the parts pattern described in [Parts](./parts.mdx), extracting data with `usePart` and passing it to the respective widgets.
 
 ### Manual Widget Usage
 
@@ -542,7 +542,7 @@ function App() {
 
 ## Next Steps
 
-- [Annotations](./annotations.mdx) - Learn how to create and send annotation data
+- [Parts](./parts.mdx) - Learn how to create and send parts
 - [Artifacts](./artifacts.mdx) - Implement interactive code and document artifacts
 - [Hooks](./hooks.mdx) - Understand the widget hook system
 - [Customization](./customization.mdx) - Style and customize widget appearance

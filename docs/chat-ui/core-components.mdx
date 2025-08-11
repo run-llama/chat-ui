@@ -13,10 +13,14 @@ The `ChatSection` is the root component that provides context and layout for all
 
 ```tsx
 import { ChatSection } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 
 function MyChat() {
-  const handler = useChat({ api: '/api/chat' })
+  const handler = useChat({ 
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+  })
   return <ChatSection handler={handler} />
 }
 ```
@@ -120,7 +124,7 @@ Action buttons for the message list:
 
 ```tsx
 <ChatMessages.Actions>
-  <button onClick={reload}>Reload</button>
+  <button onClick={regenerate}>Regenerate</button>
   <button onClick={stop}>Stop</button>
 </ChatMessages.Actions>
 ```
@@ -134,7 +138,7 @@ Action buttons for the message list:
 
 ## ChatMessage
 
-Individual message component with full annotation support and role-based rendering.
+Individual message component with full message parts support and role-based rendering.
 
 ### Basic Usage
 
@@ -148,7 +152,7 @@ function CustomMessage({ message, isLast }) {
         <UserAvatar role={message.role} />
       </ChatMessage.Avatar>
       <ChatMessage.Content>
-        <ChatMessage.Content.Markdown />
+        <ChatMessage.Part.Markdown />
       </ChatMessage.Content>
       <ChatMessage.Actions />
     </ChatMessage>
@@ -164,6 +168,18 @@ interface ChatMessageProps {
   isLast?: boolean
   className?: string
   children?: React.ReactNode
+}
+```
+
+### Message Structure
+
+Messages now use a parts-based system:
+
+```typescript
+interface Message {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  parts: MessagePart[]
 }
 ```
 
@@ -183,17 +199,16 @@ User/assistant avatar display:
 
 #### ChatMessage.Content
 
-Main content area with annotation support:
+Main content area with message parts support:
 
 ```tsx
-<ChatMessage.Content isLoading={isLoading} append={append}>
-  <ChatMessage.Content.Markdown />
-  <ChatMessage.Content.Image />
-  <ChatMessage.Content.Source />
-  <ChatMessage.Content.Event />
-  <ChatMessage.Content.AgentEvent />
-  <ChatMessage.Content.DocumentFile />
-  <ChatMessage.Content.SuggestedQuestions />
+<ChatMessage.Content>
+  <ChatMessage.Part.Markdown />
+  <ChatMessage.Part.Artifact />
+  <ChatMessage.Part.Sources />
+  <ChatMessage.Part.Event />
+  <ChatMessage.Part.File />
+  <ChatMessage.Part.Suggestion />
 </ChatMessage.Content>
 ```
 
@@ -208,18 +223,16 @@ Message-level actions (copy, regenerate, etc.):
 </ChatMessage.Actions>
 ```
 
-### Content Types
+### Message Parts
 
-The content system supports multiple annotation types:
+The content system now supports multiple message part types:
 
-- **Markdown** - Rich text with LaTeX support
-- **Image** - Image display with preview
-- **Artifact** - Interactive code/document editing
-- **Source** - Citation and source links
-- **Event** - Process events and status
-- **AgentEvent** - Agent-specific events with progress
-- **DocumentFile** - File attachments
-- **SuggestedQuestions** - Follow-up question suggestions
+- **TextPart** - Rich text with Markdown and LaTeX support
+- **ArtifactPart** - Interactive code/document editing
+- **SourcesPart** - Citation and source links
+- **EventPart** - Process events and status updates
+- **FilePart** - File attachments and uploads
+- **SuggestedQuestionsPart** - Follow-up question suggestions
 
 ## ChatInput
 
@@ -364,7 +377,11 @@ function ChatWithCanvas() {
 
 ```tsx
 function AdvancedChat() {
-  const handler = useChat({ api: '/api/chat' })
+  const handler = useChat({ 
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+  })
   
   return (
     <ChatSection handler={handler} className="flex h-full">
@@ -407,16 +424,52 @@ All components have access to chat context through hooks:
 import { useChatUI, useChatMessage } from '@llamaindex/chat-ui'
 
 function CustomComponent() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages, status, sendMessage } = useChatUI()
   const { message } = useChatMessage() // Only in message context
   
   // Component logic
 }
 ```
 
+## Message Parts System
+
+Each message can have multiple parts. Parts are rendered in the order they are received.
+For more information on parts, see [Message Parts](./parts.mdx).
+
+### Creating Custom Parts
+
+```tsx
+import { usePart } from '@llamaindex/chat-ui'
+
+function CustomPart() {
+  const { data } = usePart()
+  
+  return (
+    <div className="custom-part">
+      {/* Custom part rendering */}
+    </div>
+  )
+}
+```
+
+### Backend Integration
+
+Parts can be sent from the backend via SSE protocol:
+
+```typescript
+// Backend example
+const parts = [
+  { type: 'weather', data: weatherInfo },
+  { type: 'sources', data: sourceNodes }
+]
+
+// Send as SSE
+response.write(`data: ${JSON.stringify({ parts })}\n\n`)
+```
+
 ## Next Steps
 
 - [Widgets](./widgets.mdx) - Learn about specialized content widgets
-- [Annotations](./annotations.mdx) - Implement rich content support
+- [Message Parts](./message-parts.mdx) - Implement rich content support with parts
 - [Hooks](./hooks.mdx) - Understand the hook system
 - [Customization](./customization.mdx) - Style and theme the components

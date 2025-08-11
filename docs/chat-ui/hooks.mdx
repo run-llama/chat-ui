@@ -20,9 +20,8 @@ function CustomChatComponent() {
     input,
     setInput,
     isLoading,
-    error,
-    append,
-    reload,
+    sendMessage,
+    regenerate,
     stop,
     setMessages,
     requestData,
@@ -30,9 +29,10 @@ function CustomChatComponent() {
   } = useChatUI()
 
   const handleSendMessage = async () => {
-    await append({
+    await sendMessage({
+      id: 'user-msg-1',
       role: 'user',
-      content: input,
+      parts: [{ type: 'text', text: input }],
     })
   }
 
@@ -48,14 +48,14 @@ function CustomChatComponent() {
 
 **Returned Properties:**
 
-- `messages` - Array of chat messages
+- `messages` - Array of chat messages with parts
 - `input` - Current input value
 - `setInput` - Function to update input
-- `isLoading` - Loading state boolean
-- `error` - Error object if any
-- `append` - Function to add message
-- `reload` - Function to reload last message
+- `isLoading` - Loading state boolean (computed from status)
+- `status` - Current chat status ('submitted' | 'streaming' | 'ready' | 'error')
+- `sendMessage` - Function to send a message
 - `stop` - Function to stop current generation
+- `regenerate` - Function to regenerate a message
 - `setMessages` - Function to update message array
 - `requestData` - Additional request data
 - `setRequestData` - Function to update request data
@@ -73,11 +73,14 @@ function CustomMessageContent() {
   return (
     <div>
       <p>Role: {message.role}</p>
-      <p>Content: {message.content}</p>
+      <p>Parts: {message.parts.length}</p>
       <p>Is last message: {isLast ? 'Yes' : 'No'}</p>
-      {message.annotations && (
-        <p>Has annotations: {message.annotations.length}</p>
-      )}
+      
+      {message.parts.map((part, index) => (
+        <div key={index}>
+          <p>Part {index + 1}: {part.type}</p>
+        </div>
+      ))}
     </div>
   )
 }
@@ -85,8 +88,62 @@ function CustomMessageContent() {
 
 **Returned Properties:**
 
-- `message` - Current message object
+- `message` - Current message object with parts array
 - `isLast` - Boolean indicating if this is the last message
+
+### usePart
+
+Access the current message part context within part components. This hook provides type-safe access to specific part types.
+
+```tsx
+import { usePart } from '@llamaindex/chat-ui'
+
+function TextPartComponent() {
+  const textPart = usePart('text')
+  
+  if (!textPart) return null
+  
+  return <p>{textPart.text}</p>
+}
+
+function ArtifactPartComponent() {
+  const artifactPart = usePart('data-artifact')
+  
+  if (!artifactPart) return null
+  
+  return (
+    <div>
+      <h4>{artifactPart.title}</h4>
+      <p>Type: {artifactPart.data.type}</p>
+    </div>
+  )
+}
+
+function CustomPartComponent() {
+  const customPart = usePart<CustomPartType>('custom-type')
+  
+  if (!customPart) return null
+  
+  return <CustomRenderer data={customPart.data} />
+}
+```
+
+**Function Overloads:**
+
+The hook provides automatic type inference for built-in part types:
+
+- `usePart('text')` → `TextPart | null`
+- `usePart('file')` → `FilePart | null`
+- `usePart('data-artifact')` → `ArtifactPart | null`
+- `usePart('event')` → `EventPart | null`
+- `usePart('sources')` → `SourcesPart | null`
+- `usePart('suggestion')` → `SuggestionPart | null`
+
+**Usage Notes:**
+
+- Must be used within a `ChatPartProvider` context
+- Returns `null` if the part type doesn't match the current part
+- For custom part types, use the generic parameter: `usePart<CustomPart>('custom-type')`
 
 ### useChatInput
 
@@ -136,21 +193,34 @@ Access messages list state and handlers.
 import { useChatMessages } from '@llamaindex/chat-ui'
 
 function CustomMessageList() {
-  const { messages, isLoading, reload, stop, isEmpty, scrollToBottom } =
+  const { messages, isLoading, regenerate, stop, isEmpty, scrollToBottom } =
     useChatMessages()
 
   return (
     <div>
       <div className="messages">
         {messages.map((msg, i) => (
-          <div key={i}>{msg.content}</div>
+          <div key={i}>
+            <p>Role: {msg.role}</p>
+            <div>
+              {msg.parts.map((part, index) => (
+                <div key={index}>
+                  {part.type === 'text' ? (
+                    <p>{part.text}</p>
+                  ) : (
+                    <p>{JSON.stringify(part.data)}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
 
       {isEmpty && <p>No messages yet</p>}
 
-      <button onClick={reload} disabled={isLoading}>
-        Reload
+      <button onClick={regenerate} disabled={isLoading}>
+        Regenerate
       </button>
       <button onClick={stop}>Stop</button>
       <button onClick={scrollToBottom}>Scroll to Bottom</button>
@@ -163,7 +233,7 @@ function CustomMessageList() {
 
 - `messages` - Array of messages
 - `isLoading` - Loading state
-- `reload` - Reload last message
+- `regenerate` - Regenerate last message
 - `stop` - Stop generation
 - `isEmpty` - Boolean if no messages
 - `scrollToBottom` - Function to scroll to bottom
@@ -326,13 +396,11 @@ function useCustomChat() {
   const messages = useChatMessages()
 
   const sendMessageWithMetadata = async (content: string, metadata: any) => {
-    await chatUI.append(
-      {
-        role: 'user',
-        content,
-      },
-      { data: metadata }
-    )
+    await chatUI.sendMessage({
+      id: `user-${Date.now()}`,
+      role: 'user',
+      parts: [{ type: 'text', text: content }]
+    }, { data: metadata })
   }
 
   const getLastAssistantMessage = () => {
@@ -398,7 +466,7 @@ function SafeHookUsage() {
 
 ## Next Steps
 
-- [Annotations](./annotations.mdx) - Learn how hooks work with annotation data
+- [Parts](./parts.mdx) - Learn how hooks work with message parts
 - [Customization](./customization.mdx) - Use hooks for custom styling and behavior
 - [Examples](./examples.mdx) - See complete examples using hooks
 - [Core Components](./core-components.mdx) - Understand component-hook relationships
@@ -620,10 +688,10 @@ function WorkflowChatApp() {
             >
               <ChatMessage.Avatar />
               <ChatMessage.Content>
-                <ChatMessage.Content.Markdown />
-                <ChatMessage.Content.Source />
-                {/* Custom annotations for UIEvents */}
-                <WeatherAnnotation />
+                <ChatMessage.Part.Markdown />
+                <ChatMessage.Part.Source />
+                {/* Custom parts */}
+                <WeatherPart />
               </ChatMessage.Content>
               <ChatMessage.Actions />
             </ChatMessage>
@@ -664,7 +732,7 @@ def handle_start_event(ev: StartEvent) -> MyNextEvent:
 
 #### Built-in Workflow Events
 
-The hook automatically processes workflow events (using `useWorkflow`) and renders them as annotations in the chat interface, making it easy to build rich conversational experiences with LlamaDeploy workflows.
+The hook automatically processes workflow events (using `useWorkflow`) and renders them as parts in the chat interface, making it easy to build rich conversational experiences with LlamaDeploy workflows.
 Your LlamaDeploy workflows can send three main types of events to enhance the chat experience:
 
 ##### 1. SourceNodesEvent - Citations and References
@@ -693,7 +761,7 @@ ctx.write_event_to_stream(
 )
 ```
 
-> Note: Your `ChatMessage.Content` component needs to have the `ChatMessage.Content.Source` component as a child to display the citations and references (as shown in the example above).
+> Note: Your `ChatMessage.Content` component needs to have the `ChatMessage.Part.Source` component as a child to display the citations and references (as shown in the example above).
 
 ##### 2. ArtifactEvent - Code and Artifacts
 
@@ -720,11 +788,11 @@ ctx.write_event_to_stream(
 )
 ```
 
-> Note: Your `ChatMessage.Content` component needs to have the `ChatMessage.Content.Markdown` component as a child to display the artifacts inline in the markdown component (as shown in the example above).
+> Note: Your `ChatMessage.Content` component needs to have the `ChatMessage.Part.Markdown` component as a child to display the artifacts inline in the markdown component (as shown in the example above).
 
 ##### 3. UIEvent - Custom UI Components
 
-Send custom data to render it in a specialized UI components. In your workflow code, you can send `UIEvent`s for this - for example to render a weather annotation in the chat interface:
+Send custom data to render it in a specialized UI components. In your workflow code, you can send `UIEvent`s for this - for example to render a weather part in the chat interface:
 
 ```python
 from llama_index.core.chat_ui.events import (
@@ -752,4 +820,4 @@ ctx.write_event_to_stream(
 )
 ```
 
-To render this custom UI component, you need to add it as child to your `ChatMessage.Content` component. The example above will render the [`WeatherAnnotation`](../../examples/llamadeploy/chat/ui/components/custom/custom-weather.tsx) component in the chat interface.
+To render this custom UI component, you need to add it as child to your `ChatMessage.Content` component. The example above will render the [`WeatherPart`](../../examples/llamadeploy/chat/ui/components/custom/custom-weather.tsx) component in the chat interface.

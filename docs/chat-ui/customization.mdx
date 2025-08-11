@@ -108,9 +108,9 @@ function CustomMessageLayout() {
         
         <div className="flex-1">
           <ChatMessage.Content>
-            <ChatMessage.Content.Markdown />
-            <ChatMessage.Content.Image />
-            <ChatMessage.Content.Source />
+            <ChatMessage.Part.Markdown />
+            <ChatMessage.Part.Image />
+            <ChatMessage.Part.Source />
           </ChatMessage.Content>
           
           <ChatMessage.Actions>
@@ -168,7 +168,7 @@ function RoleBasedMessage() {
     <div className={`flex ${styles.container} mb-4`}>
       <div className={`${styles.bubble} ${styles.maxWidth} p-4`}>
         <ChatMessage.Content>
-          <ChatMessage.Content.Markdown />
+          <ChatMessage.Part.Markdown />
         </ChatMessage.Content>
       </div>
     </div>
@@ -514,7 +514,11 @@ export const useTheme = () => useContext(ThemeContext)
 ```tsx
 function ThemedChatSection() {
   const { theme } = useTheme()
-  const handler = useChat({ api: '/api/chat' })
+  const handler = useChat({ 
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+  })
   
   const themeClasses = {
     light: 'bg-white text-gray-900',

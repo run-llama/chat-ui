@@ -105,9 +105,9 @@ function CustomChatMessages({
             <ChatMessage.Avatar />
             <ChatMessage.Content isLoading={isLoading} append={append}>
               <CLIHumanInput resumeWorkflow={resumeWorkflow} />
-              <ChatMessage.Content.Markdown />
+              <ChatMessage.Part.Markdown />
               <WeatherAnnotation />
-              <ChatMessage.Content.Source />
+              <ChatMessage.Part.Source />
             </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>
