@@ -121,7 +121,7 @@ The `markdown.css` file includes styling for code blocks using [highlight.js](ht
 
 ### 1. Create a Chat API Route
 
-Set up an API route to handle chat requests. Here's an example using Next.js:
+Set up an API route to handle chat requests. Here's an example using Next.js with LlamaIndex:
 
 ```typescript
 // app/api/chat/route.ts
@@ -130,13 +130,14 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   const { messages } = await request.json()
 
-  // Your chat logic here
+  // Your LlamaIndex chat logic here
   const response = await generateChatResponse(messages)
 
+  // Return streaming response in LlamaIndex format
   return new Response(response, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'X-Vercel-AI-Data-Stream': 'v1',
+      'Content-Type': 'text/event-stream',
+      'Connection': 'keep-alive',
     },
   })
 }
@@ -144,13 +145,13 @@ export async function POST(request: Request) {
 
 ### 2. Create Your Chat Component
 
-The easiest way to get started is to connect the whole `ChatSection` component with `useChat` hook from [vercel/ai](https://github.com/vercel/ai):
+The easiest way to get started is to connect the whole `ChatSection` component with `useChat` hook from `@ai-sdk/react`:
 
 ```tsx
 'use client'
 
 import { ChatSection } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 
 export default function Chat() {
   const handler = useChat({
@@ -172,7 +173,7 @@ Components are designed to be composable. You can use them as is with the simple
 ```tsx
 import { ChatSection, ChatMessages, ChatInput } from '@llamaindex/chat-ui'
 import LlamaCloudSelector from './components/LlamaCloudSelector' // your custom component
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 
 const ChatExample = () => {
   const handler = useChat()
@@ -309,7 +310,7 @@ For any language that the LLM generates, you can specify a custom renderer to re
 Now that you have a basic chat interface running:
 
 1. **Explore Components** - Learn about [Core Components](./core-components.mdx) for customization
-2. **Add Rich Content** - Implement [Annotations](./annotations.mdx) for images, files, and sources
+2. **Add Rich Content** - Implement [Parts](./parts.mdx) for images, files, and sources
 3. **Enable Artifacts** - Set up [Artifacts](./artifacts.mdx) for interactive code and documents
 4. **Customize Styling** - Read the [Customization](./customization.mdx) guide for theming
 
@@ -323,7 +324,7 @@ Now that you have a basic chat interface running:
 
 **Build errors**: Check that your bundler supports the package's export conditions.
 
-**Chat not working**: Verify your API route is returning the correct response format for the Vercel AI SDK.
+**Chat not working**: Verify your API route is returning the correct response format for the LlamaIndex streaming protocol.
 
 ### Getting Help
 

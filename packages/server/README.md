@@ -151,7 +151,7 @@ To display custom UI components, your workflow needs to emit UI events that have
 
 ```typescript
 class UIEvent extends WorkflowEvent<{
-  type: 'ui_event'
+  type: 'data-ui_event'
   data: UIEventData
 }> {}
 ```
@@ -234,19 +234,32 @@ new LlamaIndexServer({
 }).start()
 ```
 
-## Sending Artifacts to the UI
+## Sending Events to the Frontend
 
-In addition to UI events for custom components, LlamaIndex Server supports a special `ArtifactEvent` to send structured data like generated documents or code snippets to the UI. These artifacts are displayed in a dedicated "Canvas" panel in the chat interface.
+LlamaIndex Server allows your workflows to send various types of events to the frontend UI. These events can include custom UI components, structured data artifacts, or any other information you want to display to users.
 
-### Artifact Event Structure
+### Event Filtering
 
-To send an artifact, your workflow needs to emit an event with `type: "artifact"`. The `data` payload of this event should include:
+**Important Note**: The server filters events from the backend to only allow specific types to reach the frontend:
+
+- **Text parts**: `text-delta`, `text-start`, `text-end` events for streaming text content
+- **Data parts**: Any event with a type that starts with `data-` (e.g., `data-artifact`, `data-chart`, `data-table`)
+
+All other events are filtered out to ensure compatibility with the Vercel AI SDK and maintain a stable frontend experience.
+
+### Sending Artifacts to the UI
+
+One common use case is sending structured data artifacts like generated documents or code snippets to the UI. These artifacts are displayed in a dedicated "Canvas" panel in the chat interface.
+
+#### Artifact Event Structure
+
+To send an artifact, your workflow needs to emit an event with `type: "data-artifact"`. The `data` payload of this event should include:
 
 - `type`: A string indicating the type of artifact (e.g., `"document"`, `"code"`).
 - `created_at`: A timestamp (e.g., `Date.now()`) indicating when the artifact was created.
 - `data`: An object containing the specific details of the artifact. The structure of this object depends on the artifact `type`.
 
-### Defining and Sending an ArtifactEvent
+#### Defining and Sending an ArtifactEvent
 
 First, define your artifact event using `workflowEvent` from `@llamaindex/workflow`:
 
@@ -255,7 +268,7 @@ import { workflowEvent } from '@llamaindex/workflow'
 
 // Example for a document artifact
 const artifactEvent = workflowEvent<{
-  type: 'artifact' // Must be "artifact"
+  type: 'data-artifact' // Must start with "data-"
   data: {
     type: 'document' // Custom type for your artifact (e.g., "document", "code")
     created_at: number
@@ -277,7 +290,7 @@ Then, within your workflow logic, use `sendEvent` (obtained from `getContext()`)
 
 sendEvent(
   artifactEvent.with({
-    type: "artifact", // This top-level type must be "artifact"
+    type: "data-artifact", // This top-level type must start with "data-"
     data: {
       type: "document", // This is your specific artifact type
       created_at: Date.now(),
@@ -293,6 +306,53 @@ This is a markdown document.",
 ```
 
 This will send the artifact to the LlamaIndex Server UI, where it will be rendered in the [ChatCanvasPanel](/packages/server/next/app/components/ui/chat/canvas/panel.tsx) by a renderer depending on the artifact type. For type `document` this is using the [DocumentArtifactViewer](https://github.com/run-llama/chat-ui/blob/bacb75fc6edceacf742fba18632404a2483b5a81/packages/chat-ui/src/chat/canvas/artifacts/document.tsx#L17).
+
+### Other Event Types
+
+You can send any event type that starts with `data-` to create custom UI experiences. For example:
+- `data-file` for file content
+- `data-image` for image content
+- `data-*` for your own custom components
+
+The key requirement is that the event type must start with `data-` to pass through the server's event filter.
+
+### How Events are Displayed in the UI
+
+When you send events from your workflow, they flow through the system as follows:
+
+1. **Workflow Stream**: Your workflow emits events using `sendEvent()`
+2. **Server Processing**: The server transforms events to Server-Sent Events (SSE) format
+3. **Frontend Parsing**: Vercel AI SDK parses the stream and converts events back to message parts
+4. **UI Rendering**: Chat UI renders each part using built-in or custom components
+
+#### Built-in Part Components
+
+Chat UI provides several built-in components to render different part types:
+
+```tsx
+<ChatMessage.Content>
+  <ChatMessage.Part.Markdown />
+  <ChatMessage.Part.File />
+  <ChatMessage.Part.Event />
+  <ChatMessage.Part.Artifact />
+  <ChatMessage.Part.Source />
+  <ChatMessage.Part.Suggestion />
+</ChatMessage.Content>
+```
+
+#### Custom Part Components
+
+For custom `data-*` events, you can create your own part components:
+
+```tsx
+export function CustomPartUI({ className }: { className?: string }) {
+  const part = usePart('data-custom') // get your custom part
+  if (!part) return null
+  return <YourCustomComponent data={part.data} className={className} />
+}
+```
+
+Each part in `message.parts` will be automatically rendered by its corresponding component, allowing you to build rich, interactive chat experiences.
 
 ## Default Endpoints and Features
 
