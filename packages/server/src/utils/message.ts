@@ -83,7 +83,7 @@ export class ServerMessage {
 
   isFilePart(part: UIMessagePart): part is FilePart {
     return (
-      part.type === FILE_PART_TYPE && this.hasFields(part, ['mediaType', 'url'])
+      part.type === FILE_PART_TYPE && this.hasFields(part, ['data'])
     )
   }
 
