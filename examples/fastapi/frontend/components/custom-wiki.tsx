@@ -2,7 +2,7 @@
 
 import { usePart } from '@llamaindex/chat-ui'
 
-interface WikiData {
+type WikiData = {
   title: string
   summary: string
   url: string
