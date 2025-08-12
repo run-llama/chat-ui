@@ -11,7 +11,8 @@
   "dependencies": {
     "@llamaindex/chat-ui": "latest",
     "@radix-ui/react-select": "^2.1.1",
-    "ai": "^4.3.16",
+    "@ai-sdk/react": "^2.0.4",
+    "ai": "^5.0.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.453.0",
