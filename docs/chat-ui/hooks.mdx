@@ -93,7 +93,7 @@ function CustomMessageContent() {
 
 ### usePart
 
-Access the current message part context within part components. This hook provides type-safe access to specific part types.
+Access the current message content within part components. This hook provides type-safe access to specific part types in the current message.
 
 ```tsx
 import { usePart } from '@llamaindex/chat-ui'
@@ -120,7 +120,7 @@ function ArtifactPartComponent() {
 }
 
 function CustomPartComponent() {
-  const customPart = usePart<CustomPartType>('custom-type')
+  const customPart = usePart<CustomPartType>('data-custom-type')
   
   if (!customPart) return null
   
@@ -133,11 +133,11 @@ function CustomPartComponent() {
 The hook provides automatic type inference for built-in part types:
 
 - `usePart('text')` → `TextPart | null`
-- `usePart('file')` → `FilePart | null`
+- `usePart('data-file')` → `FilePart | null`
 - `usePart('data-artifact')` → `ArtifactPart | null`
-- `usePart('event')` → `EventPart | null`
-- `usePart('sources')` → `SourcesPart | null`
-- `usePart('suggestion')` → `SuggestionPart | null`
+- `usePart('data-event')` → `EventPart | null`
+- `usePart('data-sources')` → `SourcesPart | null`
+- `usePart('data-suggestion')` → `SuggestionPart | null`
 
 **Usage Notes:**
 
@@ -690,7 +690,7 @@ function WorkflowChatApp() {
               <ChatMessage.Content>
                 <ChatMessage.Part.Markdown />
                 <ChatMessage.Part.Source />
-                {/* Custom parts */}
+                {/* Renderer for custom message parts */}
                 <WeatherPart />
               </ChatMessage.Content>
               <ChatMessage.Actions />

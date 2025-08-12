@@ -7,9 +7,9 @@ Widgets are specialized components for displaying and interacting with rich cont
 
 This section describes how to use them standalone.
 
-## Content Widgets
+## ChatUI Widgets
 
-### Markdown
+## Markdown
 
 Renders rich text with LaTeX math support, syntax highlighting, and citations.
 
@@ -155,69 +155,25 @@ export default function Home() {
 - **Image Support** - Embed images
 - **Live Preview** - Real-time markdown preview
 
-## Other Widgets
+### ChatFile
 
-Used for rendering additional rich content in a chat message. See [Parts](./parts.mdx) for more information on how to add parts to a message.
-
-### ChatImage
-
-Displays images with preview and zoom functionality.
+Displays a file attachment like image, pdf, etc.
 
 ```tsx
-import { ChatImage } from '@llamaindex/chat-ui/widgets'
-
-function ImageDisplay() {
-  return (
-    <ChatImage
-      data={{
-        url: 'https://example.com/image.jpg',
-        alt: 'Description of the image',
-      }}
-    />
-  )
-}
-```
-
-**Features:**
-
-- **Zoom & Pan** - Interactive image viewing
-- **Lazy Loading** - Performance optimization
-- **Alt Text** - Accessibility support
-- **Error Handling** - Graceful fallback for broken images
-
-### ChatFiles
-
-Displays file attachments with download and preview.
-
-```tsx
-import { ChatFiles } from '@llamaindex/chat-ui/widgets'
+import { ChatFile } from '@llamaindex/chat-ui/widgets'
 
 function FileDisplay() {
   return (
-    <ChatFiles
-      data={{
-        files: [
-          {
-            id: '1',
-            name: 'report.pdf',
-            type: 'application/pdf',
-            url: '/files/report.pdf',
-            size: 1024000,
-          },
-        ],
+    <ChatFile
+      file={{
+        filename: 'upload.pdf',
+        mediaType: 'application/pdf',
+        url: 'https://pdfobject.com/pdf/sample.pdf',
       }}
     />
   )
 }
 ```
-
-**Supported File Types:**
-
-- **PDF** - Inline viewer
-- **Images** - Thumbnail preview
-- **Text Files** - Content preview
-- **CSV** - Data table preview
-- **Word Documents** - Document preview
 
 ### ChatSources
 
@@ -253,52 +209,36 @@ function SourceDisplay() {
 - **Click to View** - Opens source documents
 - **Metadata Display** - Shows title, author, date
 
-### ChatEvents
+### ChatEvent
 
-Displays collapsible process events and status updates.
+Displays collapsible process event with status updates.
 
 ```tsx
-import { ChatEvents } from '@llamaindex/chat-ui/widgets'
+import { ChatEvent } from '@llamaindex/chat-ui/widgets'
 
-function EventDisplay() {
+// When Event with loading status
+function SearchDocumentsEvent() {
   return (
-    <ChatEvents
-      data={[
-        {
-          type: 'function_call',
-          name: 'search_documents',
-          args: { query: 'machine learning' },
-          result: 'Found 15 relevant documents',
-        },
-      ]}
-      showLoading={false}
+    <ChatEvent
+      event={{
+        title: 'Searching documents',
+        description: 'Searching documents for machine learning',
+        status: 'pending',
+      }}
     />
   )
 }
-```
 
-### ChatAgentEvents
-
-Displays agent-specific events with progress tracking.
-
-```tsx
-import { ChatAgentEvents } from '@llamaindex/chat-ui/widgets'
-
-function AgentEventDisplay() {
+// When Event with success status
+function SearchDocumentsResult() {
   return (
-    <ChatAgentEvents
-      data={{
-        agent_name: 'Research Assistant',
-        progress: 75,
-        current_step: 'Analyzing documents',
-        events: [
-          { step: 'Searching', status: 'completed' },
-          { step: 'Analyzing', status: 'in_progress' },
-          { step: 'Summarizing', status: 'pending' },
-        ],
+    <ChatEvent
+      event={{
+        title: 'Searching documents',
+        description: 'Searching documents for machine learning',
+        status: 'success',
+        data: 'Document content...',
       }}
-      isFinished={true}
-      isLast={false}
     />
   )
 }
@@ -349,8 +289,6 @@ function ChatStarters() {
   )
 }
 ```
-
-## Utility Widgets
 
 ### FileUploader
 
@@ -427,7 +365,7 @@ function DocInfo({ document }) {
 }
 ```
 
-### Citation
+## Citation
 
 Individual citation component with linking.
 

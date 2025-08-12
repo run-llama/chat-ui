@@ -14,7 +14,7 @@ Text parts contain markdown content that gets rendered as formatted text. They u
 
 ### 2. Data Parts  
 Data parts contain structured data for rich interactive components like weather widgets, file attachments, sources, and more.
-Both built-in and custom parts are both using the data- prefix because Vercel need `data-` prefix to detect data parts from events.
+Both built-in and custom parts are both using the `data-` prefix. We're using here the convention from Vercel AI SDK 5 to use the `data-` prefix to detect data parts in messages.
 
 ## Message Structure with Parts
 
@@ -189,7 +189,7 @@ const suggestionPart = {
 
 ## Creating Custom Parts
 
-Create domain-specific parts for specialized content by implementing a custom component:
+Create domain-specific parts for specialized content by implementing a custom render component:
 
 ### 1. Define the Part Type and Data Interface
 
@@ -245,7 +245,10 @@ export function WeatherPart() {
 
 ## Adding Parts from Backend via SSE Protocol
 
-Parts are streamed using the **Server-Sent Events (SSE)** protocol, which provides real-time communication between the server and client. Here's how the streaming implementation works:
+Parts are streamed using the **Server-Sent Events (SSE)** protocol, which provides real-time communication between the server and client. 
+Read more about SSE protocol in [Vercel AI SDK 5](https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0#proprietary-protocol---server-sent-events) documentation.
+
+Here's how the streaming implementation works in the backend:
 
 ### Response Headers
 
@@ -378,7 +381,7 @@ Example:
 ```typescript
 part1 = {
   id: 'demo_sample_event_id',
-  type: 'event',
+  type: 'data-event',
   data: {
     title: 'Calling tool `get_weather` with input `San Francisco, CA`',
     status: 'pending',
@@ -391,7 +394,7 @@ part1 = {
 ```typescript
 part2 = {
   id: 'demo_sample_event_id',
-  type: 'event',
+  type: 'data-event',
   data: {
     title: 'Calling tool `get_weather` with input `San Francisco, CA`',
     status: 'pending',

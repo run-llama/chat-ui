@@ -138,7 +138,7 @@ Action buttons for the message list:
 
 ## ChatMessage
 
-Individual message component with full message parts support and role-based rendering.
+Individual message component which renders, the avatar, the content and actions of a message.
 
 ### Basic Usage
 
@@ -173,7 +173,7 @@ interface ChatMessageProps {
 
 ### Message Structure
 
-Messages now use a parts-based system:
+The Message data structure stores the content of a message in so called parts:
 
 ```typescript
 interface Message {
@@ -199,7 +199,7 @@ User/assistant avatar display:
 
 #### ChatMessage.Content
 
-Main content area with message parts support:
+This is the main content area which configures a couple of renders for specific message parts:
 
 ```tsx
 <ChatMessage.Content>
@@ -225,7 +225,7 @@ Message-level actions (copy, regenerate, etc.):
 
 ### Message Parts
 
-The content system now supports multiple message part types:
+There are different renderers available for each part in the message:
 
 - **TextPart** - Rich text with Markdown and LaTeX support
 - **ArtifactPart** - Interactive code/document editing
