@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { DocumentFile, FileData } from '../widgets'
-import { FilePartType, MessagePart } from '../chat/message-parts'
+import { FilePart, FilePartType, MessagePart } from '../chat/message-parts'
 
 export function useFile({ uploadAPI }: { uploadAPI: string }) {
   const [image, setImage] = useState<{
@@ -50,8 +50,8 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
     return (await response.json()) as DocumentFile
   }
 
-  const getAttachments = (): MessagePart[] => {
-    const parts = []
+  const getAttachments = (): FilePart[] => {
+    const parts: FilePart[] = []
     if (image) {
       parts.push({ type: FilePartType, data: image })
     }
@@ -63,7 +63,7 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
             filename: file.name,
             mediaType: file.type,
             url: file.url,
-          } as FileData,
+          },
         }))
       )
     }
