@@ -1,8 +1,8 @@
 'use client'
 
-import { useChatMessage, getAnnotationData } from '@llamaindex/chat-ui'
+import { usePart } from '@llamaindex/chat-ui'
 
-interface WeatherData {
+type WeatherData = {
   location: string
   temperature: number
   condition: string
@@ -10,14 +10,18 @@ interface WeatherData {
   windSpeed: number
 }
 
-// A custom annotation component that is used to display weather information in a chat message
-// The weather data is extracted from annotations in the message that has type 'weather'
-export function WeatherAnnotation() {
-  const { message } = useChatMessage()
-  const weatherData = getAnnotationData<WeatherData>(message, 'weather')
+const WeatherPartType = 'data-weather'
 
-  if (weatherData.length === 0) return null
-  return <WeatherCard data={weatherData[0]} />
+type WeatherPart = {
+  type: typeof WeatherPartType
+  data: WeatherData
+}
+
+// A custom part component that is used to display weather information in a chat message
+export function WeatherPart() {
+  const weatherData = usePart<WeatherPart>(WeatherPartType)?.data
+  if (!weatherData) return null
+  return <WeatherCard data={weatherData} />
 }
 
 function WeatherCard({ data }: { data: WeatherData }) {
@@ -29,13 +33,13 @@ function WeatherCard({ data }: { data: WeatherData }) {
     stormy: '⛈️',
   }
 
-  if (!data.location) return null
-
   return (
     <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-          <span className="text-2xl">{iconMap[data.condition] || '🌤️'}</span>
+          <span className="text-2xl">
+            {iconMap[data.condition.toLowerCase()] || '🌤️'}
+          </span>
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-blue-900">{data.location}</h3>

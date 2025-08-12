@@ -196,7 +196,7 @@ Create domain-specific parts for specialized content by implementing a custom co
 ```typescript
 const WeatherPartType = 'data-weather'
 
-interface WeatherData {
+type WeatherData = {
   location: string
   temperature: number
   condition: string

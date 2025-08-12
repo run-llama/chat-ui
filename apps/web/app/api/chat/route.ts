@@ -1,4 +1,4 @@
-import { fakeStreamText } from '@/app/utils'
+import { fakeStreamText, TextChunk, writeStream } from '@/app/utils'
 import { UIMessage as Message } from '@ai-sdk/react'
 import {
   MessageContentDetail,
@@ -11,8 +11,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-
-const DATA_PREFIX = 'data: '
 
 Settings.llm = new OpenAI({ model: 'gpt-4o-mini' })
 Settings.embedModel = new OpenAIEmbedding({
@@ -51,29 +49,16 @@ export async function POST(request: NextRequest) {
 
     const sseStream = new ReadableStream({
       async start(controller) {
-        const encoder = new TextEncoder()
-
-        // New SSE format with text chunks
-        function writeStream(chunk: {
-          id: string
-          type: string
-          delta?: string
-        }) {
-          controller.enqueue(
-            encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
-          )
-        }
-
         // Generate a unique message id
         const messageId = crypto.randomUUID()
 
         // Start the text chunk
-        const startChunk = { id: messageId, type: 'text-start' }
-        writeStream(startChunk)
+        const startChunk: TextChunk = { id: messageId, type: 'text-start' }
+        writeStream(controller, startChunk)
 
         // Consume the response and write the chunks to the controller
         for await (const chunk of response) {
-          writeStream({
+          writeStream(controller, {
             id: messageId,
             type: 'text-delta',
             delta: chunk.delta,
@@ -81,8 +66,8 @@ export async function POST(request: NextRequest) {
         }
 
         // End the text chunk
-        const endChunk = { id: messageId, type: 'text-end' }
-        writeStream(endChunk)
+        const endChunk: TextChunk = { id: messageId, type: 'text-end' }
+        writeStream(controller, endChunk)
 
         controller.close()
       },

@@ -2,7 +2,7 @@
 
 import { usePart } from '@llamaindex/chat-ui'
 
-interface WeatherData {
+type WeatherData = {
   location: string
   temperature: number
   condition: string

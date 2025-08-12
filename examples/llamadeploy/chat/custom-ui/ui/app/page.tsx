@@ -10,7 +10,7 @@ import {
   useChatUI,
   useChatWorkflow,
 } from '@llamaindex/chat-ui'
-import { WeatherAnnotation } from '@/components/custom/custom-weather'
+import { WeatherPart } from '@/components/custom/custom-weather'
 import { CLIHumanInput } from '@/components/custom/human-input'
 import {
   Select,
@@ -106,7 +106,7 @@ function CustomChatMessages({
             <ChatMessage.Content isLoading={isLoading} append={append}>
               <CLIHumanInput resumeWorkflow={resumeWorkflow} />
               <ChatMessage.Part.Markdown />
-              <WeatherAnnotation />
+              <WeatherPart />
               <ChatMessage.Part.Source />
             </ChatMessage.Content>
             <ChatMessage.Actions />

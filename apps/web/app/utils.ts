@@ -3,15 +3,26 @@ import { faker } from '@faker-js/faker'
 const DATA_PREFIX = 'data: ' // SSE format prefix
 const TOKEN_DELAY = 30 // 30ms delay between tokens
 
-interface TextChunk {
+export type TextChunk = {
   type: 'text-delta' | 'text-start' | 'text-end'
   id: string
   delta?: string
 }
 
-interface DataChunk {
+export type DataChunk = {
   type: `data-${string}` // requires `data-` prefix when sending data parts
   data: Record<string, any>
+}
+
+const encoder = new TextEncoder()
+
+export const writeStream = (
+  controller: ReadableStreamDefaultController,
+  chunk: TextChunk | DataChunk
+) => {
+  controller.enqueue(
+    encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
+  )
 }
 
 export const fakeStreamText = ({
@@ -82,6 +93,8 @@ export const fakeStreamText = ({
           await writeTextMessage('\n\n')
         }
       }
+
+      controller.close()
     },
   })
 }

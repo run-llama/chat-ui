@@ -31,7 +31,7 @@ export default function Page(): JSX.Element {
     <div className="flex h-screen flex-col">
       <header className="w-full border-b p-4 text-center">
         <h1 className="text-2xl font-bold">
-          LlamaIndex Chat UI - Next.js Example
+          LlamaIndex Chat UI - FastAPI Example
         </h1>
         <p className="text-gray-600">
           A simple chat interface using @llamaindex/chat-ui
