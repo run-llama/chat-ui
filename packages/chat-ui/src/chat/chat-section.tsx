@@ -20,7 +20,10 @@ export default function ChatSection(props: ChatSectionProps) {
   const [input, setInput] = useState('')
   const [requestData, setRequestData] = useState<any>()
 
-  const isLoading = handler.status === 'streaming'
+  // show loading immediately after the user submits the request
+  // then keep loading util streaming is finished
+  const isLoading =
+    handler.status === 'submitted' || handler.status === 'streaming'
 
   const children = props.children ?? (
     <>
