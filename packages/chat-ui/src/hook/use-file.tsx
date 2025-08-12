@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { DocumentFile, FileData } from '../widgets'
-import { FilePart, FilePartType, MessagePart } from '../chat/message-parts'
+import { FilePart, FilePartType } from '../chat/message-parts'
+import { DocumentFile } from '../widgets'
 
 export function useFile({ uploadAPI }: { uploadAPI: string }) {
   const [image, setImage] = useState<{
