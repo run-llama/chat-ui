@@ -11,7 +11,7 @@ PART_DELAY = 1.0  # 1s delay between parts
 
 class SSEStreamResponse(StreamingResponse):
     """
-    New SSE format compatible with the updated Next.js chat handler.
+    New SSE format compatible with Vercel/AI SDK 5 useChat
     """
 
     def __init__(self, parts: list[Union[str, Dict[str, Any]]], query: str = "", **kwargs):
@@ -77,3 +77,10 @@ class SSEStreamResponse(StreamingResponse):
             elif isinstance(item, dict):
                 async for chunk in write_data(item):
                     yield chunk
+
+def get_text(message: Any) -> str:
+    return "\n\n".join(
+        part["text"]
+        for part in message["parts"]
+        if part.get("type") == "text" and "text" in part
+    )

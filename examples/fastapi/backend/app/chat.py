@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
-from .vercel import SSEStreamResponse
+from .vercel import SSEStreamResponse, get_text
 
 router = APIRouter(prefix="/chat")
 
@@ -10,18 +10,7 @@ async def chat(request: Request) -> StreamingResponse:
     data = await request.json()
     messages = data.get("messages", [])
     last_message = messages[-1] if messages else {}
-    
-    # Handle new message format with parts
-    if "parts" in last_message and last_message["parts"]:
-        # Extract text from the first part
-        first_part = last_message["parts"][0]
-        if isinstance(first_part, dict) and "text" in first_part:
-            content = first_part["text"]
-        else:
-            content = ""
-    else:
-        # Fallback to old format
-        content = last_message.get("content", "")
+    content = get_text(last_message)
     
     query_text = f'User query: "{content}".\n'
     

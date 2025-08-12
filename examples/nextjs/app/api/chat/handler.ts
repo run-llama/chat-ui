@@ -16,6 +16,11 @@ interface DataChunk {
   data: Record<string, any>
 }
 
+interface TextPart {
+  type: 'text'
+  text: string
+}
+
 export interface MessagePart {
   id?: string
   type: string
@@ -29,7 +34,7 @@ export async function chatHandler(
   try {
     // extract query from last message
     const { messages } = await request.json()
-    const query = messages[messages.length - 1]?.parts[0]?.text ?? ''
+    const query = getText(messages[messages.length - 1]?.parts ?? [])
 
     // create a stream
     const stream = fakeChatStream(`User query: "${query}".\n`, parts)
@@ -46,6 +51,13 @@ export async function chatHandler(
     const detail = (error as Error).message
     return NextResponse.json({ detail }, { status: 500 })
   }
+}
+
+function getText(message: { parts: MessagePart[] }): string {
+  return message.parts
+    .filter((part): part is TextPart => part.type === 'text')
+    .map(part => part.text)
+    .join('\n\n')
 }
 
 const fakeChatStream = (
