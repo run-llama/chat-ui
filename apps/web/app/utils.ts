@@ -42,24 +42,15 @@ export const fakeStreamText = ({
     })),
   ]
 
-  const encoder = new TextEncoder()
-
   return new ReadableStream({
     async start(controller) {
-      // New SSE format with text chunks
-      function writeStream(chunk: TextChunk | DataChunk) {
-        controller.enqueue(
-          encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
-        )
-      }
-
       async function writeTextMessage(content: string) {
         // Generate a unique message id
         const messageId = crypto.randomUUID()
 
         // Start the text chunk
         const startChunk: TextChunk = { id: messageId, type: 'text-start' }
-        writeStream(startChunk)
+        writeStream(controller, startChunk)
 
         // Stream tokens one by one
         for (const token of content.split(' ')) {
@@ -69,14 +60,14 @@ export const fakeStreamText = ({
               type: 'text-delta',
               delta: `${token} `,
             }
-            writeStream(deltaChunk)
+            writeStream(controller, deltaChunk)
             await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
           }
         }
 
         // End the text chunk
         const endChunk: TextChunk = { id: messageId, type: 'text-end' }
-        writeStream(endChunk)
+        writeStream(controller, endChunk)
       }
 
       // Stream each block as a separate message
