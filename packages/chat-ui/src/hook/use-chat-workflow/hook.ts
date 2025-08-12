@@ -35,24 +35,16 @@ export function useChatWorkflow({
       if (lastMessage?.role === 'assistant') {
         const updatedParts = [...lastMessage.parts, ...parts]
 
-        const textParts = updatedParts.filter(
-          (part): part is TextPart => part.type === TextPartType
-        )
-        const dataParts = updatedParts.filter(
-          part => part.type !== TextPartType
-        )
+        // Merge adjacent text parts while preserving order
+        const mergedParts = mergeAdjacentTextParts(updatedParts)
 
-        const content = textParts.map(part => part.text).join('') // join text delta parts into one
-        const newParts = [{ type: TextPartType, text: content }, ...dataParts]
-
-        // merge text parts into one, keep other parts as it is
         return [
           ...prev.slice(0, -1),
           {
             ...lastMessage,
-            parts: newParts,
+            parts: mergedParts,
           },
-        ] as Message[]
+        ]
       }
 
       // if last message is user message, add a new assistant message
@@ -140,4 +132,34 @@ export function useChatWorkflow({
     },
     resume: handleResume,
   }
+}
+
+function mergeAdjacentTextParts(parts: MessagePart[]): MessagePart[] {
+  const result: MessagePart[] = []
+
+  for (let i = 0; i < parts.length; i++) {
+    const currentPart = parts[i]
+
+    if (currentPart.type === TextPartType) {
+      // Collect all consecutive text parts
+      let mergedText = (currentPart as TextPart).text
+      let j = i + 1
+
+      while (j < parts.length && parts[j].type === TextPartType) {
+        mergedText += (parts[j] as TextPart).text
+        j++
+      }
+
+      // Add the merged text part
+      result.push({ type: TextPartType, text: mergedText })
+
+      // Skip the parts we've already processed
+      i = j - 1
+    } else {
+      // Non-text part, add as-is
+      result.push(currentPart)
+    }
+  }
+
+  return result
 }
