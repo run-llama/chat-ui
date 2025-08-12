@@ -476,18 +476,18 @@ function CustomPartComponent() {
 }
 ```
 
-### extractAllPartData Function
+### getParts Function
 
 Extract all parts of a specific type from a message:
 
 ```tsx
-import { extractAllPartData } from '@llamaindex/chat-ui'
+import { getParts } from '@llamaindex/chat-ui'
 
 // Get all text content from a message
-const allTextParts = extractAllPartData<string>(message, 'text')
+const allTextParts = getParts<string>(message, 'text')
 
 // Get all weather data parts
-const allWeatherData = extractAllPartData<WeatherData>(message, 'data-weather')
+const allWeatherData = getParts<WeatherData>(message, 'data-weather')
 ```
 
 This function is useful for:
