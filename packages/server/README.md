@@ -140,6 +140,56 @@ export const workflowFactory = async () => {
 
 To generate sophisticated examples of workflows, you best use the [create-llama](https://github.com/run-llama/create-llama) project.
 
+## ServerMessage
+
+The `ServerMessage` class is a central utility for handling messages in the LlamaIndex Server. It provides convenient methods to extract and process different types of content from Vercel AI SDK messages, including artifacts, file attachments, and human responses.
+
+### Key Features
+
+- **Extract artifacts**: Get code artifacts, documents, and other generated content
+- **Access attachments**: Retrieve file attachments from messages
+- **Convert to LlamaIndex format**: Transform messages for use with LlamaIndex workflows
+- **Type-safe filtering**: Built-in type guards for different message part types
+
+### Usage
+
+Import and create a `ServerMessage` instance:
+
+```typescript
+import { toServerMessage } from '@llamaindex/server'
+import { UIMessage } from '@ai-sdk/react'
+
+// Convert Vercel AI SDK messages to ServerMessage instances
+const messages: UIMessage[] = ...
+const serverMessages = messages.map(toServerMessage)
+```
+
+### Getting Artifacts
+
+```typescript
+// Get all artifacts from all messages
+const artifacts = serverMessages.flatMap(message => message.artifacts)
+
+// Get the last artifact of any type
+const lastArtifact = artifacts[artifacts.length - 1]
+
+// Get the last artifact of a specific type
+const lastCodeArtifact = serverMessage.getLastArtifact('code')
+const lastDocumentArtifact = serverMessage.getLastArtifact('document')
+```
+
+### Getting Attachments
+
+```typescript
+const attachments = serverMessage.attachments
+```
+
+### Converting to LlamaIndex Format
+
+```typescript
+const llamaindexMessage = serverMessage.llamaindexMessage
+```
+
 ## AI-generated UI Components
 
 The LlamaIndex server provides support for rendering workflow events using custom UI components, allowing you to extend and customize the chat interface.
@@ -325,35 +375,6 @@ When you send events from your workflow, they flow through the system as follows
 2. **Server Processing**: The server transforms events to Server-Sent Events (SSE) format
 3. **Frontend Parsing**: Vercel AI SDK parses the stream and converts events back to message parts
 4. **UI Rendering**: Chat UI renders each part using built-in or custom components
-
-#### Built-in Part Components
-
-Chat UI provides several built-in components to render different part types:
-
-```tsx
-<ChatMessage.Content>
-  <ChatMessage.Part.Markdown />
-  <ChatMessage.Part.File />
-  <ChatMessage.Part.Event />
-  <ChatMessage.Part.Artifact />
-  <ChatMessage.Part.Source />
-  <ChatMessage.Part.Suggestion />
-</ChatMessage.Content>
-```
-
-#### Custom Part Components
-
-For custom `data-*` events, you can create your own part components:
-
-```tsx
-export function CustomPartUI({ className }: { className?: string }) {
-  const part = usePart('data-custom') // get your custom part
-  if (!part) return null
-  return <YourCustomComponent data={part.data} className={className} />
-}
-```
-
-Each part in `message.parts` will be automatically rendered by its corresponding component, allowing you to build rich, interactive chat experiences.
 
 ## Default Endpoints and Features
 
