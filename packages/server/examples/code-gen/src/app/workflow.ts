@@ -1,7 +1,7 @@
 import {
   artifactEvent,
   getMessageTextContent,
-  ServerMessage,
+  toServerMessage,
 } from '@llamaindex/server'
 import { ChatMemoryBuffer, MessageContent, Settings } from 'llamaindex'
 
@@ -60,9 +60,7 @@ const uiEvent = workflowEvent<UIEvent>()
 export function workflowFactory(reqBody: { messages: UIMessage[] }) {
   const llm = Settings.llm
 
-  const serverMessages = reqBody.messages.map(
-    message => new ServerMessage(message)
-  )
+  const serverMessages = reqBody.messages.map(toServerMessage)
   const artifacts = serverMessages.flatMap(message => message.artifacts)
   const lastArtifact = artifacts[artifacts.length - 1]
 

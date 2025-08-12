@@ -101,3 +101,7 @@ export class ServerMessage {
     return fields.every(field => field in part)
   }
 }
+
+export function toServerMessage(message: UIMessage): ServerMessage {
+  return new ServerMessage(message)
+}
