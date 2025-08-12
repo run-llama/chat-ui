@@ -65,10 +65,7 @@ export function useChatWorkflow({
   const append = async (newMessage: Message) => {
     setMessages(prev => [...prev, newMessage])
 
-    const newMessageContent = newMessage.parts.find(
-      (part): part is TextPart => part.type === TextPartType
-    )?.text
-
+    const newMessageContent = getTextMessageContent(newMessage)
     if (!newMessageContent) return
 
     try {
@@ -132,6 +129,13 @@ export function useChatWorkflow({
     },
     resume: handleResume,
   }
+}
+
+function getTextMessageContent(message: Message): string {
+  return message.parts
+    .filter((part): part is TextPart => part.type === TextPartType)
+    .map(part => part.text)
+    .join('\n\n')
 }
 
 function mergeAdjacentTextParts(parts: MessagePart[]): MessagePart[] {
