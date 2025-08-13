@@ -1,6 +1,6 @@
-import { extractFileAttachments, getStoredFilePath } from '@llamaindex/server'
+import { getStoredFilePath, ServerMessage } from '@llamaindex/server'
 import { agent } from '@llamaindex/workflow'
-import { type Message } from 'ai'
+import { type UIMessage as Message } from '@ai-sdk/react'
 import { tool } from 'llamaindex'
 import { promises as fsPromises } from 'node:fs'
 import { z } from 'zod'
@@ -8,7 +8,9 @@ import { z } from 'zod'
 export const workflowFactory = async (reqBody: { messages: Message[] }) => {
   const { messages } = reqBody
   // Extract the files from the messages
-  const files = extractFileAttachments(messages)
+  const lastMessage = messages[messages.length - 1]
+  const serverMessage = new ServerMessage(lastMessage)
+  const files = serverMessage.attachments
   const fileIds = files.map(file => file.id)
 
   // Define a tool to read the file content using the id

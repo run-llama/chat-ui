@@ -1,0 +1,515 @@
+---
+title: Message Parts
+description: Working with rich content parts for multimedia and interactive chat experiences
+---
+
+Message parts are the building blocks for creating rich, interactive chat experiences beyond simple text. They allow you to embed text, files, sources, events, artifacts, and custom content types directly into chat messages as structured components.
+
+## Parts System Overview
+
+Chat-UI supports two fundamental types of parts that make up chat messages:
+
+### 1. Text Parts
+Text parts contain markdown content that gets rendered as formatted text. They use the `text` type and are the primary way to display textual content.
+
+### 2. Data Parts  
+Data parts contain structured data for rich interactive components like weather widgets, file attachments, sources, and more.
+Both built-in and custom parts are both using the `data-` prefix. We're using here the convention from Vercel AI SDK 5 to use the `data-` prefix to detect data parts in messages.
+
+## Message Structure with Parts
+
+```typescript
+interface Message {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  parts: MessagePart[]
+}
+
+// Two types of parts
+type MessagePart = TextPart | DataPart
+
+// Text parts for markdown content
+interface TextPart {
+  type: 'text'
+  text: string
+}
+
+// Data parts for rich components
+interface DataPart {
+  id?: string // if provided, only the last part with same id is kept
+  type: string // should use 'data-' prefix for data parts
+  data?: any
+}
+```
+
+## How Chat-UI Renders Parts
+
+Parts are automatically rendered when using the `ChatMessage.Content` component. Each part type has a corresponding component that checks if the current part matches its type:
+
+```tsx
+<ChatMessage message={message}>
+  <ChatMessage.Content>
+    {/* Built-in part components */}
+    <ChatMessage.Part.Markdown />
+    <ChatMessage.Part.File />
+    <ChatMessage.Part.Event />
+    <ChatMessage.Part.Artifact />
+    <ChatMessage.Part.Source />
+    <ChatMessage.Part.Suggestion />
+    
+    {/* Custom part components */}
+    <WeatherPart />
+    <WikiPart />
+  </ChatMessage.Content>
+</ChatMessage>
+```
+
+The rendering system:
+1. Iterates through each part in `message.parts`
+2. Provides each part to all child components via `ChatPartProvider`
+3. Each component uses `usePart(partType)` to check if it should render
+4. Only the matching component renders, others return `null`
+
+## Built-in Parts
+
+Chat-UI provides several built-in part types for common use cases:
+
+### Text Parts (`text`)
+Display markdown content with syntax highlighting, links, and formatting.
+
+```typescript
+const textPart = {
+  type: 'text',
+  text: `
+# Heading
+This is **bold** and *italic* text.
+
+\`\`\`javascript
+console.log('Hello, world!')
+\`\`\`
+  `
+}
+```
+
+### File Parts (`data-file`)
+Display file attachments with download links and metadata.
+
+```typescript
+const filePart = {
+  type: 'data-file',
+  data: {
+    name: 'quarterly-report.pdf',
+    type: 'application/pdf',
+    url: '/files/quarterly-report.pdf',
+    size: 2048576 // bytes
+  }
+}
+```
+
+### Source Parts (`data-sources`)
+Display citations and source references with document grouping.
+
+```typescript
+const sourcesPart = {
+  type: 'data-sources',
+  data: {
+    nodes: [
+      {
+        id: 'source1',
+        url: '/documents/research-paper.pdf',
+        metadata: {
+          title: 'Machine Learning in Healthcare',
+          author: 'Dr. Jane Smith',
+          page_number: 15,
+          section: 'Methodology'
+        }
+      }
+    ]
+  }
+}
+```
+
+### Event Parts (`data-event`) 
+Display process events, function calls, and system activities with status updates.
+
+```typescript
+const eventPart = {
+  id: 'search_event', // Same ID will update previous event
+  type: 'data-event',
+  data: {
+    title: 'Calling tool `search_database`',
+    status: 'success',
+    data: {
+      query: 'machine learning papers',
+      result: 'Found 8 relevant papers'
+    }
+  }
+}
+```
+
+### Artifact Parts (`data-artifact`)
+Create interactive code and document artifacts that users can edit.
+
+```typescript
+const artifactPart = {
+  type: 'data-artifact',
+  data: {
+    type: 'code',
+    data: {
+      title: 'Data Analysis Script',
+      file_name: 'analyze_data.py',
+      language: 'python',
+      code: `
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def analyze_sales_data(file_path):
+    df = pd.read_csv(file_path)
+    monthly_sales = df.groupby('month')['sales'].sum()
+    return monthly_sales
+      `
+    }
+  }
+}
+```
+
+### Suggestion Parts (`data-suggested_questions`)
+Provide interactive follow-up questions to guide conversation.
+
+```typescript
+const suggestionPart = {
+  type: 'data-suggested_questions',
+  data: [
+    'Can you explain the methodology in more detail?',
+    'What are the potential limitations?',
+    'How does this compare to traditional methods?'
+  ]
+}
+```
+
+## Creating Custom Parts
+
+Create domain-specific parts for specialized content by implementing a custom render component:
+
+### 1. Define the Part Type and Data Interface
+
+```typescript
+const WeatherPartType = 'data-weather'
+
+type WeatherData = {
+  location: string
+  temperature: number
+  condition: string
+  humidity: number
+  windSpeed: number
+}
+```
+
+### 2. Create the Component
+
+```tsx
+import { usePart } from '@llamaindex/chat-ui'
+
+export function WeatherPart() {
+  // usePart returns data only if current part matches the type
+  const weatherData = usePart<WeatherData>(WeatherPartType)
+  
+  if (!weatherData) return null
+  
+  return (
+    <div className="weather-widget">
+      <h3>{weatherData.location}</h3>
+      <div className="temperature">{weatherData.temperature}°C</div>
+      <div className="condition">{weatherData.condition}</div>
+      <div className="details">
+        <span>Humidity: {weatherData.humidity}%</span>
+        <span>Wind: {weatherData.windSpeed} km/h</span>
+      </div>
+    </div>
+  )
+}
+```
+
+### 3. Add to Message Rendering
+
+```tsx
+<ChatMessage message={message}>
+  <ChatMessage.Content>
+    <ChatMessage.Part.Markdown />
+    <ChatMessage.Part.File />
+    {/* Add your custom component */}
+    <WeatherPart />
+  </ChatMessage.Content>
+</ChatMessage>
+```
+
+## Adding Parts from Backend via SSE Protocol
+
+Parts are streamed using the **Server-Sent Events (SSE)** protocol, which provides real-time communication between the server and client. 
+Read more about SSE protocol in [Vercel AI SDK 5](https://ai-sdk.dev/docs/migration-guides/migration-guide-5-0#proprietary-protocol---server-sent-events) documentation.
+
+Here's how the streaming implementation works in the backend:
+
+### Response Headers
+
+The server must set specific headers for SSE streaming:
+
+```typescript
+return new Response(stream, {
+  headers: {
+    'Content-Type': 'text/event-stream',
+    'Connection': 'keep-alive',
+  },
+})
+```
+
+### Stream Format
+
+Each chunk sent to the client must follow the SSE format with a `data:` prefix:
+
+```typescript
+const DATA_PREFIX = 'data: '
+
+function writeStream(chunk: TextChunk | DataChunk) {
+  controller.enqueue(
+    encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
+  )
+}
+```
+
+### Chunk Types
+
+The streaming protocol supports two types of chunks:
+
+#### Text Chunks (for streaming text content)
+```typescript
+interface TextChunk {
+  type: 'text-start' | 'text-delta' | 'text-end'
+  id: string
+  delta?: string // only for text-delta
+}
+
+// Example sequence:
+// data: {"type":"text-start","id":"msg-123"}
+// data: {"type":"text-delta","id":"msg-123","delta":"Hello "}
+// data: {"type":"text-delta","id":"msg-123","delta":"world!"}
+// data: {"type":"text-end","id":"msg-123"}
+```
+
+#### Data Chunks (for rich components)
+```typescript
+interface DataChunk {
+  id?: string // optional - same ID replaces previous parts
+  type: `data-${string}` // requires 'data-' prefix
+  data: Record<string, any>
+}
+
+// Example:
+// data: {"type":"data-weather","data":{"location":"SF","temp":22}}
+```
+
+### Implementation Example
+
+```typescript
+const fakeChatStream = (parts: (string | MessagePart)[]): ReadableStream => {
+  return new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder()
+      
+      function writeStream(chunk: TextChunk | DataChunk) {
+        controller.enqueue(
+          encoder.encode(`${DATA_PREFIX}${JSON.stringify(chunk)}\n\n`)
+        )
+      }
+      
+      async function writeText(content: string) {
+        const messageId = crypto.randomUUID()
+        
+        // Start text stream
+        writeStream({ id: messageId, type: 'text-start' })
+        
+        // Stream tokens
+        for (const token of content.split(' ')) {
+          writeStream({
+            id: messageId,
+            type: 'text-delta',
+            delta: token + ' '
+          })
+          await new Promise(resolve => setTimeout(resolve, 30))
+        }
+        
+        // End text stream
+        writeStream({ id: messageId, type: 'text-end' })
+      }
+      
+      async function writeData(data: MessagePart) {
+        writeStream({
+          id: data.id,
+          type: `data-${data.type}`,
+          data: data.data
+        })
+      }
+      
+      // Stream all parts
+      for (const item of parts) {
+        if (typeof item === 'string') {
+          await writeText(item)
+        } else {
+          await writeData(item)
+        }
+      }
+      
+      controller.close()
+    },
+  })
+}
+```
+
+### Important ID Behavior for Data Parts
+
+When data parts have the same `id`, only the **last** data part with that ID will exist in `message.parts`. This is useful for:
+
+- **Single data display**: Show only the final result (e.g., hide loading, show final weather data)
+- **Progressive updates**: Update the same component as new data arrives (e.g., streaming events)
+
+If you want multiple parts of the same type, **don't provide an ID** or use different IDs.
+
+Example:
+
+1. When calling a tool, send an event with tool call information:
+
+```typescript
+part1 = {
+  id: 'demo_sample_event_id',
+  type: 'data-event',
+  data: {
+    title: 'Calling tool `get_weather` with input `San Francisco, CA`',
+    status: 'pending',
+  },
+}
+```
+
+2. When the tool call is completed, send an event with the tool call result. The previous event with the same id will be replaced by the new one.
+
+```typescript
+part2 = {
+  id: 'demo_sample_event_id',
+  type: 'data-event',
+  data: {
+    title: 'Calling tool `get_weather` with input `San Francisco, CA`',
+    status: 'pending',
+  },
+}
+```
+
+When checking `message.parts`, you will only see the last event with the final result.
+
+
+### Important Notes
+
+- **SSE Format**: Each message must be prefixed with `data: ` and end with `\n\n`
+- **JSON Encoding**: All chunks are JSON-encoded objects
+- **Text Streaming**: Text content requires start/delta/end sequence for proper rendering
+- **Data Parts**: Must use `data-` prefix in the type field
+- **ID Behavior**: Same IDs in data parts will replace previous parts with that ID
+
+
+## Complete Message Example
+
+```typescript
+const message = {
+  id: 'msg-123',
+  role: 'assistant',
+  parts: [
+    {
+      type: 'text',
+      text: 'I\'ve analyzed your data and here are the results:'
+    },
+    {
+      type: 'data-artifact',
+      data: {
+        type: 'code',
+        data: {
+          title: 'Sales Analysis',
+          file_name: 'analysis.py',
+          language: 'python',
+          code: 'import pandas as pd\n# Analysis code...'
+        }
+      }
+    },
+    {
+      type: 'data-sources',
+      data: {
+        nodes: [
+          { 
+            id: '1', 
+            url: '/data/sales.csv', 
+            metadata: { title: 'Sales Data Q4 2024' } 
+          }
+        ]
+      }
+    },
+    {
+      type: 'data-suggested_questions',
+      data: [
+        'Can you explain the quarterly trends?',
+        'What about the seasonal patterns?',
+        'How can we improve performance?'
+      ]
+    }
+  ]
+}
+```
+
+## Utility Functions
+
+### usePart Hook
+
+Extract part data by type within part components:
+
+```tsx
+import { usePart } from '@llamaindex/chat-ui'
+
+function CustomPartComponent() {
+  // Returns data only if current part matches type, null otherwise
+  const weatherData = usePart<WeatherData>('data-weather')
+  const textContent = usePart<string>('text')
+  
+  // Component logic...
+}
+```
+
+### getParts Function
+
+Extract all parts of a specific type from a message:
+
+```tsx
+import { getParts } from '@llamaindex/chat-ui'
+
+// Get all text content from a message
+const allTextParts = getParts<string>(message, 'text')
+
+// Get all weather data parts
+const allWeatherData = getParts<WeatherData>(message, 'data-weather')
+```
+
+This function is useful for:
+- Aggregating data from multiple parts
+- Building summaries or indexes
+- Processing historical data
+
+## Best Practices
+
+1. **Use the `data-` prefix** for all custom part types
+2. **Provide IDs** only when you want parts to replace each other
+3. **Keep data structures simple** and serializable
+4. **Handle null cases** in custom components when data doesn't match
+5. **Mix text and data parts** to create rich, contextual experiences
+6. **Stream progressively** to improve perceived performance
+
+## Next Steps
+
+- [Artifacts](./artifacts.mdx) - Learn about interactive code and document artifacts
+- [Widgets](./widgets.mdx) - Explore widget implementation details  
+- [Examples](./examples.mdx) - See complete implementation examples
+- [Customization](./customization.mdx) - Style and customize part appearance

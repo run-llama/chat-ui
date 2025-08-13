@@ -1,10 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import { FilePart, FilePartType } from '../chat/message-parts'
 import { DocumentFile } from '../widgets'
 
 export function useFile({ uploadAPI }: { uploadAPI: string }) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [image, setImage] = useState<{
+    filename: string
+    mediaType: string
+    url: string
+  } | null>(null)
   const [files, setFiles] = useState<DocumentFile[]>([])
 
   const addDoc = (file: DocumentFile) => {
@@ -21,7 +26,7 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
   }
 
   const reset = () => {
-    imageUrl && setImageUrl(null)
+    image && setImage(null)
     files.length && setFiles([])
   }
 
@@ -45,21 +50,24 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
     return (await response.json()) as DocumentFile
   }
 
-  const getAnnotations = () => {
-    const annotations = []
-    if (imageUrl) {
-      annotations.push({
-        type: 'image',
-        data: { url: imageUrl },
-      })
+  const getAttachments = (): FilePart[] => {
+    const parts: FilePart[] = []
+    if (image) {
+      parts.push({ type: FilePartType, data: image })
     }
     if (files.length > 0) {
-      annotations.push({
-        type: 'document_file',
-        data: { files },
-      })
+      parts.push(
+        ...files.map(file => ({
+          type: FilePartType,
+          data: {
+            filename: file.name,
+            mediaType: file.type,
+            url: file.url,
+          },
+        }))
+      )
     }
-    return annotations
+    return parts
   }
 
   const readContent = async (input: {
@@ -83,7 +91,11 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
   const uploadFile = async (file: File, requestParams: any = {}) => {
     if (file.type.startsWith('image/')) {
       const base64 = await readContent({ file, asUrl: true })
-      return setImageUrl(base64)
+      return setImage({
+        filename: file.name,
+        mediaType: file.type,
+        url: base64,
+      })
     }
 
     // Upload any non-image file as a document
@@ -92,12 +104,12 @@ export function useFile({ uploadAPI }: { uploadAPI: string }) {
   }
 
   return {
-    imageUrl,
-    setImageUrl,
+    image,
+    setImage,
     files,
     removeDoc,
     reset,
-    getAnnotations,
+    getAttachments,
     uploadFile,
   }
 }

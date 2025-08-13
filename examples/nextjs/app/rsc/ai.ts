@@ -1,8 +1,8 @@
 'use server'
 
-import { createAI } from 'ai/rsc'
+import { createAI } from '@ai-sdk/rsc'
 import { chatAction } from './action'
-import { Message } from 'ai'
+import { UIMessage as Message } from 'ai'
 import { ReactNode } from 'react'
 
 // define AI state and AI provider for RSC app

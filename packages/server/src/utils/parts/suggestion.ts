@@ -1,24 +1,40 @@
 import { getEnv } from '@llamaindex/env'
-import type { DataStreamWriter } from 'ai'
+import { workflowEvent } from '@llamaindex/workflow'
 import { type ChatMessage, Settings } from 'llamaindex'
-import { NEXT_QUESTION_PROMPT } from './prompts'
+import { getMessageTextContent } from './text'
 
-export const sendSuggestedQuestionsEvent = async (
-  streamWriter: DataStreamWriter,
-  chatHistory: ChatMessage[] = []
-) => {
-  const questions = await generateNextQuestions(chatHistory)
-  if (questions.length > 0) {
-    streamWriter.writeMessageAnnotation({
-      type: 'suggested_questions',
-      data: questions,
-    })
-  }
+export const SUGGESTION_PART_TYPE = `data-suggested_questions` as const
+
+export type SuggestionData = string[]
+
+export type SuggestionPart = {
+  id?: string
+  type: typeof SUGGESTION_PART_TYPE
+  data: SuggestionData
 }
+
+export const suggestionEvent = workflowEvent<SuggestionPart>()
+
+const NEXT_QUESTION_PROMPT = `You're a helpful assistant! 
+Your task is to suggest the next question that user might ask. 
+Here is the conversation history
+---------------------
+{conversation}
+---------------------
+Given the conversation history, please give me 3 questions that user might ask next!
+Your answer should be wrapped in three sticks which follows the following format:
+\`\`\`
+<question 1>
+<question 2>
+<question 3>
+\`\`\`
+`
 
 export async function generateNextQuestions(conversation: ChatMessage[]) {
   const conversationText = conversation
-    .map(message => `${message.role}: ${message.content}`)
+    .map(
+      message => `${message.role}: ${getMessageTextContent(message.content)}`
+    )
     .join('\n')
   const promptTemplate = getEnv('NEXT_QUESTION_PROMPT') || NEXT_QUESTION_PROMPT
   const message = promptTemplate.replace('{conversation}', conversationText)

@@ -1,6 +1,6 @@
 import { Message } from '../chat.interface'
-import { MessageAnnotationType, getAnnotationData } from '../annotations'
-import { getInlineAnnotations } from '../annotations/inline'
+import { ArtifactPartType } from '../message-parts/types'
+import { getParts } from '../message-parts/utils'
 
 // check if two artifacts are equal by comparing their type and created time
 export function isEqualArtifact(a: Artifact, b: Artifact) {
@@ -15,9 +15,7 @@ export function extractArtifactsFromAllMessages(messages: Message[]) {
 }
 
 export function extractArtifactsFromMessage(message: Message): Artifact[] {
-  return getAnnotationData<Artifact>(message, MessageAnnotationType.ARTIFACT, [
-    getInlineAnnotations, // only extract artifacts from inline annotations
-  ])
+  return getParts(message, ArtifactPartType).map(part => part.data)
 }
 
 export type CodeArtifactError = {

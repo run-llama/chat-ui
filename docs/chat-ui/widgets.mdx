@@ -3,13 +3,13 @@ title: Widgets
 description: Comprehensive guide to specialized content widgets for rich chat experiences
 ---
 
-Widgets are specialized components for displaying and interacting with rich content in chat messages. They provide functionality beyond simple text, enabling multimedia, interactive elements, and custom annotations.
+Widgets are specialized components for displaying and interacting with rich content in chat messages. They provide functionality beyond simple text, enabling multimedia, interactive elements, and custom parts.
 
 This section describes how to use them standalone.
 
-## Content Widgets
+## ChatUI Widgets
 
-### Markdown
+## Markdown
 
 Renders rich text with LaTeX math support, syntax highlighting, and citations.
 
@@ -155,69 +155,25 @@ export default function Home() {
 - **Image Support** - Embed images
 - **Live Preview** - Real-time markdown preview
 
-## Annotation Widgets
+### ChatFile
 
-Used for rendering additional rich content in a chat message. See [Annotations](./annotations.mdx) for more information on how to add annotations to a message.
-
-### ChatImage
-
-Displays images with preview and zoom functionality.
+Displays a file attachment like image, pdf, etc.
 
 ```tsx
-import { ChatImage } from '@llamaindex/chat-ui/widgets'
-
-function ImageDisplay() {
-  return (
-    <ChatImage
-      data={{
-        url: 'https://example.com/image.jpg',
-        alt: 'Description of the image',
-      }}
-    />
-  )
-}
-```
-
-**Features:**
-
-- **Zoom & Pan** - Interactive image viewing
-- **Lazy Loading** - Performance optimization
-- **Alt Text** - Accessibility support
-- **Error Handling** - Graceful fallback for broken images
-
-### ChatFiles
-
-Displays file attachments with download and preview.
-
-```tsx
-import { ChatFiles } from '@llamaindex/chat-ui/widgets'
+import { ChatFile } from '@llamaindex/chat-ui/widgets'
 
 function FileDisplay() {
   return (
-    <ChatFiles
-      data={{
-        files: [
-          {
-            id: '1',
-            name: 'report.pdf',
-            type: 'application/pdf',
-            url: '/files/report.pdf',
-            size: 1024000,
-          },
-        ],
+    <ChatFile
+      file={{
+        filename: 'upload.pdf',
+        mediaType: 'application/pdf',
+        url: 'https://pdfobject.com/pdf/sample.pdf',
       }}
     />
   )
 }
 ```
-
-**Supported File Types:**
-
-- **PDF** - Inline viewer
-- **Images** - Thumbnail preview
-- **Text Files** - Content preview
-- **CSV** - Data table preview
-- **Word Documents** - Document preview
 
 ### ChatSources
 
@@ -253,52 +209,36 @@ function SourceDisplay() {
 - **Click to View** - Opens source documents
 - **Metadata Display** - Shows title, author, date
 
-### ChatEvents
+### ChatEvent
 
-Displays collapsible process events and status updates.
+Displays collapsible process event with status updates.
 
 ```tsx
-import { ChatEvents } from '@llamaindex/chat-ui/widgets'
+import { ChatEvent } from '@llamaindex/chat-ui/widgets'
 
-function EventDisplay() {
+// When Event with loading status
+function SearchDocumentsEvent() {
   return (
-    <ChatEvents
-      data={[
-        {
-          type: 'function_call',
-          name: 'search_documents',
-          args: { query: 'machine learning' },
-          result: 'Found 15 relevant documents',
-        },
-      ]}
-      showLoading={false}
+    <ChatEvent
+      event={{
+        title: 'Searching documents',
+        description: 'Searching documents for machine learning',
+        status: 'pending',
+      }}
     />
   )
 }
-```
 
-### ChatAgentEvents
-
-Displays agent-specific events with progress tracking.
-
-```tsx
-import { ChatAgentEvents } from '@llamaindex/chat-ui/widgets'
-
-function AgentEventDisplay() {
+// When Event with success status
+function SearchDocumentsResult() {
   return (
-    <ChatAgentEvents
-      data={{
-        agent_name: 'Research Assistant',
-        progress: 75,
-        current_step: 'Analyzing documents',
-        events: [
-          { step: 'Searching', status: 'completed' },
-          { step: 'Analyzing', status: 'in_progress' },
-          { step: 'Summarizing', status: 'pending' },
-        ],
+    <ChatEvent
+      event={{
+        title: 'Searching documents',
+        description: 'Searching documents for machine learning',
+        status: 'success',
+        data: 'Document content...',
       }}
-      isFinished={true}
-      isLast={false}
     />
   )
 }
@@ -311,7 +251,7 @@ Interactive follow-up question suggestions.
 ```tsx
 import { SuggestedQuestions } from '@llamaindex/chat-ui/widgets'
 
-function QuestionSuggestions({ append, requestData }) {
+function QuestionSuggestions({ regenerate, requestData }) {
   return (
     <SuggestedQuestions
       questions={[
@@ -319,7 +259,7 @@ function QuestionSuggestions({ append, requestData }) {
         'What are the practical applications?',
         'How does this compare to other approaches?',
       ]}
-      append={append}
+      regenerate={regenerate}
       requestData={requestData}
     />
   )
@@ -349,8 +289,6 @@ function ChatStarters() {
   )
 }
 ```
-
-## Utility Widgets
 
 ### FileUploader
 
@@ -427,7 +365,7 @@ function DocInfo({ document }) {
 }
 ```
 
-### Citation
+## Citation
 
 Individual citation component with linking.
 
@@ -451,7 +389,7 @@ function CitationLink({ source, index }) {
 
 ### Automatic Rendering
 
-Annotation widgets render based on message annotations through dedicated annotation components:
+Other widgets render based on message parts through dedicated components:
 
 ```tsx
 import { ChatMessage } from '@llamaindex/chat-ui'
@@ -460,17 +398,17 @@ function MessageWithWidgets({ message }) {
   return (
     <ChatMessage message={message}>
       <ChatMessage.Content>
-        <ChatMessage.Content.Markdown />
-        <ChatMessage.Content.Image /> {/* Renders ChatImage */}
-        <ChatMessage.Content.Source /> {/* Renders ChatSources */}
-        <ChatMessage.Content.Event /> {/* Renders ChatEvents */}
+        <ChatMessage.Part.Markdown />
+        <ChatMessage.Part.Image /> {/* Renders ChatImage */}
+        <ChatMessage.Part.Source /> {/* Renders ChatSources */}
+        <ChatMessage.Part.Event /> {/* Renders ChatEvents */}
       </ChatMessage.Content>
     </ChatMessage>
   )
 }
 ```
 
-The `ChatMessage.Content.*` components internally use the annotation pattern described in [Annotations](./annotations.mdx), extracting data with `getAnnotationData` and passing it to the respective widgets.
+The `ChatMessage.Part.*` components internally use the parts pattern described in [Parts](./parts.mdx), extracting data with `usePart` and passing it to the respective widgets.
 
 ### Manual Widget Usage
 
@@ -506,7 +444,7 @@ function CustomMessageLayout({ message }) {
 Create custom widgets by following this pattern:
 
 ```tsx
-interface WeatherData {
+type WeatherData = {
   location: string
   temperature: number
   condition: string
@@ -542,7 +480,7 @@ function App() {
 
 ## Next Steps
 
-- [Annotations](./annotations.mdx) - Learn how to create and send annotation data
+- [Parts](./parts.mdx) - Learn how to create and send parts
 - [Artifacts](./artifacts.mdx) - Implement interactive code and document artifacts
 - [Hooks](./hooks.mdx) - Understand the widget hook system
 - [Customization](./customization.mdx) - Style and customize widget appearance

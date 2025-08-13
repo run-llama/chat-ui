@@ -8,15 +8,21 @@ import {
   ChatSection,
   useChatUI,
 } from '@llamaindex/chat-ui'
-import { Message, useChat } from 'ai/react'
-import { WeatherAnnotation } from '../components/custom-weather'
-import { WikiCard } from '@/components/custom-wiki'
+import { UIMessage, useChat } from '@ai-sdk/react'
+import { WeatherPart } from '../components/custom-weather'
+import { DefaultChatTransport } from 'ai'
+import { WikiPart } from '../components/custom-wiki'
 
-const initialMessages: Message[] = [
+const initialMessages: UIMessage[] = [
   {
     id: '1',
-    content: 'Hello! How can I help you today?',
     role: 'assistant',
+    parts: [
+      {
+        type: 'text',
+        text: 'Hello! How can I help you today?',
+      },
+    ],
   },
 ]
 
@@ -40,15 +46,17 @@ export default function Page(): JSX.Element {
 
 function ChatExample() {
   const handler = useChat({
-    api: '/api/chat',
+    transport: new DefaultChatTransport({
+      // uncomment this to try advanced example in app/api/chat/advanced/route.ts
+      api: '/api/chat/advanced',
 
-    // uncomment this to try edge runtime example in app/api/chat/edge/route.ts
-    // api: '/api/chat/edge',
+      // uncomment this to try basic example in app/api/chat/route.ts
+      // api: '/api/chat',
 
-    // uncomment this to try advanced example in app/api/chat/advanced/route.ts
-    // api: '/api/chat/advanced',
-
-    initialMessages,
+      // uncomment this to try edge runtime example in app/api/chat/edge/route.ts
+      // api: '/api/chat/edge',
+    }),
+    messages: initialMessages,
   })
 
   return (
@@ -77,7 +85,7 @@ function ChatExample() {
 }
 
 function CustomChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
 
   return (
     <>
@@ -93,18 +101,15 @@ function CustomChatMessages() {
               {message.role === 'user' ? 'U' : 'AI'}
             </div>
           </ChatMessage.Avatar>
-          <ChatMessage.Content isLoading={isLoading} append={append}>
-            <ChatMessage.Content.Markdown
-              annotationRenderers={{
-                // these annotations are rendered inline with the Markdown text
-                artifact: ChatCanvas.Artifact,
-                wiki: WikiCard,
-              }}
-            />
-
-            {/* annotation components under the Markdown text */}
-            <WeatherAnnotation />
-            <ChatMessage.Content.Source />
+          <ChatMessage.Content>
+            <ChatMessage.Part.File />
+            <ChatMessage.Part.Event />
+            <ChatMessage.Part.Markdown />
+            <ChatMessage.Part.Artifact />
+            <ChatMessage.Part.Source />
+            <ChatMessage.Part.Suggestion />
+            <WikiPart />
+            <WeatherPart />
           </ChatMessage.Content>
           <ChatMessage.Actions />
         </ChatMessage>

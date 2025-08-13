@@ -32,10 +32,26 @@ export async function pipeStreamToResponse(
   stream: ReadableStream
 ) {
   if (!stream) return
+
+  // Set SSE headers
+  response.setHeader('Content-Type', 'text/event-stream')
+  response.setHeader('Connection', 'keep-alive')
+  response.setHeader('Cache-Control', 'no-cache')
+
   const reader = stream.getReader()
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) return response.end()
-    response.write(value)
+  const read = async () => {
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        response.write(value)
+      }
+    } catch (error) {
+      throw error
+    } finally {
+      response.end()
+    }
   }
+
+  read()
 }

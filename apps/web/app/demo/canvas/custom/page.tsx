@@ -11,7 +11,7 @@ import {
   useChatCanvas,
   useChatUI,
 } from '@llamaindex/chat-ui'
-import { Message, useChat } from 'ai/react'
+import { UIMessage as Message, useChat } from '@ai-sdk/react'
 import { Image } from 'lucide-react'
 
 const code = `
@@ -25,11 +25,11 @@ import {
   useChatCanvas,
   useChatUI,
 } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { Image } from 'lucide-react'
 
 export function CustomChat() {
-  const handler = useChat({ initialMessages: [] })
+  const handler = useChat()
 
   return (
     <ChatSection
@@ -103,11 +103,8 @@ function CustomChatMessages() {
           >
             <ChatMessage.Avatar />
             <ChatMessage.Content>
-              <ChatMessage.Content.Markdown
-                annotationRenderers={{
-                  artifact: CustomArtifactCard,
-                }}
-              />
+              <ChatMessage.Part.Markdown />
+              <ChatMessage.Part.Artifact />
             </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>
@@ -116,32 +113,24 @@ function CustomChatMessages() {
     </ChatMessages>
   )
 }
-
-// custom artifact card for image artifacts
-function CustomArtifactCard({ data }: { data: Artifact }) {
-  return (
-    <ChatCanvas.Artifact
-      data={data}
-      getTitle={artifact => (artifact as ImageArtifact).data.caption}
-      iconMap={{ image: Image }}
-    />
-  )
-}
 `
 
 const initialMessages: Message[] = [
   {
     id: '1',
     role: 'user',
-    content: 'Generate an image of a cat',
+    parts: [{ type: 'text', text: 'Generate an image of a cat' }],
   },
   {
     id: '2',
     role: 'assistant',
-    content:
-      'Here is a cat image named Millie.' +
-      `\n\`\`\`annotation\n${JSON.stringify({
-        type: 'artifact',
+    parts: [
+      {
+        type: 'text',
+        text: 'Here is a cat image named Millie.',
+      },
+      {
+        type: 'data-artifact',
         data: {
           type: 'image',
           data: {
@@ -150,21 +139,24 @@ const initialMessages: Message[] = [
           },
           created_at: 1745480281756,
         },
-      })}
-      \n\`\`\`\n`,
+      },
+    ],
   },
   {
     id: '3',
     role: 'user',
-    content: 'Please generate a black cat image',
+    parts: [{ type: 'text', text: 'Please generate a black cat image' }],
   },
   {
     id: '4',
     role: 'assistant',
-    content:
-      'Here is a black cat image named Poppy.' +
-      `\n\`\`\`annotation\n${JSON.stringify({
-        type: 'artifact',
+    parts: [
+      {
+        type: 'text',
+        text: 'Here is a black cat image named Poppy.',
+      },
+      {
+        type: 'data-artifact',
         data: {
           type: 'image',
           data: {
@@ -173,8 +165,8 @@ const initialMessages: Message[] = [
           },
           created_at: 1745480281999,
         },
-      })}
-      \n\`\`\`\n`,
+      },
+    ],
   },
 ]
 
@@ -184,7 +176,7 @@ export default function Page(): JSX.Element {
 
 function CustomChat() {
   const { copyToClipboard, isCopied } = useCopyToClipboard({ timeout: 2000 })
-  const handler = useChat({ initialMessages })
+  const handler = useChat({ messages: initialMessages })
 
   return (
     <ChatSection
@@ -279,27 +271,13 @@ function CustomChatMessages() {
           >
             <ChatMessage.Avatar />
             <ChatMessage.Content>
-              <ChatMessage.Content.Markdown
-                annotationRenderers={{
-                  artifact: CustomArtifactCard,
-                }}
-              />
+              <ChatMessage.Part.Markdown />
+              <ChatMessage.Part.Artifact />
             </ChatMessage.Content>
             <ChatMessage.Actions />
           </ChatMessage>
         ))}
       </ChatMessages.List>
     </ChatMessages>
-  )
-}
-
-// custom artifact card for image artifacts
-function CustomArtifactCard({ data }: { data: Artifact }) {
-  return (
-    <ChatCanvas.Artifact
-      data={data}
-      getTitle={artifact => (artifact as ImageArtifact).data.caption}
-      iconMap={{ image: Image }}
-    />
   )
 }

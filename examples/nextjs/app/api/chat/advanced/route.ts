@@ -3,47 +3,27 @@
  *
  * This example demonstrates advanced streaming features:
  * - Text streaming with token-by-token delivery
- * - Both standard annotations (sent after text) and inline annotations (embedded in text)
- * - Inline annotations are embedded as special code blocks within the markdown stream
+ * - Both standard annotations (sent after text) and artifacts inlined in the markdown stream
  * - Multiple annotation types: sources, artifacts, and custom components (wiki)
  *
- * Use this example to understand how to mix regular content with interactive
- * components that appear at specific positions in the chat stream.
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
+import { chatHandler, MessagePart } from '../handler'
 
-const TOKEN_DELAY = 30 // 30ms delay between tokens
-const TEXT_PREFIX = '0:' // vercel ai text prefix
-const ANNOTATION_PREFIX = '8:' // vercel ai annotation prefix
-const INLINE_ANNOTATION_KEY = 'annotation' // the language key to detect inline annotation code in markdown
-const ANNOTATION_DELAY = 1000 // 1 second delay between annotations
+const SAMPLE_PARTS: (string | MessagePart)[] = [
+  'Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.',
 
-export async function POST(request: NextRequest) {
-  try {
-    const { messages } = await request.json()
-    const lastMessage = messages[messages.length - 1]
-
-    const stream = fakeChatStream(`User query: "${lastMessage.content}".\n`)
-
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-Vercel-AI-Data-Stream': 'v1',
-        Connection: 'keep-alive',
-      },
-    })
-  } catch (error) {
-    const detail = (error as Error).message
-    return NextResponse.json({ detail }, { status: 500 })
-  }
-}
-
-const SAMPLE_TEXT = [
   `
-Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
+### Text Part
+Text part is used to display text in the chat. It is in markdown format.
+You can use markdown syntax to format the text. Some examples:
 
-### Markdown with code block
+- **bold** -> this is bold text
+- *italic* -> this is italic text
+- [link](https://www.google.com) -> this is a link
+
+You can also display a code block inside markdown.
 
 \`\`\`js
 const a = 1
@@ -51,63 +31,80 @@ const b = 2
 const c = a + b
 console.log(c)
 \`\`\`
-
 `,
-  '\n ### Demo inline annotations \n',
-  'Here are some steps to create a simple wiki app: \n',
-  '1. Create package.json file:',
+
+  `
+### Parts
+
+Beside text, you can also display parts in the chat. Parts can be displayed before or after the text.
+
+**Built-in parts**
+
+@llamaindex/chat-ui provides some built-in parts for you to use
+
+- **file** -> display a file with name and url
+- **event** -> display a event with title, status, and data
+- **artifact** -> display a code artifact
+- **sources** -> display a list of sources
+- **suggested_questions** -> display a list of suggested questions
+
+**Custom parts**
+
+You can also create your own custom parts.
+
+- **weather** -> display a weather card
+- **wiki** -> display a wiki card
+  `,
+
+  '**file**: Here is the demo of a file part',
   {
-    type: 'artifact',
+    type: 'file',
     data: {
-      type: 'code',
-      created_at: 1717334400000,
+      filename: 'upload.pdf',
+      mediaType: 'application/pdf',
+      url: 'https://pdfobject.com/pdf/sample.pdf',
+    },
+  },
+
+  '**event**: Here is the demo of event parts. The second event part will override the first one because they have the same id',
+  {
+    id: 'demo_sample_event_id',
+    type: 'event',
+    data: {
+      title: 'Calling tool `get_weather` with input `San Francisco, CA`',
+      status: 'pending',
+    },
+  },
+  {
+    id: 'demo_sample_event_id', // use the same id to override the previous part
+    type: 'event',
+    data: {
+      title:
+        'Got response from tool `get_weather` with input `San Francisco, CA`',
+      status: 'success',
       data: {
-        file_name: 'package.json',
-        language: 'json',
-        code: `{
-  "name": "wiki-app",
-  "version": "1.0.0",
-  "description": "Wiki application",
-  "main": "wiki.js",
-  "dependencies": {
-    "axios": "^1.0.0",
-    "wiki-api": "^2.1.0"
-  }
-}`,
+        location: 'San Francisco, CA',
+        temperature: 22,
+        condition: 'sunny',
+        humidity: 65,
+        windSpeed: 12,
       },
     },
   },
-  '2. Check the wiki fetching script:',
+
+  '**weather**: Here is the demo of a weather part. It is a custom part',
   {
-    type: 'artifact',
+    type: 'weather',
     data: {
-      created_at: 1717334500000,
-      type: 'code',
-      data: {
-        file_name: 'wiki.js',
-        language: 'javascript',
-        code: `async function getWiki(search) {
-  const response = await fetch("/api/wiki?search=" + search);
-  const data = await response.json();
-  return data;
-}`,
-      },
+      location: 'San Francisco, CA',
+      temperature: 22,
+      condition: 'sunny',
+      humidity: 65,
+      windSpeed: 12,
     },
   },
-  '3. Run getWiki with the search term:',
-  {
-    type: 'artifact',
-    data: {
-      created_at: 1717334600000,
-      type: 'code',
-      data: {
-        file_name: 'wiki.js',
-        language: 'javascript',
-        code: `getWiki(\`What is \${search}?\`);`,
-      },
-    },
-  },
-  '4. Check the current wiki:',
+
+  '**wiki**: Here is the demo of a wiki part',
   {
     type: 'wiki',
     data: {
@@ -118,64 +115,21 @@ console.log(c)
       lastUpdated: '2025-06-02',
     },
   },
-  '#### 🎯 Demo generating a document artifact',
+
+  '**artifact**: Here is the demo of a artifact part',
   {
     type: 'artifact',
     data: {
-      type: 'document',
+      type: 'code',
       data: {
-        title: 'Sample document',
-        content: `# Getting Started Guide
-  
-  ## Introduction
-  This comprehensive guide will walk you through everything you need to know to get started with our platform. Whether you're a beginner or an experienced user, you'll find valuable information here.
-  
-  ## Key Features
-  - **Easy Setup**: Get running in minutes
-  - **Powerful Tools**: Access advanced capabilities
-  - **Great Documentation**: Find answers quickly
-  - **Active Community**: Get help when needed
-  
-  ## Setup Process
-  1. Install Dependencies
-     First, ensure you have all required dependencies installed on your system.
-  
-  2. Configuration
-     Update your configuration files with the necessary settings:
-     - API keys
-     - Environment variables
-     - User preferences
-  
-  3. First Steps
-     Begin with basic operations to familiarize yourself with the platform.
-  
-  ## Best Practices
-  - Always backup your data
-  - Follow security guidelines
-  - Keep your dependencies updated
-  - Document your changes
-  
-  ## Troubleshooting
-  If you encounter issues, try these steps:
-  1. Check logs for errors
-  2. Verify configurations
-  3. Update to latest version
-  4. Contact support if needed
-  
-  ## Additional Resources
-  - [Documentation](https://docs.example.com)
-  - [API Reference](https://api.example.com)
-  - [Community Forums](https://community.example.com)
-  
-  Feel free to explore and reach out if you need assistance!`,
-        type: 'markdown',
+        file_name: 'code.py',
+        code: 'print("Hello, world!")',
+        language: 'python',
       },
     },
   },
-  '\n\n Please feel free to open the document in the canvas and edit it. The document will be saved as a new version',
-]
 
-const SAMPLE_SOURCES = [
+  '**sources**: Here is the demo of a sources part',
   {
     type: 'sources',
     data: {
@@ -185,59 +139,18 @@ const SAMPLE_SOURCES = [
       ],
     },
   },
+
+  '**suggested_questions**: Here is the demo of a suggested_questions part',
+  {
+    type: 'suggested_questions',
+    data: [
+      'I think you should go to the beach',
+      'I think you should go to the mountains',
+      'I think you should go to the city',
+    ],
+  },
 ]
 
-const fakeChatStream = (query: string): ReadableStream => {
-  return new ReadableStream({
-    async start(controller) {
-      const encoder = new TextEncoder()
-      controller.enqueue(
-        encoder.encode(`${TEXT_PREFIX}${JSON.stringify(query)}\n`)
-      )
-
-      // insert inline annotations
-      for (const item of SAMPLE_TEXT) {
-        if (typeof item === 'string') {
-          for (const token of item.split(' ')) {
-            await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
-            controller.enqueue(
-              encoder.encode(`${TEXT_PREFIX}${JSON.stringify(`${token} `)}\n`)
-            )
-          }
-        } else {
-          await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
-          // append inline annotation with 0: prefix
-          const annotationCode = toInlineAnnotationCode(item)
-          controller.enqueue(
-            encoder.encode(`${TEXT_PREFIX}${JSON.stringify(annotationCode)}\n`)
-          )
-        }
-      }
-
-      // insert sources in fixed positions
-      for (const item of SAMPLE_SOURCES) {
-        controller.enqueue(
-          encoder.encode(`${ANNOTATION_PREFIX}${JSON.stringify([item])}\n`)
-        )
-      }
-
-      controller.close()
-    },
-  })
-}
-
-/**
- * To append inline annotations to the stream, we need to wrap the annotation in a code block with the language key.
- * The language key is `annotation` and the code block is wrapped in backticks.
- * The prefix `0:` ensures it will be treated as inline markdown. Example:
- *
- * 0:\`\`\`annotation
- * \{
- *   "type": "artifact",
- *   "data": \{...\}
- * \}
- * \`\`\`
- */
-function toInlineAnnotationCode(item: any) {
-  return `\n\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(item)}\n\`\`\`\n`
+export async function POST(request: NextRequest) {
+  return chatHandler(request, SAMPLE_PARTS)
 }

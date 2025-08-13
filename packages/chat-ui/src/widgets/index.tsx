@@ -1,10 +1,8 @@
 'use client'
 
 // Other useful components
-export * from './chat-agent-events'
-export * from './chat-events'
-export * from './chat-files'
-export * from './chat-image'
+export * from './chat-event'
+export * from './chat-file'
 export * from './chat-sources'
 export * from './markdown'
 export * from './codeblock'

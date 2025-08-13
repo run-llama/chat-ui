@@ -21,7 +21,7 @@ const CLIHumanInput: FC<{
     .filter((ev): ev is CLIInputEvent => ev !== null)
     .at(-1)
 
-  const { append } = useChatUI()
+  const { sendMessage } = useChatUI()
   const [confirmedValue, setConfirmedValue] = useState<boolean | null>(null)
   const [editableCommand, setEditableCommand] = useState<string | undefined>(
     inputEvent?.command
@@ -33,35 +33,43 @@ const CLIHumanInput: FC<{
   }, [inputEvent?.command])
 
   const handleConfirm = () => {
-    append({
-      content: 'Yes',
-      role: 'user',
-      annotations: [
+    sendMessage({
+      id: crypto.randomUUID(),
+      parts: [
         {
-          type: 'human_response',
+          type: 'text',
+          text: 'Yes',
+        },
+        {
+          type: 'data-human_response',
           data: {
             execute: true,
             command: editableCommand, // Use editable command
           },
         },
       ],
+      role: 'user',
     })
     setConfirmedValue(true)
   }
 
   const handleCancel = () => {
-    append({
-      content: 'No',
-      role: 'user',
-      annotations: [
+    sendMessage({
+      id: crypto.randomUUID(),
+      parts: [
         {
-          type: 'human_response',
+          type: 'text',
+          text: 'No',
+        },
+        {
+          type: 'data-human_response',
           data: {
             execute: false,
-            command: inputEvent?.command,
+            command: editableCommand,
           },
         },
       ],
+      role: 'user',
     })
     setConfirmedValue(false)
   }

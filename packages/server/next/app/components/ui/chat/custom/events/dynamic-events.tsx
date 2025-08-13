@@ -1,13 +1,7 @@
 'use client'
 
-import {
-  getAnnotationData,
-  JSONValue,
-  MessageAnnotation,
-  MessageAnnotationType,
-  useChatMessage,
-} from '@llamaindex/chat-ui'
-import React, { useEffect, useRef, useState } from 'react'
+import { getParts, JSONValue, useChatMessage } from '@llamaindex/chat-ui'
+import React, { useState } from 'react'
 import { DynamicComponentErrorBoundary } from './error-boundary'
 import { ComponentDef } from './types'
 
@@ -15,8 +9,12 @@ type EventComponent = ComponentDef & {
   events: JSONValue[]
 }
 
-// image, document_file, sources, events, suggested_questions, agent
-const BUILT_IN_CHATUI_COMPONENTS = Object.values(MessageAnnotationType)
+const DYNAMIC_EVENT_TYPE_PREFIX = 'data-'
+
+type DynamicEventPart = {
+  type: `data-${string}`
+  data: JSONValue
+}
 
 export const DynamicEvents = ({
   componentDefs,
@@ -26,9 +24,7 @@ export const DynamicEvents = ({
   appendError: (error: string) => void
 }) => {
   const { message } = useChatMessage()
-  const annotations = message.annotations
 
-  const shownWarningsRef = useRef<Set<string>>(new Set()) // track warnings
   const [hasErrors, setHasErrors] = useState(false)
 
   const handleError = (error: string) => {
@@ -36,42 +32,15 @@ export const DynamicEvents = ({
     appendError(error)
   }
 
-  // Check for missing components in annotations
-  useEffect(() => {
-    if (!annotations?.length) return
-
-    const availableComponents = new Set(componentDefs.map(comp => comp.type))
-
-    annotations.forEach((item: JSONValue) => {
-      const annotation = item as MessageAnnotation
-      const type = annotation.type
-      if (!type) return // Skip if annotation doesn't have a type
-
-      const events = getAnnotationData<JSONValue>(message, type)
-
-      // Skip if it's a built-in component or if we've already shown the warning
-      if (
-        BUILT_IN_CHATUI_COMPONENTS.includes(type as MessageAnnotationType) ||
-        shownWarningsRef.current.has(type)
-      ) {
-        return
-      }
-
-      // If we have events for a type but no component definition, show a warning
-      if (events && !availableComponents.has(type)) {
-        console.warn(
-          `No component found for event type: ${type} or having error when rendering it. Ensure there is a component file named ${type}.tsx or ${type}.jsx in your components directory, and verify the code for any errors.`
-        )
-        shownWarningsRef.current.add(type)
-      }
-    })
-  }, [annotations, componentDefs])
-
   const components: EventComponent[] = componentDefs
+    .map(comp => ({
+      ...comp,
+      type: `${DYNAMIC_EVENT_TYPE_PREFIX}${comp.type}`, // adding data- prefix to make it a data part
+    }))
     .map(comp => {
-      const events = getAnnotationData<JSONValue>(message, comp.type)
-      if (!events?.length) return null
-      return { ...comp, events }
+      const dynamicEventParts = getParts<DynamicEventPart>(message, comp.type)
+      if (!dynamicEventParts?.length) return null
+      return { ...comp, events: dynamicEventParts.map(part => part.data) }
     })
     .filter(comp => comp !== null)
 

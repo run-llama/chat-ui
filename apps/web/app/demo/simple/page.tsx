@@ -1,12 +1,12 @@
 'use client'
 
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { ChatSection } from '@llamaindex/chat-ui'
 import { Code } from '@/components/code'
 
 const code = `
 import { ChatSection } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from "@ai-sdk/react";
 
 function SimpleChat() {
   const handler = useChat()

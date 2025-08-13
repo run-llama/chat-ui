@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@llamaindex/chat-ui": "latest",
-    "ai": "^4.3.16",
+    "@ai-sdk/react": "^2.0.4",
+    "@ai-sdk/rsc": "^1.0.4",
+    "ai": "^5.0.4",
     "next": "^15.3.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

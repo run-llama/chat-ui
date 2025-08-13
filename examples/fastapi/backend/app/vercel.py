@@ -1,58 +1,86 @@
 import asyncio
 import json
-from typing import Any, AsyncGenerator, Iterable, Union
-
+import uuid
+from typing import Any, AsyncGenerator, Dict, Union
 from fastapi.responses import StreamingResponse
 
+DATA_PREFIX = "data: "
+TOKEN_DELAY = 0.03  # 30ms delay between tokens
+PART_DELAY = 1.0  # 1s delay between parts
 
-class VercelStreamResponse(StreamingResponse):
+
+class SSEStreamResponse(StreamingResponse):
     """
-    Converts preprocessed events into Vercel-compatible streaming response format.
+    New SSE format compatible with Vercel/AI SDK 5 useChat
     """
 
-    TEXT_PREFIX = "0:"
-    DATA_PREFIX = "8:"
-    ERROR_PREFIX = "3:"
+    def __init__(self, parts: list[Union[str, Dict[str, Any]]], query: str = "", **kwargs):
+        stream = self._create_stream(query, parts)
+        super().__init__(
+            stream,
+            media_type="text/event-stream",
+            headers={"Connection": "keep-alive"},
+            **kwargs
+        )
 
-    def __init__(
-        self,
-        events: Iterable[Any],
-        *args: Any,
-        **kwargs: Any,
-    ):
-        stream = self._stream_event(events=events)
-        super().__init__(stream, *args, **kwargs)
+    async def _create_stream(self, query: str, parts: list[Union[str, Dict[str, Any]]]) -> AsyncGenerator[str, None]:
+        """Create SSE stream with new format"""
 
-    async def _stream_event(self, events: Iterable[Any]) -> AsyncGenerator[str, None]:
-        stream_started = False
-        for event in events:
-            if not stream_started:
-                yield self.convert_text("")
-                stream_started = True
-            # Simulate a small delay between events
-            await asyncio.sleep(0.1)
-            if isinstance(event, str):
-                yield self.convert_text(event)
-            elif isinstance(event, dict):
-                yield self.convert_data(event)
-            else:
-                raise ValueError(f"Unknown event type: {type(event)}")
+        async def write_text(content: str) -> AsyncGenerator[str, None]:
+            """Write text content with token-by-token streaming"""
+            # Generate unique message id
+            message_id = str(uuid.uuid4())
 
-    @classmethod
-    def convert_text(cls, token: str) -> str:
-        """Convert text event to Vercel format."""
-        # Escape newlines and double quotes to avoid breaking the stream
-        token = json.dumps(token)
-        return f"{cls.TEXT_PREFIX}{token}\n"
+            # Start text chunk
+            start_chunk = {"id": message_id, "type": "text-start"}
+            yield f"{DATA_PREFIX}{json.dumps(start_chunk)}\n\n"
 
-    @classmethod
-    def convert_data(cls, data: Union[dict, str]) -> str:
-        """Convert data event to Vercel format."""
-        data_str = json.dumps(data) if isinstance(data, dict) else data
-        return f"{cls.DATA_PREFIX}[{data_str}]\n"
+            # Stream tokens
+            for token in content.split(' '):
+                if token:  # Skip empty tokens
+                    delta_chunk = {
+                        "id": message_id,
+                        "type": "text-delta",
+                        "delta": token + " "
+                    }
+                    yield f"{DATA_PREFIX}{json.dumps(delta_chunk)}\n\n"
+                    await asyncio.sleep(TOKEN_DELAY)
 
-    @classmethod
-    def convert_error(cls, error: str) -> str:
-        """Convert error event to Vercel format."""
-        error_str = json.dumps(error)
-        return f"{cls.ERROR_PREFIX}{error_str}\n"
+            # End text chunk
+            end_chunk = {"id": message_id, "type": "text-end"}
+            yield f"{DATA_PREFIX}{json.dumps(end_chunk)}\n\n"
+
+        async def write_data(data: Dict[str, Any]) -> AsyncGenerator[str, None]:
+            """Write data part"""
+            chunk = {
+                "type": f"data-{data['type']}",  # Add data- prefix
+                "data": data.get("data", {})
+            }
+            
+            # Only include id if it exists
+            if data.get("id"):
+                chunk["id"] = data["id"]
+                
+            yield f"{DATA_PREFIX}{json.dumps(chunk)}\n\n"
+            await asyncio.sleep(PART_DELAY)
+
+        # Stream the query first
+        if query:
+            async for chunk in write_text(query):
+                yield chunk
+
+        # Stream all parts
+        for item in parts:
+            if isinstance(item, str):
+                async for chunk in write_text(item):
+                    yield chunk
+            elif isinstance(item, dict):
+                async for chunk in write_data(item):
+                    yield chunk
+
+def get_text(message: Any) -> str:
+    return "\n\n".join(
+        part["text"]
+        for part in message["parts"]
+        if part.get("type") == "text" and "text" in part
+    )

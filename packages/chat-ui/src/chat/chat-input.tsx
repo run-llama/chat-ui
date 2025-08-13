@@ -6,11 +6,13 @@ import { Textarea } from '../ui/textarea'
 import { FileUploader } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { useChatUI } from './chat.context'
 import { Message } from './chat.interface'
+import { v4 as uuidv4 } from 'uuid'
+import { MessagePart } from './message-parts'
 
 interface ChatInputProps extends React.PropsWithChildren {
   className?: string
   resetUploadedFiles?: () => void
-  annotations?: any
+  attachments?: MessagePart[]
 }
 
 interface ChatInputFormProps extends React.PropsWithChildren {
@@ -55,21 +57,21 @@ export const useChatInput = () => {
 }
 
 function ChatInput(props: ChatInputProps) {
-  const { input, setInput, append, isLoading, requestData } = useChatUI()
+  const { input, setInput, sendMessage, isLoading, requestData } = useChatUI()
   const isDisabled = isLoading || !input.trim()
   const [isComposing, setIsComposing] = useState(false)
 
   const submit = async () => {
-    const newMessage: Omit<Message, 'id'> = {
+    const newMessage: Message = {
+      id: uuidv4(),
       role: 'user',
-      content: input,
-      annotations: props.annotations,
+      parts: [{ type: 'text', text: input }, ...(props.attachments ?? [])],
     }
 
     setInput('') // Clear the input
     props.resetUploadedFiles?.() // Reset the uploaded files
 
-    await append(newMessage, { data: requestData })
+    await sendMessage(newMessage, { body: requestData })
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

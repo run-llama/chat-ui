@@ -3,14 +3,9 @@ import fs from 'node:fs'
 import https from 'node:https'
 import path from 'node:path'
 
-import { type ServerFile } from '@llamaindex/server'
-
 export const UPLOADED_FOLDER = 'output/uploaded'
 
-export async function storeFile(
-  name: string,
-  fileBuffer: Buffer
-): Promise<ServerFile> {
+export async function storeFile(name: string, fileBuffer: Buffer) {
   const parts = name.split('.')
   const fileName = parts[0]
   const fileExt = parts[1]

@@ -3,9 +3,9 @@ import {
   type WorkflowEventData,
   workflowEvent,
 } from '@llamaindex/workflow'
-import type { Message } from 'ai'
 import type { JSONValue } from 'llamaindex'
-import z from 'zod'
+
+export const HUMAN_RESPONSE_PART_TYPE = 'data-human_response' as const
 
 export type HumanInputEventData = {
   type: string
@@ -16,22 +16,16 @@ export type HumanInputEventData = {
 export const humanInputEvent = workflowBaseEvent<HumanInputEventData>()
 
 export type HumanResponseEventData = {
-  type: 'human_response'
-  data?: JSONValue
+  type: typeof HUMAN_RESPONSE_PART_TYPE
+  data: JSONValue
+}
+
+export type HumanResponsePart = HumanResponseEventData & {
+  id?: string
 }
 
 export const humanResponseEvent = workflowBaseEvent<HumanResponseEventData>()
 
-// helper function to extract human responses from message annotations
-export const getHumanResponsesFromMessage = (message: Message) => {
-  const schema = z.object({ type: z.literal('human_response'), data: z.any() })
-  return (
-    message.annotations?.filter(
-      (annotation): annotation is z.infer<typeof schema> =>
-        schema.safeParse(annotation).success
-    ) ?? []
-  )
-}
 // TODO: move to llama-flow package
 export type BaseEvent<K> = (<T extends K>() => WorkflowEvent<T>) &
   WorkflowEvent<K>

@@ -53,11 +53,7 @@ function CustomChatMessages() {
 
   const frontendMessages = messages.map(message => ({
     ...message,
-    display: (
-      <ChatMessage.Content>
-        {(message as Message & { display: ReactNode }).display}
-      </ChatMessage.Content>
-    ),
+    display: (message as Message & { display: ReactNode }).display,
   }))
 
   return (

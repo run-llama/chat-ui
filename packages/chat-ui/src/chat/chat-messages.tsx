@@ -51,13 +51,13 @@ export const useChatMessages = () => {
 }
 
 function ChatMessages(props: ChatMessagesProps) {
-  const { messages, reload, stop, isLoading } = useChatUI()
+  const { messages, regenerate, stop, isLoading } = useChatUI()
 
   const messageLength = messages.length
   const lastMessage = messages[messageLength - 1]
   const isLastMessageFromAssistant =
     messageLength > 0 && lastMessage?.role !== 'user'
-  const showReload = reload && !isLoading && isLastMessageFromAssistant
+  const showReload = regenerate && !isLoading && isLastMessageFromAssistant
   const showStop = stop && isLoading
 
   // `isPending` indicate
@@ -85,7 +85,7 @@ function ChatMessages(props: ChatMessagesProps) {
 
 function ChatMessagesList(props: ChatMessagesListProps) {
   const scrollableChatContainerRef = useRef<HTMLDivElement>(null)
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
   const { lastMessage, messageLength } = useChatMessages()
 
   const scrollToBottom = () => {
@@ -107,8 +107,6 @@ function ChatMessagesList(props: ChatMessagesListProps) {
             key={index}
             message={message}
             isLast={index === messageLength - 1}
-            isLoading={isLoading}
-            append={append}
           />
         )
       })}
@@ -197,7 +195,7 @@ function ChatMessagesLoading(props: ChatMessagesLoadingProps) {
 }
 
 function ChatActions(props: ChatActionsProps) {
-  const { reload, stop, requestData } = useChatUI()
+  const { regenerate, stop, requestData } = useChatUI()
   const { showReload, showStop } = useChatMessages()
   if (!showStop && !showReload) return null
 
@@ -213,7 +211,7 @@ function ChatActions(props: ChatActionsProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => reload?.({ data: requestData })}
+          onClick={() => regenerate?.({ body: requestData })}
         >
           <RefreshCw className="mr-2 h-4 w-4" />
           Regenerate

@@ -1,4 +1,4 @@
-type MessageRole = 'system' | 'user' | 'assistant' | 'data'
+import { MessagePart } from './message-parts/types'
 
 export type JSONValue =
   | null
@@ -11,29 +11,34 @@ export type JSONValue =
   | JSONValue[]
 
 export interface Message {
-  content: string
-  role: MessageRole
-  annotations?: JSONValue[]
+  id: string
+  role: 'system' | 'user' | 'assistant'
+  parts: MessagePart[]
+}
+
+export type ChatRequestOptions = {
+  headers?: Record<string, string> | Headers
+  body?: object
 }
 
 export type ChatHandler = {
-  input: string
-  setInput: (input: string) => void
-  isLoading: boolean
   messages: Message[]
-  reload?: (chatRequestOptions?: { data?: any }) => void
-  stop?: () => void
-  append: (
-    message: Message,
-    chatRequestOptions?: { data?: any }
-  ) => Promise<string | null | undefined>
-
-  // TODO: (Message & { id: string }) is a quick fix for compatibility with Message from ai/react
-  // We should make Message type in ChatHandler more flexible. Eg: ChatHandler<T extends Message = Message>
-  setMessages?: (messages: (Message & { id: string })[]) => void
+  status: 'submitted' | 'streaming' | 'ready' | 'error'
+  sendMessage: (msg: Message, opts?: ChatRequestOptions) => Promise<void>
+  stop?: () => Promise<void>
+  regenerate?: (opts?: { messageId?: string } & ChatRequestOptions) => void
+  setMessages?: (messages: Message[]) => void
 }
 
 export type ChatContext = ChatHandler & {
+  // user input state
+  input: string
+  setInput: (input: string) => void
+
+  // additional data including in the body
   requestData: any
   setRequestData: (data: any) => void
+
+  // computed state from status
+  isLoading: boolean
 }

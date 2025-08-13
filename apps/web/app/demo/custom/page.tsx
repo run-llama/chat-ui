@@ -9,7 +9,7 @@ import {
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
-import { Message, useChat } from 'ai/react'
+import { UIMessage as Message, useChat } from '@ai-sdk/react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const code = `
@@ -21,15 +21,14 @@ import {
   useChatUI,
   useFile,
 } from '@llamaindex/chat-ui'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export function CustomChat() {
   const handler = useChat()
-  const { imageUrl, getAnnotations, uploadFile, reset } = useFile({
+  const { image, uploadFile, reset, getAttachments } = useFile({
     uploadAPI: '/chat/upload',
   })
-  const annotations = getAnnotations()
   const handleUpload = async (file: File) => {
     try {
       await uploadFile(file)
@@ -37,18 +36,22 @@ export function CustomChat() {
       console.error(error)
     }
   }
+  const attachments = getAttachments()
   return (
     <ChatSection
       handler={handler}
-      className="mx-auto h-screen max-w-3xl overflow-hidden"
+      className="h-screen overflow-hidden p-0 md:p-5"
     >
       <CustomChatMessages />
-      <ChatInput annotations={annotations} resetUploadedFiles={reset}>
+      <ChatInput
+        attachments={attachments}
+        resetUploadedFiles={reset}
+      >
         <div>
-          {imageUrl ? (
+          {image ? (
             <img
               className="max-h-[100px] object-contain"
-              src={imageUrl}
+              src={image.url}
               alt="uploaded"
             />
           ) : null}
@@ -56,6 +59,7 @@ export function CustomChat() {
         <ChatInput.Form>
           <ChatInput.Field />
           <ChatInput.Upload
+            allowedExtensions={['jpg', 'png', 'jpeg']}
             onUpload={handleUpload}
           />
           <ChatInput.Submit />
@@ -66,7 +70,7 @@ export function CustomChat() {
 }
 
 function CustomChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
   return (
     <ChatMessages>
       <ChatMessages.List className="px-0 md:px-16">
@@ -91,10 +95,9 @@ function CustomChatMessages() {
                     src="/llama.png"
                   />
                 </ChatMessage.Avatar>
-                <ChatMessage.Content isLoading={isLoading} append={append}>
-                  <ChatMessage.Content.Image />
-                  <ChatMessage.Content.Markdown />
-                  <ChatMessage.Content.DocumentFile />
+                <ChatMessage.Content>
+                  <ChatMessage.Part.File />
+                  <ChatMessage.Part.Markdown />
                 </ChatMessage.Content>
                 <ChatMessage.Actions />
               </ChatMessage>
@@ -110,18 +113,22 @@ function CustomChatMessages() {
 const initialMessages: Message[] = [
   {
     id: '1',
-    content: 'Generate a logo for LlamaIndex',
+    parts: [{ type: 'text', text: 'Generate a logo for LlamaIndex' }],
     role: 'user',
   },
   {
     id: '2',
     role: 'assistant',
-    content:
-      'Got it! Here is the logo for LlamaIndex. The logo features a friendly llama mascot that represents our AI-powered document indexing and chat capabilities.',
-    annotations: [
+    parts: [
       {
-        type: 'image',
+        type: 'text',
+        text: 'Got it! Here is the logo for LlamaIndex. The logo features a friendly llama mascot that represents our AI-powered document indexing and chat capabilities.',
+      },
+      {
+        type: 'data-file',
         data: {
+          filename: 'llama.png',
+          mediaType: 'image/png',
           url: '/llama.png',
         },
       },
@@ -130,24 +137,22 @@ const initialMessages: Message[] = [
   {
     id: '3',
     role: 'user',
-    content: 'Show me a pdf file',
+    parts: [{ type: 'text', text: 'Show me a pdf file' }],
   },
   {
     id: '4',
     role: 'assistant',
-    content:
-      'Got it! Here is a sample PDF file that demonstrates PDF handling capabilities. This PDF contains some basic text and formatting examples that you can use to test PDF viewing functionality.',
-    annotations: [
+    parts: [
       {
-        type: 'document_file',
+        type: 'text',
+        text: 'Got it! Here is a sample PDF file that demonstrates PDF handling capabilities. This PDF contains some basic text and formatting examples that you can use to test PDF viewing functionality.',
+      },
+      {
+        type: 'data-file',
         data: {
-          files: [
-            {
-              id: '1',
-              name: 'sample.pdf',
-              url: 'https://pdfobject.com/pdf/sample.pdf',
-            },
-          ],
+          filename: 'sample.pdf',
+          mediaType: 'application/pdf',
+          url: 'https://pdfobject.com/pdf/sample.pdf',
         },
       },
     ],
@@ -172,11 +177,10 @@ export default function Page(): JSX.Element {
 }
 
 function CustomChat() {
-  const handler = useChat({ initialMessages })
-  const { imageUrl, getAnnotations, uploadFile, reset } = useFile({
+  const handler = useChat({ messages: initialMessages })
+  const { image, uploadFile, reset, getAttachments } = useFile({
     uploadAPI: '/chat/upload',
   })
-  const annotations = getAnnotations()
   const handleUpload = async (file: File) => {
     try {
       await uploadFile(file)
@@ -184,18 +188,19 @@ function CustomChat() {
       console.error(error)
     }
   }
+  const attachments = getAttachments()
   return (
     <ChatSection
       handler={handler}
       className="h-screen overflow-hidden p-0 md:p-5"
     >
       <CustomChatMessages />
-      <ChatInput annotations={annotations} resetUploadedFiles={reset}>
+      <ChatInput attachments={attachments} resetUploadedFiles={reset}>
         <div>
-          {imageUrl ? (
+          {image ? (
             <img
               className="max-h-[100px] object-contain"
-              src={imageUrl}
+              src={image.url}
               alt="uploaded"
             />
           ) : null}
@@ -214,7 +219,7 @@ function CustomChat() {
 }
 
 function CustomChatMessages() {
-  const { messages, isLoading, append } = useChatUI()
+  const { messages } = useChatUI()
   return (
     <ChatMessages>
       <ChatMessages.List className="px-0 md:px-16">
@@ -239,10 +244,9 @@ function CustomChatMessages() {
                     src="/llama.png"
                   />
                 </ChatMessage.Avatar>
-                <ChatMessage.Content isLoading={isLoading} append={append}>
-                  <ChatMessage.Content.Image />
-                  <ChatMessage.Content.Markdown />
-                  <ChatMessage.Content.DocumentFile />
+                <ChatMessage.Content>
+                  <ChatMessage.Part.File />
+                  <ChatMessage.Part.Markdown />
                 </ChatMessage.Content>
                 <ChatMessage.Actions />
               </ChatMessage>

@@ -1,5 +1,4 @@
 import { OpenAI } from '@llamaindex/openai'
-import { toAgentRunEvent, writeResponseToStream } from '@llamaindex/server'
 import { chatWithTools } from '@llamaindex/tools'
 import {
   createWorkflow,
@@ -12,6 +11,7 @@ import {
 import { ChatMessage, Settings, ToolCallLLM } from 'llamaindex'
 import { cliHumanInputEvent, cliHumanResponseEvent } from './events'
 import { cliExecutor } from './tools'
+import { runEvent, streamText } from '@llamaindex/server'
 
 Settings.llm = new OpenAI({
   model: 'gpt-4o-mini',
@@ -49,7 +49,7 @@ export const workflowFactory = (body: unknown) => {
     const command = cliExecutorToolCall?.input?.command as string
     if (command) {
       return cliHumanInputEvent.with({
-        type: 'cli_human_input',
+        type: 'data-cli_human_input',
         data: { command },
         response: cliHumanResponseEvent,
       })
@@ -70,14 +70,28 @@ export const workflowFactory = (body: unknown) => {
     }
 
     sendEvent(
-      toAgentRunEvent({
-        agent: 'CLI Executor',
-        text: `Execute the command "${command}" and return the result`,
-        type: 'text',
+      runEvent.with({
+        type: 'data-event',
+        data: {
+          status: 'pending',
+          title: 'Executing command',
+          description: `Executing the command "${command}"`,
+        },
       })
     )
 
     const result = (await cliExecutor.call({ command })) as string
+
+    sendEvent(
+      runEvent.with({
+        type: 'data-event',
+        data: {
+          status: 'success',
+          title: 'Command executed',
+          description: `Executed the command "${command}" and got the result: ${result}`,
+        },
+      })
+    )
 
     return summaryEvent.with(
       `Executed the command ${command} and got the result: ${result}`
@@ -97,7 +111,7 @@ export const workflowFactory = (body: unknown) => {
       stream: true,
     })
 
-    const result = await writeResponseToStream(stream, sendEvent)
+    const result = await streamText(stream, sendEvent)
 
     return stopAgentEvent.with({ result })
   })

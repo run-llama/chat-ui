@@ -1,18 +1,16 @@
 'use server'
 
-import { defaultAnnotationRenderers } from '@llamaindex/chat-ui'
-import { Markdown } from '@llamaindex/chat-ui/widgets'
-import { createStreamableUI } from 'ai/rsc'
+import { createStreamableUI } from '@ai-sdk/rsc'
 import { ReactNode } from 'react'
+import { MessagePart } from '@llamaindex/chat-ui'
+import { MessageDisplay } from './display'
 
-const TOKEN_DELAY = 30
-const ANNOTATION_DELAY = 300
-const INLINE_ANNOTATION_KEY = 'annotation'
+const DELAY = 300
 
 export async function chatAction(question: string) {
   const uiStream = createStreamableUI()
 
-  let assistantMsg = ''
+  let parts: MessagePart[] = []
 
   const responseStream = fakeChatStream(question)
   responseStream
@@ -20,17 +18,11 @@ export async function chatAction(question: string) {
       new WritableStream({
         write: (data: any) => {
           if (typeof data === 'string') {
-            assistantMsg += data
+            parts = parts.concat({ type: 'text', text: data })
           } else {
-            assistantMsg += toInlineAnnotationCode(data)
+            parts = parts.concat(data)
           }
-
-          uiStream.update(
-            <Markdown
-              content={assistantMsg}
-              annotationRenderers={defaultAnnotationRenderers}
-            />
-          )
+          uiStream.update(<MessageDisplay parts={parts} />)
         },
         close: () => {
           uiStream.done()
@@ -42,7 +34,7 @@ export async function chatAction(question: string) {
   return uiStream.value as Promise<ReactNode>
 }
 
-const SAMPLE_TEXT = [
+const SAMPLE_PARTS = [
   `
 Welcome to the demo of @llamaindex/chat-ui. Let me show you the different types of components that can be triggered from the server.
 
@@ -56,11 +48,11 @@ console.log(c)
 \`\`\`
 
 `,
-  '\n ### Demo inline annotations \n',
+  '\n ### Demo parts \n',
   'Here are some steps to create a simple wiki app: \n',
   '1. Create package.json file:',
   {
-    type: 'artifact',
+    type: 'data-artifact',
     data: {
       type: 'code',
       created_at: 1717334400000,
@@ -82,7 +74,7 @@ console.log(c)
   },
   '2. Check the wiki fetching script:',
   {
-    type: 'artifact',
+    type: 'data-artifact',
     data: {
       created_at: 1717334500000,
       type: 'code',
@@ -99,7 +91,7 @@ console.log(c)
   },
   '3. Run getWiki with the search term:',
   {
-    type: 'artifact',
+    type: 'data-artifact',
     data: {
       created_at: 1717334600000,
       type: 'code',
@@ -112,7 +104,7 @@ console.log(c)
   },
   '#### 🎯 Demo generating a document artifact',
   {
-    type: 'artifact',
+    type: 'data-artifact',
     data: {
       type: 'document',
       data: {
@@ -172,23 +164,12 @@ function fakeChatStream(question: string): ReadableStream {
     async start(controller) {
       controller.enqueue(`User question: ${question}. \n `)
 
-      for (const item of SAMPLE_TEXT) {
-        if (typeof item === 'string') {
-          for (const token of item.split(' ')) {
-            await new Promise(resolve => setTimeout(resolve, TOKEN_DELAY))
-            controller.enqueue(`${token} `)
-          }
-        } else {
-          await new Promise(resolve => setTimeout(resolve, ANNOTATION_DELAY))
-          controller.enqueue(item)
-        }
+      for (const item of SAMPLE_PARTS) {
+        await new Promise(resolve => setTimeout(resolve, DELAY))
+        controller.enqueue(item)
       }
 
       controller.close()
     },
   })
-}
-
-function toInlineAnnotationCode(item: any) {
-  return `\n\`\`\`${INLINE_ANNOTATION_KEY}\n${JSON.stringify(item)}\n\`\`\`\n`
 }

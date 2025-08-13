@@ -1,25 +1,36 @@
-import { ChatHandler } from '../chat/chat.interface'
+import { ChatContext } from '../chat/chat.interface'
+import { cn } from '../lib/utils'
+import { v4 as uuidv4 } from 'uuid'
 
 export type SuggestedQuestionsData = string[]
 
 export function SuggestedQuestions({
   questions,
-  append,
+  sendMessage,
   requestData,
+  className,
 }: {
   questions: SuggestedQuestionsData
-  append: ChatHandler['append']
+  sendMessage: ChatContext['sendMessage']
   requestData?: any
+  className?: string
 }) {
   const showQuestions = questions.length > 0
   return (
     showQuestions && (
-      <div className="flex flex-col space-y-2">
+      <div className={cn('flex flex-col space-y-2', className)}>
         {questions.map((question, index) => (
           <a
             key={index}
             onClick={() => {
-              append({ role: 'user', content: question }, { data: requestData })
+              sendMessage(
+                {
+                  id: uuidv4(),
+                  role: 'user',
+                  parts: [{ type: 'text', text: question }],
+                },
+                { body: requestData }
+              )
             }}
             className="cursor-pointer text-sm italic hover:underline"
           >

@@ -19,7 +19,7 @@ import {
 } from './artifacts'
 import { Message } from '../chat.interface'
 import { useChatUI } from '../chat.context'
-import { toInlineAnnotation } from '../annotations'
+import { v4 as uuid } from 'uuid'
 
 interface ChatCanvasContextType {
   allArtifacts: Artifact[]
@@ -51,7 +51,8 @@ export function ChatCanvasProvider({
   children: ReactNode
   autoOpenCanvas?: boolean
 }) {
-  const { messages, isLoading, append, requestData, setMessages } = useChatUI()
+  const { messages, isLoading, sendMessage, requestData, setMessages } =
+    useChatUI()
 
   const [isCanvasOpen, setIsCanvasOpen] = useState(false) // whether the canvas is open
   const [displayedArtifact, setDisplayedArtifact] = useState<Artifact>() // the artifact currently displayed in the canvas
@@ -107,19 +108,33 @@ export function ChatCanvasProvider({
       created_at: Date.now(),
     }
 
-    const newMessages = [
+    const newMessages: Message[] = [
       ...messages,
       {
         id: `restore-msg-${Date.now()}`,
         role: 'user',
-        content: `Restore to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
+        parts: [
+          {
+            type: 'text',
+            text: `Restore to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
+          },
+        ],
       },
       {
         id: `restore-success-${Date.now()}`,
         role: 'assistant',
-        content: `Successfully restored to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`,
+        parts: [
+          {
+            type: 'text',
+            text: `Successfully restored to ${artifact.type} version ${getArtifactVersion(artifact).versionNumber}`,
+          },
+          {
+            type: 'data-artifact',
+            data: newArtifact,
+          },
+        ],
       },
-    ] as (Message & { id: string })[]
+    ]
 
     setMessages(newMessages)
 
@@ -158,17 +173,33 @@ export function ChatCanvasProvider({
 
     if (!newArtifact) return
 
-    const newMessages = [
+    const newMessages: Message[] = [
       ...messages,
       {
+        id: uuid(),
         role: 'user',
-        content: `Update content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+        parts: [
+          {
+            type: 'text',
+            text: `Update content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+          },
+        ],
       },
       {
+        id: uuid(),
         role: 'assistant',
-        content: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}${toInlineAnnotation({ type: 'artifact', data: newArtifact })}`,
+        parts: [
+          {
+            type: 'text',
+            text: `Updated content for ${artifact.type} artifact version ${getArtifactVersion(artifact).versionNumber}`,
+          },
+          {
+            type: 'data-artifact',
+            data: newArtifact,
+          },
+        ],
       },
-    ] as (Message & { id: string })[]
+    ]
 
     setMessages(newMessages)
     openArtifactInCanvas(newArtifact)
@@ -201,12 +232,18 @@ export function ChatCanvasProvider({
   const fixCodeErrors = (artifact: CodeArtifact) => {
     const errors = getCodeErrors(artifact)
     if (errors.length === 0) return
-    append(
+    sendMessage(
       {
+        id: uuid(),
         role: 'user',
-        content: `Please fix the following errors: ${errors.join('\n')} happened when running the code.`,
+        parts: [
+          {
+            type: 'text',
+            text: `Please fix the following errors: ${errors.join('\n')} happened when running the code.`,
+          },
+        ],
       },
-      { data: requestData }
+      { body: requestData }
     )
   }
 
