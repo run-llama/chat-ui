@@ -34,7 +34,7 @@ export async function chatHandler(
   try {
     // extract query from last message
     const { messages } = await request.json()
-    const query = getText(messages[messages.length - 1]?.parts ?? [])
+    const query = getText(messages[messages.length - 1])
 
     // create a stream
     const stream = fakeChatStream(`User query: "${query}".\n`, parts)
