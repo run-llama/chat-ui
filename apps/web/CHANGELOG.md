@@ -1,5 +1,17 @@
 # web
 
+## 1.1.0
+
+### Minor Changes
+
+- 1ceb4ba: support vercel ai sdk ver 5
+
+### Patch Changes
+
+- Updated dependencies [1ceb4ba]
+  - @llamaindex/chat-ui@0.6.0
+  - @llamaindex/dynamic-ui@1.0.0
+
 ## 1.0.50
 
 ### Patch Changes

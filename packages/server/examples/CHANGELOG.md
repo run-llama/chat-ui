@@ -1,5 +1,16 @@
 # llamaindex-server-examples
 
+## 0.1.0
+
+### Minor Changes
+
+- 1ceb4ba: support vercel ai sdk ver 5
+
+### Patch Changes
+
+- Updated dependencies [1ceb4ba]
+  - @llamaindex/server@0.4.0
+
 ## 0.0.4
 
 ### Patch Changes

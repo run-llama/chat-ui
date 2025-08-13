@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.6.0
+
+### Minor Changes
+
+- 1ceb4ba: support vercel ai sdk ver 5
+
 ## 0.5.17
 
 ### Patch Changes

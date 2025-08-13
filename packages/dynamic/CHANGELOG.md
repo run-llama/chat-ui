@@ -1,5 +1,12 @@
 # @llamaindex/dynamic-ui
 
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies [1ceb4ba]
+  - @llamaindex/chat-ui@0.6.0
+
 ## 0.0.4
 
 ### Patch Changes
