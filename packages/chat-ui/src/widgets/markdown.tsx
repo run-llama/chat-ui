@@ -1,13 +1,13 @@
-import { FC, memo, ComponentType } from 'react'
-import ReactMarkdown, { Options } from 'react-markdown'
+import { ComponentType, FC, memo } from 'react'
+import ReactMarkdown, { Components, Options } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import { CodeBlock } from './codeblock'
-import { DocumentInfo } from './document-info'
+import { cn } from '../lib/utils'
 import { SourceData } from './chat-sources'
 import { Citation, CitationComponentProps } from './citation'
-import { cn } from '../lib/utils'
+import { CodeBlock } from './codeblock'
+import { DocumentInfo } from './document-info'
 
 const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -110,21 +110,38 @@ export interface LanguageRendererProps {
   className?: string
 }
 
+type ReactStyleMarkdownComponents = {
+  // Extract pulls out the ComponentType side of unions like ComponentType | string
+  // react-markdown supports passing "h1" for example, which is difficult to
+  [K in keyof Components]?: Extract<Components[K], FC<any>>
+}
+
+// Simple function to render a component if provided, otherwise use fallback
+function combineComponent<Props>(
+  component: FC<Props> | undefined,
+  fallback: FC<Props>
+): FC<Props> {
+  return props => component?.(props) || fallback(props)
+}
+
+export interface MarkdownProps {
+  content: string
+  sources?: SourceData
+  backend?: string
+  components?: ReactStyleMarkdownComponents
+  citationComponent?: ComponentType<CitationComponentProps>
+  className?: string
+  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
+}
 export function Markdown({
   content,
   sources,
   backend,
   citationComponent: CitationComponent,
   className: customClassName,
+  components,
   languageRenderers,
-}: {
-  content: string
-  sources?: SourceData
-  backend?: string
-  citationComponent?: ComponentType<CitationComponentProps>
-  className?: string
-  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
-}) {
+}: MarkdownProps) {
   const processedContent = preprocessContent(content)
 
   return (
@@ -137,49 +154,53 @@ export function Markdown({
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex as any]}
         components={{
-          p({ children }) {
+          ...components,
+          p: combineComponent(components?.p, ({ children }) => {
             return <div className="mb-2 last:mb-0">{children}</div>
-          },
-          code({ inline, className, children, ...props }) {
-            if (children.length) {
-              if (children[0] === '▍') {
+          }),
+          code: combineComponent(
+            components?.code,
+            ({ inline, className, children, ...props }) => {
+              if (children.length) {
+                if (children[0] === '▍') {
+                  return (
+                    <span className="mt-1 animate-pulse cursor-default">▍</span>
+                  )
+                }
+
+                children[0] = (children[0] as string).replace('`▍`', '▍')
+              }
+
+              const match = /language-(\w+)/.exec(className || '')
+              const language = (match && match[1]) || ''
+              const codeValue = String(children).replace(/\n$/, '')
+
+              if (inline) {
                 return (
-                  <span className="mt-1 animate-pulse cursor-default">▍</span>
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
                 )
               }
 
-              children[0] = (children[0] as string).replace('`▍`', '▍')
-            }
+              // Check for custom language renderer
+              if (languageRenderers?.[language]) {
+                const CustomRenderer = languageRenderers[language]
+                return <CustomRenderer code={codeValue} className="mb-2" />
+              }
 
-            const match = /language-(\w+)/.exec(className || '')
-            const language = (match && match[1]) || ''
-            const codeValue = String(children).replace(/\n$/, '')
-
-            if (inline) {
               return (
-                <code className={className} {...props}>
-                  {children}
-                </code>
+                <CodeBlock
+                  key={Math.random()}
+                  language={language}
+                  value={codeValue}
+                  className="mb-2"
+                  {...props}
+                />
               )
             }
-
-            // Check for custom language renderer
-            if (languageRenderers?.[language]) {
-              const CustomRenderer = languageRenderers[language]
-              return <CustomRenderer code={codeValue} className="mb-2" />
-            }
-
-            return (
-              <CodeBlock
-                key={Math.random()}
-                language={language}
-                value={codeValue}
-                className="mb-2"
-                {...props}
-              />
-            )
-          },
-          a({ href, children }) {
+          ),
+          a: combineComponent(components?.a, ({ href, children }) => {
             // If href starts with `{backend}/api/files`, then it's a local document and we use DocumentInfo for rendering
             if (href?.startsWith(`${backend}/api/files`)) {
               // Check if the file is document file type
@@ -231,7 +252,7 @@ export function Markdown({
                 {children}
               </a>
             )
-          },
+          }),
         }}
       >
         {processedContent}
