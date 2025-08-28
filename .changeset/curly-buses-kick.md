@@ -1,5 +1,5 @@
 ---
-"@llamaindex/chat-ui": patch
+'@llamaindex/chat-ui': patch
 ---
 
 Expose ReactMarkdown `components` prop
