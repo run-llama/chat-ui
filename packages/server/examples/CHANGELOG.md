@@ -1,5 +1,11 @@
 # llamaindex-server-examples
 
+## 0.1.1
+
+### Patch Changes
+
+- @llamaindex/server@0.4.1
+
 ## 0.1.0
 
 ### Minor Changes
