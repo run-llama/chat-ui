@@ -1,20 +1,19 @@
-import { ComponentType } from 'react'
 import { cn } from '../../../lib/utils.js'
 import {
-  CitationComponentProps,
-  LanguageRendererProps,
   Markdown,
   preprocessSourceNodes,
+  type MarkdownProps,
 } from '../../../widgets/index.js'
 import { useChatMessage } from '../../chat-message.context.js'
-import { SourcesPartType, TextPartType } from '../types.js'
 import { usePart } from '../context.js'
+import { SourcesPartType, TextPartType } from '../types.js'
 import { getParts } from '../utils.js'
 
 interface ChatMarkdownProps extends React.PropsWithChildren {
-  citationComponent?: ComponentType<CitationComponentProps>
+  components?: MarkdownProps['components']
+  citationComponent?: MarkdownProps['citationComponent']
   className?: string
-  languageRenderers?: Record<string, ComponentType<LanguageRendererProps>>
+  languageRenderers?: MarkdownProps['languageRenderers']
 }
 
 /**
@@ -41,6 +40,7 @@ export function MarkdownPartUI(props: ChatMarkdownProps) {
     <Markdown
       content={markdown}
       sources={{ nodes }}
+      components={props.components}
       citationComponent={props.citationComponent}
       languageRenderers={props.languageRenderers}
       className={cn(
