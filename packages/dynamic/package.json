@@ -1,6 +1,6 @@
 {
   "name": "@llamaindex/dynamic-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "types": "./dist/index.d.ts",
   "type": "module",
   "files": [

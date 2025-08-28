@@ -1,5 +1,11 @@
 # @llamaindex/chat-ui
 
+## 0.6.1
+
+### Patch Changes
+
+- b092d5e: Expose ReactMarkdown `components` prop
+
 ## 0.6.0
 
 ### Minor Changes
