@@ -33,10 +33,11 @@ npm install @llamaindex/chat-ui
 
 ## Usage
 
-1. Install the package
+1. Install the package (also install src helpers if not)
 
 ```sh
 npm install @llamaindex/chat-ui
+npm install --save-dev @swc/helpers@latest 
 ```
 
 2. Configure Tailwind CSS to include the chat-ui components
