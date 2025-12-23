@@ -1,7 +1,7 @@
 import { Send, Square } from 'lucide-react'
 import { createContext, useContext, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
-import { Button } from '../ui/button'
+import { Button, ButtonProps } from '../ui/button'
 import { Textarea } from '../ui/textarea'
 import { FileUploader } from '../widgets/index.js' // this import needs the file extension as it's importing the widget bundle
 import { useChatUI } from './chat.context'
@@ -15,11 +15,16 @@ interface ChatInputProps extends React.PropsWithChildren {
   attachments?: MessagePart[]
 }
 
-interface ChatInputFormProps extends React.PropsWithChildren {
+type FormProps = Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onSubmit'>
+interface ChatInputFormProps extends FormProps, React.PropsWithChildren {
   className?: string
 }
 
-interface ChatInputFieldProps {
+type TextAreaProps = Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  'onChange'
+>
+interface ChatInputFieldProps extends TextAreaProps {
   className?: string
   placeholder?: string
 }
@@ -31,7 +36,7 @@ interface ChatInputUploadProps {
   multiple?: boolean
 }
 
-interface ChatInputSubmitProps extends React.PropsWithChildren {
+interface ChatInputSubmitProps extends ButtonProps, React.PropsWithChildren {
   className?: string
   disabled?: boolean
 }
@@ -113,7 +118,8 @@ function ChatInput(props: ChatInputProps) {
 
 function ChatInputForm(props: ChatInputFormProps) {
   const { handleSubmit } = useChatInput()
-  const children = props.children ?? (
+  const { children: childrenProp, ...formProps } = props
+  const children = childrenProp ?? (
     <>
       <ChatInputField />
       <ChatInputSubmit />
@@ -123,6 +129,7 @@ function ChatInputForm(props: ChatInputFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
+      {...formProps}
       className={cn('relative flex gap-2', props.className)}
     >
       {children}
@@ -134,6 +141,7 @@ function ChatInputField(props: ChatInputFieldProps) {
   const { input, setInput } = useChatUI()
   const { handleKeyDown, setIsComposing } = useChatInput()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { placeholder, className, ...textareaProps } = props
 
   // auto resize the textarea based on the content
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -150,12 +158,14 @@ function ChatInputField(props: ChatInputFieldProps) {
 
   return (
     <Textarea
-      ref={textareaRef}
       name="input"
-      placeholder={props.placeholder ?? 'Type a message...'}
+      spellCheck={false}
+      {...textareaProps}
+      ref={textareaRef}
+      placeholder={placeholder ?? 'Type a message...'}
       className={cn(
         'bg-secondary h-[100px] max-h-[400px] min-h-0 flex-1 resize-none overflow-y-auto rounded-2xl p-4',
-        props.className
+        className
       )}
       value={input}
       onChange={handleInputChange}
@@ -164,7 +174,6 @@ function ChatInputField(props: ChatInputFieldProps) {
       onCompositionEnd={() => {
         setTimeout(() => setIsComposing(false), 100)
       }}
-      spellCheck={false}
     />
   )
 }
@@ -199,6 +208,7 @@ function ChatInputUpload(props: ChatInputUploadProps) {
 function ChatInputSubmit(props: ChatInputSubmitProps) {
   const { stop, isLoading } = useChatUI()
   const { isDisabled } = useChatInput()
+  const { disabled, className, children, ...buttonProps } = props
 
   if (stop && isLoading) {
     return (
@@ -217,10 +227,11 @@ function ChatInputSubmit(props: ChatInputSubmitProps) {
     <Button
       type="submit"
       size="icon"
-      disabled={props.disabled ?? isDisabled}
-      className={cn('absolute bottom-2 right-2 rounded-full', props.className)}
+      {...buttonProps}
+      disabled={disabled ?? isDisabled}
+      className={cn('absolute bottom-2 right-2 rounded-full', className)}
     >
-      {props.children ?? <Send className="size-4" />}
+      {children ?? <Send className="size-4" />}
     </Button>
   )
 }
